@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 cd "$CLAUDE_PROJECT_DIR/.claude/hooks"
-cat | npx tsx subagent-stop-continuity.ts
+cat | node dist/subagent-stop-continuity.mjs

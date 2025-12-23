@@ -1,5 +1,4 @@
 #!/bin/bash
 set -e
-
 cd "$CLAUDE_PROJECT_DIR/.claude/hooks"
-cat | npx tsx pre-compact-continuity.ts
+cat | node dist/pre-compact-continuity.mjs

@@ -104,8 +104,11 @@ Desktop.ini
 .claude/cache/
 .claude/tsc-cache/
 
-# Node modules in hooks
+# Node modules in hooks (dev deps only)
 .claude/hooks/node_modules/
+
+# Include bundled hooks (zero-dep runtime)
+!.claude/hooks/dist/
 
 # Continuity ledgers (session-specific, not shared)
 CONTINUITY_CLAUDE-*

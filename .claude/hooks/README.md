@@ -2,15 +2,37 @@
 
 Claude Code hooks that enable skill auto-activation, file tracking, and validation.
 
+**Zero runtime dependencies** - hooks are pre-bundled, just clone and go.
+
+---
+
+## Architecture
+
+```
+hooks/
+├── src/              # TypeScript source (for development)
+├── dist/             # Pre-bundled JS (committed, ready to run)
+├── *.sh              # Shell wrappers (call node dist/*.mjs)
+├── build.sh          # Rebuild dist/ after modifying src/
+└── package.json      # Dev dependencies only (esbuild)
+```
+
+**For users:** Just clone the repo. Hooks work immediately.
+
+**For developers:** Edit `src/*.ts`, then run `./build.sh` to rebuild.
+
 ---
 
 ## What Are Hooks?
 
 Hooks are scripts that run at specific points in Claude's workflow:
 - **UserPromptSubmit**: When user submits a prompt
-- **PreToolUse**: Before a tool executes  
+- **PreToolUse**: Before a tool executes
 - **PostToolUse**: After a tool completes
-- **Stop**: When user requests to stop
+- **SessionStart**: When a session starts/resumes
+- **SessionEnd**: When a session ends
+- **PreCompact**: Before context compaction
+- **SubagentStop**: When a subagent completes
 
 **Key insight:** Hooks can modify prompts, block actions, and track state - enabling features Claude can't do alone.
 
@@ -32,16 +54,11 @@ Hooks are scripts that run at specific points in Claude's workflow:
 
 **Integration:**
 ```bash
-# Copy both files
-cp skill-activation-prompt.sh your-project/.claude/hooks/
-cp skill-activation-prompt.ts your-project/.claude/hooks/
+# Just copy - no npm install needed!
+cp -r .claude/hooks your-project/.claude/
 
-# Make executable
-chmod +x your-project/.claude/hooks/skill-activation-prompt.sh
-
-# Install dependencies
-cd your-project/.claude/hooks
-npm install
+# Make shell scripts executable
+chmod +x your-project/.claude/hooks/*.sh
 ```
 
 **Add to settings.json:**
@@ -62,30 +79,19 @@ npm install
 }
 ```
 
-**Customization:** ✅ None needed - reads skill-rules.json automatically
-
 ---
 
 ### post-tool-use-tracker (PostToolUse)
 
-**Purpose:** Tracks file changes to maintain context across sessions
+**Purpose:** Tracks file changes and build attempts for context management
 
 **How it works:**
-1. Monitors Edit/Write/MultiEdit tool calls
+1. Monitors Edit/Write/Bash tool calls
 2. Records which files were modified
-3. Creates cache for context management
+3. Captures build/test pass/fail for reasoning
 4. Auto-detects project structure (frontend, backend, packages, etc.)
 
 **Why it's essential:** Helps Claude understand what parts of your codebase are active.
-
-**Integration:**
-```bash
-# Copy file
-cp post-tool-use-tracker.sh your-project/.claude/hooks/
-
-# Make executable
-chmod +x your-project/.claude/hooks/post-tool-use-tracker.sh
-```
 
 **Add to settings.json:**
 ```json
@@ -93,7 +99,7 @@ chmod +x your-project/.claude/hooks/post-tool-use-tracker.sh
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|MultiEdit|Write",
+        "matcher": "Edit|MultiEdit|Write|Bash",
         "hooks": [
           {
             "type": "command",
@@ -106,45 +112,44 @@ chmod +x your-project/.claude/hooks/post-tool-use-tracker.sh
 }
 ```
 
-**Customization:** ✅ None needed - auto-detects structure
+---
+
+## Continuity Hooks
+
+### session-start-continuity (SessionStart)
+
+**Purpose:** Loads continuity ledger on session start/resume/compact
+
+### pre-compact-continuity (PreCompact)
+
+**Purpose:** Auto-creates handoff document before context compaction
+
+### session-end-cleanup (SessionEnd)
+
+**Purpose:** Updates ledger timestamp, cleans old cache
+
+### subagent-stop-continuity (SubagentStop)
+
+**Purpose:** Logs agent output to ledger and cache for resumability
 
 ---
 
-## Optional Hooks (Require Customization)
+## Development
 
-### tsc-check (Stop)
+To modify hooks:
 
-**Purpose:** TypeScript compilation check when user stops
+```bash
+# Edit TypeScript source
+vim src/skill-activation-prompt.ts
 
-**⚠️ WARNING:** Configured for multi-service monorepo structure
+# Rebuild bundled JS
+./build.sh
 
-**Integration:**
+# Test
+echo '{"prompt": "test"}' | ./skill-activation-prompt.sh
+```
 
-**First, determine if this is right for you:**
-- ✅ Use if: Multi-service TypeScript monorepo
-- ❌ Skip if: Single-service project or different build setup
-
-**If using:**
-1. Copy tsc-check.sh
-2. **EDIT the service detection (line ~28):**
-   ```bash
-   # Replace example services with YOUR services:
-   case "$repo" in
-       api|web|auth|payments|...)  # ← Your actual services
-   ```
-3. Test manually before adding to settings.json
-
-**Customization:** ⚠️⚠️⚠️ Heavy
-
----
-
-### trigger-build-resolver (Stop)
-
-**Purpose:** Auto-launches build-error-resolver agent when compilation fails
-
-**Depends on:** tsc-check hook working correctly
-
-**Customization:** ✅ None (but tsc-check must work first)
+The `build.sh` script will install dev dependencies (esbuild) if needed.
 
 ---
 
@@ -152,12 +157,10 @@ chmod +x your-project/.claude/hooks/post-tool-use-tracker.sh
 
 **When setting up hooks for a user:**
 
-1. **Read [CLAUDE_INTEGRATION_GUIDE.md](../../CLAUDE_INTEGRATION_GUIDE.md)** first
-2. **Always start with the two essential hooks**
-3. **Ask before adding Stop hooks** - they can block if misconfigured  
+1. **Copy the hooks directory** - no npm install needed
+2. **Make shell scripts executable:** `chmod +x .claude/hooks/*.sh`
+3. **Add to settings.json** as shown above
 4. **Verify after setup:**
    ```bash
    ls -la .claude/hooks/*.sh | grep rwx
    ```
-
-**Questions?** See [CLAUDE_INTEGRATION_GUIDE.md](../../CLAUDE_INTEGRATION_GUIDE.md)

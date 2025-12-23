@@ -65,9 +65,8 @@ Fresh context + ledger loaded
 git clone https://github.com/parcadei/claude-continuity-kit.git
 cd claude-continuity-kit
 
-# Install
+# Install Python deps
 uv sync
-cd .claude/hooks && npm install && cd ../..
 
 # Configure (add your API keys)
 cp .env.example .env
@@ -78,6 +77,8 @@ uv run mcp-generate
 # Start
 claude
 ```
+
+**Zero-dep hooks** - hooks are pre-bundled, no `npm install` needed.
 
 The continuity system loads automatically via hooks.
 
@@ -372,14 +373,21 @@ Runs: Every message you send
 
 ### How Hooks Work
 
-Shell wrapper (`.sh`) pipes input to TypeScript (`.ts`) via `npx tsx`:
+Hooks are **pre-bundled** - no runtime dependencies needed. Shell wrappers call bundled JS:
 
 ```bash
 # .claude/hooks/session-start-continuity.sh
 #!/bin/bash
 set -e
 cd "$CLAUDE_PROJECT_DIR/.claude/hooks"
-cat | npx tsx session-start-continuity.ts
+cat | node dist/session-start-continuity.mjs
+```
+
+**For developers** who want to modify hooks:
+```bash
+cd .claude/hooks
+vim src/session-start-continuity.ts  # Edit source
+./build.sh                            # Rebuild dist/
 ```
 
 Hooks receive JSON input and return JSON output:
