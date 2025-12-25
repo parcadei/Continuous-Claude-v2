@@ -285,6 +285,11 @@ Continue with installation? [y/N] y
 
 Installing Continuous Claude to ~/.claude...
 
+✓ uv installed (Python package manager)
+✓ qlty installed (code quality toolkit)
+Installing MCP runtime package globally...
+✓ MCP commands installed: mcp-exec, mcp-generate, mcp-discover
+
 Creating full backup at ~/.claude-backup-20251225_043445...
 Backup complete. To restore: rm -rf ~/.claude && mv ~/.claude-backup-<timestamp> ~/.claude
 
@@ -1267,10 +1272,11 @@ If you write code first, the skill prompts you to delete it and start with a tes
 
 ## Code Quality (qlty)
 
-Install qlty:
+**Automatically installed** by `install-global.sh`. The `.qlty/` config is included in this repo, so no `qlty init` needed.
+
+Manual install (if needed):
 ```bash
 curl -fsSL https://qlty.sh/install.sh | bash
-qlty init
 ```
 
 Use it:
@@ -1323,7 +1329,7 @@ NIA_API_KEY="nk_..."
 Services without API keys still work:
 - `git` - local git operations
 - `ast-grep` - structural code search
-- `qlty` - code quality (after install)
+- `qlty` - code quality (auto-installed by `install-global.sh`)
 
 License-based (no API key, requires purchase):
 - `repoprompt` - codebase maps (Free tier: basic features; Pro: MCP tools, CodeMaps)

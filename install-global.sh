@@ -73,6 +73,19 @@ if ! command -v uv &> /dev/null; then
     echo ""
 fi
 
+# Install qlty if not present (required for code quality checks)
+if ! command -v qlty &> /dev/null && [ ! -f "$HOME/.qlty/bin/qlty" ]; then
+    echo "Installing qlty (code quality toolkit)..."
+    curl -fsSL https://qlty.sh/install.sh | bash
+    # Add to PATH for this session
+    export PATH="$HOME/.qlty/bin:$PATH"
+    echo "✓ qlty installed"
+    echo ""
+elif command -v qlty &> /dev/null || [ -f "$HOME/.qlty/bin/qlty" ]; then
+    echo "✓ qlty already installed"
+    echo ""
+fi
+
 # Install MCP runtime package globally (makes mcp-exec, mcp-generate available everywhere)
 echo "Installing MCP runtime package globally..."
 cd "$SCRIPT_DIR"
@@ -243,6 +256,9 @@ echo "                   Get key: https://trynia.ai"
 echo ""
 echo "  GitHub         - GitHub code/issue search (/github-search)"
 echo "                   Get key: https://github.com/settings/tokens"
+echo ""
+echo "  Qlty           - Code quality checks (/qlty-check)"
+echo "                   Auto-installed by this script (no API key needed)"
 echo ""
 echo "Add keys to: ~/.claude/.env"
 echo ""
