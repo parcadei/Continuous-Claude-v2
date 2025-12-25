@@ -255,6 +255,22 @@ claude
 
 This installs skills, agents, rules, and hooks to `~/.claude/`. Now you can use continuity, handoffs, and all other features from any project.
 
+### Option 3: Initialize a New Project
+
+After global install, set up any project for full continuity support:
+
+```bash
+cd your-project
+~/.claude/scripts/init-project.sh
+# Or if you cloned this repo:
+./init-project.sh
+```
+
+This creates:
+- `thoughts/` - Plans, handoffs, ledgers (gitignored)
+- `.claude/cache/artifact-index/` - Local search database
+- Adds `.claude/cache/` to `.gitignore`
+
 ### What's Optional?
 
 All external services are optional. Without API keys:
@@ -348,12 +364,19 @@ This kit responds to natural language triggers. Say certain phrases and Claude a
 | "ast", "find all calls", "refactor", "codemod" | Runs **ast-grep-find** (structural search) |
 | "search github", "find repo", "github issue" | Runs **github-search** |
 
+### Learning & Insights
+
+| Say This | What Happens |
+|----------|--------------|
+| "compound learnings", "turn learnings into rules" | Runs **compound-learnings** - transforms session learnings into skills/rules |
+| "analyze session", "what happened", "session insights" | Runs **braintrust-analyze** to review traces |
+| "recall", "what was tried", "past reasoning" | Searches **reasoning history** |
+
 ### Other
 
 | Say This | What Happens |
 |----------|--------------|
 | "scrape", "fetch url", "crawl" | Runs **firecrawl-scrape** |
-| "recall", "what was tried", "past reasoning" | Searches **reasoning history** (see below) |
 | "create skill", "skill triggers", "skill system" | Runs **skill-developer** meta-skill |
 | "codebase structure", "file tree", "signatures" | Runs **repoprompt** for code maps |
 
