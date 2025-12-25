@@ -5,6 +5,9 @@
 # FIXED: Per-session state files to prevent multi-instance clobbering
 ###
 
+# Load environment from ~/.claude/.env if it exists
+[ -f "$HOME/.claude/.env" ] && set -a && source "$HOME/.claude/.env" && set +a
+
 # Config
 export LOG_FILE="$HOME/.claude/state/braintrust_hook.log"
 export STATE_DIR="$HOME/.claude/state/braintrust_sessions"
