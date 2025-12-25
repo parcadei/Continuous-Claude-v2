@@ -122,3 +122,5 @@ thoughts/
 !thoughts/shared/handoffs/.gitkeep
 package.json
 pnpm-lock.yaml
+node_modules/
+workspace/
