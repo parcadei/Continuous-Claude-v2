@@ -40,10 +40,10 @@ Session continuity, token-efficient MCP execution, and agentic workflows for Cla
 │          │                  │                  │                  │         │
 │          ▼                  ▼                  ▼                  ▼         │
 │   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐   ┌───────────┐   │
-│   │Load Ledger   │   │PostToolUse   │   │Auto-Handoff  │   │Mark       │   │
-│   │Load Handoff  │   │UserPrompt    │   │Block Manual  │   │Outcome    │   │
-│   │Surface       │   │SubagentStop  │   │              │   │Cleanup    │   │
-│   │Learnings     │   │              │   │              │   │Learn      │   │
+│   │Load Ledger   │   │PreToolUse    │   │Auto-Handoff  │   │Mark       │   │
+│   │Load Handoff  │   │ TS Preflight │   │Block Manual  │   │Outcome    │   │
+│   │Surface       │   │PostToolUse   │   │              │   │Cleanup    │   │
+│   │Learnings     │   │UserPrompt    │   │              │   │Learn      │   │
 │   └──────────────┘   └──────────────┘   └──────────────┘   └───────────┘   │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -83,9 +83,10 @@ Session continuity, token-efficient MCP execution, and agentic workflows for Cla
 │  ├──────────────────┤             │  │  ├──────────────────┤             │
 │  │ tdd-workflow     │ Red/Green   │  │  │ debug-agent      │ Debug       │
 │  ├──────────────────┤             │  │  ├──────────────────┤             │
-│  │ compound-learn   │ Make rules  │  │  │ rp-explorer      │ Codebase    │
-│  └──────────────────┘             │  │  └──────────────────┘             │
-│                                   │  │                                   │
+│  │ hook-developer   │ Hook ref    │  │  │ rp-explorer      │ Codebase    │
+│  ├──────────────────┤             │  │  └──────────────────┘             │
+│  │ compound-learn   │ Make rules  │  │                                   │
+│  └──────────────────┘             │  │                                   │
 └───────────────────────────────────┘  └───────────────────────────────────┘
                 │                                        │
                 └────────────────────┬───────────────────┘
