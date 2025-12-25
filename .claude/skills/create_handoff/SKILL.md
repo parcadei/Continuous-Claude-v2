@@ -135,6 +135,33 @@ Handoff created and synced! You can resume from this handoff in a new session wi
 </example_response>
 
 ---
+
+### 4. Mark Session Outcome
+
+After confirming the handoff was created, use the AskUserQuestion tool to ask about the session outcome:
+
+```
+Question: "How did this task/session go?"
+Options:
+  - SUCCEEDED: Task completed successfully
+  - PARTIAL_PLUS: Mostly done, minor issues remain
+  - PARTIAL_MINUS: Some progress, major issues remain
+  - FAILED: Task abandoned or blocked
+```
+
+Based on the user's response, run:
+```bash
+uv run python scripts/context_graph_mark.py --handoff <handoff_id> --outcome <OUTCOME>
+```
+
+To get the handoff_id, query the database:
+```bash
+sqlite3 .claude/cache/context-graph/context.db "SELECT id FROM handoffs ORDER BY indexed_at DESC LIMIT 1"
+```
+
+If the database doesn't exist yet (first handoff), skip this step.
+
+---
 ##.  Additional Notes & Instructions
 - **more information, not less**. This is a guideline that defines the minimum of what a handoff should be. Always feel free to include more information if necessary.
 - **be thorough and precise**. include both top-level objectives, and lower-level details as necessary.
