@@ -45,11 +45,33 @@ rp-cli -e 'structure .'
 rp-cli -e 'builder "understand the codebase architecture"'
 ```
 
-**Workspace switching notes:**
-- `workspace list` shows available workspaces
-- `workspace switch "<name>"` switches to a workspace by name
-- `--workspace <name>` flag is shorthand for switch + execute
-- If the project isn't in RepoPrompt, the commands will fail - use bash fallback
+**Workspace handling (IMPORTANT):**
+
+RepoPrompt workspaces are shared state. Switching affects ALL Claude instances.
+
+**Safe pattern:**
+```bash
+# 1. Check current workspace first
+rp-cli -e 'workspace list'
+
+# 2. If already on correct project, just use it
+rp-cli -e 'tree'
+
+# 3. If on wrong project, DON'T switch - fall back to bash
+# Switching could disrupt another Claude instance's work
+```
+
+**If you must switch (user has only one instance):**
+```bash
+# Use window targeting to be explicit
+rp-cli -e 'windows'              # List windows
+rp-cli -w 1 -e 'workspace switch "<project>"'  # Target window 1
+```
+
+**When to fall back to bash:**
+- Workspace doesn't match and you're unsure about other instances
+- Project isn't in RepoPrompt at all
+- rp-cli commands fail
 
 **Fallback (no RepoPrompt):**
 
