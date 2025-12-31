@@ -110,16 +110,6 @@ Desktop.ini
 # Include bundled hooks (zero-dep runtime)
 !.claude/hooks/dist/
 
-# Continuity ledgers (session-specific, not shared)
-CONTINUITY_CLAUDE-*
-
-# Thoughts directory (user-specific research and plans)
-thoughts/
-!thoughts/shared/
-!thoughts/shared/.gitkeep
-!thoughts/shared/plans/.gitkeep
-!thoughts/shared/research/.gitkeep
-!thoughts/shared/handoffs/.gitkeep
 package.json
 pnpm-lock.yaml
 node_modules/

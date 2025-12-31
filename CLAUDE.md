@@ -1,5 +1,31 @@
 # CLAUDE.md - Claude Code Operational Guide
 
+## Directory Documentation
+
+Each major directory has its own CLAUDE.md with detailed context:
+
+| Directory | Documentation | Purpose |
+|-----------|---------------|---------|
+| `.claude/` | [.claude/CLAUDE.md](.claude/CLAUDE.md) | Skills, agents, rules, hooks configuration |
+| `.claude/skills/` | [.claude/skills/CLAUDE.md](.claude/skills/CLAUDE.md) | 35+ reusable expert tools |
+| `.claude/agents/` | [.claude/agents/CLAUDE.md](.claude/agents/CLAUDE.md) | 14 specialized autonomous workers |
+| `.claude/rules/` | [.claude/rules/CLAUDE.md](.claude/rules/CLAUDE.md) | 11 operational guidelines |
+| `.claude/hooks/` | [.claude/hooks/CLAUDE.md](.claude/hooks/CLAUDE.md) | Event-driven automation |
+| `src/` | [src/CLAUDE.md](src/CLAUDE.md) | Source code overview |
+| `src/runtime/` | [src/runtime/CLAUDE.md](src/runtime/CLAUDE.md) | Core MCP execution engine |
+| `src/prompts/` | [src/prompts/CLAUDE.md](src/prompts/CLAUDE.md) | LLM prompt templates |
+| `scripts/` | [scripts/CLAUDE.md](scripts/CLAUDE.md) | CLI-based MCP workflows |
+| `tests/` | [tests/CLAUDE.md](tests/CLAUDE.md) | Test suite guide |
+| `tests/unit/` | [tests/unit/CLAUDE.md](tests/unit/CLAUDE.md) | Unit tests with mocks |
+| `tests/integration/` | [tests/integration/CLAUDE.md](tests/integration/CLAUDE.md) | Integration tests with real servers |
+| `thoughts/` | [thoughts/CLAUDE.md](thoughts/CLAUDE.md) | Session continuity system |
+| `thoughts/shared/` | [thoughts/shared/CLAUDE.md](thoughts/shared/CLAUDE.md) | Cross-session documentation |
+| `thoughts/shared/plans/` | [thoughts/shared/plans/CLAUDE.md](thoughts/shared/plans/CLAUDE.md) | Implementation plans |
+| `thoughts/shared/research/` | [thoughts/shared/research/CLAUDE.md](thoughts/shared/research/CLAUDE.md) | Codebase analysis |
+| `thoughts/shared/handoffs/` | [thoughts/shared/handoffs/CLAUDE.md](thoughts/shared/handoffs/CLAUDE.md) | Session transfer documents |
+
+---
+
 **Terminology:**
 - **Skills** = Claude Code native format (.claude/skills/ with SKILL.md) - Auto-discovered
 - **Scripts** = CLI-based Python workflows (./scripts/) - Agent-agnostic
