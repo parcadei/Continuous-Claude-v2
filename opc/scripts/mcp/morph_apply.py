@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Morph Fast Apply - Apply code edits using AI-assisted diff application.
+r"""Morph Fast Apply - Apply code edits using AI-assisted diff application.
 
 Use Cases:
 - Apply targeted code changes without reading entire files

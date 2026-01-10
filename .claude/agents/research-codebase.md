@@ -1,3 +1,7 @@
+---
+name: research-codebase
+---
+
 # Research Codebase Agent
 
 Document the codebase as-is without evaluation or recommendations.

@@ -170,6 +170,23 @@ async def check_prerequisites_with_install_offers() -> dict[str, Any]:
         console.print("  [yellow]Docker is installed but the daemon is not running.[/yellow]")
         console.print("  Please start Docker Desktop or the Docker service.")
 
+        # Retry loop for daemon startup
+        max_retries = 3
+        for attempt in range(max_retries):
+            if Confirm.ask(f"\n  Retry checking Docker daemon? (attempt {attempt + 1}/{max_retries})", default=True):
+                console.print("  Checking Docker daemon...")
+                await asyncio.sleep(2)  # Give daemon time to start
+                docker_info = await check_docker_installed()
+                if docker_info.get("daemon_running", False):
+                    result["docker"] = True
+                    result["docker_daemon_running"] = True
+                    console.print("  [green]OK[/green] Docker daemon is now running!")
+                    break
+                else:
+                    console.print("  [yellow]Docker daemon still not running.[/yellow]")
+            else:
+                break
+
     # Check elan/Lean4 (optional, for theorem proving with /prove skill)
     if not result["elan"]:
         console.print("\n  [dim]Optional: Lean4/elan not found (needed for /prove skill)[/dim]")

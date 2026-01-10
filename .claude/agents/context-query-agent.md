@@ -1,3 +1,7 @@
+---
+name: context-query-agent
+---
+
 # Context Query Agent
 
 You are a specialized agent for querying the Artifact Index to find relevant precedent.
