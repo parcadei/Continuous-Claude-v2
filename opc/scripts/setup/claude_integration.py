@@ -495,10 +495,11 @@ def install_opc_integration(
             shutil.copytree(opc_scripts_core, target_scripts_core)
             result["installed_scripts"] = len(list(target_scripts_core.rglob("*.py")))
 
-        # Copy scripts/math/ for math computation support
+        # Copy scripts/mathtools/ for math computation support
         # This enables sympy_compute, pint_compute, math_router, etc.
-        opc_scripts_math = opc_source.parent / "opc" / "scripts" / "math"
-        target_scripts_math = target_dir / "scripts" / "math"
+        # Named 'mathtools' to avoid shadowing Python's stdlib 'math' module
+        opc_scripts_math = opc_source.parent / "opc" / "scripts" / "mathtools"
+        target_scripts_math = target_dir / "scripts" / "mathtools"
         if opc_scripts_math.exists():
             if target_scripts_math.exists():
                 shutil.rmtree(target_scripts_math)
@@ -526,6 +527,7 @@ def install_opc_integration(
             "multi_tool_pipeline.py",    # /skill-developer example
             "recall_temporal_facts.py",  # /system_overview skill
         ]
+
         opc_scripts_root = opc_source.parent / "opc" / "scripts"
         target_scripts_root = target_dir / "scripts"
         target_scripts_root.mkdir(parents=True, exist_ok=True)
@@ -534,6 +536,13 @@ def install_opc_integration(
             if src.exists():
                 shutil.copy2(src, target_scripts_root / script_name)
                 result["installed_scripts"] += 1
+
+        # Copy status.py from .claude/scripts/ (not opc/scripts/)
+        # This is the status line script referenced in settings.json
+        source_status = opc_source / "scripts" / "status.py"
+        if source_status.exists():
+            shutil.copy2(source_status, target_scripts_root / "status.py")
+            result["installed_scripts"] += 1
 
         # Merge user items if requested
         if merge_user_items and existing and conflicts:
