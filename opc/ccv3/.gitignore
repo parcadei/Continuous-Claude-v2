@@ -1,0 +1,15 @@
+# Environment files with secrets
+.env
+.env.local
+.env.hackathon
+*.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/

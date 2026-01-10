@@ -32,19 +32,20 @@ import httpx
 
 
 # Task → Model mapping (PRD Section 3.2)
+# OPTIMIZED FOR COST - using minimax-m2p1 as default cheap model
 TaskType = Literal["planning", "analysis", "coding", "patching", "cheap", "strong"]
 
 TASK_MODEL_MAP: dict[TaskType, str] = {
-    "planning": "accounts/nvidia/models/nemotron-3-8b-chat-v1",  # NVIDIA Nemotron
-    "analysis": "accounts/fireworks/models/qwen2-72b-instruct",  # Strong analysis
-    "coding": "accounts/fireworks/models/qwen2-72b-instruct",     # Strong coding
-    "patching": "accounts/fireworks/models/llama-v3p1-70b-instruct",  # Strong patching
-    "cheap": "accounts/nvidia/models/nemotron-3-8b-chat-v1",      # Cost optimized
-    "strong": "accounts/fireworks/models/qwen2-72b-instruct",     # Quality optimized
+    "planning": "accounts/fireworks/models/minimax-m2p1",         # CHEAPEST - use for planning
+    "analysis": "accounts/fireworks/models/minimax-m2p1",         # CHEAPEST - use for analysis
+    "coding": "accounts/fireworks/models/minimax-m2p1",           # CHEAPEST - for hackathon demo
+    "patching": "accounts/fireworks/models/minimax-m2p1",         # CHEAPEST - for hackathon demo
+    "cheap": "accounts/fireworks/models/minimax-m2p1",            # CHEAPEST - explicit cheap
+    "strong": "accounts/fireworks/models/llama-v3p1-70b-instruct",  # Only use when really needed
 }
 
-# Default model
-DEFAULT_MODEL = "accounts/fireworks/models/llama-v3p1-70b-instruct"
+# Default model - CHEAPEST for hackathon
+DEFAULT_MODEL = "accounts/fireworks/models/minimax-m2p1"
 
 
 class InferenceLLM:
