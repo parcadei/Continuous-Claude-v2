@@ -557,6 +557,27 @@ class EmbeddingService:
             local_model = model if model is not None else "BAAI/bge-large-en-v1.5"
             device = kwargs.get("device", None)
             self._provider = LocalEmbeddingProvider(model=local_model, device=device)
+        elif provider == "jina":
+            from .jina_embeddings import JinaEmbeddingProvider
+            jina_dim = dimension if dimension is not None else 1024
+            task = kwargs.get("task", "retrieval.passage")
+            self._provider = JinaEmbeddingProvider(
+                dimension=jina_dim,
+                task=task,
+                max_batch_size=max_batch_size,
+                max_retries=max_retries,
+            )
+        elif provider.startswith("jina-"):
+            # Allow provider="jina-v3" shorthand
+            from .jina_embeddings import JinaEmbeddingProvider
+            jina_dim = dimension if dimension is not None else 1024
+            task = kwargs.get("task", "retrieval.passage")
+            self._provider = JinaEmbeddingProvider(
+                dimension=jina_dim,
+                task=task,
+                max_batch_size=max_batch_size,
+                max_retries=max_retries,
+            )
         else:
             raise ValueError(f"Unknown provider: {provider}")
 

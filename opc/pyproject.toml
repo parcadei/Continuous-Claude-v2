@@ -64,6 +64,14 @@ postgres = [
     "pgvector>=0.3.0",
     "numpy>=1.24.0",  # Required for embedding padding
 ]
+hackathon = [
+    # Hackathon sponsor integrations
+    # Install with: uv sync --extra hackathon
+    "motor>=3.3.0",  # MongoDB Atlas async driver
+    "pymongo>=4.6.0",  # MongoDB sync driver
+    "promptquality>=0.1.0",  # Galileo AI evaluations
+    "httpx>=0.27.0",  # Async HTTP for Fireworks/Jina
+]
 math = [
     "sympy>=1.14.0",
     "z3-solver>=4.15.4.0",
