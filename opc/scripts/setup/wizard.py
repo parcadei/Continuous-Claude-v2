@@ -572,8 +572,8 @@ async def run_setup_wizard() -> None:
     console.print("    - SciPy/NumPy: scientific computing")
     console.print("    - Lean 4: theorem proving (requires separate Lean install)")
     console.print("")
-    console.print("  [dim]Note: Z3 downloads a ~35MB binary. All packages have")
-    console.print("  pre-built wheels for Windows, macOS, and Linux.[/dim]")
+    console.print("  [dim]Note: Z3 downloads a ~35MB binary. All packages have[/dim]")
+    console.print("  [dim]pre-built wheels for Windows, macOS, and Linux.[/dim]")
 
     if Confirm.ask("\nInstall math features?", default=False):
         console.print("  Installing math dependencies...")
