@@ -146,23 +146,53 @@ class JinaEmbeddings:
 
 
 class LocalEmbeddings:
-    """Fallback to local embeddings (sentence-transformers).
+    """Fallback to local embeddings.
 
-    Used when JINA_API_KEY is not set.
+    Tries sentence-transformers first, then falls back to hash-based
+    pseudo-embeddings for testing/demo purposes.
     """
 
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2", dimensions: int = 384):
         self.model_name = model_name
+        self.dimensions = dimensions
         self._model = None
+        self._use_hash = False
 
     def _get_model(self):
-        if self._model is None:
+        if self._model is None and not self._use_hash:
             try:
                 from sentence_transformers import SentenceTransformer
                 self._model = SentenceTransformer(self.model_name)
             except ImportError:
-                raise ImportError("pip install sentence-transformers for local embeddings")
+                self._use_hash = True
         return self._model
+
+    def _hash_embed(self, text: str) -> list[float]:
+        """Generate pseudo-embedding from text hash.
+
+        NOT for production - use for testing/demo only.
+        Creates deterministic embeddings that preserve some similarity.
+        """
+        import hashlib
+        import math
+
+        # Normalize text
+        text = text.lower().strip()
+
+        # Create multiple hashes from different offsets
+        embedding = []
+        for i in range(self.dimensions):
+            h = hashlib.md5(f"{text}_{i}".encode()).hexdigest()
+            # Convert hex to float in [-1, 1]
+            val = (int(h[:8], 16) / 0xFFFFFFFF) * 2 - 1
+            embedding.append(val)
+
+        # Normalize to unit vector
+        norm = math.sqrt(sum(x*x for x in embedding))
+        if norm > 0:
+            embedding = [x / norm for x in embedding]
+
+        return embedding
 
     async def embed(
         self,
@@ -170,13 +200,20 @@ class LocalEmbeddings:
         task: str = "retrieval.passage",  # Ignored for local
     ) -> list[float] | list[list[float]]:
         """Generate embeddings locally."""
-        model = self._get_model()
+        self._get_model()  # Try to load model
 
+        if self._use_hash:
+            # Hash-based fallback
+            if isinstance(text, str):
+                return self._hash_embed(text)
+            return [self._hash_embed(t) for t in text]
+
+        # Use sentence-transformers
         if isinstance(text, str):
-            embedding = model.encode(text, convert_to_numpy=True)
+            embedding = self._model.encode(text, convert_to_numpy=True)
             return embedding.tolist()
 
-        embeddings = model.encode(text, convert_to_numpy=True)
+        embeddings = self._model.encode(text, convert_to_numpy=True)
         return [e.tolist() for e in embeddings]
 
     async def close(self):

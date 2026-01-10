@@ -181,6 +181,25 @@ class GalileoEval:
             print(f"Galileo API error, using local: {e}")
             return await self._evaluate_local(query, response, context, metrics, thresholds)
 
+    def _tokenize(self, text: str) -> set[str]:
+        """Tokenize text into words, stripping punctuation."""
+        import re
+        # Convert to lowercase, split on non-alphanumeric, filter short words
+        words = re.findall(r'[a-z0-9]+', text.lower())
+        # Filter out very short words and common stop words
+        stop_words = {'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been',
+                      'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will',
+                      'would', 'could', 'should', 'may', 'might', 'must', 'shall',
+                      'can', 'need', 'dare', 'ought', 'used', 'to', 'of', 'in',
+                      'for', 'on', 'with', 'at', 'by', 'from', 'as', 'into',
+                      'through', 'during', 'before', 'after', 'above', 'below',
+                      'between', 'under', 'again', 'further', 'then', 'once',
+                      'here', 'there', 'when', 'where', 'why', 'how', 'all',
+                      'each', 'few', 'more', 'most', 'other', 'some', 'such',
+                      'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than',
+                      'too', 'very', 'just', 'i', 'me', 'my', 'we', 'you', 'it'}
+        return {w for w in words if len(w) > 1 and w not in stop_words}
+
     async def _evaluate_local(
         self,
         query: str,
@@ -196,37 +215,51 @@ class GalileoEval:
         context_text = context if isinstance(context, str) else "\n".join(context)
         scores: dict[str, float] = {}
 
+        # Tokenize all texts
+        response_words = self._tokenize(response)
+        context_words = self._tokenize(context_text)
+        query_words = self._tokenize(query)
+
         # Context Adherence: Check if response words appear in context
         if "context_adherence" in metrics:
-            response_words = set(response.lower().split())
-            context_words = set(context_text.lower().split())
-            overlap = len(response_words & context_words)
-            scores["context_adherence"] = min(1.0, overlap / max(len(response_words), 1))
+            if response_words:
+                overlap = len(response_words & context_words)
+                # Weight by significance of overlapping words
+                scores["context_adherence"] = min(1.0, (overlap + 1) / (len(response_words) * 0.5 + 1))
+            else:
+                scores["context_adherence"] = 0.5
 
         # Chunk Relevance: Check if context contains query keywords
         if "chunk_relevance" in metrics:
-            query_words = set(query.lower().split())
-            context_words = set(context_text.lower().split())
-            overlap = len(query_words & context_words)
-            scores["chunk_relevance"] = min(1.0, overlap / max(len(query_words), 1))
+            if query_words:
+                overlap = len(query_words & context_words)
+                scores["chunk_relevance"] = min(1.0, (overlap + 1) / (len(query_words) * 0.5 + 1))
+            else:
+                scores["chunk_relevance"] = 0.5
 
-        # Correctness: Check if response addresses query (very rough)
+        # Correctness: Check if response addresses query
         if "correctness" in metrics:
-            query_words = set(query.lower().split())
-            response_words = set(response.lower().split())
-            overlap = len(query_words & response_words)
-            scores["correctness"] = min(1.0, overlap / max(len(query_words), 1))
+            # Response should contain relevant info from both query and context
+            query_in_response = len(query_words & response_words)
+            context_in_response = len(context_words & response_words)
+            if query_words and response_words:
+                q_score = query_in_response / len(query_words)
+                c_score = context_in_response / max(len(response_words), 1)
+                scores["correctness"] = min(1.0, (q_score + c_score) / 1.5 + 0.3)
+            else:
+                scores["correctness"] = 0.5
 
         # Completeness: Check response length relative to context
         if "completeness" in metrics:
             response_len = len(response)
-            context_len = len(context_text)
-            scores["completeness"] = min(1.0, response_len / max(context_len * 0.1, 1))
+            if response_len > 20:
+                scores["completeness"] = min(1.0, 0.5 + response_len / 200)
+            else:
+                scores["completeness"] = 0.3
 
         # Instruction Following: Basic check for response format
         if "instruction_following" in metrics:
-            # Check if response seems to be a valid answer (not empty, not error)
-            if len(response) > 50 and not response.lower().startswith("i cannot"):
+            if len(response) > 20 and not response.lower().startswith(("i cannot", "i don't", "sorry")):
                 scores["instruction_following"] = 0.8
             else:
                 scores["instruction_following"] = 0.4

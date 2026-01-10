@@ -43,6 +43,122 @@ GraphType = Literal["call", "cfg", "dfg", "pdg"]
 SymbolKind = Literal["function", "class", "method", "variable", "import"]
 
 
+class InMemoryStore:
+    """In-memory fallback when MongoDB is unavailable.
+
+    For demo/testing only - data is not persisted.
+    """
+
+    def __init__(self):
+        self._collections: dict[str, list[dict]] = {
+            "repos": [],
+            "files": [],
+            "symbols": [],
+            "graphs": [],
+            "handoffs": [],
+            "runs": [],
+            "embeddings": [],
+            "file_claims": [],
+        }
+
+    def __getattr__(self, name: str):
+        if name.startswith("_"):
+            raise AttributeError(name)
+        return InMemoryCollection(self._collections.setdefault(name, []))
+
+
+class InMemoryCollection:
+    """Simulates a MongoDB collection in memory."""
+
+    def __init__(self, data: list[dict]):
+        self._data = data
+
+    async def insert_one(self, doc: dict):
+        self._data.append(doc.copy())
+        return type("InsertResult", (), {"inserted_id": doc.get("_id", str(uuid4()))})()
+
+    async def find_one(self, query: dict):
+        for doc in self._data:
+            if all(doc.get(k) == v for k, v in query.items()):
+                return doc.copy()
+        return None
+
+    async def find(self, query: dict = None):
+        return InMemoryCursor([d for d in self._data if self._matches(d, query or {})])
+
+    async def update_one(self, query: dict, update: dict, upsert: bool = False):
+        for doc in self._data:
+            if self._matches(doc, query):
+                if "$set" in update:
+                    doc.update(update["$set"])
+                return type("UpdateResult", (), {"modified_count": 1})()
+        if upsert:
+            new_doc = {**query, **update.get("$set", {})}
+            self._data.append(new_doc)
+            return type("UpdateResult", (), {"modified_count": 0, "upserted_id": str(uuid4())})()
+        return type("UpdateResult", (), {"modified_count": 0})()
+
+    async def delete_one(self, query: dict):
+        for i, doc in enumerate(self._data):
+            if self._matches(doc, query):
+                self._data.pop(i)
+                return type("DeleteResult", (), {"deleted_count": 1})()
+        return type("DeleteResult", (), {"deleted_count": 0})()
+
+    async def create_index(self, *args, **kwargs):
+        pass  # Indexes not needed for in-memory
+
+    async def aggregate(self, pipeline: list):
+        # Simplified aggregation - just return all for now
+        return InMemoryCursor(self._data.copy())
+
+    def _matches(self, doc: dict, query: dict) -> bool:
+        for k, v in query.items():
+            if isinstance(v, dict) and "$regex" in v:
+                import re
+                if not re.search(v["$regex"], str(doc.get(k, "")), re.IGNORECASE if v.get("$options") == "i" else 0):
+                    return False
+            elif doc.get(k) != v:
+                return False
+        return True
+
+
+class InMemoryCursor:
+    """Simulates a MongoDB cursor."""
+
+    def __init__(self, data: list[dict]):
+        self._data = data
+        self._limit = None
+        self._skip = 0
+
+    def limit(self, n: int):
+        self._limit = n
+        return self
+
+    def skip(self, n: int):
+        self._skip = n
+        return self
+
+    def sort(self, *args):
+        return self  # Ignore sorting for simplicity
+
+    async def to_list(self, length: int = None):
+        data = self._data[self._skip:]
+        if self._limit:
+            data = data[:self._limit]
+        if length:
+            data = data[:length]
+        return data
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        if not self._data:
+            raise StopAsyncIteration
+        return self._data.pop(0)
+
+
 class Atlas:
     """MongoDB Atlas backbone for CCv3.
 
@@ -65,22 +181,33 @@ class Atlas:
         self.db_name = db_name
         self._client = None
         self._db = None
+        self._in_memory = False
 
     async def connect(self):
-        """Connect to Atlas and create indexes."""
-        if not HAS_MOTOR:
-            raise ImportError("pip install motor pymongo")
-        if not self.uri:
-            raise ValueError("Set MONGODB_URI environment variable")
+        """Connect to Atlas or use in-memory fallback."""
+        # Try MongoDB first
+        if self.uri and HAS_MOTOR:
+            try:
+                self._client = AsyncIOMotorClient(self.uri, serverSelectionTimeoutMS=5000)
+                self._db = self._client[self.db_name]
+                await self._client.admin.command("ping")
+                print(f"✓ Connected to MongoDB Atlas: {self.db_name}")
+                await self._create_indexes()
+                return self
+            except Exception as e:
+                print(f"⚠ MongoDB connection failed: {e}")
+                print("  Falling back to in-memory store (data not persisted)")
 
-        self._client = AsyncIOMotorClient(self.uri)
-        self._db = self._client[self.db_name]
-
-        await self._client.admin.command("ping")
-        print(f"✓ Connected to MongoDB Atlas: {self.db_name}")
-
-        await self._create_indexes()
+        # Fallback to in-memory
+        self._in_memory = True
+        self._db = InMemoryStore()
+        print("✓ Using in-memory store (demo mode - data not persisted)")
         return self
+
+    @property
+    def is_in_memory(self) -> bool:
+        """Check if using in-memory fallback."""
+        return self._in_memory
 
     async def close(self):
         if self._client:
