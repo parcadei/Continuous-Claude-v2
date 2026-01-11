@@ -18,15 +18,14 @@ Thank you for your interest in contributing! This guide covers how to add skills
 ## Development Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/parcadei/continuous-claude.git
-cd continuous-claude
+# Clone (your fork) of the repository
+cd Continuous-Claude-v3/opc
 
 # Install Python dependencies
 uv sync
 
 # Install hook dependencies (TypeScript)
-cd .claude/hooks && npm install && npm run build && cd ../..
+cd ../.claude/hooks && npm install && npm run build && cd ../../opc
 
 # Verify installation
 claude
@@ -108,22 +107,13 @@ Agents are specialized AI workers defined in `.claude/agents/<agent-name>.md`.
 ### Agent Structure
 
 ```markdown
-# agent-name
-
-## Purpose
-
-One-line description of what this agent does.
-
-## Model
-
-Preferred model: opus | sonnet | haiku
-
-## Tools
-
-- Read
-- Grep
-- Glob
-- [other tools this agent needs]
+# Frontmatter
+---
+name: <name of agent>
+description: <one line description of agent>
+model: <preferred model: opus | sonnet | haiku>
+tools: <list tools agent needs (optional): Read | Grep | Glob | etc...>
+---
 
 ## Prompt
 

@@ -47,7 +47,7 @@ except ImportError:
 
 
 # =============================================================================
-# Docker Detection and Installation
+# Container Runtime Detection (Docker/Podman)
 # =============================================================================
 
 # Platform-specific Docker installation commands
@@ -58,25 +58,29 @@ DOCKER_INSTALL_COMMANDS = {
 }
 
 
-async def check_docker_installed() -> dict[str, Any]:
-    """Check if Docker is installed and get version info.
+async def check_runtime_installed(runtime: str = "docker") -> dict[str, Any]:
+    """Check if a container runtime (docker or podman) is installed.
+
+    Args:
+        runtime: The runtime to check ("docker" or "podman")
 
     Returns:
         dict with keys:
-            - installed: bool - True if Docker binary exists
-            - version: str | None - Docker version string if installed
-            - daemon_running: bool - True if Docker daemon is responding
+            - installed: bool - True if runtime binary exists
+            - runtime: str - The runtime name that was checked
+            - version: str | None - Version string if installed
+            - daemon_running: bool - True if daemon/service is responding
     """
     result = {
         "installed": False,
+        "runtime": runtime,
         "version": None,
         "daemon_running": False,
     }
 
     try:
-        # Check docker --version
         proc = await asyncio.create_subprocess_exec(
-            "docker",
+            runtime,
             "--version",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
@@ -85,7 +89,7 @@ async def check_docker_installed() -> dict[str, Any]:
 
         if proc.returncode == 0:
             result["installed"] = True
-            # Parse version from output like "Docker version 24.0.5, build ced0996"
+            # Parse version from output like "Docker version 24.0.5" or "podman version 4.5.0"
             version_output = stdout.decode().strip()
             if "version" in version_output.lower():
                 parts = version_output.split()
@@ -96,21 +100,44 @@ async def check_docker_installed() -> dict[str, Any]:
                             break
             result["daemon_running"] = True
         elif proc.returncode == 1:
-            # Docker binary exists but daemon not running
+            # Binary exists but daemon not running
             stderr_text = stderr.decode().lower()
             if "cannot connect" in stderr_text or "daemon" in stderr_text:
                 result["installed"] = True
                 result["daemon_running"] = False
-        # returncode 127 means command not found - installed stays False
 
     except FileNotFoundError:
-        # Docker not installed
         pass
     except Exception:
-        # Any other error, assume not installed
         pass
 
     return result
+
+
+async def check_container_runtime() -> dict[str, Any]:
+    """Check for Docker or Podman, preferring Docker if both exist.
+
+    Returns:
+        dict with keys:
+            - installed: bool - True if any runtime is available
+            - runtime: str - "docker", "podman", or None
+            - version: str | None - Version string
+            - daemon_running: bool - True if service is responding
+    """
+    # Try Docker first (most common)
+    result = await check_runtime_installed("docker")
+    if result["installed"]:
+        return result
+
+    # Fall back to Podman (common on Fedora/RHEL)
+    result = await check_runtime_installed("podman")
+    return result
+
+
+# Keep old function name for backwards compatibility
+async def check_docker_installed() -> dict[str, Any]:
+    """Check if Docker is installed. Deprecated: use check_container_runtime()."""
+    return await check_container_runtime()
 
 
 def get_docker_install_command() -> str:
@@ -129,16 +156,17 @@ def get_docker_install_command() -> str:
 
 
 async def offer_docker_install() -> bool:
-    """Offer to show Docker installation instructions.
+    """Offer to show Docker/Podman installation instructions.
 
     Returns:
-        bool: True if user wants to see installation instructions
+        bool: True if user wants to proceed without container runtime
     """
     install_cmd = get_docker_install_command()
-    console.print("\n  [yellow]Docker is required but not installed.[/yellow]")
-    console.print(f"  Install with: [bold]{install_cmd}[/bold]")
+    console.print("\n  [yellow]Docker or Podman is required but not installed.[/yellow]")
+    console.print(f"  Install Docker with: [bold]{install_cmd}[/bold]")
+    console.print("  [dim]Or on Fedora/RHEL: sudo dnf install podman podman-compose[/dim]")
 
-    return Confirm.ask("\n  Would you like to proceed without Docker?", default=False)
+    return Confirm.ask("\n  Would you like to proceed without a container runtime?", default=False)
 
 
 async def check_prerequisites_with_install_offers() -> dict[str, Any]:
@@ -148,42 +176,49 @@ async def check_prerequisites_with_install_offers() -> dict[str, Any]:
     guidance when tools are missing.
 
     Returns:
-        dict with keys: docker, python, uv, elan, all_present
+        dict with keys: docker, container_runtime, python, uv, elan, all_present
     """
     result = {
         "docker": False,
+        "container_runtime": None,  # "docker" or "podman"
         "python": shutil.which("python3") is not None,
         "uv": shutil.which("uv") is not None,
         "elan": shutil.which("elan") is not None,  # Lean4 version manager
     }
 
-    # Check Docker with detailed info
-    docker_info = await check_docker_installed()
-    result["docker"] = docker_info["installed"] and docker_info.get("daemon_running", False)
-    result["docker_version"] = docker_info.get("version")
-    result["docker_daemon_running"] = docker_info.get("daemon_running", False)
+    # Check for Docker or Podman
+    runtime_info = await check_container_runtime()
+    result["docker"] = runtime_info["installed"] and runtime_info.get("daemon_running", False)
+    result["container_runtime"] = runtime_info.get("runtime") if runtime_info["installed"] else None
+    result["docker_version"] = runtime_info.get("version")
+    result["docker_daemon_running"] = runtime_info.get("daemon_running", False)
 
-    # Offer Docker install if missing
-    if not docker_info["installed"]:
+    runtime_name = runtime_info.get("runtime", "Docker")
+
+    # Offer install if missing
+    if not runtime_info["installed"]:
         await offer_docker_install()
-    elif not docker_info.get("daemon_running", False):
-        console.print("  [yellow]Docker is installed but the daemon is not running.[/yellow]")
-        console.print("  Please start Docker Desktop or the Docker service.")
+    elif not runtime_info.get("daemon_running", False):
+        console.print(f"  [yellow]{runtime_name.title()} is installed but the daemon is not running.[/yellow]")
+        if runtime_name == "docker":
+            console.print("  Please start Docker Desktop or the Docker service.")
+        else:
+            console.print("  Please start the Podman service: systemctl --user start podman.socket")
 
         # Retry loop for daemon startup
         max_retries = 3
         for attempt in range(max_retries):
-            if Confirm.ask(f"\n  Retry checking Docker daemon? (attempt {attempt + 1}/{max_retries})", default=True):
-                console.print("  Checking Docker daemon...")
+            if Confirm.ask(f"\n  Retry checking {runtime_name} daemon? (attempt {attempt + 1}/{max_retries})", default=True):
+                console.print(f"  Checking {runtime_name} daemon...")
                 await asyncio.sleep(2)  # Give daemon time to start
-                docker_info = await check_docker_installed()
-                if docker_info.get("daemon_running", False):
+                runtime_info = await check_runtime_installed(runtime_name)
+                if runtime_info.get("daemon_running", False):
                     result["docker"] = True
                     result["docker_daemon_running"] = True
-                    console.print("  [green]OK[/green] Docker daemon is now running!")
+                    console.print(f"  [green]OK[/green] {runtime_name.title()} daemon is now running!")
                     break
                 else:
-                    console.print("  [yellow]Docker daemon still not running.[/yellow]")
+                    console.print(f"  [yellow]{runtime_name.title()} daemon still not running.[/yellow]")
             else:
                 break
 
@@ -382,24 +417,35 @@ def generate_env_file(config: dict[str, Any], env_path: Path) -> None:
     # Database config
     db = config.get("database", {})
     if db:
-        host = db.get('host', 'localhost')
-        port = db.get('port', 5432)
-        database = db.get('database', 'continuous_claude')
-        user = db.get('user', 'claude')
-        password = db.get('password', '')
+        mode = db.get("mode", "docker")
+        lines.append(f"# Database Mode: {mode}")
 
-        lines.append("# PostgreSQL Configuration")
-        lines.append(f"POSTGRES_HOST={host}")
-        lines.append(f"POSTGRES_PORT={port}")
-        lines.append(f"POSTGRES_DB={database}")
-        lines.append(f"POSTGRES_USER={user}")
-        if password:
-            lines.append(f"POSTGRES_PASSWORD={password}")
-        lines.append("")
-
-        # DATABASE_URL for scripts (memory, artifacts, etc.)
-        lines.append("# Connection string for scripts")
-        lines.append(f"DATABASE_URL=postgresql://{user}:{password}@{host}:{port}/{database}")
+        if mode == "docker":
+            host = db.get('host', 'localhost')
+            port = db.get('port', 5432)
+            database = db.get('database', 'continuous_claude')
+            user = db.get('user', 'claude')
+            password = db.get('password', '')
+            lines.append(f"POSTGRES_HOST={host}")
+            lines.append(f"POSTGRES_PORT={port}")
+            lines.append(f"POSTGRES_DB={database}")
+            lines.append(f"POSTGRES_USER={user}")
+            if password:
+                lines.append(f"POSTGRES_PASSWORD={password}")
+            lines.append("")
+            lines.append("# Connection string for scripts")
+            lines.append(f"DATABASE_URL=postgresql://{user}:{password}@{host}:{port}/{database}")
+        elif mode == "embedded":
+            pgdata = db.get("pgdata", "")
+            venv = db.get("venv", "")
+            lines.append(f"PGSERVER_PGDATA={pgdata}")
+            lines.append(f"PGSERVER_VENV={venv}")
+            lines.append("")
+            lines.append("# Connection string (Unix socket)")
+            lines.append(f"DATABASE_URL=postgresql://postgres:@/postgres?host={pgdata}")
+        else:  # sqlite
+            lines.append("# SQLite mode - no DATABASE_URL needed")
+            lines.append("DATABASE_URL=")
         lines.append("")
 
     # API keys (only write non-empty keys)
@@ -458,7 +504,8 @@ async def run_setup_wizard() -> None:
     prereqs = await check_prerequisites_with_install_offers()
 
     if prereqs["docker"]:
-        console.print("  [green]OK[/green] Docker")
+        runtime = prereqs.get("container_runtime", "docker")
+        console.print(f"  [green]OK[/green] {runtime.title()}")
     # Installation guidance already shown by check_prerequisites_with_install_offers()
 
     if prereqs["python"]:
@@ -479,19 +526,43 @@ async def run_setup_wizard() -> None:
 
     # Step 2: Database config
     console.print("\n[bold]Step 2/12: Database Configuration[/bold]")
-    console.print("  [dim]Customize host/port for containers (podman, nerdctl) or remote postgres.[/dim]")
-    if Confirm.ask("Configure database connection?", default=True):
-        db_config = await prompt_database_config()
-        password = Prompt.ask("Database password", password=True, default="claude_dev")
-        db_config["password"] = password
-    else:
-        db_config = {
-            "host": "localhost",
-            "port": 5432,
-            "database": "continuous_claude",
-            "user": "claude",
-            "password": "claude_dev",
-        }
+    console.print("  Choose your database backend:")
+    console.print("    [bold]docker[/bold]    - PostgreSQL in Docker (recommended)")
+    console.print("    [bold]embedded[/bold]  - Embedded PostgreSQL (no Docker needed)")
+    console.print("    [bold]sqlite[/bold]    - SQLite fallback (simplest, no cross-terminal)")
+    db_mode = Prompt.ask("\n  Database mode", choices=["docker", "embedded", "sqlite"], default="docker")
+
+    if db_mode == "embedded":
+        from scripts.setup.embedded_postgres import setup_embedded_environment
+        console.print("  Setting up embedded postgres (creates Python 3.12 environment)...")
+        embed_result = await setup_embedded_environment()
+        if embed_result["success"]:
+            console.print(f"  [green]OK[/green] Embedded environment ready at {embed_result['venv']}")
+            db_config = {"mode": "embedded", "pgdata": str(embed_result["pgdata"]), "venv": str(embed_result["venv"])}
+        else:
+            console.print(f"  [red]ERROR[/red] {embed_result.get('error', 'Unknown')}")
+            console.print("  Falling back to Docker mode")
+            db_mode = "docker"
+
+    if db_mode == "sqlite":
+        db_config = {"mode": "sqlite"}
+        console.print("  [yellow]Note:[/yellow] Cross-terminal coordination disabled in SQLite mode")
+
+    if db_mode == "docker":
+        console.print("  [dim]Customize host/port for containers (podman, nerdctl) or remote postgres.[/dim]")
+        if Confirm.ask("Configure database connection?", default=True):
+            db_config = await prompt_database_config()
+            password = Prompt.ask("Database password", password=True, default="claude_dev")
+            db_config["password"] = password
+        else:
+            db_config = {
+                "host": "localhost",
+                "port": 5432,
+                "database": "continuous_claude",
+                "user": "claude",
+                "password": "claude_dev",
+            }
+        db_config["mode"] = "docker"
 
     # Step 3: API keys
     console.print("\n[bold]Step 3/12: API Keys (Optional)[/bold]")
@@ -507,19 +578,23 @@ async def run_setup_wizard() -> None:
     generate_env_file(config, env_path)
     console.print(f"  [green]OK[/green] Generated {env_path}")
 
-    # Step 5: Docker stack (Sandbox Infrastructure)
-    console.print("\n[bold]Step 5/12: Docker Stack (Sandbox Infrastructure)[/bold]")
+    # Step 5: Container stack (Sandbox Infrastructure)
+    runtime = prereqs.get("container_runtime", "docker")
+    console.print(f"\n[bold]Step 5/12: Container Stack (Sandbox Infrastructure)[/bold]")
     console.print("  The sandbox requires PostgreSQL and Redis for:")
     console.print("  - Agent coordination and scheduling")
     console.print("  - Build cache and LSP index storage")
     console.print("  - Real-time agent status")
-    if Confirm.ask("Start Docker stack (PostgreSQL, Redis)?", default=True):
-        from scripts.setup.docker_setup import run_migrations, start_docker_stack, wait_for_services
+    if Confirm.ask(f"Start {runtime} stack (PostgreSQL, Redis)?", default=True):
+        from scripts.setup.docker_setup import run_migrations, set_container_runtime, start_docker_stack, wait_for_services
 
-        console.print("  [dim]Starting Docker containers (first run downloads ~500MB, may take a few minutes)...[/dim]")
+        # Set the detected runtime before starting
+        set_container_runtime(runtime)
+
+        console.print(f"  [dim]Starting containers (first run downloads ~500MB, may take a few minutes)...[/dim]")
         result = await start_docker_stack(env_file=env_path)
         if result["success"]:
-            console.print("  [green]OK[/green] Docker stack started")
+            console.print(f"  [green]OK[/green] {runtime.title()} stack started")
 
             # Wait for services
             console.print("  Waiting for services to be healthy...")
@@ -530,13 +605,15 @@ async def run_setup_wizard() -> None:
                 console.print("  [yellow]WARN[/yellow] Some services may not be healthy")
         else:
             console.print(f"  [red]ERROR[/red] {result.get('error', 'Unknown error')}")
-            console.print("  You can start manually with: docker compose up -d")
+            console.print(f"  You can start manually with: {runtime} compose up -d")
 
     # Step 6: Migrations
     console.print("\n[bold]Step 6/12: Database Setup[/bold]")
     if Confirm.ask("Run database migrations?", default=True):
-        from scripts.setup.docker_setup import run_migrations
+        from scripts.setup.docker_setup import run_migrations, set_container_runtime
 
+        # Ensure runtime is set (in case step 5 was skipped)
+        set_container_runtime(runtime)
         result = await run_migrations()
         if result["success"]:
             console.print("  [green]OK[/green] Migrations complete")

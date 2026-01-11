@@ -187,11 +187,11 @@ export BRAINTRUST_CC_DEBUG=true
 
 # Test hooks manually
 echo '{"session_id":"test-123","type":"resume"}' | \
-  bash .claude/plugins/braintrust-tracing/hooks/session_start.sh
+  bash "$CLAUDE_PROJECT_DIR/.claude/plugins/braintrust-tracing/hooks/session_start.sh"
 
 # Test PreToolUse (Task injection)
 echo '{"session_id":"test-123","tool_name":"Task","tool_input":{"prompt":"test"}}' | \
-  bash .claude/plugins/braintrust-tracing/hooks/pre_tool_use.sh
+  bash "$CLAUDE_PROJECT_DIR/.claude/plugins/braintrust-tracing/hooks/pre_tool_use.sh"
 ```
 
 ### Troubleshooting Checklist

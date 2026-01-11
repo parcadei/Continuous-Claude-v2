@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Docker Stack Setup for OPC v3.
+"""Container Stack Setup for OPC v3.
 
-Manages the Docker Compose stack lifecycle including:
+Manages the Docker/Podman Compose stack lifecycle including:
 - Starting services (PostgreSQL, Redis, Sandbox)
 - Waiting for health checks
 - Running database migrations
 - Verifying stack health
+
+Supports both Docker and Podman as container runtimes.
 
 USAGE:
     python -m scripts.setup.docker_setup
@@ -35,6 +37,20 @@ DOCKER_DIR = PROJECT_ROOT.parent / "docker"
 DOCKER_COMPOSE_FILE = DOCKER_DIR / "docker-compose.yml"
 MIGRATIONS_DIR = PROJECT_ROOT / "scripts" / "migrations"
 
+# Container runtime - "docker" or "podman" (set by wizard after detection)
+_CONTAINER_RUNTIME = "docker"
+
+
+def set_container_runtime(runtime: str) -> None:
+    """Set the container runtime to use (docker or podman)."""
+    global _CONTAINER_RUNTIME
+    _CONTAINER_RUNTIME = runtime
+
+
+def get_container_runtime() -> str:
+    """Get the current container runtime."""
+    return _CONTAINER_RUNTIME
+
 
 async def start_docker_stack(
     compose_file: Path | None = None,
@@ -55,7 +71,7 @@ async def start_docker_stack(
         return {"success": False, "error": f"Docker compose file not found: {compose_path}"}
 
     # Build command with optional --env-file
-    cmd = ["docker", "compose", "-f", str(compose_path)]
+    cmd = [_CONTAINER_RUNTIME, "compose", "-f", str(compose_path)]
     if env_file and env_file.exists():
         cmd.extend(["--env-file", str(env_file)])
     cmd.extend(["up", "-d"])
@@ -104,7 +120,7 @@ async def wait_for_services(
         for service in services:
             try:
                 process = await asyncio.create_subprocess_exec(
-                    "docker",
+                    _CONTAINER_RUNTIME,
                     "compose",
                     "-f",
                     str(compose_path),
@@ -156,7 +172,7 @@ async def run_migrations(
     try:
         if init_sql.exists():
             process = await asyncio.create_subprocess_exec(
-                "docker",
+                _CONTAINER_RUNTIME,
                 "compose",
                 "-f",
                 str(compose_path),
@@ -178,7 +194,7 @@ async def run_migrations(
             if process.returncode != 0:
                 # Try alternative approach - pipe the SQL directly
                 process = await asyncio.create_subprocess_exec(
-                    "docker",
+                    _CONTAINER_RUNTIME,
                     "compose",
                     "-f",
                     str(compose_path),
@@ -204,7 +220,7 @@ async def run_migrations(
         if migrations_path.exists():
             for sql_file in sorted(migrations_path.glob("*.sql")):
                 process = await asyncio.create_subprocess_exec(
-                    "docker",
+                    _CONTAINER_RUNTIME,
                     "compose",
                     "-f",
                     str(compose_path),
@@ -249,7 +265,7 @@ async def verify_stack_health(compose_file: Path | None = None) -> dict[str, Any
 
     try:
         process = await asyncio.create_subprocess_exec(
-            "docker",
+            _CONTAINER_RUNTIME,
             "compose",
             "-f",
             str(compose_path),
@@ -316,7 +332,7 @@ async def stop_docker_stack(compose_file: Path | None = None) -> dict[str, Any]:
 
     try:
         process = await asyncio.create_subprocess_exec(
-            "docker",
+            _CONTAINER_RUNTIME,
             "compose",
             "-f",
             str(compose_path),

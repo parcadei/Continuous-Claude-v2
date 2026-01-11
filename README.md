@@ -27,6 +27,7 @@
   - [Math System](#math-system)
 - [Workflows](#workflows)
 - [Installation](#installation)
+- [Updating](#updating)
 - [Configuration](#configuration)
 - [Contributing](#contributing)
 - [License](#license)
@@ -948,6 +949,21 @@ uv run python -m scripts.setup.wizard
 ```
 
 The wizard walks you through all configuration options interactively.
+
+## Updating
+
+Pull latest changes and sync your installation:
+
+```bash
+cd continuous-claude/opc
+uv run python -m scripts.setup.update
+```
+
+This will:
+- Pull latest from GitHub
+- Update hooks, skills, rules, agents
+- Upgrade TLDR if installed
+- Rebuild TypeScript hooks if changed
 
 ### What Gets Installed
 

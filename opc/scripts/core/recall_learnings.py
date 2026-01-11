@@ -41,8 +41,9 @@ if global_env.exists():
     load_dotenv(global_env)
 load_dotenv()
 
-# Add scripts to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+# Add project root to path for imports (opc/)
+project_dir = os.environ.get("CLAUDE_PROJECT_DIR", str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, project_dir)
 
 
 def format_result_preview(content: str, max_length: int = 200) -> str:

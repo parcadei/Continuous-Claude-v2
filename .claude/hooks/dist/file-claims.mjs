@@ -86,7 +86,7 @@ import json
 file_path = sys.argv[1]
 project = sys.argv[2]
 my_session_id = sys.argv[3]
-pg_url = os.environ.get('OPC_POSTGRES_URL', 'postgresql://opc:opc_dev_password@localhost:5432/opc')
+pg_url = os.environ.get('OPC_POSTGRES_URL', 'postgresql://claude:claude_dev@localhost:5432/continuous_claude')
 
 async def main():
     conn = await asyncpg.connect(pg_url)
@@ -138,7 +138,7 @@ import os
 file_path = sys.argv[1]
 project = sys.argv[2]
 session_id = sys.argv[3]
-pg_url = os.environ.get('OPC_POSTGRES_URL', 'postgresql://opc:opc_dev_password@localhost:5432/opc')
+pg_url = os.environ.get('OPC_POSTGRES_URL', 'postgresql://claude:claude_dev@localhost:5432/continuous_claude')
 
 async def main():
     conn = await asyncpg.connect(pg_url)

@@ -1,6 +1,7 @@
 ---
 name: braintrust-analyst
 description: Analyze Claude Code sessions using Braintrust logs
+model: opus
 ---
 
 # Braintrust Analyst Agent

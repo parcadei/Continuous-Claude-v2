@@ -86,7 +86,7 @@ from datetime import datetime
 session_id = sys.argv[1]
 project = sys.argv[2]
 working_on = sys.argv[3] if len(sys.argv) > 3 else ''
-pg_url = os.environ.get('OPC_POSTGRES_URL', 'postgresql://opc:opc_dev_password@localhost:5432/opc')
+pg_url = os.environ.get('OPC_POSTGRES_URL', 'postgresql://claude:claude_dev@localhost:5432/continuous_claude')
 
 async def main():
     conn = await asyncpg.connect(pg_url)
@@ -134,7 +134,7 @@ import json
 from datetime import datetime, timedelta
 
 project_filter = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] != 'null' else None
-pg_url = os.environ.get('OPC_POSTGRES_URL', 'postgresql://opc:opc_dev_password@localhost:5432/opc')
+pg_url = os.environ.get('OPC_POSTGRES_URL', 'postgresql://claude:claude_dev@localhost:5432/continuous_claude')
 
 async def main():
     conn = await asyncpg.connect(pg_url)

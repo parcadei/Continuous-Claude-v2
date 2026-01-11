@@ -1,5 +1,7 @@
 ---
 name: research-codebase
+description: Document the codebase comprehensively
+model: sonnet
 ---
 
 # Research Codebase Agent

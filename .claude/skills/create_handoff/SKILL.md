@@ -11,17 +11,17 @@ You are tasked with writing a handoff document to hand off your work to another 
 ### 1. Filepath & Metadata
 Use the following information to understand how to create your document:
 
-**First, determine the session name from the active ledger:**
+**First, determine the session name from existing handoffs:**
 ```bash
-ls thoughts/ledgers/CONTINUITY_CLAUDE-*.md 2>/dev/null | head -1 | sed 's/.*CONTINUITY_CLAUDE-\(.*\)\.md/\1/'
+ls -td thoughts/shared/handoffs/*/ 2>/dev/null | head -1 | xargs basename
 ```
 
-This returns the active work stream name (e.g., `open-source-release`). Use this as the handoff folder name.
+This returns the most recently modified handoff folder name (e.g., `open-source-release`). Use this as the handoff folder name.
 
-If no ledger exists, use `general` as the folder name.
+If no handoffs exist, use `general` as the folder name.
 
 **Create your file under:** `thoughts/shared/handoffs/{session-name}/YYYY-MM-DD_HH-MM_description.yaml`, where:
-- `{session-name}` is from the ledger (e.g., `open-source-release`) or `general` if no ledger
+- `{session-name}` is from existing handoffs (e.g., `open-source-release`) or `general` if none exist
 - `YYYY-MM-DD` is today's date
 - `HH-MM` is the current time in 24-hour format (no seconds needed)
 - `description` is a brief kebab-case description
