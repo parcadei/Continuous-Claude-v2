@@ -7,7 +7,7 @@
 
 import { readFileSync, existsSync, statSync } from 'fs';
 import { join } from 'path';
-import { queryDaemonSync } from './daemon-client.js';
+import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
 
 interface SessionStartInput {
   session_id: string;
@@ -139,6 +139,12 @@ async function main() {
   const semanticWarning = semantic.exists
     ? ''
     : '\n⚠️ No semantic index found. Run `tldr semantic index .` for AI-powered code search.';
+
+  // Track hook activity for flush threshold
+  trackHookActivitySync('session-start-tldr-cache', projectDir, true, {
+    sessions_started: 1,
+    cache_warmed: shouldWarm && warmStatus.includes('warmed') ? 1 : 0,
+  });
 
   // Emit system message - don't load full JSON, just notify availability
   const cacheInfo = cache.exists ? `${available.join(', ')}` : 'building...';

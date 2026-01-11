@@ -8,7 +8,7 @@
  */
 
 import { readFileSync, existsSync } from 'fs';
-import { queryDaemonSync } from './daemon-client.js';
+import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
 
 interface SessionStartInput {
   session_id: string;
@@ -126,6 +126,12 @@ async function main() {
     console.log('{}');
     return;
   }
+
+  // Track hook activity for flush threshold
+  trackHookActivitySync('session-start-dead-code', projectDir, true, {
+    sessions_checked: 1,
+    dead_found: result.count,
+  });
 
   // Emit warning message
   const warning = formatWarning(result);

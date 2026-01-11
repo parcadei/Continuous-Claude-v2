@@ -6,7 +6,7 @@
  */
 
 import { readFileSync } from 'fs';
-import { queryDaemonSync } from './daemon-client.js';
+import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
 
 interface HookInput {
   tool_name: string;
@@ -167,6 +167,12 @@ async function main() {
       additionalContext: `[Signatures from TLDR]\n${signatures.join('\n')}`
     }
   };
+
+  // Track hook activity for flush threshold
+  trackHookActivitySync('signature-helper', projectDir, true, {
+    edits_checked: 1,
+    signatures_found: signatures.length,
+  });
 
   console.log(JSON.stringify(output));
 }

@@ -7,7 +7,7 @@
 
 import { readFileSync } from 'fs';
 import { basename } from 'path';
-import { queryDaemonSync } from './daemon-client.js';
+import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
 
 interface HookInput {
   tool_name: string;
@@ -73,12 +73,13 @@ function getTLDRImports(filePath: string): TLDRImport[] {
 
 /**
  * Get file structure using TLDR daemon extract command.
+ * @param sessionId - Optional session ID for token tracking
  */
-function getTLDRExtract(filePath: string): TLDRExtract | null {
+function getTLDRExtract(filePath: string, sessionId?: string): TLDRExtract | null {
   try {
     const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
     const response = queryDaemonSync(
-      { cmd: 'extract', file: filePath },
+      { cmd: 'extract', file: filePath, session: sessionId },
       projectDir
     );
 
@@ -111,8 +112,8 @@ async function main() {
     return;
   }
 
-  // Get file structure from TLDR
-  const extract = getTLDRExtract(filePath);
+  // Get file structure from TLDR (pass session_id for token tracking)
+  const extract = getTLDRExtract(filePath, input.session_id);
   const imports = getTLDRImports(filePath);
 
   const classCount = extract?.classes?.length || 0;
@@ -158,6 +159,13 @@ async function main() {
       additionalContext: `[Edit context: ${basename(filePath)} - ${summary}]\n${parts.join('\n')}`
     }
   };
+
+  // Track hook activity for flush threshold
+  const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  trackHookActivitySync('edit-context-inject', projectDir, true, {
+    edits_processed: 1,
+    symbols_shown: total,
+  });
 
   console.log(JSON.stringify(output));
 }

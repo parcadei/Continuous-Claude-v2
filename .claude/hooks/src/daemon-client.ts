@@ -35,6 +35,35 @@ function getLockPath(projectDir: string): string {
 }
 
 /**
+ * Get PID file path for daemon.
+ */
+function getPidPath(projectDir: string): string {
+  const resolvedPath = resolveProjectDir(projectDir);
+  const hash = crypto.createHash('md5').update(resolvedPath).digest('hex').substring(0, 8);
+  return `/tmp/tldr-${hash}.pid`;
+}
+
+/**
+ * Check if daemon process is running by checking PID file and process existence.
+ * This is more reliable than socket ping which can timeout when daemon is busy.
+ */
+function isDaemonProcessRunning(projectDir: string): boolean {
+  const pidPath = getPidPath(projectDir);
+  if (!existsSync(pidPath)) return false;
+
+  try {
+    const pid = parseInt(readFileSync(pidPath, 'utf-8').trim(), 10);
+    if (isNaN(pid) || pid <= 0) return false;
+
+    // kill(pid, 0) checks if process exists without sending signal
+    process.kill(pid, 0);
+    return true;  // Process exists
+  } catch {
+    return false;  // Process doesn't exist or permission denied
+  }
+}
+
+/**
  * Try to acquire startup lock (non-blocking).
  * Returns true if lock acquired, false if another process holds it.
  */
@@ -274,7 +303,26 @@ function isDaemonReachable(projectDir: string): boolean {
       return false;
     }
 
-    // Try a quick ping to verify daemon is alive (sync approach using nc)
+    // First check if daemon process is running via PID file
+    // This is more reliable than socket ping which can timeout when busy
+    if (isDaemonProcessRunning(projectDir)) {
+      // Process exists - socket might just be busy, don't delete it
+      // Try a quick ping but don't delete socket on failure
+      try {
+        execSync(`echo '{"cmd":"ping"}' | nc -U "${connInfo.path}"`, {
+          encoding: 'utf-8',
+          timeout: 1000,  // Increased from 500ms
+          stdio: ['pipe', 'pipe', 'pipe'],
+        });
+        return true;
+      } catch {
+        // Ping failed but process exists - daemon is starting or busy
+        // Return true to prevent spawning duplicates
+        return true;
+      }
+    }
+
+    // No daemon process running - try ping to verify socket isn't stale
     try {
       execSync(`echo '{"cmd":"ping"}' | nc -U "${connInfo.path}"`, {
         encoding: 'utf-8',
@@ -283,7 +331,7 @@ function isDaemonReachable(projectDir: string): boolean {
       });
       return true;
     } catch {
-      // Connection failed - socket is stale, remove it
+      // Connection failed AND no daemon process - socket is stale, safe to remove
       try {
         unlinkSync(connInfo.path!);
       } catch {
@@ -303,8 +351,14 @@ function isDaemonReachable(projectDir: string): boolean {
  */
 export function tryStartDaemon(projectDir: string): boolean {
   try {
-    // Check if daemon is already running BEFORE spawning
-    // Prevents orphaned daemon processes when multiple sessions start
+    // FAST CHECK: Is daemon process running? (checks PID file + kill -0)
+    // This is faster and more reliable than socket ping
+    if (isDaemonProcessRunning(projectDir)) {
+      return true;  // Process exists, even if socket not ready yet
+    }
+
+    // SLOW CHECK: Is daemon reachable via socket?
+    // Only needed if PID file doesn't exist (first start or cleaned up)
     if (isDaemonReachable(projectDir)) {
       return true;  // Already running, no need to spawn
     }
@@ -314,27 +368,34 @@ export function tryStartDaemon(projectDir: string): boolean {
       // Another process is starting the daemon - wait and check if it succeeds
       const start = Date.now();
       while (Date.now() - start < 5000) {
-        if (isDaemonReachable(projectDir)) {
+        // Check process first (faster), then socket
+        if (isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir)) {
           return true;
         }
         // Brief wait
         const end = Date.now() + 100;
         while (Date.now() < end) { /* spin */ }
       }
-      return isDaemonReachable(projectDir);
+      return isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir);
     }
 
     try {
       // We hold the lock - start the daemon
       const tldrPath = join(projectDir, 'opc', 'packages', 'tldr-code');
-      const result = spawnSync('uv', ['run', 'tldr', 'daemon', 'start', '--project', projectDir], {
-        timeout: 10000,
-        stdio: 'ignore',
-        cwd: tldrPath,
-      });
+      let started = false;
 
-      // If uv failed, try direct tldr (might work if installed globally with daemon support)
-      if (result.status !== 0) {
+      // Try local dev installation first (only if it exists)
+      if (existsSync(tldrPath)) {
+        const result = spawnSync('uv', ['run', 'tldr', 'daemon', 'start', '--project', projectDir], {
+          timeout: 10000,
+          stdio: 'ignore',
+          cwd: tldrPath,
+        });
+        started = result.status === 0;
+      }
+
+      // Fallback to global tldr if local didn't work
+      if (!started) {
         spawnSync('tldr', ['daemon', 'start', '--project', projectDir], {
           timeout: 5000,
           stdio: 'ignore',

@@ -6,7 +6,7 @@
  */
 
 import { readFileSync } from 'fs';
-import { queryDaemonSync } from './daemon-client.js';
+import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
 
 interface HookInput {
   tool_name: string;
@@ -47,6 +47,12 @@ async function main() {
       { cmd: 'notify', file: filePath },
       projectDir
     );
+
+    // Track hook activity for flush threshold
+    trackHookActivitySync('post-edit-notify', projectDir, true, {
+      edits_notified: 1,
+      reindexes_triggered: response.reindex_triggered ? 1 : 0,
+    });
 
     // If reindex was triggered, optionally inform user
     if (response.reindex_triggered) {

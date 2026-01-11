@@ -16,6 +16,23 @@ function getLockPath(projectDir) {
   const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
   return `/tmp/tldr-${hash}.lock`;
 }
+function getPidPath(projectDir) {
+  const resolvedPath = resolveProjectDir(projectDir);
+  const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
+  return `/tmp/tldr-${hash}.pid`;
+}
+function isDaemonProcessRunning(projectDir) {
+  const pidPath = getPidPath(projectDir);
+  if (!existsSync(pidPath)) return false;
+  try {
+    const pid = parseInt(readFileSync(pidPath, "utf-8").trim(), 10);
+    if (isNaN(pid) || pid <= 0) return false;
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
 function tryAcquireLock(projectDir) {
   const lockPath = getLockPath(projectDir);
   try {
@@ -93,6 +110,19 @@ function isDaemonReachable(projectDir) {
     if (!existsSync(connInfo.path)) {
       return false;
     }
+    if (isDaemonProcessRunning(projectDir)) {
+      try {
+        execSync(`echo '{"cmd":"ping"}' | nc -U "${connInfo.path}"`, {
+          encoding: "utf-8",
+          timeout: 1e3,
+          // Increased from 500ms
+          stdio: ["pipe", "pipe", "pipe"]
+        });
+        return true;
+      } catch {
+        return true;
+      }
+    }
     try {
       execSync(`echo '{"cmd":"ping"}' | nc -U "${connInfo.path}"`, {
         encoding: "utf-8",
@@ -111,29 +141,36 @@ function isDaemonReachable(projectDir) {
 }
 function tryStartDaemon(projectDir) {
   try {
+    if (isDaemonProcessRunning(projectDir)) {
+      return true;
+    }
     if (isDaemonReachable(projectDir)) {
       return true;
     }
     if (!tryAcquireLock(projectDir)) {
       const start = Date.now();
       while (Date.now() - start < 5e3) {
-        if (isDaemonReachable(projectDir)) {
+        if (isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir)) {
           return true;
         }
         const end = Date.now() + 100;
         while (Date.now() < end) {
         }
       }
-      return isDaemonReachable(projectDir);
+      return isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir);
     }
     try {
       const tldrPath = join(projectDir, "opc", "packages", "tldr-code");
-      const result = spawnSync("uv", ["run", "tldr", "daemon", "start", "--project", projectDir], {
-        timeout: 1e4,
-        stdio: "ignore",
-        cwd: tldrPath
-      });
-      if (result.status !== 0) {
+      let started = false;
+      if (existsSync(tldrPath)) {
+        const result = spawnSync("uv", ["run", "tldr", "daemon", "start", "--project", projectDir], {
+          timeout: 1e4,
+          stdio: "ignore",
+          cwd: tldrPath
+        });
+        started = result.status === 0;
+      }
+      if (!started) {
         spawnSync("tldr", ["daemon", "start", "--project", projectDir], {
           timeout: 5e3,
           stdio: "ignore"
@@ -209,6 +246,15 @@ function queryDaemonSync(query, projectDir) {
     return { status: "error", error: err.message || "Unknown error" };
   }
 }
+function trackHookActivitySync(hookName, projectDir, success = true, metrics = {}) {
+  try {
+    queryDaemonSync(
+      { cmd: "track", hook: hookName, success, metrics },
+      projectDir
+    );
+  } catch {
+  }
+}
 
 // src/edit-context-inject.ts
 function getTLDRImports(filePath) {
@@ -229,11 +275,11 @@ function getTLDRImports(filePath) {
     return [];
   }
 }
-function getTLDRExtract(filePath) {
+function getTLDRExtract(filePath, sessionId) {
   try {
     const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
     const response = queryDaemonSync(
-      { cmd: "extract", file: filePath },
+      { cmd: "extract", file: filePath, session: sessionId },
       projectDir
     );
     if (response.indexing || response.status === "unavailable" || response.status === "error") {
@@ -258,7 +304,7 @@ async function main() {
     console.log("{}");
     return;
   }
-  const extract = getTLDRExtract(filePath);
+  const extract = getTLDRExtract(filePath, input.session_id);
   const imports = getTLDRImports(filePath);
   const classCount = extract?.classes?.length || 0;
   const funcCount = extract?.functions?.length || 0;
@@ -294,6 +340,11 @@ async function main() {
 ${parts.join("\n")}`
     }
   };
+  const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  trackHookActivitySync("edit-context-inject", projectDir, true, {
+    edits_processed: 1,
+    symbols_shown: total
+  });
   console.log(JSON.stringify(output));
 }
 main().catch(() => console.log("{}"));

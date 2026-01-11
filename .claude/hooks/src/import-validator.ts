@@ -7,7 +7,7 @@
 
 import { readFileSync } from 'fs';
 import { basename } from 'path';
-import { queryDaemonSync } from './daemon-client.js';
+import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
 
 interface HookInput {
   tool_name: string;
@@ -140,6 +140,13 @@ async function main() {
       additionalContext: `[Import check]\n${warnings.join('\n')}`
     }
   };
+
+  // Track hook activity for flush threshold
+  const projectDir = process.env.CLAUDE_PROJECT_DIR || '.';
+  trackHookActivitySync('import-validator', projectDir, true, {
+    writes_validated: 1,
+    warnings_found: warnings.length,
+  });
 
   console.log(JSON.stringify(output));
 }

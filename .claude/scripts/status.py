@@ -98,6 +98,48 @@ def log_context_drop(session_id: str, prev_pct: int, curr_pct: int) -> None:
         pass
 
 
+def write_session_stats(data: dict) -> None:
+    """Write full session stats for /tldr-stats skill.
+
+    Extracts token usage, model info, and cost from Claude Code data.
+    Writes to JSON file that skill can read for full picture view.
+    """
+    session_id = get_session_id(data)
+    tmp_dir = Path(tempfile.gettempdir())
+    stats_file = tmp_dir / f"claude-session-stats-{session_id}.json"
+
+    try:
+        ctx = data.get("context_window", {})
+        usage = ctx.get("current_usage", {})
+        model_info = data.get("model", {})
+        cost_info = data.get("cost", {})
+
+        # Use totals from context_window, fall back to current_usage
+        stats = {
+            "session_id": session_id,
+            # Cumulative totals (preferred)
+            "total_input_tokens": ctx.get("total_input_tokens", 0) or 0,
+            "total_output_tokens": ctx.get("total_output_tokens", 0) or 0,
+            # Current turn (for reference)
+            "current_input_tokens": usage.get("input_tokens", 0) or 0,
+            "current_output_tokens": usage.get("output_tokens", 0) or 0,
+            # Cache tokens
+            "cache_read_tokens": usage.get("cache_read_input_tokens", 0) or 0,
+            "cache_creation_tokens": usage.get("cache_creation_input_tokens", 0) or 0,
+            "context_window_size": ctx.get("context_window_size", 200000) or 200000,
+            # Model info
+            "model_id": model_info.get("id", "unknown"),
+            "model_name": model_info.get("display_name", "Unknown"),
+            # Cost info
+            "total_cost_usd": cost_info.get("total_cost_usd", 0) or 0,
+            "total_duration_ms": cost_info.get("total_duration_ms", 0) or 0,
+        }
+
+        stats_file.write_text(json.dumps(stats))
+    except OSError:
+        pass  # Non-critical
+
+
 def write_context_pct(context_pct: int, data: dict) -> None:
     """Write context percentage for other hooks to read.
 
@@ -394,6 +436,9 @@ def main() -> None:
 
     # Write context percentage for hooks (use session_id from Claude Code)
     write_context_pct(context_pct, data)
+
+    # Write full session stats for /tldr-stats skill
+    write_session_stats(data)
 
     # Get git info
     git_info = get_git_info(cwd)

@@ -21,6 +21,7 @@ import {
   sliceDaemon,
   extractDaemon,
   DaemonResponse,
+  trackHookActivitySync,
 } from './daemon-client';
 
 interface HookInput {
@@ -490,6 +491,12 @@ ${prompt}`;
       }
     }
   };
+
+  // Track hook activity for flush threshold
+  trackHookActivitySync('tldr-context-inject', projectRoot, true, {
+    context_injected: 1,
+    layers_used: layers.length,
+  });
 
   console.log(JSON.stringify(output));
 }
