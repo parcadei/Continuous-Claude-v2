@@ -1754,25 +1754,62 @@ async def run_setup_wizard() -> None:
             if result.returncode == 0:
                 console.print("  [green]OK[/green] Embeddings installed")
 
-                # Verify imports work
-                console.print("  Verifying installation...")
+                # Also install postgres/pgvector for storage
+                console.print("  Installing pgvector for PostgreSQL storage...")
+                pg_result = subprocess.run(
+                    ["uv", "sync", "--extra", "postgres"],
+                    capture_output=True,
+                    text=True,
+                    timeout=120,
+                )
+                if pg_result.returncode == 0:
+                    console.print("  [green]OK[/green] pgvector installed")
+                else:
+                    console.print("  [yellow]WARN[/yellow] pgvector install failed (optional)")
+
+                # Verify imports and load actual Qwen3 model
+                console.print("  Loading Qwen3-Embedding-0.6B model...")
                 verify_result = subprocess.run(
                     [
                         "uv",
                         "run",
                         "python",
                         "-c",
-                        "from sentence_transformers import SentenceTransformer; print('OK')",
+                        "from sentence_transformers import SentenceTransformer; "
+                        "m = SentenceTransformer('Qwen/Qwen3-Embedding-0.6B'); "
+                        "print('OK dim:', m.get_sentence_embedding_dimension())",
                     ],
                     capture_output=True,
                     text=True,
-                    timeout=60,
+                    timeout=120,  # 2 min for first model download
                 )
                 if verify_result.returncode == 0 and "OK" in verify_result.stdout:
-                    console.print("  [green]OK[/green] sentence-transformers verified")
+                    console.print(f"  [green]OK[/green] {verify_result.stdout.strip()}")
                 else:
-                    console.print("  [yellow]WARN[/yellow] Verification failed")
+                    console.print("  [yellow]WARN[/yellow] Model verification failed")
                     console.print(f"       {verify_result.stderr[:200]}")
+
+                # Verify reranker model
+                console.print("  Loading BAAI/bge-reranker-base model...")
+                rerank_result = subprocess.run(
+                    [
+                        "uv",
+                        "run",
+                        "python",
+                        "-c",
+                        "from sentence_transformers import CrossEncoder; "
+                        "m = CrossEncoder('BAAI/bge-reranker-base'); "
+                        "print('OK')",
+                    ],
+                    capture_output=True,
+                    text=True,
+                    timeout=120,
+                )
+                if rerank_result.returncode == 0:
+                    console.print("  [green]OK[/green] Reranker verified")
+                else:
+                    console.print("  [yellow]WARN[/yellow] Reranker verification failed (optional)")
+
             else:
                 console.print("  [red]ERROR[/red] Installation failed")
                 console.print(f"       {result.stderr[:200]}")

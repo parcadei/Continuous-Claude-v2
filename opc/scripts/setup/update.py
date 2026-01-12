@@ -986,6 +986,38 @@ def run_update(
         console.print(f"  [{'green' if success else 'dim'}]{msg}[/{'green' if success else 'dim'}]")
         return summary
 
+    if embeddings_only:
+        console.print("\n[bold]Installing embeddings dependencies...[/bold]")
+        try:
+            result = subprocess.run(
+                ["uv", "sync", "--extra", "embeddings"],
+                cwd=opc_dir,
+                capture_output=True,
+                text=True,
+                timeout=600,
+            )
+            if result.returncode == 0:
+                console.print("  [green]OK[/green] Embeddings installed")
+                # Validate
+                test_result = subprocess.run(
+                    ["uv", "run", "python", "-c",
+                     "from sentence_transformers import SentenceTransformer; "
+                     "m = SentenceTransformer('Qwen/Qwen3-Embedding-0.6B'); "
+                     "print('Model loaded:', m.get_sentence_embedding_dimension(), 'dims')"],
+                    cwd=opc_dir,
+                    capture_output=True,
+                    text=True,
+                    timeout=120,
+                )
+                if test_result.returncode == 0:
+                    console.print(f"  [green]OK[/green] {test_result.stdout.strip()}")
+            else:
+                console.print("  [red]ERROR[/red] Embeddings install failed")
+                console.print(f"       {result.stderr[:200]}")
+        except Exception as e:
+            console.print(f"  [red]ERROR[/red] {e}")
+        return summary
+
     # Step 1: Git pull (unless skipped)
     console.print("\n[bold]Step 1/9: Checking git status...[/bold]")
 
@@ -1052,6 +1084,48 @@ def run_update(
             console.print(f"  [green]OK[/green] {msg}")
         else:
             console.print(f"  [dim]{msg}[/dim]")
+
+        # Step 2.5: Update embeddings dependencies (sentence-transformers, torch)
+        console.print("\n[bold]Step 2.5/9: Updating embeddings dependencies...[/bold]")
+        try:
+            result = subprocess.run(
+                ["uv", "sync", "--extra", "embeddings"],
+                cwd=opc_dir,
+                capture_output=True,
+                text=True,
+                timeout=300,
+            )
+            if result.returncode == 0:
+                console.print("  [green]OK[/green] Embeddings dependencies updated")
+            elif "Nothing to do" in result.stdout or "Already up to date" in result.stdout:
+                console.print("  [dim]Embeddings dependencies already up to date[/dim]")
+            else:
+                console.print(f"  [yellow]WARN[/yellow] Embeddings update failed")
+        except subprocess.TimeoutExpired:
+            console.print("  [yellow]WARN[/yellow] Embeddings update timed out")
+        except Exception as e:
+            console.print(f"  [yellow]WARN[/yellow] Embeddings update error: {e}")
+
+        # Step 2.6: Validate embedding models
+        console.print("\n[bold]Step 2.6/9: Validating embedding models...[/bold]")
+        try:
+            # Test Qwen3-Embedding-0.6B
+            test_result = subprocess.run(
+                ["uv", "run", "python", "-c",
+                 "from sentence_transformers import SentenceTransformer; "
+                 "m = SentenceTransformer('Qwen/Qwen3-Embedding-0.6B'); "
+                 "print('OK dim:', m.get_sentence_embedding_dimension())"],
+                cwd=opc_dir,
+                capture_output=True,
+                text=True,
+                timeout=120,
+            )
+            if test_result.returncode == 0 and "OK" in test_result.stdout:
+                console.print(f"  [green]OK[/green] Qwen3-Embedding-0.6B: {test_result.stdout.strip()}")
+            else:
+                console.print("  [yellow]WARN[/yellow] Qwen3-Embedding-0.6B validation failed")
+        except Exception as e:
+            console.print(f"  [yellow]WARN[/yellow] Embedding validation error: {e}")
 
     # Step 3: Compare directories (hooks, skills, rules, agents, servers)
     console.print("\n[bold]Step 3/9: Comparing installed files...[/bold]")
@@ -1325,6 +1399,11 @@ def main() -> int:
         action="store_true",
         help="Update NPM dependencies only (npm update)",
     )
+    parser.add_argument(
+        "--embeddings",
+        action="store_true",
+        help="Install embeddings dependencies (sentence-transformers, torch)",
+    )
 
     args = parser.parse_args()
 
@@ -1341,6 +1420,7 @@ def main() -> int:
             reindex_tldr=args.reindex,
             update_deps_only=args.update_deps,
             update_npm_only=args.update_npm,
+            embeddings_only=args.embeddings,
         )
 
         # Print summary if verbose or there were changes
