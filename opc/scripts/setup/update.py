@@ -507,6 +507,8 @@ def rebuild_tldr_index(
 ) -> tuple[bool, str]:
     """Rebuild TLDR symbol index if hooks/scripts changed.
 
+    Uses the local build_symbol_index.py script for AST-based indexing.
+
     Args:
         project_root: Path to project root
         force: Force reindex even if no changes detected
@@ -516,14 +518,8 @@ def rebuild_tldr_index(
         Tuple of (success, message)
     """
     try:
-        # Check if tldr is available
-        tldr_cmd = shutil.which("tldr")
-        if not tldr_cmd:
-            return False, "tldr not found"
-
         # Check if we should reindex based on file changes
         if not force:
-            # Check if .claude files changed (hooks, skills, agents, rules, servers)
             claude_dir = project_root / ".claude"
             if claude_dir.exists():
                 last_index = project_root / ".tldr_index_timestamp"
@@ -541,27 +537,28 @@ def rebuild_tldr_index(
         if verbose:
             console.print("  [dim]Rebuilding TLDR index...[/dim]")
 
-        # Run tldr reindex
+        # Use local build_symbol_index.py script
+        opc_dir = project_root / "opc"
+        index_script = opc_dir / "scripts" / "tldr" / "build_symbol_index.py"
+
+        if not index_script.exists():
+            return False, f"TLDR index script not found: {index_script}"
+
+        # Run the local Python script via uv
+        uv_cmd = shutil.which("uv")
+        if not uv_cmd:
+            return False, "uv not found"
+
         result = subprocess.run(
-            [tldr_cmd, "reindex"],
-            cwd=project_root,
+            [uv_cmd, "run", "python", str(index_script), str(project_root)],
+            cwd=str(project_root),
             capture_output=True,
             text=True,
-            timeout=120,
+            timeout=300,  # 5 min timeout for large projects
         )
 
         if result.returncode != 0:
-            # Try semantic reindex as fallback
-            result = subprocess.run(
-                [tldr_cmd, "semantic", "reindex"],
-                cwd=project_root,
-                capture_output=True,
-                text=True,
-                timeout=120,
-            )
-
-            if result.returncode != 0:
-                return False, f"TLDR reindex failed: {result.stderr[:200]}"
+            return False, f"TLDR reindex failed: {result.stderr[:200]}"
 
         # Update timestamp file
         timestamp_file = project_root / ".tldr_index_timestamp"
