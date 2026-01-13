@@ -1026,7 +1026,10 @@ If you installed with copy mode and want to switch:
 mkdir -p ~/.claude/backups/$(date +%Y%m%d)
 cp -r ~/.claude/{rules,skills,hooks,agents} ~/.claude/backups/$(date +%Y%m%d)/
 
-# Remove copies
+# Verify backup succeeded before proceeding
+ls -la ~/.claude/backups/$(date +%Y%m%d)/
+
+# Remove copies (only after verifying backup above)
 rm -rf ~/.claude/{rules,skills,hooks,agents}
 
 # Create symlinks (adjust path to your repo location)
@@ -1051,7 +1054,10 @@ $BackupDir = "$HOME\.claude\backups\$(Get-Date -Format 'yyyyMMdd')"
 New-Item -ItemType Directory -Path $BackupDir -Force
 Copy-Item -Recurse "$HOME\.claude\rules","$HOME\.claude\skills","$HOME\.claude\hooks","$HOME\.claude\agents" $BackupDir
 
-# Remove copies
+# Verify backup succeeded before proceeding
+Get-ChildItem $BackupDir
+
+# Remove copies (only after verifying backup above)
 Remove-Item -Recurse "$HOME\.claude\rules","$HOME\.claude\skills","$HOME\.claude\hooks","$HOME\.claude\agents"
 
 # Create symlinks (adjust path to your repo location)
