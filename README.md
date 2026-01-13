@@ -1040,6 +1040,31 @@ ln -s "$REPO/.claude/agents" ~/.claude/agents
 ls -la ~/.claude | grep -E "rules|skills|hooks|agents"
 ```
 
+**Windows users:** Use PowerShell (as Administrator or with Developer Mode enabled):
+
+```powershell
+# Enable Developer Mode first (Settings → Privacy & security → For developers)
+# Or run PowerShell as Administrator
+
+# Backup current config
+$BackupDir = "$HOME\.claude\backups\$(Get-Date -Format 'yyyyMMdd')"
+New-Item -ItemType Directory -Path $BackupDir -Force
+Copy-Item -Recurse "$HOME\.claude\rules","$HOME\.claude\skills","$HOME\.claude\hooks","$HOME\.claude\agents" $BackupDir
+
+# Remove copies
+Remove-Item -Recurse "$HOME\.claude\rules","$HOME\.claude\skills","$HOME\.claude\hooks","$HOME\.claude\agents"
+
+# Create symlinks (adjust path to your repo location)
+$REPO = "$HOME\continuous-claude"  # or wherever you cloned
+New-Item -ItemType SymbolicLink -Path "$HOME\.claude\rules" -Target "$REPO\.claude\rules"
+New-Item -ItemType SymbolicLink -Path "$HOME\.claude\skills" -Target "$REPO\.claude\skills"
+New-Item -ItemType SymbolicLink -Path "$HOME\.claude\hooks" -Target "$REPO\.claude\hooks"
+New-Item -ItemType SymbolicLink -Path "$HOME\.claude\agents" -Target "$REPO\.claude\agents"
+
+# Verify
+Get-ChildItem "$HOME\.claude" | Where-Object { $_.LinkType -eq "SymbolicLink" }
+```
+
 ### For Brownfield Projects
 
 After installation, start Claude and run:
