@@ -24,6 +24,37 @@ if str(_project_root) not in __import__("sys").path:
 
 
 @dataclass
+class Migration:
+    """Represents a single database migration file."""
+    id: str
+    name: str
+    path: Path
+
+    @classmethod
+    def from_filename(cls, filename: str) -> "Migration":
+        """Parse a migration filename.
+
+        Args:
+            filename: Migration filename like "001_create_migrations_table.sql"
+
+        Returns:
+            Migration instance
+        """
+        match = re.match(r"^(\d+)_([a-zA-Z0-9_]+)\.sql$", filename)
+        if not match:
+            raise ValueError(f"Invalid migration filename: {filename}")
+        return cls(
+            id=match.group(1),
+            name=match.group(2),
+            path=Path(filename),
+        )
+
+    def __lt__(self, other: "Migration") -> bool:
+        """Compare by ID numerically."""
+        return int(self.id) < int(other.id)
+
+
+@dataclass
 class MigrationResult:
     """Result of applying migrations."""
     applied: list[str]

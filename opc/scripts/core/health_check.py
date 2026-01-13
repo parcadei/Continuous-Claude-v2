@@ -81,6 +81,12 @@ MIN_DISK_GB = 1.0
 MAX_MEMORY_PERCENT = 90.0
 MAX_CONNECTION_LATENCY_MS = 5000
 
+# Hook paths
+HOOKS_DIR = CLAUDE_HOME / "hooks"
+HOOKS_SRC_DIR = HOOKS_DIR / "src"
+HOOKS_DIST_DIR = HOOKS_DIR / "dist"
+SETTINGS_FILE = CLAUDE_HOME / "settings.json"
+
 
 # =============================================================================
 # Enums and Data Classes
@@ -377,6 +383,845 @@ class ProcessLivenessCheck(HealthCheckProvider):
                 recovery_action="restart_daemon"
             )
 
+
+# =============================================================================
+# Phase 1: Hook Health Check Providers
+# =============================================================================
+
+class HookFileCheck(HealthCheckProvider):
+    """Check if hooks dist/ directory exists with .mjs files."""
+
+    def __init__(self, dist_dir: Optional[Path] = None):
+        self.dist_dir = dist_dir if dist_dir is not None else HOOKS_DIST_DIR
+
+    @property
+    def name(self) -> str:
+        return "hook_file"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.STARTUP
+
+    def check(self) -> HealthCheckResult:
+        if not self.dist_dir.exists():
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.UNHEALTHY,
+                level=self.get_level(),
+                message=f"Hooks dist/ directory does not exist",
+                details={"path": str(self.dist_dir)},
+                recovery_action="build_hooks"
+            )
+
+        # Count .mjs files
+        mjs_files = list(self.dist_dir.glob("*.mjs"))
+        count = len(mjs_files)
+
+        if count == 0:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.UNHEALTHY,
+                level=self.get_level(),
+                message="No .mjs files found in hooks dist/",
+                details={"path": str(self.dist_dir), "count": 0},
+                recovery_action="build_hooks"
+            )
+
+        return HealthCheckResult(
+            name=self.name,
+            status=HealthStatus.HEALTHY,
+            level=self.get_level(),
+            message=f"Hooks dist/ exists with {count} .mjs files",
+            details={"path": str(self.dist_dir), "count": count}
+        )
+
+
+class HookSyntaxCheck(HealthCheckProvider):
+    """Check TypeScript syntax of hooks using tsc."""
+
+    def __init__(self, hooks_dir: Optional[Path] = None):
+        self.hooks_dir = hooks_dir if hooks_dir is not None else HOOKS_DIR
+
+    @property
+    def name(self) -> str:
+        return "hook_syntax"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.STARTUP
+
+    def check(self) -> HealthCheckResult:
+        if not self.hooks_dir.exists():
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="Hooks directory does not exist, skipping syntax check",
+                details={"path": str(self.hooks_dir)}
+            )
+
+        try:
+            result = subprocess.run(
+                ["npx", "tsc", "--noEmit", "--skipLibCheck"],
+                cwd=self.hooks_dir,
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+
+            # Count errors in output
+            error_count = result.returncode
+            if error_count == 0:
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.HEALTHY,
+                    level=self.get_level(),
+                    message="TypeScript syntax check passed (0 errors)",
+                    details={"errors": 0}
+                )
+            else:
+                # Extract error count from stderr
+                stderr_lines = result.stderr.count("\nerror ") + (1 if "error " in result.stderr else 0)
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.UNHEALTHY,
+                    level=self.get_level(),
+                    message=f"TypeScript syntax check failed ({stderr_lines} errors)",
+                    details={"errors": stderr_lines, "stderr": result.stderr[:500]},
+                    recovery_action="fix_typescript_errors"
+                )
+        except subprocess.TimeoutExpired:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="TypeScript check timed out after 60s",
+                recovery_action="fix_typescript_errors"
+            )
+        except FileNotFoundError:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="TypeScript compiler (npx tsc) not found",
+                recovery_action="install_typescript"
+            )
+
+
+class HookBuildCheck(HealthCheckProvider):
+    """Check if hooks are up to date by comparing src/ and dist/ timestamps."""
+
+    def __init__(self, src_dir: Optional[Path] = None, dist_dir: Optional[Path] = None):
+        self.src_dir = src_dir if src_dir is not None else HOOKS_SRC_DIR
+        self.dist_dir = dist_dir if dist_dir is not None else HOOKS_DIST_DIR
+
+    @property
+    def name(self) -> str:
+        return "hook_build"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.STARTUP
+
+    def check(self) -> HealthCheckResult:
+        if not self.src_dir.exists():
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="Hooks src/ directory does not exist",
+                details={"path": str(self.src_dir)}
+            )
+
+        if not self.dist_dir.exists():
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.UNHEALTHY,
+                level=self.get_level(),
+                message="Hooks dist/ directory does not exist",
+                details={"path": str(self.dist_dir)},
+                recovery_action="build_hooks"
+            )
+
+        # Get newest source file and oldest dist file
+        src_files = list(self.src_dir.glob("*.ts"))
+        dist_files = list(self.dist_dir.glob("*.mjs"))
+
+        if not src_files:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.HEALTHY,
+                level=self.get_level(),
+                message="No TypeScript source files to check",
+                details={"src_files": 0, "dist_files": len(dist_files)}
+            )
+
+        if not dist_files:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.UNHEALTHY,
+                level=self.get_level(),
+                message="No built hook files found",
+                details={"src_files": len(src_files), "dist_files": 0},
+                recovery_action="build_hooks"
+            )
+
+        # Compare timestamps
+        newest_src = max(f.stat().st_mtime for f in src_files)
+        oldest_dist = min(f.stat().st_mtime for f in dist_files)
+
+        if newest_src > oldest_dist:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="Hooks are out of date - source files newer than dist",
+                details={"newest_src": newest_src, "oldest_dist": oldest_dist},
+                recovery_action="build_hooks"
+            )
+
+        return HealthCheckResult(
+            name=self.name,
+            status=HealthStatus.HEALTHY,
+            level=self.get_level(),
+            message="Hooks are up to date",
+            details={"src_files": len(src_files), "dist_files": len(dist_files)}
+        )
+
+
+class HookConfigCheck(HealthCheckProvider):
+    """Check if settings.json exists and is valid."""
+
+    def __init__(self, settings_file: Optional[Path] = None):
+        self.settings_file = settings_file if settings_file is not None else SETTINGS_FILE
+
+    @property
+    def name(self) -> str:
+        return "hook_config"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.STARTUP
+
+    def check(self) -> HealthCheckResult:
+        if not self.settings_file.exists():
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="settings.json does not exist",
+                details={"path": str(self.settings_file)},
+                recovery_action="regenerate_settings"
+            )
+
+        try:
+            with open(self.settings_file, 'r') as f:
+                json.load(f)
+
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.HEALTHY,
+                level=self.get_level(),
+                message="settings.json is valid JSON",
+                details={"path": str(self.settings_file)}
+            )
+        except json.JSONDecodeError as e:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.UNHEALTHY,
+                level=self.get_level(),
+                message=f"settings.json is not valid JSON: {e}",
+                details={"path": str(self.settings_file), "error": str(e)},
+                recovery_action="regenerate_settings"
+            )
+        except IOError as e:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message=f"Could not read settings.json: {e}",
+                details={"path": str(self.settings_file), "error": str(e)}
+            )
+
+
+# =============================================================================
+# Phase 2: Bash Command Validator
+# =============================================================================
+
+class BashCommandValidator:
+    """Utility class for validating bash commands before execution."""
+
+    @staticmethod
+    def run_command(cmd: str, timeout: int = 10) -> tuple[int, str, str]:
+        """Run a bash command and return (exit_code, stdout, stderr)."""
+        try:
+            result = subprocess.run(
+                cmd,
+                shell=True,
+                capture_output=True,
+                text=True,
+                timeout=timeout
+            )
+            return result.returncode, result.stdout, result.stderr
+        except subprocess.TimeoutExpired:
+            return -1, "", f"Command timed out after {timeout}s"
+        except Exception as e:
+            return -1, "", str(e)
+
+
+class BashCommandCheck(HealthCheckProvider):
+    """Check bash command availability for scripts."""
+
+    @property
+    def name(self) -> str:
+        return "bash_commands"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.READINESS
+
+    def check(self) -> HealthCheckResult:
+        # Verify bash is available
+        exit_code, stdout, stderr = BashCommandValidator.run_command("which bash")
+        if exit_code != 0:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="Bash not found in PATH",
+                recovery_action="install_bash"
+            )
+
+        return HealthCheckResult(
+            name=self.name,
+            status=HealthStatus.HEALTHY,
+            level=self.get_level(),
+            message="Bash is available",
+            details={"path": stdout.strip() if stdout else "/bin/bash"}
+        )
+
+
+# =============================================================================
+# Phase 3: TLDR/LLM Health Check Providers
+# =============================================================================
+
+class TldrCliCheck(HealthCheckProvider):
+    """Check if tldr CLI tool is available."""
+
+    @property
+    def name(self) -> str:
+        return "tldr_functional"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.READINESS
+
+    def check(self) -> HealthCheckResult:
+        exit_code, stdout, stderr = BashCommandValidator.run_command("which tldr")
+        if exit_code != 0:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="tldr CLI not found",
+                recovery_action="install_tldr"
+            )
+
+        # Check if tldr is functional
+        exit_code, stdout, stderr = BashCommandValidator.run_command("tldr --version", timeout=5)
+        if exit_code != 0:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="tldr CLI not functional",
+                details={"error": stderr.strip()}
+            )
+
+        return HealthCheckResult(
+            name=self.name,
+            status=HealthStatus.HEALTHY,
+            level=self.get_level(),
+            message="tldr CLI is functional",
+            details={"version": stdout.strip() if stdout else "unknown"}
+        )
+
+
+class TldrIndexCheck(HealthCheckProvider):
+    """Check tldr index availability and freshness."""
+
+    def __init__(self):
+        self.max_age_days = 2  # 48 hours
+
+    @property
+    def name(self) -> str:
+        return "tldr_index"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.READINESS
+
+    def check(self) -> HealthCheckResult:
+        # Use Path.home() at runtime, not in __init__, to allow mocking
+        cache_dir = Path.home() / ".cache" / "tldr"
+        index_file = cache_dir / "index.json"
+
+        if not index_file.exists():
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="tldr index not found",
+                details={"path": str(index_file)},
+                recovery_action="rebuild_tldr_index"
+            )
+
+        # Check if index is stale
+        try:
+            mtime = index_file.stat().st_mtime
+            age_days = (time.time() - mtime) / (24 * 3600)
+            if age_days > self.max_age_days:
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.DEGRADED,
+                    level=self.get_level(),
+                    message=f"tldr index is stale ({age_days:.1f} days old)",
+                    details={"age_days": age_days},
+                    recovery_action="rebuild_tldr_index"
+                )
+        except OSError as e:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message=f"Could not check tldr index age: {e}",
+                details={"error": str(e)}
+            )
+
+        return HealthCheckResult(
+            name=self.name,
+            status=HealthStatus.HEALTHY,
+            level=self.get_level(),
+            message="tldr index is available and fresh",
+            details={"path": str(index_file)}
+        )
+
+
+class LlmProviderCheck(HealthCheckProvider):
+    """Check LLM provider (Anthropic) configuration."""
+
+    @property
+    def name(self) -> str:
+        return "llm_provider"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.READINESS
+
+    def check(self) -> HealthCheckResult:
+        # Check for Anthropic API key
+        api_key = os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("CLAUDE_API_KEY")
+        if not api_key:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="Anthropic API key not configured",
+                recovery_action="configure_api_key"
+            )
+
+        # Basic validation - check format (not a full validation)
+        if not api_key.startswith("sk-ant-"):
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="API key format may be incorrect"
+            )
+
+        return HealthCheckResult(
+            name=self.name,
+            status=HealthStatus.HEALTHY,
+            level=self.get_level(),
+            message="Anthropic API key is configured"
+        )
+
+
+class EmbeddingProviderCheck(HealthCheckProvider):
+    """Check embedding provider (PostgreSQL/pgvector) configuration."""
+
+    @property
+    def name(self) -> str:
+        return "embedding_provider"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.READINESS
+
+    def check(self) -> HealthCheckResult:
+        # Check for PostgreSQL connection
+        db_url = os.environ.get("DATABASE_URL")
+        if not db_url:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="PostgreSQL not configured (DATABASE_URL not set)",
+                recovery_action="configure_postgres"
+            )
+
+        # Check for pgvector extension
+        try:
+            import psycopg2
+            conn = psycopg2.connect(db_url)
+            cur = conn.cursor()
+            cur.execute("SELECT 1 FROM pg_extension WHERE extname='vector'")
+            if not cur.fetchone():
+                conn.close()
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.DEGRADED,
+                    level=self.get_level(),
+                    message="pgvector extension not installed",
+                    recovery_action="install_pgvector"
+                )
+            conn.close()
+        except ImportError:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="psycopg2 not installed, cannot check pgvector"
+            )
+        except Exception as e:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message=f"Could not connect to PostgreSQL: {e}",
+                recovery_action="check_db_connection"
+            )
+
+        return HealthCheckResult(
+            name=self.name,
+            status=HealthStatus.HEALTHY,
+            level=self.get_level(),
+            message="Embedding provider (pgvector) is configured"
+        )
+
+
+# =============================================================================
+# Phase 4: Database Health Check Providers
+# =============================================================================
+
+class VectorIndexCheck(HealthCheckProvider):
+    """Check pgvector index health."""
+
+    @property
+    def name(self) -> str:
+        return "vector_index"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.STARTUP
+
+    def check(self) -> HealthCheckResult:
+        db_url = os.environ.get("DATABASE_URL")
+        if not db_url:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="DATABASE_URL not set"
+            )
+
+        try:
+            import psycopg2
+            conn = psycopg2.connect(db_url)
+            cur = conn.cursor()
+
+            # Check if vector table exists
+            cur.execute("""
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables
+                    WHERE table_name = 'archival_memory'
+                )
+            """)
+            if not cur.fetchone()[0]:
+                conn.close()
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.UNHEALTHY,
+                    level=self.get_level(),
+                    message="archival_memory table does not exist",
+                    recovery_action="run_migrations"
+                )
+
+            # Check for vector column
+            cur.execute("""
+                SELECT data_type FROM information_schema.columns
+                WHERE table_name = 'archival_memory' AND column_name = 'embedding'
+            """)
+            result = cur.fetchone()
+            if not result or result[0] != 'vector':
+                conn.close()
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.UNHEALTHY,
+                    level=self.get_level(),
+                    message="embedding column is not vector type",
+                    recovery_action="run_migrations"
+                )
+
+            conn.close()
+        except ImportError:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="psycopg2 not installed"
+            )
+        except Exception as e:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message=f"Could not check vector index: {e}"
+            )
+
+        return HealthCheckResult(
+            name=self.name,
+            status=HealthStatus.HEALTHY,
+            level=self.get_level(),
+            message="Vector index is healthy"
+        )
+
+
+class SchemaVersionCheck(HealthCheckProvider):
+    """Check database schema version compatibility."""
+
+    CURRENT_VERSION = 1
+
+    @property
+    def name(self) -> str:
+        return "schema_version"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.STARTUP
+
+    def check(self) -> HealthCheckResult:
+        db_url = os.environ.get("DATABASE_URL")
+        if not db_url:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="DATABASE_URL not set"
+            )
+
+        try:
+            import psycopg2
+            conn = psycopg2.connect(db_url)
+            cur = conn.cursor()
+
+            # Check if schema_migrations table exists
+            cur.execute("""
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables
+                    WHERE table_name = 'schema_migrations'
+                )
+            """)
+            if not cur.fetchone()[0]:
+                # Table doesn't exist - this might be a fresh install
+                conn.close()
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.HEALTHY,
+                    level=self.get_level(),
+                    message="Fresh database (no migrations table)"
+                )
+
+            # Get latest migration
+            cur.execute("SELECT version FROM schema_migrations ORDER BY applied_at DESC LIMIT 1")
+            result = cur.fetchone()
+            conn.close()
+
+            if result and result[0] >= self.CURRENT_VERSION:
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.HEALTHY,
+                    level=self.get_level(),
+                    message=f"Schema version {result[0]} is current"
+                )
+            elif result:
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.DEGRADED,
+                    level=self.get_level(),
+                    message=f"Schema version {result[0]} behind current ({self.CURRENT_VERSION})",
+                    recovery_action="run_migrations"
+                )
+
+        except ImportError:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="psycopg2 not installed"
+            )
+        except Exception as e:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message=f"Could not check schema version: {e}"
+            )
+
+        return HealthCheckResult(
+            name=self.name,
+            status=HealthStatus.HEALTHY,
+            level=self.get_level(),
+            message="Schema is up to date"
+        )
+
+
+class DatabasePermissionsCheck(HealthCheckProvider):
+    """Check database user permissions."""
+
+    @property
+    def name(self) -> str:
+        return "db_permissions"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.READINESS
+
+    def check(self) -> HealthCheckResult:
+        db_url = os.environ.get("DATABASE_URL")
+        if not db_url:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="DATABASE_URL not set"
+            )
+
+        try:
+            import psycopg2
+            conn = psycopg2.connect(db_url)
+            cur = conn.cursor()
+
+            # Check if we can create/read/write tables
+            required_permissions = [
+                ("SELECT", "archival_memory"),
+                ("INSERT", "archival_memory"),
+                ("CREATE", None),  # Schema creation
+            ]
+
+            missing_perms = []
+            for perm, table in required_permissions:
+                if table:
+                    cur.execute(f"SELECT has_table_privilege(current_user, '{table}', '{perm}')")
+                else:
+                    cur.execute(f"SELECT has_schema_privilege(current_user, 'public', '{perm}')")
+                if not cur.fetchone()[0]:
+                    missing_perms.append(f"{perm}" + (f" ON {table}" if table else ""))
+
+            conn.close()
+
+            if missing_perms:
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.UNHEALTHY,
+                    level=self.get_level(),
+                    message=f"Missing database permissions: {', '.join(missing_perms)}",
+                    recovery_action="fix_database_permissions"
+                )
+
+        except ImportError:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message="psycopg2 not installed"
+            )
+        except Exception as e:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message=f"Could not check permissions: {e}"
+            )
+
+        return HealthCheckResult(
+            name=self.name,
+            status=HealthStatus.HEALTHY,
+            level=self.get_level(),
+            message="Database permissions are sufficient"
+        )
+
+
+# =============================================================================
+# Phase 5: CLI Utilities
+# =============================================================================
+
+def cmd_validate(args: list[str]) -> bool:
+    """Validate CLI arguments for health check commands."""
+    if not args:
+        return False
+
+    valid_commands = {"status", "liveness", "readiness", "startup", "check", "server", "metrics"}
+    return args[0] in valid_commands
+
+
+@dataclass
+class HealthReport:
+    """Health check report."""
+    overall_status: HealthStatus
+    level: HealthLevel
+    checks: list[HealthCheckResult]
+    uptime_seconds: float = 0.0
+
+
+def format_validation_report(report: HealthReport, verbose: bool = False) -> str:
+    """Format a health validation report for display."""
+    lines = [
+        "=" * 60,
+        "Continuous-Claude-v3 Validator",
+        "=" * 60,
+        "",
+        f"Overall Status: {report.overall_status.value.upper()}",
+        f"Level: {report.level.value.upper()}",
+        f"Uptime: {report.uptime_seconds:.2f}s",
+        "",
+        "-" * 60,
+        "SUMMARY",
+        "-" * 60,
+    ]
+
+    # Group results by status
+    status_groups: dict[HealthStatus, list[HealthCheckResult]] = {}
+    for check in report.checks:
+        if check.status not in status_groups:
+            status_groups[check.status] = []
+        status_groups[check.status].append(check)
+
+    # Format each group
+    for status in [HealthStatus.HEALTHY, HealthStatus.DEGRADED, HealthStatus.UNHEALTHY, HealthStatus.UNKNOWN]:
+        if status in status_groups:
+            icon = "[OK]" if status == HealthStatus.HEALTHY else "[WARN]" if status == HealthStatus.DEGRADED else "[FAIL]"
+            lines.append(f"\n{icon} {status.value.upper()} ({len(status_groups[status])})")
+            for result in status_groups[status]:
+                lines.append(f"  - {result.name}: {result.message}")
+                if verbose and result.details:
+                    for key, value in result.details.items():
+                        lines.append(f"      {key}: {value}")
+
+    lines.extend([
+        "",
+        "=" * 60,
+        f"Total checks: {len(report.checks)}",
+        f"Healthy: {len(status_groups.get(HealthStatus.HEALTHY, []))}",
+        f"Degraded: {len(status_groups.get(HealthStatus.DEGRADED, []))}",
+        f"Unhealthy: {len(status_groups.get(HealthStatus.UNHEALTHY, []))}",
+        "=" * 60,
+    ])
+
+    return "\n".join(lines)
+
+
+# =============================================================================
+# Database Health Check Providers (existing)
+# =============================================================================
 
 class DatabaseConnectionCheck(HealthCheckProvider):
     """Check database connectivity and latency."""
@@ -1211,6 +2056,26 @@ class HealthCheck:
 
         # Startup checks
         self.providers.append(SchemaCheck())
+
+        # Phase 1: Hook health checks
+        self.providers.append(HookFileCheck())
+        self.providers.append(HookSyntaxCheck())
+        self.providers.append(HookBuildCheck())
+        self.providers.append(HookConfigCheck())
+
+        # Phase 2: Bash command check
+        self.providers.append(BashCommandCheck())
+
+        # Phase 3: TLDR/LLM providers
+        self.providers.append(TldrCliCheck())
+        self.providers.append(TldrIndexCheck())
+        self.providers.append(LlmProviderCheck())
+        self.providers.append(EmbeddingProviderCheck())
+
+        # Phase 4: Database providers
+        self.providers.append(VectorIndexCheck())
+        self.providers.append(SchemaVersionCheck())
+        self.providers.append(DatabasePermissionsCheck())
 
     def add_provider(self, provider: HealthCheckProvider):
         """Add a custom health check provider."""

@@ -550,7 +550,7 @@ class MemoryServicePG:
         """Search archival memory with vector similarity and threshold filter.
 
         Args:
-            query_embedding: Query embedding (will be padded to 4096)
+            query_embedding: Query embedding (will be padded to 1024)
             threshold: Minimum similarity threshold (0.0 to 1.0)
             limit: Max results to return
 
@@ -605,7 +605,7 @@ class MemoryServicePG:
         """Search archival memory with vector similarity and metadata filter.
 
         Args:
-            query_embedding: Query embedding (will be padded to 4096)
+            query_embedding: Query embedding (will be padded to 1024)
             metadata_filter: Dict of key-value pairs to filter by (exact match)
             limit: Max results to return
 
@@ -1004,36 +1004,62 @@ class MemoryServicePG:
         if not candidates:
             return []
 
-        # MMR selection
+        # MMR selection with greedy re-evaluation
         selected = []
         selected_embeddings = []
+        remaining = list(candidates)
 
-        for item in candidates:
-            if len(selected) >= limit:
+        while len(selected) < limit and remaining:
+            best_item = None
+            best_mmr_score = float("-inf")
+            best_idx = -1
+
+            # Re-evaluate MMR scores for all remaining candidates
+            for idx, item in enumerate(remaining):
+                relevance = item.get("relevance", 0)
+
+                # Calculate diversity (max similarity to already selected)
+                diversity = 0.0
+                if selected_embeddings:
+                    similarities = [
+                        self._cosine_similarity(item["embedding"], sel_emb)
+                        for sel_emb in selected_embeddings
+                    ]
+                    diversity = max(similarities) if similarities else 0
+
+                # MMR score: balance relevance vs diversity
+                mmr_score = lambda_param * relevance - (1 - lambda_param) * diversity
+
+                if mmr_score > best_mmr_score:
+                    best_mmr_score = mmr_score
+                    best_item = item
+                    best_idx = idx
+
+            # Check if best candidate meets threshold
+            if best_item is None or best_mmr_score < similarity_threshold:
                 break
 
-            relevance = item.get("relevance", 0)
-
-            # Calculate diversity (max similarity to already selected)
-            diversity = 0.0
-            if selected_embeddings:
-                similarities = [
-                    self._cosine_similarity(item["embedding"], sel_emb)
+            # Select the best item
+            best_item["mmr_score"] = best_mmr_score
+            best_item["diversity"] = (
+                0.0
+                if not selected_embeddings
+                else max(
+                    self._cosine_similarity(best_item["embedding"], sel_emb)
                     for sel_emb in selected_embeddings
-                ]
-                diversity = max(similarities) if similarities else 0
+                )
+            )
+            selected.append(best_item)
+            selected_embeddings.append(best_item["embedding"])
+            remaining.pop(best_idx)
 
-            # MMR score: balance relevance vs diversity
-            mmr_score = lambda_param * relevance - (1 - lambda_param) * diversity
+        # Remove embeddings from final output to reduce size
+        for item in selected:
+            if "embedding" in item:
+                del item["embedding"]
 
-            item["mmr_score"] = mmr_score
-            item["diversity"] = diversity
-
-            if mmr_score >= similarity_threshold:
-                selected.append(item)
-                selected_embeddings.append(item["embedding"])
-
-            # Remove embedding from final output to reduce size
+        # Also clean up remaining candidates (in case they're referenced elsewhere)
+        for item in remaining:
             if "embedding" in item:
                 del item["embedding"]
 
