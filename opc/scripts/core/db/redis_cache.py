@@ -32,6 +32,9 @@ _client_lock: Any | None = None
 # Cache key prefix for embeddings
 EMBEDDING_PREFIX = "embedding:"
 
+# Default TTL for cached embeddings (1 hour)
+DEFAULT_TTL = 3600
+
 
 def _get_redis_url() -> str:
     """Get Redis connection URL from environment.
@@ -151,10 +154,10 @@ class RedisCache:
         try:
             client = await self._get_client()
             key = self._hash_key(text)
-            # Store with no expiration (embedding cache is permanent)
             await client.set(
                 f"{EMBEDDING_PREFIX}{key}",
                 json.dumps(embedding),
+                ex=DEFAULT_TTL,
             )
         except Exception as e:
             logger.error(f"Failed to store embedding in cache: {e}")

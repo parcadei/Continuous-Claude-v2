@@ -1043,36 +1043,50 @@ class MemoryServicePG:
         if not candidates:
             return []
 
-        # MMR selection
+        # MMR selection - proper implementation
+        # At each iteration, recalculate MMR scores for ALL remaining candidates
+        # and select the highest-scoring one
         selected = []
         selected_embeddings = []
+        candidates = [c for c in candidates if c.get("embedding") is not None]
 
-        for item in candidates:
-            if len(selected) >= limit:
+        for _ in range(min(limit, len(candidates))):
+            best_item = None
+            best_score = float("-inf")
+
+            for item in candidates:
+                # Skip already selected items
+                if item in selected:
+                    continue
+
+                relevance = item.get("relevance", 0)
+
+                # Calculate diversity (max similarity to already selected)
+                diversity = 0.0
+                if selected_embeddings:
+                    similarities = [
+                        self._cosine_similarity(item["embedding"], sel_emb)
+                        for sel_emb in selected_embeddings
+                    ]
+                    diversity = max(similarities) if similarities else 0
+
+                # MMR score: balance relevance vs diversity
+                mmr_score = lambda_param * relevance - (1 - lambda_param) * diversity
+
+                if mmr_score > best_score:
+                    best_score = mmr_score
+                    best_item = item
+
+            # Select the best item if it passes the threshold
+            if best_item and best_score >= similarity_threshold:
+                selected.append(best_item)
+                selected_embeddings.append(best_item["embedding"])
+            else:
+                # No more items meet the threshold
                 break
 
-            relevance = item.get("relevance", 0)
-
-            # Calculate diversity (max similarity to already selected)
-            diversity = 0.0
-            if selected_embeddings:
-                similarities = [
-                    self._cosine_similarity(item["embedding"], sel_emb)
-                    for sel_emb in selected_embeddings
-                ]
-                diversity = max(similarities) if similarities else 0
-
-            # MMR score: balance relevance vs diversity
-            mmr_score = lambda_param * relevance - (1 - lambda_param) * diversity
-
-            item["mmr_score"] = mmr_score
-            item["diversity"] = diversity
-
-            if mmr_score >= similarity_threshold:
-                selected.append(item)
-                selected_embeddings.append(item["embedding"])
-
-            # Remove embedding from final output to reduce size
+        # Remove embeddings from final output to reduce size
+        for item in selected:
             if "embedding" in item:
                 del item["embedding"]
 

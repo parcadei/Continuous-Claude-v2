@@ -46,12 +46,16 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import logging
 import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 from dotenv import load_dotenv
+
+# Setup logging
+logger = logging.getLogger(__name__)
 
 # Load global ~/.claude/.env first, then local .env
 global_env = Path.home() / ".claude" / ".env"
@@ -192,9 +196,9 @@ async def store_learning_v2(
                         "reason": f"duplicate (similarity: {similarity:.2f})",
                         "existing_id": top_match.get("id"),
                     }
-        except Exception:
+        except Exception as e:
             # If search fails, proceed with storing (don't block on dedup errors)
-            pass
+            logger.warning(f"Duplicate detection failed: {e}")
 
         # Build metadata
         metadata = {
