@@ -245,7 +245,7 @@ async def search_learnings_auto_rerank(
     k: int = 5,
     provider: str = "local",
     auto_rerank: bool = True,
-    reranker: str = "BAAI/bge-reranker-base",
+    reranker: str = "Qwen/Qwen3-Reranker-0.6B",
     confidence_gap_threshold: float = 0.10,
     high_confidence_threshold: float = 0.85,
 ) -> list[dict[str, Any]]:
