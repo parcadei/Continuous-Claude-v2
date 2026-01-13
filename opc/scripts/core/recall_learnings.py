@@ -112,10 +112,10 @@ async def search_learnings_text_only_postgres(query: str, k: int = 5) -> list[di
                 content,
                 metadata,
                 created_at,
-                ts_rank(to_tsvector('english', content), to_tsquery('english', $1)) as similarity
+                ts_rank(to_tsvector('english', content), to_tsquery('english', $1::text)) as similarity
             FROM archival_memory
             WHERE metadata->>'type' = 'session_learning'
-                AND to_tsvector('english', content) @@ to_tsquery('english', $1)
+                AND to_tsvector('english', content) @@ to_tsquery('english', $1::text)
             ORDER BY similarity DESC, created_at DESC
             LIMIT $2
             """,
@@ -139,13 +139,12 @@ async def search_learnings_text_only_postgres(query: str, k: int = 5) -> list[di
                     0.1 as similarity
                 FROM archival_memory
                 WHERE metadata->>'type' = 'session_learning'
-                    AND content ILIKE $3::text
+                    AND content ILIKE $1::text
                 ORDER BY created_at DESC
                 LIMIT $2
                 """,
-                first_word,
-                k,
                 search_pattern,
+                k,
             )
 
     results = []
@@ -439,12 +438,12 @@ async def search_learnings_hybrid_rrf(
                     ROW_NUMBER() OVER (
                         ORDER BY ts_rank(
                             to_tsvector('english', content),
-                            plainto_tsquery('english', $1)
+                            plainto_tsquery('english', $1::text)
                         ) DESC
                     ) as fts_rank
                 FROM archival_memory
                 WHERE metadata->>'type' = 'session_learning'
-                AND to_tsvector('english', content) @@ plainto_tsquery('english', $1)
+                AND to_tsvector('english', content) @@ plainto_tsquery('english', $1::text)
             ),
             vector_ranked AS (
                 SELECT
@@ -624,13 +623,12 @@ async def search_learnings_postgres(
                     0.5 as similarity
                 FROM archival_memory
                 WHERE metadata->>'type' = 'session_learning'
-                    AND content ILIKE $3::text
+                    AND content ILIKE $1::text
                 ORDER BY created_at DESC
                 LIMIT $2
                 """,
-                query,
-                k,
                 search_pattern,
+                k,
             )
     else:
         return []
