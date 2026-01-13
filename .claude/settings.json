@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": {
+          "all": true
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $HOOK_DIR/dist/user-confirm-learning.mjs"
+          }
+        ]
+      }
+    ]
+  }
+}
