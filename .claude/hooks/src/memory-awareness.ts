@@ -179,7 +179,19 @@ function checkMemoryRelevance(intent: string, projectDir: string): MemoryMatch |
 }
 
 async function main() {
-  const input: UserPromptSubmitInput = JSON.parse(readStdin());
+  let input: UserPromptSubmitInput | null = null;
+  try {
+    input = JSON.parse(readStdin());
+  } catch {
+    // Invalid JSON input, skip hook
+    return;
+  }
+
+  // Validate input has required fields
+  if (!input || typeof input.prompt !== 'string') {
+    return;
+  }
+
   const projectDir = process.env.CLAUDE_PROJECT_DIR || input.cwd;
 
   // Skip for subagents - they don't need memory recall (saves tokens)
