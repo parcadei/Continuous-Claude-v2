@@ -79,15 +79,17 @@ async def query_memory(
     try:
         conn = await asyncpg.connect(POSTGRES_URL)
         try:
+            # Use parameterized query to prevent SQL injection
+            search_pattern = f"%{query}%" if query else None
             sql = """
                 SELECT id, session_id, agent_id, content, created_at
                 FROM archival_memory
-                WHERE ($1::text IS NULL OR content ILIKE '%' || $1 || '%')
+                WHERE ($1::text IS NULL OR content ILIKE $4)
                 AND ($2::text IS NULL OR session_id = $2)
                 ORDER BY created_at DESC
                 LIMIT $3
             """
-            rows = await conn.fetch(sql, query, session_id, limit)
+            rows = await conn.fetch(sql, query, session_id, limit, search_pattern)
             return [dict(r) for r in rows]
         finally:
             await conn.close()

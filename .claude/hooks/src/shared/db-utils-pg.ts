@@ -716,17 +716,18 @@ pg_url = os.environ.get('OPC_POSTGRES_URL', 'postgresql://claude:claude_dev@loca
 async def main():
     conn = await asyncpg.connect(pg_url)
     try:
-        # Search by topic match or relevance
+        # Use parameterized query to prevent SQL injection
+        search_pattern = f'%{query}%'
         rows = await conn.fetch('''
             SELECT session_id, topic, finding, relevant_to, created_at
             FROM findings
             WHERE session_id != $1
-              AND (topic ILIKE '%' || $2 || '%'
-                   OR $2 = ANY(relevant_to)
-                   OR finding ILIKE '%' || $2 || '%')
+              AND (topic ILIKE $4
+                   OR $4 = ANY(relevant_to)
+                   OR finding ILIKE $5)
             ORDER BY created_at DESC
             LIMIT $3
-        ''', exclude_session, query, limit)
+        ''', exclude_session, query, limit, search_pattern, search_pattern)
 
         findings = []
         for row in rows:

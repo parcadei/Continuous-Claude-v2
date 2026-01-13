@@ -134,17 +134,19 @@ def search_postgres(query: str, k: int = 5) -> list[dict[str, Any]]:
             # Fallback to ILIKE if no FTS results
             if not rows:
                 first_word = query.split()[0] if query.split() else query
+                search_pattern = f"%{first_word}%"
                 rows = await conn.fetch(
                     """
                     SELECT id, session_id, content, metadata, created_at, 0.1 as similarity
                     FROM archival_memory
                     WHERE metadata->>'type' = 'session_learning'
-                        AND content ILIKE '%' || $1 || '%'
+                        AND content ILIKE $3
                     ORDER BY created_at DESC
                     LIMIT $2
                     """,
                     first_word,
                     k,
+                    search_pattern,
                 )
 
             results = []

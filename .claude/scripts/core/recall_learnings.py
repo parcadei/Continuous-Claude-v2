@@ -124,6 +124,7 @@ async def search_learnings_text_only_postgres(query: str, k: int = 5) -> list[di
         if not rows:
             # Extract first word for simple substring match
             first_word = query.split()[0] if query.split() else query
+            search_pattern = f"%{first_word}%"
             rows = await conn.fetch(
                 """
                 SELECT
@@ -135,12 +136,13 @@ async def search_learnings_text_only_postgres(query: str, k: int = 5) -> list[di
                     0.1 as similarity
                 FROM archival_memory
                 WHERE metadata->>'type' = 'session_learning'
-                    AND content ILIKE '%' || $1 || '%'
+                    AND content ILIKE $3
                 ORDER BY created_at DESC
                 LIMIT $2
                 """,
                 first_word,
                 k,
+                search_pattern,
             )
 
     results = []
@@ -455,6 +457,7 @@ async def search_learnings_postgres(
                 )
     elif text_fallback:
         # Fallback to text search (ILIKE) when no embeddings
+        search_pattern = f"%{query}%"
         async with pool.acquire() as conn:
             rows = await conn.fetch(
                 """
@@ -467,12 +470,13 @@ async def search_learnings_postgres(
                     0.5 as similarity
                 FROM archival_memory
                 WHERE metadata->>'type' = 'session_learning'
-                    AND content ILIKE '%' || $1 || '%'
+                    AND content ILIKE $3
                 ORDER BY created_at DESC
                 LIMIT $2
                 """,
                 query,
                 k,
+                search_pattern,
             )
     else:
         return []
