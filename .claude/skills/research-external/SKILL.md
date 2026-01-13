@@ -192,26 +192,26 @@ Primary tool: **perplexity-search** - Find recommended approaches, patterns, ant
 
 ```bash
 # AI-synthesized research (sonar-pro)
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/perplexity_search.py \
+(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/mcp/perplexity_search.py \
   --research "$TOPIC best practices 2024 2025")
 
 # If comparing alternatives
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/perplexity_search.py \
+(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/mcp/perplexity_search.py \
   --reason "$TOPIC vs alternatives - which to choose?")
 ```
 
 **Thorough depth additions:**
 ```bash
 # Chain-of-thought for complex decisions
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/perplexity_search.py \
+(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/mcp/perplexity_search.py \
   --reason "$TOPIC tradeoffs and considerations 2025")
 
 # Deep comprehensive research
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/perplexity_search.py \
+(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/mcp/perplexity_search.py \
   --deep "$TOPIC comprehensive guide 2025")
 
 # Recent developments
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/perplexity_search.py \
+(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/mcp/perplexity_search.py \
   --search "$TOPIC latest developments" \
   --recency month --max-results 5)
 ```
@@ -228,7 +228,7 @@ Use ALL available MCP tools - comprehensive multi-source research.
 
 **Step 2b: Web research (perplexity)**
 ```bash
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/perplexity_search.py \
+(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/mcp/perplexity_search.py \
   --research "$TOPIC")
 ```
 
