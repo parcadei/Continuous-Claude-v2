@@ -545,6 +545,152 @@ class RedisConnectionCheck(HealthCheckProvider):
             )
 
 
+class RedisClientCheck(HealthCheckProvider):
+    """Check Redis connectivity using OPC's redis_client module."""
+
+    @property
+    def name(self) -> str:
+        return "redis_client"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.READINESS
+
+    def check(self) -> HealthCheckResult:
+        try:
+            from scripts.core.db.redis_client import get_redis
+            import asyncio
+
+            # Run the async get_redis and ping
+            result = asyncio.run(self._async_check())
+
+            if result["connected"]:
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.HEALTHY,
+                    level=self.get_level(),
+                    message=f"OPC Redis client connected ({result.get('latency_ms', 0):.0f}ms)",
+                    details={"latency_ms": result.get("latency_ms", 0)}
+                )
+            else:
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.UNHEALTHY,
+                    level=self.get_level(),
+                    message=f"OPC Redis client failed: {result.get('error', 'unknown')}",
+                    details={"error": result.get("error")}
+                )
+        except ImportError as e:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message=f"OPC redis_client module not available: {e}",
+                details={"error": str(e)}
+            )
+        except Exception as e:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.UNHEALTHY,
+                level=self.get_level(),
+                message=f"Redis client check failed: {e}",
+                details={"error": str(e)},
+                recovery_action="check_redis_connection"
+            )
+
+    async def _async_check(self) -> dict:
+        """Perform async Redis check."""
+        from scripts.core.db.redis_client import get_redis
+        start = time.time()
+        try:
+            client = await get_redis()
+            await client.ping()
+            latency_ms = (time.time() - start) * 1000
+            return {"connected": True, "latency_ms": latency_ms}
+        except Exception as e:
+            return {"connected": False, "error": str(e)}
+
+
+class RedisCacheCheck(HealthCheckProvider):
+    """Check Redis cache read/write using OPC's redis_cache module."""
+
+    @property
+    def name(self) -> str:
+        return "redis_cache"
+
+    def get_level(self) -> HealthLevel:
+        return HealthLevel.READINESS
+
+    def check(self) -> HealthCheckResult:
+        try:
+            import asyncio
+
+            # Run the async cache check
+            result = asyncio.run(self._async_check())
+
+            if result["success"]:
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.HEALTHY,
+                    level=self.get_level(),
+                    message="Redis cache read/write OK",
+                    details={"latency_ms": result.get("latency_ms", 0)}
+                )
+            else:
+                return HealthCheckResult(
+                    name=self.name,
+                    status=HealthStatus.UNHEALTHY,
+                    level=self.get_level(),
+                    message=f"Redis cache check failed: {result.get('error', 'unknown')}",
+                    details={"error": result.get("error")}
+                )
+        except ImportError as e:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.DEGRADED,
+                level=self.get_level(),
+                message=f"OPC redis_cache module not available: {e}",
+                details={"error": str(e)}
+            )
+        except Exception as e:
+            return HealthCheckResult(
+                name=self.name,
+                status=HealthStatus.UNHEALTHY,
+                level=self.get_level(),
+                message=f"Redis cache check failed: {e}",
+                details={"error": str(e)},
+                recovery_action="check_redis_connection"
+            )
+
+    async def _async_check(self) -> dict:
+        """Perform async cache read/write check."""
+        from scripts.core.db.redis_cache import cache
+        import json
+
+        start = time.time()
+        try:
+            # Generate a test embedding (1024-dim vector like real embeddings)
+            test_embedding = [0.1] * 1024
+            test_key = "health_check_test"
+
+            # Write to cache
+            await cache.set_embedding(test_key, test_embedding)
+
+            # Read from cache
+            result = await cache.get_embedding(test_key)
+
+            # Clean up test key
+            await cache.delete_embedding(test_key)
+
+            latency_ms = (time.time() - start) * 1000
+
+            if result is not None:
+                return {"success": True, "latency_ms": latency_ms}
+            else:
+                return {"success": False, "error": "Cache read returned None"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+
 class QueueDepthCheck(HealthCheckProvider):
     """Check extraction queue depth."""
 
@@ -1055,6 +1201,8 @@ class HealthCheck:
         # Readiness checks
         self.providers.append(DatabaseConnectionCheck())
         self.providers.append(RedisConnectionCheck())
+        self.providers.append(RedisClientCheck())
+        self.providers.append(RedisCacheCheck())
         self.providers.append(QueueDepthCheck())
         self.providers.append(BacklogCheck())
         self.providers.append(DiskSpaceCheck())
