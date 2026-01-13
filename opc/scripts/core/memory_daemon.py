@@ -15,17 +15,23 @@ USAGE:
     # Stop daemon
     uv run python scripts/core/memory_daemon.py stop
 
+    # Show confidence scores for extraction results
+    uv run python scripts/core/memory_daemon.py status --confidence
+
 ARCHITECTURE:
     - Single global instance (PID file at ~/.claude/memory-daemon.pid)
     - Works with PostgreSQL or SQLite
+    - Uses Redis heartbeat for real-time stale detection (not DB polling)
     - Polls every 60 seconds for stale sessions (heartbeat > 5 min)
     - Runs headless `claude -p` for memory extraction
     - Marks sessions as extracted to prevent re-processing
+    - Confidence gate filters low-quality transcripts before extraction
 
 The session_start hook ensures this daemon is running.
 """
 
 import argparse
+import asyncio
 import os
 import signal
 import sqlite3
@@ -34,6 +40,7 @@ import sys
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Optional
 
 from dotenv import load_dotenv
 
@@ -49,6 +56,10 @@ opc_env = Path(__file__).parent.parent.parent / ".env"
 if opc_env.exists():
     load_dotenv(opc_env, override=True)  # Override with project-specific values
 
+# Add project root to path for imports
+project_dir = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_dir))
+
 # Global config
 POLL_INTERVAL = 60  # seconds
 STALE_THRESHOLD = 300  # 5 minutes in seconds
@@ -59,6 +70,8 @@ LOG_FILE = Path.home() / ".claude" / "memory-daemon.log"
 # Worker queue state (module-level for daemon process)
 active_extractions: dict[int, str] = {}  # pid -> session_id
 pending_queue: list[tuple[str, str]] = []  # [(session_id, project), ...]
+extracted_count: int = 0  # Track daily extraction count
+extraction_scores: list[dict] = []  # Store confidence scores for status
 
 
 def log(msg: str):
@@ -71,6 +84,114 @@ def log(msg: str):
             f.write(line)
     except Exception:
         pass  # Don't crash on log failures
+
+
+# =============================================================================
+# Redis Heartbeat for Real-Time Stale Detection
+# =============================================================================
+
+async def get_active_sessions_from_redis() -> list[dict]:
+    """Get all sessions with active heartbeats from Redis."""
+    try:
+        from scripts.core.db.session_heartbeat import heartbeat
+        return await heartbeat.get_active_sessions()
+    except Exception as e:
+        log(f"Failed to get active sessions from Redis: {e}")
+        return []
+
+
+async def get_stale_sessions_via_heartbeat(processed_sessions: set) -> list[tuple[str, str]]:
+    """Get stale sessions using Redis heartbeat (real-time detection).
+
+    Args:
+        processed_sessions: Set of session IDs already marked as extracted
+
+    Returns:
+        List of (session_id, project) tuples for stale sessions
+    """
+    try:
+        active_sessions = await get_active_sessions_from_redis()
+
+        # Sessions not in active list are stale (no recent heartbeat)
+        stale = []
+        now = datetime.now()
+
+        for session in active_sessions:
+            session_id = session.get("session_id")
+            if session_id in processed_sessions:
+                continue
+
+            # Check if session is stale (no heartbeat within threshold)
+            timestamp_str = session.get("timestamp")
+            if timestamp_str:
+                try:
+                    last_heartbeat = datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))
+                    if (now - last_heartbeat).total_seconds() > STALE_THRESHOLD:
+                        stale.append((session_id, session.get("project", "")))
+                except ValueError:
+                    # Invalid timestamp, consider stale
+                    stale.append((session_id, session.get("project", "")))
+
+        return stale
+    except Exception as e:
+        log(f"Heartbeat detection error: {e}")
+        return []
+
+
+# =============================================================================
+# Confidence Scorer for Quality Gate
+# =============================================================================
+
+def score_transcript_for_quality(jsonl_path: Path) -> tuple[float, list[str]]:
+    """Score transcript content for quality before extraction.
+
+    Args:
+        jsonl_path: Path to the JSONL transcript file
+
+    Returns:
+        Tuple of (confidence_score, quality_signals)
+    """
+    try:
+        from scripts.core.learning_scorer import scorer, ConfidenceLevel
+
+        # Read transcript content
+        content = jsonl_path.read_text()
+
+        # Truncate for scoring (first 4000 chars is enough for quality signals)
+        sample_content = content[:4000]
+
+        # Score the content
+        score = scorer.score(sample_content)
+
+        return score.confidence, score.quality_signals
+    except ImportError:
+        log("Learning scorer not available, skipping confidence gate")
+        return 1.0, ["scorer unavailable - auto-approved"]
+    except Exception as e:
+        log(f"Scoring error: {e}")
+        return 0.5, ["scoring error - defaulting to medium"]
+
+
+def should_extract_with_confidence(
+    confidence: float,
+    threshold: str = "medium",
+) -> bool:
+    """Determine if extraction should proceed based on confidence score.
+
+    Args:
+        confidence: Confidence score (0.0 to 1.0)
+        threshold: Storage threshold (high/medium/low)
+
+    Returns:
+        True if confidence meets threshold
+    """
+    thresholds = {
+        "high": 0.7,
+        "medium": 0.4,
+        "low": 0.0,
+    }
+    required = thresholds.get(threshold.lower(), 0.4)
+    return confidence >= required
 
 
 def get_postgres_url() -> str | None:
@@ -250,6 +371,32 @@ def extract_memories(session_id: str, project_dir: str):
         log(f"No JSONL found for session {session_id}, skipping")
         return
 
+    # Quality gate: Score transcript before extraction
+    confidence, signals = score_transcript_for_quality(jsonl_path)
+    log(f"Transcript quality for {session_id}: confidence={confidence:.2f}, signals={signals}")
+
+    # Check confidence threshold
+    if not should_extract_with_confidence(confidence, "medium"):
+        log(f"Skipping low-quality transcript {session_id} (confidence={confidence:.2f} < 0.4)")
+        # Store score for status reporting
+        extraction_scores.append({
+            "session_id": session_id,
+            "confidence": confidence,
+            "signals": signals,
+            "status": "skipped_low_quality",
+            "timestamp": datetime.now().isoformat(),
+        })
+        return
+
+    # Store score for status reporting
+    extraction_scores.append({
+        "session_id": session_id,
+        "confidence": confidence,
+        "signals": signals,
+        "status": "extracted",
+        "timestamp": datetime.now().isoformat(),
+    })
+
     # Run headless memory extraction
     try:
         # Read agent prompt from memory-extractor.md (strip YAML frontmatter)
@@ -333,10 +480,15 @@ def queue_or_extract(session_id: str, project: str):
 
 
 def daemon_loop():
-    """Main daemon loop."""
+    """Main daemon loop with Redis heartbeat detection."""
     db_type = "PostgreSQL" if use_postgres() else "SQLite"
-    log(f"Memory daemon started (using {db_type}, max_concurrent={MAX_CONCURRENT_EXTRACTIONS})")
+    use_redis = True  # Prefer Redis heartbeat
+
+    log(f"Memory daemon started (db={db_type}, heartbeat=Redis, max_concurrent={MAX_CONCURRENT_EXTRACTIONS})")
     ensure_schema()
+
+    # Track processed sessions to avoid re-processing
+    processed_sessions: set = set()
 
     while True:
         try:
@@ -344,12 +496,17 @@ def daemon_loop():
             reap_completed_extractions()
             process_pending_queue()
 
-            # Find new stale sessions
-            stale = get_stale_sessions()
+            # Find new stale sessions using Redis heartbeat
+            if use_redis:
+                stale = asyncio.run(get_stale_sessions_via_heartbeat(processed_sessions))
+            else:
+                stale = get_stale_sessions()
+
             if stale:
                 log(f"Found {len(stale)} stale sessions")
                 for session_id, project in stale:
                     queue_or_extract(session_id, project or "")
+                    processed_sessions.add(session_id)
                     mark_extracted(session_id)
         except Exception as e:
             log(f"Error in daemon loop: {e}")

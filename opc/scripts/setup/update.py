@@ -19,6 +19,7 @@ OPTIONS:
     --update-deps  Update Python dependencies only (uv sync)
     --update-npm   Update NPM dependencies only (npm update)
     --migrate      Run database migrations after git pull
+    --backup/--no-backup  Enable/disable timestamped backup before settings merge (default: enabled)
 
 EXAMPLES:
     uv run python -m scripts.setup.update              # Normal update
@@ -738,6 +739,25 @@ def build_typescript_hooks(hooks_dir: Path, verbose: bool = False) -> tuple[bool
         return False, str(e)
 
 
+def backup_settings(settings_path: Path) -> str:
+    """Create timestamped backup of settings.json before merging.
+
+    Args:
+        settings_path: Path to user's ~/.claude/settings.json
+
+    Returns:
+        Path to backup file, or empty string if no backup created
+    """
+    if not settings_path.exists():
+        return ""
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup_path = f"{settings_path}.backup_{timestamp}"
+    shutil.copy2(settings_path, backup_path)
+    console.print(f"  [dim]Created backup: {backup_path}[/dim]")
+    return backup_path
+
+
 def merge_settings_smart(
     settings_path: Path,
     template_path: Path,
@@ -1120,6 +1140,7 @@ def run_update(
     update_deps_only: bool = False,
     update_npm_only: bool = False,
     embeddings_only: bool = False,
+    backup: bool = True,
 ) -> UpdateSummary:
     """Run the incremental update.
 
@@ -1136,6 +1157,7 @@ def run_update(
         update_deps_only: Update Python dependencies only
         update_npm_only: Update NPM dependencies only
         embeddings_only: Install embeddings dependencies only
+        backup: Create timestamped backup before merging settings
 
     Returns:
         UpdateSummary with details of changes made
@@ -1462,6 +1484,12 @@ def run_update(
     template_path = opc_dir / "settings.json"
 
     if template_path.exists():
+        # Create backup before merging (unless disabled)
+        if backup and not dry_run:
+            backup_path = backup_settings(settings_path)
+            if backup_path and verbose:
+                console.print(f"  [dim]Backup created: {backup_path}[/dim]")
+
         success, msg = merge_settings_smart(
             settings_path, template_path, verbose=verbose
         )
@@ -1604,6 +1632,13 @@ def main() -> int:
         action="store_true",
         help="Install embeddings dependencies (sentence-transformers, torch)",
     )
+    parser.add_argument(
+        "--backup",
+        dest="backup",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Create timestamped backup before merging settings (default: enabled)",
+    )
 
     args = parser.parse_args()
 
@@ -1621,6 +1656,7 @@ def main() -> int:
             update_deps_only=args.update_deps,
             update_npm_only=args.update_npm,
             embeddings_only=args.embeddings,
+            backup=args.backup,
         )
 
         # Print summary if verbose or there were changes
