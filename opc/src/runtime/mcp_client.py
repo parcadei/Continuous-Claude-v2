@@ -18,12 +18,28 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-import aiofiles
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.sse import sse_client
-from mcp.client.stdio import stdio_client
-from mcp.client.streamable_http import streamablehttp_client
-from mcp.types import Tool
+# ============================================================================
+# Import Guards - Required third-party dependencies
+# ============================================================================
+try:
+    import aiofiles
+except ImportError:
+    raise ImportError(
+        "Missing required dependency: 'aiofiles'. "
+        "Run: cd opc && uv sync"
+    )
+
+try:
+    from mcp import ClientSession, StdioServerParameters
+    from mcp.client.sse import sse_client
+    from mcp.client.stdio import stdio_client
+    from mcp.client.streamable_http import streamablehttp_client
+    from mcp.types import Tool
+except ImportError as e:
+    raise ImportError(
+        f"Missing required dependency: 'mcp'. {e}. "
+        "Run: cd opc && uv sync"
+    )
 
 from .config import McpConfig, ServerConfig
 from .exceptions import (

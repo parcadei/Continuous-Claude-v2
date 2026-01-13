@@ -1,0 +1,21 @@
+name: Dependency Validation
+on:
+  push:
+    paths: ['pyproject.toml', 'opc/src/runtime/**', 'opc/scripts/core/**']
+  pull_request:
+
+jobs:
+  import-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+      - name: Install dependencies
+        run: cd opc && uv sync
+      - name: Check imports
+        run: cd opc && uv run python scripts/core/dependency_check.py
