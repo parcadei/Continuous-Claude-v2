@@ -189,6 +189,31 @@ uv run python -m scripts.setup.wizard
 | 10 | TLDR code analysis tool |
 | 11-12 | Diagnostics tools + Loogle (optional) |
 
+### Remote Database Setup
+
+By default, CC-v3 expects PostgreSQL running locally via Docker. For remote database setups:
+
+1. **Set environment variable** in `~/.claude/settings.json`:
+
+```json
+{
+  "env": {
+    "OPC_POSTGRES_URL": "postgresql://user:password@hostname:5432/continuous_claude"
+  }
+}
+```
+
+2. **Or export in shell** before running Claude:
+
+```bash
+export OPC_POSTGRES_URL="postgresql://user:password@hostname:5432/continuous_claude"
+claude
+```
+
+> **Note:** The database must have pgvector extension and the schema from `docker/init-schema.sql`.
+
+See `.env.example` for all available environment variables.
+
 ### First Session
 
 ```bash
