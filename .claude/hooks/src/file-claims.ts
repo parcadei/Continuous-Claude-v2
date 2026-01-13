@@ -10,7 +10,7 @@
  */
 
 import { readFileSync } from 'fs';
-import { checkFileClaim, claimFile } from './shared/db-utils-pg.js';
+import { checkFileClaim, claimFileAtomic } from './shared/db-utils-pg.js';
 import type { PreToolUseInput, HookOutput } from './shared/types.js';
 
 // Get session ID from environment (set by session-register hook)
@@ -53,23 +53,25 @@ export function main(): void {
   const sessionId = getSessionId();
   const project = getProject();
 
-  // Check if file is claimed by another session
-  const claimCheck = checkFileClaim(filePath, project, sessionId);
+  // Atomically claim the file (no TOCTOU race condition)
+  const claimResult = claimFileAtomic(filePath, project, sessionId);
 
   let output: HookOutput;
 
-  if (claimCheck.claimed) {
-    // File is being edited by another session - warn but allow
+  if (claimResult.claimed) {
+    // We successfully claimed the file
+    output = { result: 'continue' };
+  } else if (claimResult.claimedBy) {
+    // Another session claimed it
     const fileName = filePath.split('/').pop() || filePath;
     output = {
       result: 'continue',  // Allow edit, just warn
       message: `\u26A0\uFE0F **File Conflict Warning**
-\`${fileName}\` is being edited by Session ${claimCheck.claimedBy}
+\`${fileName}\` is being edited by Session ${claimResult.claimedBy}
 Consider coordinating with the other session to avoid conflicts.`,
     };
   } else {
-    // Claim the file for this session
-    claimFile(filePath, project, sessionId);
+    // Claim failed for other reasons, allow the edit
     output = { result: 'continue' };
   }
 

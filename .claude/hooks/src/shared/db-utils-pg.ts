@@ -627,6 +627,72 @@ asyncio.run(main())
   return { success: result.success && result.stdout === 'ok' };
 }
 
+/**
+ * Atomically claim a file for the current session if not already claimed.
+ * This prevents TOCTOU race conditions by using INSERT ... ON CONFLICT.
+ *
+ * @param filePath - Path to the file
+ * @param project - Project directory
+ * @param sessionId - Session claiming the file
+ * @returns {claimed: boolean, claimedBy?: string} - Whether claim succeeded
+ */
+export function claimFileAtomic(
+  filePath: string,
+  project: string,
+  sessionId: string
+): { claimed: boolean; claimedBy?: string } {
+  const pythonCode = `
+import asyncpg
+import os
+
+file_path = sys.argv[1]
+project = sys.argv[2]
+session_id = sys.argv[3]
+pg_url = os.environ.get('OPC_POSTGRES_URL', 'postgresql://claude:claude_dev@localhost:5432/continuous_claude')
+
+async def main():
+    conn = await asyncpg.connect(pg_url)
+    try:
+        # Atomically insert or update, returning the session_id that was written
+        result = await conn.fetchrow('''
+            INSERT INTO file_claims (file_path, project, session_id, claimed_at)
+            VALUES ($1, $2, $3, NOW())
+            ON CONFLICT (file_path, project) DO UPDATE SET
+                session_id = EXCLUDED.session_id,
+                claimed_at = NOW()
+            RETURNING session_id
+        ''', file_path, project, session_id)
+
+        # If the returned session_id matches our session_id, we own the claim
+        if result['session_id'] == session_id:
+            print('claimed:true')
+        else:
+            # Someone else claimed it - return their session_id
+            print(f'claimed:false:claimed_by:{result["session_id"]}')
+    finally:
+        await conn.close()
+
+asyncio.run(main())
+`;
+
+  const result = runPgQuery(pythonCode, [filePath, project, sessionId]);
+
+  if (!result.success) {
+    return { claimed: false };
+  }
+
+  const output = result.stdout.trim();
+
+  if (output === 'claimed:true') {
+    return { claimed: true };
+  } else if (output.startsWith('claimed:false:claimed_by:')) {
+    const claimedBy = output.split(':claimed_by:')[1];
+    return { claimed: false, claimedBy };
+  }
+
+  return { claimed: false };
+}
+
 // =============================================================================
 // COORDINATION LAYER: Findings
 // =============================================================================

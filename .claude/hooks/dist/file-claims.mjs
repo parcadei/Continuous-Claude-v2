@@ -77,60 +77,7 @@ ${pythonCode}
     };
   }
 }
-function checkFileClaim(filePath, project, mySessionId) {
-  const pythonCode = `
-import asyncpg
-import os
-import json
-
-file_path = sys.argv[1]
-project = sys.argv[2]
-my_session_id = sys.argv[3]
-pg_url = os.environ.get('OPC_POSTGRES_URL', 'postgresql://claude:claude_dev@localhost:5432/continuous_claude')
-
-async def main():
-    conn = await asyncpg.connect(pg_url)
-    try:
-        # Create table if not exists
-        await conn.execute('''
-            CREATE TABLE IF NOT EXISTS file_claims (
-                file_path TEXT,
-                project TEXT,
-                session_id TEXT,
-                claimed_at TIMESTAMP DEFAULT NOW(),
-                PRIMARY KEY (file_path, project)
-            )
-        ''')
-
-        row = await conn.fetchrow('''
-            SELECT session_id, claimed_at FROM file_claims
-            WHERE file_path = $1 AND project = $2 AND session_id != $3
-        ''', file_path, project, my_session_id)
-
-        if row:
-            print(json.dumps({
-                'claimed': True,
-                'claimedBy': row['session_id'],
-                'claimedAt': row['claimed_at'].isoformat() if row['claimed_at'] else None
-            }))
-        else:
-            print(json.dumps({'claimed': False}))
-    finally:
-        await conn.close()
-
-asyncio.run(main())
-`;
-  const result = runPgQuery(pythonCode, [filePath, project, mySessionId]);
-  if (!result.success) {
-    return { claimed: false };
-  }
-  try {
-    return JSON.parse(result.stdout || '{"claimed": false}');
-  } catch {
-    return { claimed: false };
-  }
-}
-function claimFile(filePath, project, sessionId) {
+function claimFileAtomic(filePath, project, sessionId) {
   const pythonCode = `
 import asyncpg
 import os
@@ -143,21 +90,39 @@ pg_url = os.environ.get('OPC_POSTGRES_URL', 'postgresql://claude:claude_dev@loca
 async def main():
     conn = await asyncpg.connect(pg_url)
     try:
-        await conn.execute('''
+        # Atomically insert or update, returning the session_id that was written
+        result = await conn.fetchrow('''
             INSERT INTO file_claims (file_path, project, session_id, claimed_at)
             VALUES ($1, $2, $3, NOW())
             ON CONFLICT (file_path, project) DO UPDATE SET
                 session_id = EXCLUDED.session_id,
                 claimed_at = NOW()
+            RETURNING session_id
         ''', file_path, project, session_id)
-        print('ok')
+
+        # If the returned session_id matches our session_id, we own the claim
+        if result['session_id'] == session_id:
+            print('claimed:true')
+        else:
+            # Someone else claimed it - return their session_id
+            print(f'claimed:false:claimed_by:{result["session_id"]}')
     finally:
         await conn.close()
 
 asyncio.run(main())
 `;
   const result = runPgQuery(pythonCode, [filePath, project, sessionId]);
-  return { success: result.success && result.stdout === "ok" };
+  if (!result.success) {
+    return { claimed: false };
+  }
+  const output = result.stdout.trim();
+  if (output === "claimed:true") {
+    return { claimed: true };
+  } else if (output.startsWith("claimed:false:claimed_by:")) {
+    const claimedBy = output.split(":claimed_by:")[1];
+    return { claimed: false, claimedBy };
+  }
+  return { claimed: false };
 }
 
 // src/file-claims.ts
@@ -187,19 +152,20 @@ function main() {
   }
   const sessionId = getSessionId();
   const project = getProject();
-  const claimCheck = checkFileClaim(filePath, project, sessionId);
+  const claimResult = claimFileAtomic(filePath, project, sessionId);
   let output;
-  if (claimCheck.claimed) {
+  if (claimResult.claimed) {
+    output = { result: "continue" };
+  } else if (claimResult.claimedBy) {
     const fileName = filePath.split("/").pop() || filePath;
     output = {
       result: "continue",
       // Allow edit, just warn
       message: `\u26A0\uFE0F **File Conflict Warning**
-\`${fileName}\` is being edited by Session ${claimCheck.claimedBy}
+\`${fileName}\` is being edited by Session ${claimResult.claimedBy}
 Consider coordinating with the other session to avoid conflicts.`
     };
   } else {
-    claimFile(filePath, project, sessionId);
     output = { result: "continue" };
   }
   console.log(JSON.stringify(output));

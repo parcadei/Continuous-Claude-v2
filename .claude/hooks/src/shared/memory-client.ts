@@ -171,7 +171,7 @@ export class MemoryClient {
 import json
 import sys
 try:
-    from scripts.agentica.memory_factory import get_default_backend
+    from scripts.core.db.memory_factory import get_default_backend
     backend = get_default_backend()
     print(json.dumps({"available": True, "backend": backend}))
 except Exception as e:
@@ -213,7 +213,7 @@ async def search():
     agent_id = sys.argv[4] if len(sys.argv) > 4 else None
 
     try:
-        from scripts.agentica.memory_factory import create_default_memory_service
+        from scripts.core.db.memory_factory import create_default_memory_service
         memory = create_default_memory_service(session_id)
 
         await memory.connect()
@@ -264,7 +264,7 @@ async def store():
     agent_id = sys.argv[4] if len(sys.argv) > 4 else None
 
     try:
-        from scripts.agentica.memory_factory import create_default_memory_service
+        from scripts.core.db.memory_factory import create_default_memory_service
         memory = create_default_memory_service(session_id)
 
         await memory.connect()
