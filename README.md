@@ -4,9 +4,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://claude.ai/code)
-[![Skills](https://img.shields.io/badge/Skills-109-green.svg)](#skills-system)
+[![Skills](https://img.shields.io/badge/Skills-105-green.svg)](#skills-system)
 [![Agents](https://img.shields.io/badge/Agents-32-purple.svg)](#agents-system)
-[![Hooks](https://img.shields.io/badge/Hooks-30-blue.svg)](#hooks-system)
+[![Hooks](https://img.shields.io/badge/Hooks-32-blue.svg)](#hooks-system)
 
 **Continuous Claude** transforms Claude Code into a continuously learning system that maintains context across sessions, orchestrates specialized agents, and eliminates wasting tokens through intelligent code analysis.
 
@@ -18,9 +18,9 @@
 - [Quick Start](#quick-start)
 - [Architecture](#architecture)
 - [Core Systems](#core-systems)
-  - [Skills (109)](#skills-system)
+  - [Skills (105)](#skills-system)
   - [Agents (32)](#agents-system)
-  - [Hooks (30)](#hooks-system)
+  - [Hooks (32)](#hooks-system)
   - [TLDR Code Analysis](#tldr-code-analysis)
   - [Memory System](#memory-system)
   - [Continuity System](#continuity-system)
@@ -46,7 +46,7 @@ Claude Code has a **compaction problem**: when context fills up, the system comp
 | Starting fresh each session | Memory system recalls + daemon auto-extracts learnings |
 | Reading entire files burns tokens | 5-layer code analysis + semantic index |
 | Complex tasks need coordination | Meta-skills orchestrate agent workflows |
-| Repeating workflows manually | 109 skills with natural language triggers |
+| Repeating workflows manually | 105 skills with natural language triggers |
 
 **The mantra: Compound, don't compact.** Extract learnings automatically, then start fresh with full context.
 
@@ -184,7 +184,7 @@ uv run python -m scripts.setup.wizard
 | 2 | Check prerequisites (Docker, Python, uv) |
 | 3-5 | Database + API key configuration |
 | 6-7 | Start Docker stack, run migrations |
-| 8 | Install Claude Code integration (32 agents, 109 skills, 30 hooks) |
+| 8 | Install Claude Code integration (32 agents, 105 skills, 32 hooks) |
 | 9 | Math features (SymPy, Z3, Pint - optional) |
 | 10 | TLDR code analysis tool |
 | 11-12 | Diagnostics tools + Loogle (optional) |
@@ -220,7 +220,7 @@ claude
 │                                                                     │
 │  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐             │
 │  │   Skills    │    │   Agents    │    │    Hooks    │             │
-│  │   (109)     │───▶│    (32)     │◀───│    (30)     │             │
+│  │   (105)     │───▶│    (32)     │◀───│    (32)     │             │
 │  └─────────────┘    └─────────────┘    └─────────────┘             │
 │         │                  │                  │                     │
 │         ▼                  ▼                  ▼                     │
@@ -593,7 +593,7 @@ Agents are specialized AI workers spawned via the Task tool. Located in `.claude
 
 Hooks intercept Claude Code at lifecycle points. Located in `.claude/hooks/`.
 
-#### Hook Events (30 hooks total)
+#### Hook Events (32 hooks total)
 
 | Event | Key Hooks | Purpose |
 |-------|-----------|---------|
@@ -614,7 +614,7 @@ Hooks intercept Claude Code at lifecycle points. Located in `.claude/hooks/`.
 | **post-edit-diagnostics** | Runs pyright/ruff after edits |
 | **memory-awareness** | Surfaces relevant learnings |
 
-[See all 30 hooks →](docs/hooks/)
+[See all 32 hooks →](docs/hooks/)
 
 ---
 
@@ -970,8 +970,8 @@ This will:
 | Component | Location |
 |-----------|----------|
 | Agents (32) | ~/.claude/agents/ |
-| Skills (109) | ~/.claude/skills/ |
-| Hooks (30) | ~/.claude/hooks/ |
+| Skills (105) | ~/.claude/skills/ |
+| Hooks (32) | ~/.claude/hooks/ |
 | Rules | ~/.claude/rules/ |
 | Scripts | ~/.claude/scripts/ |
 | PostgreSQL | Docker container |
@@ -1043,10 +1043,10 @@ Services without API keys still work:
 continuous-claude/
 ├── .claude/
 │   ├── agents/           # 32 specialized AI agents
-│   ├── hooks/            # 30 lifecycle hooks
+│   ├── hooks/            # 32 lifecycle hooks
 │   │   ├── src/          # TypeScript source
 │   │   └── dist/         # Compiled JavaScript
-│   ├── skills/           # 109 modular capabilities
+│   ├── skills/           # 105 modular capabilities
 │   ├── rules/            # System policies
 │   ├── scripts/          # Python utilities
 │   └── settings.json     # Hook configuration

@@ -183,7 +183,7 @@ cd opc && docker compose up -d
 
 ```bash
 # Database
-DATABASE_URL=postgresql://opc:opc_dev_password@localhost:5432/opc
+DATABASE_URL=postgresql://opc:opc_dev_password@localhost:5432/continuous_claude
 
 # Embeddings (optional)
 VOYAGE_API_KEY=...
@@ -259,13 +259,13 @@ The `settings.json` file contains sensitive configuration:
 | File | Contains | Safe to Commit? |
 |------|----------|-----------------|
 | `~/.claude/settings.json` | User's actual API keys, tokens, secrets | **NEVER** |
-| `opc/settings.json` | OPC template with hooks only (no secrets) | **YES** |
+| `settings.json.bak` | Template (hooks only, no secrets) | **YES** |
 
 ### How Updates Work
 
 When running the updater (`uv run python -m scripts.setup.update`):
 
-1. Reads `opc/settings.json` (OPC template - hooks only, no secrets)
+1. Reads `settings.json.bak` (template - hooks only, no secrets)
 2. Merges it into the user's existing `~/.claude/settings.json`
 3. Preserves user-specific fields:
    - `env` - user's environment variables

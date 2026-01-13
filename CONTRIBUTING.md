@@ -267,7 +267,7 @@ Or debug existing hooks:
 
 ## Extending TLDR
 
-TLDR is the 5-layer code analysis system in `opc/packages/tldr-code/`.
+TLDR is the 5-layer code analysis system installed as a pip package (`llm-tldr`).
 
 ### Architecture
 
@@ -306,9 +306,11 @@ LANGUAGE_CONFIGS = {
 ### Running TLDR Tests
 
 ```bash
-cd opc/packages/tldr-code
-source .venv/bin/activate
-python -m pytest tests/ -v
+# TLDR is installed via pip
+pip show llm-tldr
+
+# Run tests if available
+python -m pytest -v
 ```
 
 ---
@@ -341,7 +343,7 @@ python -m pytest tests/ -v
 
 ```bash
 # TLDR tests
-cd opc/packages/tldr-code && pytest tests/ -v
+pip show llm-tldr && python -m pytest -v
 
 # Hook tests (TypeScript)
 cd .claude/hooks && npm test
