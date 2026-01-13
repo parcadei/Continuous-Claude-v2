@@ -34,6 +34,14 @@ from abc import ABC, abstractmethod
 
 import httpx
 
+# Redis cache import (graceful degradation if unavailable)
+try:
+    from scripts.core.db.redis_cache import cache
+    REDIS_CACHE_AVAILABLE = True
+except ImportError:
+    REDIS_CACHE_AVAILABLE = False
+    cache = None
+
 
 class EmbeddingError(Exception):
     """Error raised when embedding generation fails."""
@@ -364,12 +372,14 @@ class LocalEmbeddingProvider(EmbeddingProvider):
         self,
         model: str = "Qwen/Qwen3-Embedding-0.6B",
         device: str | None = None,
+        redis_cache: bool = True,
     ):
         """Initialize local embedding provider.
 
         Args:
             model: Model name from sentence-transformers
             device: Device to use ('cpu', 'cuda', 'mps', or None for auto)
+            redis_cache: Enable Redis caching (default True)
         """
         try:
             from sentence_transformers import SentenceTransformer
@@ -383,23 +393,131 @@ class LocalEmbeddingProvider(EmbeddingProvider):
         self._model = SentenceTransformer(model, device=device)
         self._dimension = self._model.get_sentence_embedding_dimension()
 
-    async def embed(self, text: str) -> list[float]:
-        """Generate embedding for a single text."""
-        import asyncio
+        # Cache configuration
+        self._redis_enabled = redis_cache and REDIS_CACHE_AVAILABLE
+        self._cache_hits = 0
+        self._cache_misses = 0
 
+    async def _embed_local(self, text: str) -> list[float]:
+        """Generate embedding locally without cache lookup.
+
+        Args:
+            text: Text to embed
+
+        Returns:
+            Embedding vector
+        """
         loop = asyncio.get_event_loop()
         embedding = await loop.run_in_executor(
             None, lambda: self._model.encode(text, convert_to_numpy=True).tolist()
         )
         return embedding
 
+    async def embed(self, text: str) -> list[float]:
+        """Generate embedding with Redis cache lookup.
+
+        Checks Redis cache first, generates embedding if not found,
+        then caches the result.
+
+        Args:
+            text: Text to embed
+
+        Returns:
+            Embedding vector
+        """
+        # Check cache first
+        if self._redis_enabled and cache is not None:
+            cached = await cache.get_embedding(text)
+            if cached:
+                self._cache_hits += 1
+                return cached
+            self._cache_misses += 1
+
+        # Generate embedding
+        embedding = await self._embed_local(text)
+
+        # Cache result
+        if self._redis_enabled and cache is not None:
+            await cache.set_embedding(text, embedding)
+
+        return embedding
+
+    def get_cache_stats(self) -> dict:
+        """Return cache hit/miss statistics.
+
+        Returns:
+            Dict with hits, misses, and hit_rate
+        """
+        total = self._cache_hits + self._cache_misses
+        return {
+            "hits": self._cache_hits,
+            "misses": self._cache_misses,
+            "hit_rate": self._cache_hits / total if total > 0 else 0.0,
+        }
+
+    def __repr__(self) -> str:
+        """String representation with cache stats."""
+        stats = self.get_cache_stats()
+        return (
+            f"LocalEmbeddingProvider("
+            f"model={self.model_name}, "
+            f"redis={self._redis_enabled}, "
+            f"cache_hit_rate={stats['hit_rate']:.1%})"
+        )
+
     async def embed_batch(self, texts: list[str]) -> list[list[float]]:
-        """Generate embeddings for multiple texts."""
+        """Generate embeddings for multiple texts with caching.
+
+        Checks cache for each text, generates embeddings for misses,
+        then caches all results.
+
+        Args:
+            texts: List of texts to embed
+
+        Returns:
+            List of embedding vectors
+        """
         if not texts:
             return []
 
-        import asyncio
+        results: list[list[float] | None] = [None] * len(texts)
+        texts_to_embed: list[tuple[int, str]] = []
 
+        # Check cache first
+        if self._redis_enabled and cache is not None:
+            for i, text in enumerate(texts):
+                cached = await cache.get_embedding(text)
+                if cached:
+                    results[i] = cached
+                    self._cache_hits += 1
+                else:
+                    self._cache_misses += 1
+                    texts_to_embed.append((i, text))
+        else:
+            texts_to_embed = list(enumerate(texts))
+
+        # Embed remaining texts
+        if texts_to_embed:
+            indices, remaining_texts = zip(*texts_to_embed)
+            new_embeddings = await self._embed_local_batch(list(remaining_texts))
+
+            async with asyncio.Lock():
+                for idx, text, embedding in zip(indices, remaining_texts, new_embeddings):
+                    results[idx] = embedding
+                    if self._redis_enabled and cache is not None:
+                        await cache.set_embedding(text, embedding)
+
+        return [r for r in results if r is not None]
+
+    async def _embed_local_batch(self, texts: list[str]) -> list[list[float]]:
+        """Generate embeddings locally without cache.
+
+        Args:
+            texts: List of texts to embed
+
+        Returns:
+            List of embedding vectors
+        """
         loop = asyncio.get_event_loop()
         embeddings = await loop.run_in_executor(
             None, lambda: self._model.encode(texts, convert_to_numpy=True).tolist()
