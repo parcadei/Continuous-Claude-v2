@@ -1,0 +1,64 @@
+# Pre-commit hooks for OPC v3 project
+#
+# This file defines custom local hooks for pre-commit validation.
+# See .pre-commit-config.yaml for the full configuration.
+
+repos:
+  - repo: local
+    hooks:
+      - id: doc-counts-validate
+        name: Validate documentation counts match reality
+        description: |
+          Compares documented claims about skills, hooks, agents, and rules
+          against actual counts to detect documentation drift.
+        entry: python opc/scripts/validate-doc-counts.py
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [push]
+        # Only run when relevant files changed
+        files: |
+          (?x)^(
+            .claude/skills/|
+            .claude/hooks/|
+            .claude/agents/|
+            .claude/rules/|
+            README.md|
+            CONTRIBUTING.md|
+            CLAUDE.md|
+            opc/scripts/validate-doc-counts\.py
+          )
+
+      - id: schema-drift-check
+        name: Check schema drift between init-db.sql and running database
+        description: |
+          Validates that the database schema in init-db.sql matches the
+          running PostgreSQL database. Requires Docker services to be running.
+        entry: python opc/scripts/schema/drift_detector.py
+        language: system
+        pass_filenames: false
+        files: opc/init-db.sql
+        stages: [push]
+        # Only run when init-db.sql changes or explicitly requested
+
+      - id: markdown-links-validate
+        name: Validate markdown links
+        description: |
+          Checks for broken internal links in markdown files.
+          Validates relative links to other .md files and code references.
+        entry: python opc/scripts/validate-markdown-links.py
+        language: system
+        pass_filenames: true
+        stages: [commit, push]
+        types: [markdown]
+
+      - id: yaml-consistency-check
+        name: Check YAML file consistency
+        description: |
+          Validates that YAML files are syntactically correct and
+          checks for common issues like duplicate keys.
+        entry: python opc/scripts/validate-yaml.py
+        language: system
+        pass_filenames: true
+        stages: [commit, push]
+        types: [yaml]

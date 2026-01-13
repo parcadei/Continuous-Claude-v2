@@ -1,0 +1,112 @@
+# Pre-commit configuration for OPC v3
+#
+# Install pre-commit hooks:
+#   pre-commit install --config .pre-commit-config.yaml
+#
+# Run hooks manually:
+#   pre-commit run --config .pre-commit-config.yaml --all-files
+
+# =============================================================================
+# External hooks (from pre-commit-hooks project)
+# =============================================================================
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # Basic file hygiene
+      - id: trailing-whitespace
+        name: Fix trailing whitespace
+        description: Ensures no trailing whitespace at line endings.
+        args: [--markdown-linebreak-ext=md]
+
+      - id: end-of-file-fixer
+        name: Fix end of file
+        description: Ensures files end with a newline.
+        exclude: '\.png$|\.jpg$|\.jpeg$|\.gif$|\.ttf$|\.woff2$'
+
+      - id: check-yaml
+        name: Validate YAML syntax
+        description: Checks YAML files for syntax errors.
+        args: [--unsafe, --allow-multiple-documents]
+
+      - id: check-json
+        name: Validate JSON syntax
+        description: Checks JSON files for syntax errors.
+
+      - id: check-added-large-files
+        name: Prevent large files
+        description: Prevents adding files larger than 500KB.
+        args: ['--maxkb=500']
+
+      - id: detect-private-key
+        name: Detect private keys
+        description: Detects private keys (RSA, DSA, EC, etc.) in files.
+
+      - id: check-merge-conflict
+        name: Detect merge conflict markers
+        description: Checks for unresolved merge conflict markers.
+
+  # =============================================================================
+  # Local hooks (custom validation for this project)
+  # =============================================================================
+  - repo: local
+    hooks:
+      # Documentation count validation
+      - id: doc-counts-validate
+        name: Validate doc counts match reality
+        description: |
+          Compares documented claims about skills, hooks, agents, and rules
+          against actual counts to detect documentation drift before commit.
+        entry: python opc/scripts/validate-doc-counts.py
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [push]
+
+      # Schema drift detection
+      - id: schema-drift-check
+        name: Check schema drift
+        description: |
+          Validates init-db.sql against running database.
+          Requires: docker compose up -d (PostgreSQL running)
+        entry: python opc/scripts/schema/drift_detector.py
+        language: system
+        pass_filenames: false
+        files: opc/init-db.sql
+        stages: [push]
+        # Skip if database not available
+        pass_filenames: false
+
+      # Python-specific hooks
+      - id: python-import-order
+        name: Check Python import order
+        description: Verifies Python imports follow project conventions.
+        entry: python opc/scripts/lint-imports.py
+        language: system
+        pass_filenames: true
+        types: [python]
+        stages: [commit, push]
+
+      - id: python-shebang
+        name: Check Python shebangs
+        description: Ensures Python files have proper shebangs.
+        entry: python opc/scripts/check-shebang.py
+        language: system
+        types: [python]
+        stages: [commit, push]
+
+# =============================================================================
+# Hook settings
+# =============================================================================
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [commit]
+minimum_pre_commit_version: "3.0.0"
+
+# Fail fast to stop on first error
+fail_fast: false
+
+# Color output
+color: true
+
+# Verbose output (enable for debugging)
+verbose: false
