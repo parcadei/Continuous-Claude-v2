@@ -1,0 +1,5 @@
+cache: true
+cacheExpires: 3600
+timeout: 10000
+no-progress: true
+exclude: ['**/.git/**', '**/.venv/**', '**/node_modules/**']

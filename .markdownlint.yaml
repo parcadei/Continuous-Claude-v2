@@ -1,0 +1,6 @@
+default: true
+line-length:
+  line_length: 120
+  code_blocks: false
+  headings: true
+  tables: true

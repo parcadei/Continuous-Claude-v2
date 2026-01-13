@@ -1,0 +1,36 @@
+name: Documentation Validation
+on:
+  push:
+    paths: ['**.md', 'docs/**']
+  pull_request:
+
+jobs:
+  markdownlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: '**/*.md'
+          config: '.markdownlint.yaml'
+
+  link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run lychee for link checking
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose --no-progress '**/*.md'
+          fail: true
+
+  count-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Count and validate
+        run: |
+          ACTUAL_SKILLS=$(ls .claude/skills/*/SKILL.md 2>/dev/null | wc -l)
+          ACTUAL_HOOKS=$(ls .claude/hooks/dist/*.mjs 2>/dev/null | wc -l)
+          echo "Skills: $ACTUAL_SKILLS, Hooks: $ACTUAL_HOOKS"
+          # Compare with documented counts

@@ -12,9 +12,8 @@
         "test:watch": "vitest"
     },
     "devDependencies": {
-        "@types/better-sqlite3": "^11.0.0",
+        "@types/better-sqlite3": "*",
         "@types/node": "^20.11.0",
-        "@vitest/types": "^2.0.0",
         "esbuild": "^0.24.0",
         "typescript": "^5.3.3",
         "vitest": "^4.0.16"
