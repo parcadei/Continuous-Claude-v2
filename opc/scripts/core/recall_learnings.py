@@ -392,6 +392,77 @@ async def search_learnings_auto_rerank(
     return results[:k]
 
 
+async def search_learnings_mmr(
+    query: str,
+    k: int = 5,
+    provider: str = "local",
+    lambda_param: float = 0.5,
+    similarity_threshold: float = 0.0,
+    rrf_k: int = 60,
+) -> list[dict[str, Any]]:
+    """Search learnings using Maximal Marginal Relevance (MMR).
+
+    MMR ensures diverse results by balancing relevance and diversity:
+        MMR score = lambda * relevance - (1 - lambda) * diversity
+
+    Args:
+        query: Search query
+        k: Number of results to return
+        provider: Embedding provider
+        lambda_param: Balance between relevance and diversity (0.0-1.0)
+            - 1.0 = pure relevance (like RRF)
+            - 0.0 = pure diversity
+            - 0.5 = balanced (recommended)
+        similarity_threshold: Minimum MMR score to include
+        rrf_k: RRF constant for candidate retrieval
+
+    Returns:
+        List of learnings with mmr_score, relevance, and diversity
+    """
+    from scripts.core.db.embedding_service import EmbeddingService
+    from scripts.core.db.memory_service_pg import MemoryServicePG
+
+    # Generate query embedding
+    embedder = EmbeddingService(provider=provider)
+    try:
+        query_embedding = await embedder.embed(query)
+    finally:
+        await embedder.aclose()
+
+    # Use MemoryServicePG for MMR search
+    memory = MemoryServicePG(session_id="default", agent_id=None)
+    await memory.connect()
+
+    try:
+        results = await memory.search_learnings_mmr(
+            query=query,
+            query_embedding=query_embedding,
+            limit=k,
+            lambda_param=lambda_param,
+            similarity_threshold=similarity_threshold,
+            k=rrf_k,
+        )
+    finally:
+        await memory.close()
+
+    # Format results for CLI output
+    formatted = []
+    for r in results:
+        formatted.append({
+            "id": r.get("id", ""),
+            "session_id": r.get("metadata", {}).get("session_id", "default"),
+            "content": r["content"],
+            "metadata": r.get("metadata", {}),
+            "created_at": r.get("created_at"),
+            "similarity": r.get("mmr_score", r.get("relevance", 0)),
+            "mmr_score": r.get("mmr_score"),
+            "relevance": r.get("relevance"),
+            "diversity": r.get("diversity"),
+        })
+
+    return formatted
+
+
 async def search_learnings_hybrid_rrf(
     query: str,
     k: int = 5,
@@ -775,6 +846,18 @@ async def main() -> int:
         action="store_true",
         help="Force reranking (override auto-decision)",
     )
+    parser.add_argument(
+        "--mmr",
+        action="store_true",
+        help="Use Maximal Marginal Relevance for diverse results",
+    )
+    parser.add_argument(
+        "--lambda",
+        dest="lambda_param",
+        type=float,
+        default=0.5,
+        help="MMR lambda: balance between relevance and diversity (0.0-1.0, default: 0.5)",
+    )
 
     args = parser.parse_args()
 
@@ -782,7 +865,9 @@ async def main() -> int:
     if not args.json:
         print(f'Recalling learnings for: "{args.query}"')
         print(f"Provider: {args.provider}")
-        if args.auto_rerank:
+        if args.mmr:
+            print(f"Mode: MMR (lambda={args.lambda_param}, diverse results)")
+        elif args.auto_rerank:
             print("Mode: Auto-rerank (skips reranker when confident)")
         print()
 
@@ -816,6 +901,15 @@ async def main() -> int:
                 high_confidence_threshold=0.0,  # Force rerank
                 confidence_gap_threshold=999.0,  # Force rerank
             )
+        elif args.mmr:
+            # MMR search for diverse results
+            results = await search_learnings_mmr(
+                query=args.query,
+                k=args.k,
+                provider=args.provider,
+                lambda_param=args.lambda_param,
+                similarity_threshold=args.threshold,
+            )
         else:
             # Default: Auto-rerank based on confidence
             results = await search_learnings_auto_rerank(
@@ -841,12 +935,20 @@ async def main() -> int:
             else:
                 created_str = str(created_at)
 
-            json_results.append({
+            result_entry = {
                 "score": result["similarity"],
                 "session_id": result["session_id"],
                 "content": result["content"],
                 "created_at": created_str,
-            })
+            }
+
+            # Include MMR-specific fields if present
+            if "mmr_score" in result:
+                result_entry["mmr_score"] = result["mmr_score"]
+                result_entry["relevance"] = result.get("relevance")
+                result_entry["diversity"] = result.get("diversity")
+
+            json_results.append(result_entry)
         print(json.dumps({"results": json_results}))
         return 0
 
@@ -858,8 +960,10 @@ async def main() -> int:
     print(f"Found {len(results)} matching learnings:")
     print()
 
+    # Check if this is MMR results (has mmr_score)
+    is_mmr = any("mmr_score" in r for r in results)
+
     for i, result in enumerate(results, 1):
-        similarity = result["similarity"]
         content_preview = format_result_preview(result["content"], max_length=300)
         session_id = result["session_id"]
         created_at = result["created_at"]
@@ -870,7 +974,17 @@ async def main() -> int:
         else:
             created_str = str(created_at)[:16]
 
-        print(f"{i}. [{similarity:.3f}] Session: {session_id} ({created_str})")
+        if is_mmr:
+            # Show MMR-specific breakdown
+            mmr_score = result.get("mmr_score", result.get("similarity", 0))
+            relevance = result.get("relevance", 0)
+            diversity = result.get("diversity", 0)
+            print(f"{i}. [MMR:{mmr_score:.3f}] Session: {session_id} ({created_str})")
+            print(f"   relevance={relevance:.3f}, diversity={diversity:.3f}")
+        else:
+            similarity = result["similarity"]
+            print(f"{i}. [{similarity:.3f}] Session: {session_id} ({created_str})")
+
         print(f"   {content_preview}")
         print()
 

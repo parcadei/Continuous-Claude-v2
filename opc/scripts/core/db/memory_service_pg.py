@@ -855,6 +855,190 @@ class MemoryServicePG:
                 for row in rows
             ]
 
+    def _cosine_similarity(self, v1: list[float], v2: list[float]) -> float:
+        """Calculate cosine similarity between two vectors.
+
+        Args:
+            v1: First vector
+            v2: Second vector
+
+        Returns:
+            Cosine similarity score (0.0 to 1.0)
+        """
+        import math
+        dot = sum(a * b for a, b in zip(v1, v2))
+        norm1 = math.sqrt(sum(a * a for a in v1))
+        norm2 = math.sqrt(sum(b * b for b in v2))
+        if norm1 * norm2 == 0:
+            return 0.0
+        return dot / (norm1 * norm2)
+
+    async def search_learnings_mmr(
+        self,
+        query: str,
+        query_embedding: list[float],
+        limit: int = 5,
+        lambda_param: float = 0.5,
+        similarity_threshold: float = 0.0,
+        k: int = 60,
+    ) -> list[dict[str, Any]]:
+        """Search archival memory using Maximal Marginal Relevance (MMR).
+
+        MMR ensures diverse results by balancing relevance and diversity:
+        MMR score = lambda * relevance - (1 - lambda) * diversity
+
+        Where:
+        - relevance: cosine similarity to query
+        - diversity: max similarity to already-selected results
+
+        Args:
+            query: Text query for FTS
+            query_embedding: Query embedding for vector search
+            limit: Max results to return
+            lambda_param: Balance between relevance and diversity (0.0-1.0)
+                - 1.0 = pure relevance (like RRF)
+                - 0.0 = pure diversity
+                - 0.5 = balanced (recommended)
+            similarity_threshold: Minimum MMR score to include result
+            k: RRF constant for initial candidate retrieval
+
+        Returns:
+            List of matching facts with mmr_score, relevance, and diversity
+        """
+        padded_query = self._pad_embedding(query_embedding)
+
+        # Get more candidates than needed for diversity filtering
+        num_candidates = limit * 2
+
+        async with get_connection() as conn:
+            await init_pgvector(conn)
+
+            # Fetch candidates with both FTS and vector scores
+            rows = await conn.fetch(
+                """
+                WITH fts_ranked AS (
+                    SELECT
+                        id,
+                        ROW_NUMBER() OVER (
+                            ORDER BY ts_rank(
+                                to_tsvector('english', content),
+                                plainto_tsquery('english', $4)
+                            ) DESC
+                        ) as fts_rank
+                    FROM archival_memory
+                    WHERE session_id = $1
+                    AND agent_id IS NOT DISTINCT FROM $2
+                    AND to_tsvector('english', content) @@ plainto_tsquery('english', $4)
+                ),
+                vector_ranked AS (
+                    SELECT
+                        id,
+                        ROW_NUMBER() OVER (ORDER BY embedding <=> $5::vector) as vec_rank,
+                        embedding
+                    FROM archival_memory
+                    WHERE session_id = $1
+                    AND agent_id IS NOT DISTINCT FROM $2
+                    AND embedding IS NOT NULL
+                ),
+                combined AS (
+                    SELECT
+                        COALESCE(f.id, v.id) as id,
+                        1 - (v.embedding <=> $5::vector) as relevance,
+                        v.embedding
+                    FROM vector_ranked v
+                    LEFT JOIN fts_ranked f ON f.id = v.id
+                    UNION
+                    SELECT
+                        f.id,
+                        1 - (v.embedding <=> $5::vector) as relevance,
+                        v.embedding
+                    FROM fts_ranked f
+                    LEFT JOIN vector_ranked v ON v.id = f.id
+                    WHERE f.id NOT IN (SELECT id FROM vector_ranked)
+                )
+                SELECT
+                    a.id,
+                    a.content,
+                    a.metadata,
+                    a.created_at,
+                    c.relevance,
+                    c.embedding
+                FROM combined c
+                JOIN archival_memory a ON a.id = c.id
+                ORDER BY c.relevance DESC
+                LIMIT $6
+            """,
+                self.session_id,
+                self.agent_id,
+                k,
+                query,
+                padded_query,
+                num_candidates,
+            )
+
+            if not rows:
+                return []
+
+            # Build candidate list with embeddings
+            candidates = []
+            for row in rows:
+                embedding_bytes = row["embedding"]
+                # Convert bytes to list of floats if stored as bytes
+                if isinstance(embedding_bytes, bytes):
+                    import struct
+                    embedding = list(struct.unpack(f"{1024}f", embedding_bytes))
+                elif embedding_bytes:
+                    embedding = list(embedding_bytes)
+                else:
+                    embedding = []
+
+                candidates.append({
+                    "id": str(row["id"]),
+                    "content": row["content"],
+                    "metadata": json.loads(row["metadata"]) if row["metadata"] else {},
+                    "created_at": row["created_at"],
+                    "relevance": float(row["relevance"]),
+                    "embedding": embedding,
+                })
+
+        if not candidates:
+            return []
+
+        # MMR selection
+        selected = []
+        selected_embeddings = []
+
+        for item in candidates:
+            if len(selected) >= limit:
+                break
+
+            relevance = item.get("relevance", 0)
+
+            # Calculate diversity (max similarity to already selected)
+            diversity = 0.0
+            if selected_embeddings:
+                similarities = [
+                    self._cosine_similarity(item["embedding"], sel_emb)
+                    for sel_emb in selected_embeddings
+                ]
+                diversity = max(similarities) if similarities else 0
+
+            # MMR score: balance relevance vs diversity
+            mmr_score = lambda_param * relevance - (1 - lambda_param) * diversity
+
+            item["mmr_score"] = mmr_score
+            item["diversity"] = diversity
+
+            if mmr_score >= similarity_threshold:
+                selected.append(item)
+                selected_embeddings.append(item["embedding"])
+
+            # Remove embedding from final output to reduce size
+            if "embedding" in item:
+                del item["embedding"]
+
+        return selected
+
     async def store_with_embedding(
         self,
         content: str,
