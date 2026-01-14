@@ -415,6 +415,69 @@ class LocalEmbeddingProvider(EmbeddingProvider):
 SentenceTransformer = None
 
 
+class OllamaEmbeddingProvider(EmbeddingProvider):
+    """Ollama embedding provider using local or remote Ollama server.
+
+    Uses Ollama's embedding API to generate embeddings.
+    Supports nomic-embed-text and other embedding models.
+
+    Environment variables:
+    - OLLAMA_HOST: Ollama server URL (default: http://localhost:11434)
+    - OLLAMA_EMBED_MODEL: Model name (default: nomic-embed-text)
+    """
+
+    DEFAULT_MODEL = "nomic-embed-text"
+    DEFAULT_HOST = "http://localhost:11434"
+
+    MODELS = {
+        "nomic-embed-text": 768,
+        "nomic-embed-text-v1.5": 768,
+        "nomic-embed-text-v2-moe": 768,
+        "mxbai-embed-large": 1024,
+        "all-minilm": 384,
+        "snowflake-arctic-embed": 1024,
+    }
+
+    def __init__(
+        self,
+        model: str | None = None,
+        host: str | None = None,
+    ):
+        """Initialize Ollama embedding provider.
+
+        Args:
+            model: Model name (default from OLLAMA_EMBED_MODEL env or nomic-embed-text)
+            host: Ollama server URL (default from OLLAMA_HOST env or localhost:11434)
+        """
+        import os
+        import httpx
+
+        self.model = model or os.getenv("OLLAMA_EMBED_MODEL", self.DEFAULT_MODEL)
+        self.host = host or os.getenv("OLLAMA_HOST", self.DEFAULT_HOST)
+        self._client = httpx.AsyncClient(timeout=30.0, verify=False)
+        self._dimension = self.MODELS.get(self.model, 768)
+
+    async def embed(self, text: str) -> list[float]:
+        """Generate embedding for a single text."""
+        url = f"{self.host.rstrip('/')}/api/embeddings"
+        response = await self._client.post(url, json={"model": self.model, "prompt": text})
+        response.raise_for_status()
+        return response.json()["embedding"]
+
+    async def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        """Generate embeddings for multiple texts (sequential for Ollama)."""
+        results = []
+        for text in texts:
+            emb = await self.embed(text)
+            results.append(emb)
+        return results
+
+    @property
+    def dimension(self) -> int:
+        """Return model dimension."""
+        return self._dimension
+
+
 class MockEmbeddingProvider(EmbeddingProvider):
     """Mock embedding provider for testing.
 
@@ -557,6 +620,10 @@ class EmbeddingService:
             local_model = model if model is not None else "BAAI/bge-large-en-v1.5"
             device = kwargs.get("device", None)
             self._provider = LocalEmbeddingProvider(model=local_model, device=device)
+        elif provider == "ollama":
+            ollama_model = model if model is not None else None  # Use env default
+            ollama_host = kwargs.get("host", None)  # Use env default
+            self._provider = OllamaEmbeddingProvider(model=ollama_model, host=ollama_host)
         else:
             raise ValueError(f"Unknown provider: {provider}")
 
