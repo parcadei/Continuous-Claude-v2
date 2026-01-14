@@ -103,7 +103,7 @@ uv run python -m runtime.harness scripts/perplexity_ask.py \
 
 **ALWAYS write findings to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/aegis/latest-output.md
+$CLAUDE_PROJECT_DIR/.claude/cache/agents/aegis/output-{timestamp}.md
 ```
 
 ## Output Format

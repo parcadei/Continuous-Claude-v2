@@ -41,7 +41,7 @@ Other analyses (run as needed):
 
 **ALWAYS write your findings to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/braintrust-analyst/latest-output.md
+$CLAUDE_PROJECT_DIR/.claude/cache/agents/braintrust-analyst/output-{timestamp}.md
 ```
 
 Use Read-then-Write pattern:

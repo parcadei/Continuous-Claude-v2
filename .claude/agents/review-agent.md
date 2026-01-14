@@ -160,7 +160,7 @@ Note any concerns in the Gaps section.
 
 **ALWAYS write output to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/review-agent/latest-output.md
+$CLAUDE_PROJECT_DIR/.claude/cache/agents/review-agent/output-{timestamp}.md
 ```
 
 ### Output Format
