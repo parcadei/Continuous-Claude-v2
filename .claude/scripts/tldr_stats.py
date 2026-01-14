@@ -4,12 +4,17 @@ TLDR Stats - Beautiful token usage dashboard.
 
 Shows session costs, TLDR savings, cache efficiency, and hook activity
 with colors, progress bars, and sparklines.
+
+Usage:
+  tldr_stats.py                    # Global stats (all projects)
+  tldr_stats.py --project /path    # Project-specific stats
 """
 
-import socket
-import json
+import argparse
 import hashlib
+import json
 import os
+import socket
 import sys
 import tempfile
 from pathlib import Path
@@ -229,7 +234,7 @@ def get_tldr_stats(project_dir: str, session_id: str) -> dict:
         data = sock.recv(65536)
         sock.close()
         return json.loads(data)
-    except (OSError, json.JSONDecodeError, socket.timeout, ConnectionRefusedError):
+    except (OSError, json.JSONDecodeError, TimeoutError, ConnectionRefusedError):
         return {}
 
 
@@ -272,10 +277,15 @@ def get_historical_stats() -> tuple[list[dict], dict]:
 # ============================================================================
 
 def main():
+    parser = argparse.ArgumentParser(description='Show TLDR token usage stats')
+    parser.add_argument('--project', help='Show stats for specific project (default: global)')
+    args = parser.parse_args()
+
     session_id = os.environ.get('CLAUDE_SESSION_ID', 'unknown')[:8]
 
     # Collect data
     claude_stats = get_claude_stats(session_id)
+    tldr_project_stats = get_tldr_stats(args.project, session_id) if args.project else None
     historical, global_totals = get_historical_stats()
 
     # Extract metrics - prefer claude_stats, fallback to JSONL parsing
@@ -353,6 +363,37 @@ def main():
                 avg_savings = sum(savings_values) / len(savings_values)
                 print(f"    {C.DIM}Recent: {trend} avg {avg_savings:.0f}%{C.RESET}")
     print()
+
+    # Project-specific daemon stats (if --project flag provided)
+    if tldr_project_stats:
+        print(f"  {C.BOLD}TLDR Daemon{C.RESET} {C.DIM}(this project){C.RESET}")
+        uptime_sec = tldr_project_stats.get('uptime', 0)
+        uptime_min = int(uptime_sec / 60)
+        uptime_hr = int(uptime_min / 60)
+        files = tldr_project_stats.get('files', 0)
+
+        salsa = tldr_project_stats.get('salsa_stats', {})
+        cache_hits = salsa.get('cache_hits', 0)
+        cache_misses = salsa.get('cache_misses', 0)
+        cache_total = cache_hits + cache_misses
+        cache_rate = (cache_hits / cache_total * 100) if cache_total > 0 else 0
+
+        session = tldr_project_stats.get('all_sessions', {})
+        session_raw = session.get('total_raw_tokens', 0)
+        session_tldr = session.get('total_tldr_tokens', 0)
+        session_saved = session_raw - session_tldr
+        session_rate = (session_saved / session_raw * 100) if session_raw > 0 else 0
+
+        print(f"    Uptime: {uptime_hr}h {uptime_min % 60}m  |  Files: {files}")
+
+        if cache_total > 0:
+            bar = progress_bar(cache_rate / 100, width=15)
+            print(f"    Cache: {bar} {cache_rate:.0f}% ({cache_hits}/{cache_total})")
+
+        if session_raw > 0:
+            print(f"    Saved: {format_tokens(session_saved)} ({session_rate:.0f}%)")
+
+        print()
 
 
 if __name__ == '__main__':
