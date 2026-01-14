@@ -18,5 +18,25 @@ services:
       retries: 5
     restart: unless-stopped
 
+  pgbouncer:
+    image: pgbouncer/pgbouncer:latest
+    container_name: continuous-claude-pgbouncer
+    environment:
+      DATABASES_HOST: postgres
+      DATABASES_PORT: 5432
+      DATABASES_USER: ${POSTGRES_USER:-claude}
+      DATABASES_PASSWORD: ${POSTGRES_PASSWORD:-claude_dev}
+      DATABASES_DBNAME: ${POSTGRES_DB:-continuous_claude}
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_MAX_CLIENT_CONN: 100
+      PGBOUNCER_DEFAULT_POOL_SIZE: 20
+      PGBOUNCER_IGNORE_STARTUP_PARAMETERS: extra_float_digits
+    ports:
+      - "6432:6432"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   continuous_claude_data:

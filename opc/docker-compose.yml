@@ -7,17 +7,16 @@ services:
     image: pgvector/pgvector:pg16
     container_name: opc-postgres
     environment:
-      POSTGRES_USER: opc
-      POSTGRES_PASSWORD: opc_dev_password
-      POSTGRES_DB: opc
+      POSTGRES_USER: ${POSTGRES_USER:-claude}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-claude_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-continuous_claude}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
-      - ../docker/init-schema.sql:/docker-entrypoint-initdb.d/02-memory.sql:ro
+      - ../docker/init-schema.sql:/docker-entrypoint-initdb.d/init-schema.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U opc -d opc"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-claude} -d ${POSTGRES_DB:-continuous_claude}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -29,9 +28,9 @@ services:
     environment:
       DATABASES_HOST: postgres
       DATABASES_PORT: 5432
-      DATABASES_USER: opc
-      DATABASES_PASSWORD: opc_dev_password
-      DATABASES_DBNAME: opc
+      DATABASES_USER: ${POSTGRES_USER:-claude}
+      DATABASES_PASSWORD: ${POSTGRES_PASSWORD:-claude_dev}
+      DATABASES_DBNAME: ${POSTGRES_DB:-continuous_claude}
       PGBOUNCER_POOL_MODE: transaction
       PGBOUNCER_MAX_CLIENT_CONN: 100
       PGBOUNCER_DEFAULT_POOL_SIZE: 20
