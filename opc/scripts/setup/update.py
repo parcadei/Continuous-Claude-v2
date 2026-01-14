@@ -247,6 +247,7 @@ def run_update() -> None:
         ("agents", claude_dir / "agents", {".md", ".yaml", ".yml"}),
         ("scripts/core", claude_dir / "scripts" / "core", {".py"}),
         ("scripts/mcp", claude_dir / "scripts" / "mcp", {".py"}),
+        ("scripts", claude_dir / "scripts", {".py"}),  # Top-level scripts like tldr_stats.py
     ]
 
     all_new = []
