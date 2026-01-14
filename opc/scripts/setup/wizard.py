@@ -732,6 +732,32 @@ async def run_setup_wizard() -> None:
             else:
                 console.print(f"  [red]ERROR[/red] {result.get('error', 'Unknown error')}")
 
+    # Set CLAUDE_OPC_DIR environment variable for skills to find scripts
+    console.print("  Setting CLAUDE_OPC_DIR environment variable...")
+    shell_config = None
+    shell = os.environ.get("SHELL", "")
+    if "zsh" in shell:
+        shell_config = Path.home() / ".zshrc"
+    elif "bash" in shell:
+        shell_config = Path.home() / ".bashrc"
+
+    opc_dir = Path.cwd()  # wizard runs from opc/
+    if shell_config and shell_config.exists():
+        content = shell_config.read_text()
+        export_line = f'export CLAUDE_OPC_DIR="{opc_dir}"'
+        if "CLAUDE_OPC_DIR" not in content:
+            with open(shell_config, "a") as f:
+                f.write(f"\n# Continuous-Claude OPC directory (for skills to find scripts)\n{export_line}\n")
+            console.print(f"  [green]OK[/green] Added CLAUDE_OPC_DIR to {shell_config.name}")
+        else:
+            console.print(f"  [dim]CLAUDE_OPC_DIR already in {shell_config.name}[/dim]")
+    elif sys.platform == "win32":
+        console.print(f"  [yellow]NOTE[/yellow] Add to your environment:")
+        console.print(f'       set CLAUDE_OPC_DIR="{opc_dir}"')
+    else:
+        console.print(f"  [yellow]NOTE[/yellow] Add to your shell config:")
+        console.print(f'       export CLAUDE_OPC_DIR="{opc_dir}"')
+
     # Step 8: Math Features (Optional)
     console.print("\n[bold]Step 8/12: Math Features (Optional)[/bold]")
     console.print("  Math features include:")
@@ -990,8 +1016,7 @@ async def run_setup_wizard() -> None:
     console.print("  [dim]Note: Requires Lean 4 (elan) and ~2GB for Mathlib index.[/dim]")
 
     if Confirm.ask("\nInstall Loogle for theorem proving?", default=False):
-        import os
-        import subprocess
+        # os and subprocess are already imported at module level
 
         # Check elan prerequisite
         if not shutil.which("elan"):

@@ -164,19 +164,19 @@ Primary tool: **nia-docs** - Find API documentation, usage patterns, code exampl
 
 ```bash
 # Semantic search in package
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python -m runtime.harness scripts/mcp/nia_docs.py \
+(cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/nia_docs.py \
   --package "$LIBRARY" \
   --registry "$REGISTRY" \
   --query "$TOPIC" \
   --limit 10)
 
 # If thorough depth, also grep for specific patterns
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python -m runtime.harness scripts/mcp/nia_docs.py \
+(cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/nia_docs.py \
   --package "$LIBRARY" \
   --grep "$TOPIC")
 
 # Supplement with official docs if URL known
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python -m runtime.harness scripts/mcp/firecrawl_scrape.py \
+(cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/firecrawl_scrape.py \
   --url "https://docs.example.com/api/$TOPIC" \
   --format markdown)
 ```
@@ -192,26 +192,26 @@ Primary tool: **perplexity-search** - Find recommended approaches, patterns, ant
 
 ```bash
 # AI-synthesized research (sonar-pro)
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/mcp/perplexity_search.py \
+(cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
   --research "$TOPIC best practices 2024 2025")
 
 # If comparing alternatives
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/mcp/perplexity_search.py \
+(cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
   --reason "$TOPIC vs alternatives - which to choose?")
 ```
 
 **Thorough depth additions:**
 ```bash
 # Chain-of-thought for complex decisions
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/mcp/perplexity_search.py \
+(cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
   --reason "$TOPIC tradeoffs and considerations 2025")
 
 # Deep comprehensive research
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/mcp/perplexity_search.py \
+(cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
   --deep "$TOPIC comprehensive guide 2025")
 
 # Recent developments
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/mcp/perplexity_search.py \
+(cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
   --search "$TOPIC latest developments" \
   --recency month --max-results 5)
 ```
@@ -222,20 +222,20 @@ Use ALL available MCP tools - comprehensive multi-source research.
 
 **Step 2a: Library documentation (nia-docs)**
 ```bash
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python -m runtime.harness scripts/mcp/nia_docs.py \
+(cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/nia_docs.py \
   --search "$TOPIC")
 ```
 
 **Step 2b: Web research (perplexity)**
 ```bash
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python scripts/mcp/perplexity_search.py \
+(cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
   --research "$TOPIC")
 ```
 
 **Step 2c: Specific documentation (firecrawl)**
 ```bash
 # Scrape relevant documentation pages found in perplexity results
-(cd $CLAUDE_PROJECT_DIR/opc && uv run python -m runtime.harness scripts/mcp/firecrawl_scrape.py \
+(cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/firecrawl_scrape.py \
   --url "$FOUND_DOC_URL" \
   --format markdown)
 ```

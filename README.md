@@ -1028,6 +1028,8 @@ Skill activation triggers.
 | `BRAINTRUST_API_KEY` | Session tracing | No |
 | `PERPLEXITY_API_KEY` | Web search | No |
 | `NIA_API_KEY` | Documentation search | No |
+| `CLAUDE_OPC_DIR` | Path to CC's opc/ directory (set by wizard) | Auto |
+| `CLAUDE_PROJECT_DIR` | Current project directory (set by SessionStart hook) | Auto |
 
 Services without API keys still work:
 - Continuity system (ledgers, handoffs)
