@@ -4,9 +4,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://claude.ai/code)
-[![Skills](https://img.shields.io/badge/Skills-105-green.svg)](#skills-system)
-[![Agents](https://img.shields.io/badge/Agents-32-purple.svg)](#agents-system)
-[![Hooks](https://img.shields.io/badge/Hooks-65-blue.svg)](#hooks-system)
+[![Skills](https://img.shields.io/badge/Skills-111-green.svg)](#skills-system)
+[![Agents](https://img.shields.io/badge/Agents-16-purple.svg)](#agents-system)
+[![Hooks](https://img.shields.io/badge/Hooks-31-blue.svg)](#hooks-system)
 
 **Continuous Claude** transforms Claude Code into a continuously learning system that maintains context across sessions, orchestrates specialized agents, and eliminates wasting tokens through intelligent code analysis.
 
@@ -46,7 +46,7 @@ Claude Code has a **compaction problem**: when context fills up, the system comp
 | Starting fresh each session | Memory system recalls + daemon auto-extracts learnings |
 | Reading entire files burns tokens | 5-layer code analysis + semantic index |
 | Complex tasks need coordination | Meta-skills orchestrate agent workflows |
-| Repeating workflows manually | 105 skills with natural language triggers |
+| Repeating workflows manually | 111 skills with natural language triggers |
 
 **The mantra: Compound, don't compact.** Extract learnings automatically, then start fresh with full context.
 
@@ -184,7 +184,7 @@ uv run python -m scripts.setup.wizard
 | 2 | Check prerequisites (Docker, Python, uv) |
 | 3-5 | Database + API key configuration |
 | 6-7 | Start Docker stack, run migrations |
-| 8 | Install Claude Code integration (32 agents, 105 skills, 65 hooks) |
+| 8 | Install Claude Code integration (16 agents, 111 skills, 31 hooks) |
 | 9 | Math features (SymPy, Z3, Pint - optional) |
 | 10 | TLDR code analysis tool |
 | 11-12 | Diagnostics tools + Loogle (optional) |
@@ -593,7 +593,7 @@ Agents are specialized AI workers spawned via the Task tool. Located in `.claude
 
 Hooks intercept Claude Code at lifecycle points. Located in `.claude/hooks/`.
 
-#### Hook Events (65 hooks total)
+#### Hook Events (31 hooks total)
 
 | Event | Key Hooks | Purpose |
 |-------|-----------|---------|
@@ -614,7 +614,7 @@ Hooks intercept Claude Code at lifecycle points. Located in `.claude/hooks/`.
 | **post-edit-diagnostics** | Runs pyright/ruff after edits |
 | **memory-awareness** | Surfaces relevant learnings |
 
-[See all 65 hooks →](docs/hooks/)
+[See all 31 hooks →](docs/hooks/)
 
 ---
 
