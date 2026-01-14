@@ -210,7 +210,22 @@ export OPC_POSTGRES_URL="postgresql://user:password@hostname:5432/continuous_cla
 claude
 ```
 
-> **Note:** The database must have pgvector extension and the schema from `docker/init-schema.sql`.
+#### Remote Database Setup
+
+The remote database must have pgvector extension and the schema applied:
+
+```bash
+# 1. Connect to your remote PostgreSQL instance
+psql -h hostname -U user -d continuous_claude
+
+# 2. Enable pgvector extension (requires superuser or rds_superuser)
+CREATE EXTENSION IF NOT EXISTS vector;
+
+# 3. Apply the schema (from your local clone)
+psql -h hostname -U user -d continuous_claude -f docker/init-schema.sql
+```
+
+> **Tip:** On managed PostgreSQL (AWS RDS, Supabase, etc.), pgvector may need to be enabled via the provider's dashboard first.
 
 See `.env.example` for all available environment variables.
 
