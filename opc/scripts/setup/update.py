@@ -247,12 +247,24 @@ def run_update() -> None:
         ("agents", claude_dir / "agents", {".md", ".yaml", ".yml"}),
         ("scripts/core", claude_dir / "scripts" / "core", {".py"}),
         ("scripts/mcp", claude_dir / "scripts" / "mcp", {".py"}),
-        ("scripts", claude_dir / "scripts", {".py"}),  # Top-level scripts like tldr_stats.py
     ]
 
     all_new = []
     all_updated = []
     ts_updated = False
+
+    # Handle top-level scripts separately (non-recursive to avoid duplicates)
+    top_level_scripts = integration_source / "scripts"
+    if top_level_scripts.exists():
+        for script_file in top_level_scripts.glob("*.py"):  # glob, not rglob
+            rel_path = script_file.name
+            installed_script = claude_dir / "scripts" / rel_path
+            src_hash = file_hash(script_file)
+
+            if not installed_script.exists():
+                all_new.append(("scripts", rel_path, top_level_scripts, claude_dir / "scripts"))
+            elif file_hash(installed_script) != src_hash:
+                all_updated.append(("scripts", rel_path, top_level_scripts, claude_dir / "scripts"))
 
     for subdir, installed_path, extensions in checks:
         source_path = integration_source / subdir
