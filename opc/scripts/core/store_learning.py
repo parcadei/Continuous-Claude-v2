@@ -121,7 +121,7 @@ async def store_learning_v2(
         )
 
         # Generate embedding
-        embedder = EmbeddingService(provider="local")
+        embedder = EmbeddingService(provider=os.getenv("EMBEDDING_PROVIDER", "local"))
         embedding = await embedder.embed(content)
 
         # Deduplication check: search for similar existing memories
@@ -249,7 +249,7 @@ async def store_learning(
         )
 
         # Generate embedding using local provider (no API key needed)
-        embedder = EmbeddingService(provider="local")
+        embedder = EmbeddingService(provider=os.getenv("EMBEDDING_PROVIDER", "local"))
         embedding = await embedder.embed(learning_content)
 
         # Store with embedding for semantic search

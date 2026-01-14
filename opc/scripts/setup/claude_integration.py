@@ -408,7 +408,7 @@ def _copy_scripts(opc_source: Path, target_dir: Path) -> int:
     count = 0
 
     # Copy script subdirectories (core, math, tldr)
-    for subdir in ["core", "math", "tldr"]:
+    for subdir in ["core", "math", "tldr, "mcp" "]:
         src = opc_source.parent / "opc" / "scripts" / subdir
         dst = target_dir / "scripts" / subdir
         if src.exists():

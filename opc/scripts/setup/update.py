@@ -239,11 +239,14 @@ def run_update() -> None:
     integration_source = opc_dir.parent / ".claude"
 
     # Define what to check: (source_subdir, installed_path, extensions)
+    # Note: scripts subdirs are listed explicitly to avoid duplicate scanning
     checks = [
         ("hooks/src", claude_dir / "hooks" / "src", {".ts"}),
         ("skills", claude_dir / "skills", {".md"}),
         ("rules", claude_dir / "rules", {".md"}),
         ("agents", claude_dir / "agents", {".md", ".yaml", ".yml"}),
+        ("scripts/core", claude_dir / "scripts" / "core", {".py"}),
+        ("scripts/mcp", claude_dir / "scripts" / "mcp", {".py"}),
     ]
 
     all_new = []

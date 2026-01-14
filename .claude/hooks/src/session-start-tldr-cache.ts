@@ -1,13 +1,16 @@
 /**
- * SessionStart Hook: TLDR Cache Awareness
+ * SessionStart Hook: TLDR Cache Warming (Async)
  *
- * On session startup, checks if TLDR caches exist and emits a system reminder.
- * Does NOT load the full JSON - just notifies Claude that caches are available.
+ * On session startup, triggers cache warming in a detached background process.
+ * Returns immediately to avoid blocking startup.
+ *
+ * The daemon will warm the cache asynchronously. First TLDR command
+ * will use the warmed cache or trigger on-demand indexing.
  */
 
-import { readFileSync, existsSync, statSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
-import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
+import { spawn } from 'child_process';
 
 interface SessionStartInput {
   session_id: string;
@@ -21,72 +24,39 @@ interface TldrCacheMeta {
   project: string;
 }
 
-interface CacheStatus {
-  exists: boolean;
-  age_hours?: number;
-  files: {
-    arch: boolean;
-    calls: boolean;
-    dead: boolean;
-  };
-}
-
-interface SemanticIndexStatus {
-  exists: boolean;
-  path: string;
-}
-
 function readStdin(): string {
   return readFileSync(0, 'utf-8');
 }
 
-function getSemanticIndexStatus(projectDir: string): SemanticIndexStatus {
-  // Check for FAISS index at .tldr/cache/semantic/index.faiss
-  const indexPath = join(projectDir, '.tldr', 'cache', 'semantic', 'index.faiss');
-  return {
-    exists: existsSync(indexPath),
-    path: indexPath
-  };
+function getCacheAge(projectDir: string): number | undefined {
+  const metaPath = join(projectDir, '.claude', 'cache', 'tldr', 'meta.json');
+  if (!existsSync(metaPath)) return undefined;
+
+  try {
+    const meta: TldrCacheMeta = JSON.parse(readFileSync(metaPath, 'utf-8'));
+    const cachedAt = new Date(meta.cached_at);
+    return Math.round((Date.now() - cachedAt.getTime()) / (1000 * 60 * 60));
+  } catch {
+    return undefined;
+  }
 }
 
-function getCacheStatus(projectDir: string): CacheStatus {
+function isCacheStale(projectDir: string): boolean {
   const cacheDir = join(projectDir, '.claude', 'cache', 'tldr');
+  if (!existsSync(cacheDir)) return true;
 
-  if (!existsSync(cacheDir)) {
-    return { exists: false, files: { arch: false, calls: false, dead: false } };
-  }
-
-  const archPath = join(cacheDir, 'arch.json');
-  const callsPath = join(cacheDir, 'call_graph.json');
-  const deadPath = join(cacheDir, 'dead.json');
-  const metaPath = join(cacheDir, 'meta.json');
-
-  const files = {
-    arch: existsSync(archPath) && statSync(archPath).size > 10,
-    calls: existsSync(callsPath) && statSync(callsPath).size > 10,
-    dead: existsSync(deadPath) && statSync(deadPath).size > 2,
-  };
-
-  let age_hours: number | undefined;
-  if (existsSync(metaPath)) {
-    try {
-      const meta: TldrCacheMeta = JSON.parse(readFileSync(metaPath, 'utf-8'));
-      const cachedAt = new Date(meta.cached_at);
-      age_hours = Math.round((Date.now() - cachedAt.getTime()) / (1000 * 60 * 60));
-    } catch {
-      // Ignore parse errors
-    }
-  }
-
-  return {
-    exists: files.arch || files.calls || files.dead,
-    age_hours,
-    files
-  };
+  const age = getCacheAge(projectDir);
+  return age === undefined || age > 24; // Stale if >24h old or missing
 }
 
-async function main() {
-  const input: SessionStartInput = JSON.parse(readStdin());
+function main() {
+  let input: SessionStartInput;
+  try {
+    input = JSON.parse(readStdin());
+  } catch {
+    console.log('{}');
+    return;
+  }
 
   // Only run on startup/resume (not clear/compact)
   if (!['startup', 'resume'].includes(input.source)) {
@@ -95,77 +65,21 @@ async function main() {
   }
 
   const projectDir = process.env.CLAUDE_PROJECT_DIR || input.cwd;
-  const cache = getCacheStatus(projectDir);
 
-  // Check daemon's actual index state (not just file cache)
-  let daemonFiles = 0;
-  try {
-    const statusResp = queryDaemonSync({ cmd: 'status' }, projectDir);
-    if (statusResp.status === 'ready') {
-      daemonFiles = statusResp.files || 0;
-    }
-  } catch { /* ignore */ }
-
-  // Warm if: file cache missing, cache stale (>24h), OR daemon has 0 files indexed
-  const shouldWarm = !cache.exists ||
-    (cache.age_hours !== undefined && cache.age_hours > 24) ||
-    daemonFiles === 0;
-  let warmStatus = '';
-
-  if (shouldWarm) {
-    try {
-      const warmResponse = queryDaemonSync({ cmd: 'warm' }, projectDir);
-      if (warmResponse.status === 'ok') {
-        warmStatus = ' 🔥 Cache warmed!';
-      } else if (warmResponse.indexing) {
-        warmStatus = ' ⏳ Warming in progress...';
-      }
-    } catch {
-      // Warm failed silently - don't block
-    }
+  // Warm cache in detached background process if stale
+  // Uses spawn with detached:true so process exits immediately
+  if (isCacheStale(projectDir)) {
+    // Cross-platform: use tldr daemon warm command
+    const child = spawn('tldr', ['daemon', 'warm', '--project', projectDir], {
+      detached: true,
+      stdio: 'ignore',
+      shell: process.platform === 'win32', // Shell needed on Windows
+    });
+    child.unref(); // Allow parent to exit immediately
   }
 
-  if (!cache.exists && !warmStatus) {
-    // No cache and warm failed - silent exit
-    console.log('{}');
-    return;
-  }
-
-  // Build status message
-  const available: string[] = [];
-  if (cache.files.arch) available.push('arch');
-  if (cache.files.calls) available.push('calls');
-  if (cache.files.dead) available.push('dead');
-
-  const ageStr = cache.age_hours !== undefined
-    ? ` (${cache.age_hours}h old)`
-    : '';
-
-  const freshness = cache.age_hours !== undefined && cache.age_hours > 168
-    ? ' ⚠️ STALE'
-    : '';
-
-  // Check semantic index
-  const semantic = getSemanticIndexStatus(projectDir);
-  const semanticWarning = semantic.exists
-    ? ''
-    : '\n⚠️ No semantic index found. Run `tldr semantic index .` for AI-powered code search.';
-
-  // Track hook activity for flush threshold
-  trackHookActivitySync('session-start-tldr-cache', projectDir, true, {
-    sessions_started: 1,
-    cache_warmed: shouldWarm && warmStatus.includes('warmed') ? 1 : 0,
-  });
-
-  // Emit system message - don't load full JSON, just notify availability
-  const cacheInfo = cache.exists ? `${available.join(', ')}` : 'building...';
-  const message = `📊 TLDR cache${ageStr}${freshness}${warmStatus}: ${cacheInfo}${semanticWarning}`;
-
-  // Output as system reminder (not full context injection)
-  console.log(message);
+  // Return immediately - don't block startup
+  console.log('{}');
 }
 
-main().catch(() => {
-  // Silent fail - don't block session start
-  console.log('{}');
-});
+main();

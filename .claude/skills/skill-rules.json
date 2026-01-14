@@ -725,6 +725,63 @@
                 ]
             }
         },
+        "tdd-migrate": {
+            "type": "workflow",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "TDD workflow for migrations - orchestrate agents, zero main context growth",
+            "promptTriggers": {
+                "keywords": [
+                    "/tdd-migrate",
+                    "tdd migrate",
+                    "port to typescript",
+                    "port to ts",
+                    "create adapters",
+                    "migrate with tdd",
+                    "multiple similar items",
+                    "batch tdd",
+                    "parallel tdd",
+                    "orchestrate agents",
+                    "zero context growth"
+                ],
+                "intentPatterns": [
+                    "(port|migrate|convert).*?(to|from).*?(typescript|ts|python|py)",
+                    "(create|implement).*?(multiple|several|many).*?(adapters|items|modules)",
+                    "(tdd|test.?driven).*?(migrate|migration|port)",
+                    "(batch|parallel).*?(tdd|implement|create)",
+                    "orchestrate.*?agents",
+                    "zero.*?context.*?growth"
+                ]
+            }
+        },
+        "tdd-migration-pipeline": {
+            "type": "workflow",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Orchestrator-only migration workflow - ZERO context growth, all work delegated to agents with TDD",
+            "promptTriggers": {
+                "keywords": [
+                    "/tdd-migration-pipeline",
+                    "migration pipeline",
+                    "rewrite codebase",
+                    "orchestrator mode",
+                    "full tdd migration",
+                    "spec-driven migration",
+                    "behavioral contracts",
+                    "adversarial review",
+                    "zero orchestrator",
+                    "pipe context only"
+                ],
+                "intentPatterns": [
+                    "(migration|rewrite).*?pipeline",
+                    "orchestrator.*?(only|mode)",
+                    "(full|complete|comprehensive).*?tdd.*?(migration|rewrite)",
+                    "(behavioral|spec).*?(contract|driven)",
+                    "(adversarial|premortem).*?(review|pass)",
+                    "zero.*?(context|orchestrator).*?(growth|execution)"
+                ]
+            }
+        },
         "workflow-router": {
             "type": "domain",
             "enforcement": "suggest",
@@ -1438,6 +1495,28 @@
                     "(compact|connected|Hausdorff).*?space",
                     "(prove|show).*?homeomorphism",
                     "(product|quotient|subspace).*?topology"
+                ]
+            }
+        },
+        "dead-code": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Find unused functions and dead code in the codebase",
+            "promptTriggers": {
+                "keywords": [
+                    "/dead-code",
+                    "dead code",
+                    "unused functions",
+                    "find unused",
+                    "unreachable code",
+                    "cleanup unused",
+                    "remove dead code"
+                ],
+                "intentPatterns": [
+                    "(find|detect|check).*?(dead|unused|unreachable).*?code",
+                    "(dead|unused).*?(code|functions?|methods?)",
+                    "(cleanup|remove).*?(unused|dead)"
                 ]
             }
         },

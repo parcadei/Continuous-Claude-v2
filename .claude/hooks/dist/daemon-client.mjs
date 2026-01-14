@@ -2,6 +2,7 @@
 import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs";
 import { execSync, spawnSync } from "child_process";
 import { join, resolve } from "path";
+import { tmpdir } from "os";
 import * as net from "net";
 import * as crypto from "crypto";
 function resolveProjectDir(projectDir) {
@@ -10,12 +11,12 @@ function resolveProjectDir(projectDir) {
 function getLockPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
-  return `/tmp/tldr-${hash}.lock`;
+  return `${tmpdir()}/tldr-${hash}.lock`;
 }
 function getPidPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
-  return `/tmp/tldr-${hash}.pid`;
+  return `${tmpdir()}/tldr-${hash}.pid`;
 }
 function isDaemonProcessRunning(projectDir) {
   const pidPath = getPidPath(projectDir);
@@ -63,13 +64,13 @@ function getConnectionInfo(projectDir) {
     const port = 49152 + parseInt(hash, 16) % 1e4;
     return { type: "tcp", host: "127.0.0.1", port };
   } else {
-    return { type: "unix", path: `/tmp/tldr-${hash}.sock` };
+    return { type: "unix", path: `${tmpdir()}/tldr-${hash}.sock` };
   }
 }
 function getSocketPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
-  return `/tmp/tldr-${hash}.sock`;
+  return `${tmpdir()}/tldr-${hash}.sock`;
 }
 function getStatusFile(projectDir) {
   const statusPath = join(projectDir, ".tldr", "status");

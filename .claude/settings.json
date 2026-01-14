@@ -94,7 +94,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/persist-project-dir.sh"
+            "command": "bash $HOME/.claude/hooks/persist-project-dir.sh"
           },
           {
             "type": "command",
@@ -127,11 +127,6 @@
           {
             "type": "command",
             "command": "node $HOME/.claude/hooks/dist/session-start-tldr-cache.mjs",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "(node $HOME/.claude/hooks/dist/session-start-dead-code.mjs &>/dev/null &)",
             "timeout": 2
           }
         ]

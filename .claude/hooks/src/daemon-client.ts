@@ -13,6 +13,7 @@
 import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
 import { execSync, spawnSync } from 'child_process';
 import { join, resolve } from 'path';
+import { tmpdir } from 'os';
 import * as net from 'net';
 import * as crypto from 'crypto';
 
@@ -31,7 +32,7 @@ function resolveProjectDir(projectDir: string): string {
 function getLockPath(projectDir: string): string {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash('md5').update(resolvedPath).digest('hex').substring(0, 8);
-  return `/tmp/tldr-${hash}.lock`;
+  return `${tmpdir()}/tldr-${hash}.lock`;
 }
 
 /**
@@ -40,7 +41,7 @@ function getLockPath(projectDir: string): string {
 function getPidPath(projectDir: string): string {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash('md5').update(resolvedPath).digest('hex').substring(0, 8);
-  return `/tmp/tldr-${hash}.pid`;
+  return `${tmpdir()}/tldr-${hash}.pid`;
 }
 
 /**
@@ -217,7 +218,7 @@ export function getConnectionInfo(projectDir: string): ConnectionInfo {
     return { type: 'tcp', host: '127.0.0.1', port };
   } else {
     // Unix socket
-    return { type: 'unix', path: `/tmp/tldr-${hash}.sock` };
+    return { type: 'unix', path: `${tmpdir()}/tldr-${hash}.sock` };
   }
 }
 
@@ -231,7 +232,7 @@ export function getConnectionInfo(projectDir: string): ConnectionInfo {
 export function getSocketPath(projectDir: string): string {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash('md5').update(resolvedPath).digest('hex').substring(0, 8);
-  return `/tmp/tldr-${hash}.sock`;
+  return `${tmpdir()}/tldr-${hash}.sock`;
 }
 
 /**

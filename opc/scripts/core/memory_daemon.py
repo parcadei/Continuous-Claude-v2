@@ -220,9 +220,8 @@ def extract_memories(session_id: str, project_dir: str):
     log(f"Extracting memories for session {session_id} in {project_dir}")
 
     # Find the most recent JSONL for this session
-    jsonl_dir = Path.home() / ".opc-dev" / "projects"
-    if not jsonl_dir.exists():
-        jsonl_dir = Path.home() / ".claude" / "projects"
+    config_dir = Path(os.environ.get('CLAUDE_CONFIG_DIR', str(Path.home() / '.claude')))
+    jsonl_dir = config_dir / "projects"
 
     # Look for session JSONL
     # Session IDs may be truncated (s-mkb24ccg) while JSONL uses full UUIDs
@@ -253,9 +252,8 @@ def extract_memories(session_id: str, project_dir: str):
     # Run headless memory extraction
     try:
         # Read agent prompt from memory-extractor.md (strip YAML frontmatter)
-        agent_file = Path.home() / ".opc-dev" / ".claude" / "agents" / "memory-extractor.md"
-        if not agent_file.exists():
-            agent_file = Path.home() / ".claude" / "agents" / "memory-extractor.md"
+        config_dir = Path(os.environ.get('CLAUDE_CONFIG_DIR', str(Path.home() / '.claude')))
+        agent_file = config_dir / "agents" / "memory-extractor.md"
 
         agent_prompt = ""
         if agent_file.exists():

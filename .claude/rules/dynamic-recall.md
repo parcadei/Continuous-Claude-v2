@@ -13,7 +13,7 @@ Query memory proactively when:
 ## How to Recall
 
 ```bash
-(cd $CLAUDE_PROJECT_DIR/opc && PYTHONPATH=. uv run python scripts/core/recall_learnings.py --query "your search terms")
+(cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/recall_learnings.py --query "your search terms")
 ```
 
 **IMPORTANT:** Always run from `opc/` directory to load correct environment variables.
@@ -22,16 +22,16 @@ Query memory proactively when:
 
 ```bash
 # Default: Hybrid RRF search (text + vector combined) - RECOMMENDED
-(cd $CLAUDE_PROJECT_DIR/opc && PYTHONPATH=. uv run python scripts/core/recall_learnings.py --query "authentication patterns")
+(cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/recall_learnings.py --query "authentication patterns")
 
 # More results
-(cd $CLAUDE_PROJECT_DIR/opc && PYTHONPATH=. uv run python scripts/core/recall_learnings.py --query "error handling" --k 10)
+(cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/recall_learnings.py --query "error handling" --k 10)
 
 # Pure vector search (higher similarity scores, 0.4-0.6 range)
-(cd $CLAUDE_PROJECT_DIR/opc && PYTHONPATH=. uv run python scripts/core/recall_learnings.py --query "database schema" --vector-only
+(cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/recall_learnings.py --query "database schema" --vector-only)
 
 # Text-only search (fast, no embeddings)
-(cd $CLAUDE_PROJECT_DIR/opc && PYTHONPATH=. uv run python scripts/core/recall_learnings.py --query "YAML format" --text-only
+(cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/recall_learnings.py --query "YAML format" --text-only)
 ```
 
 ## Backend Architecture
@@ -78,7 +78,7 @@ Use recall to avoid repeating mistakes and leverage past successes.
 When you discover something worth remembering, store it:
 
 ```bash
-cd $CLAUDE_PROJECT_DIR/opc && PYTHONPATH=. uv run python scripts/core/store_learning.py \
+cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/store_learning.py \
   --session-id "<short-identifier>" \
   --type <TYPE> \
   --content "<what you learned>" \
@@ -104,7 +104,7 @@ cd $CLAUDE_PROJECT_DIR/opc && PYTHONPATH=. uv run python scripts/core/store_lear
 ### Example
 
 ```bash
-cd $CLAUDE_PROJECT_DIR/opc && PYTHONPATH=. uv run python scripts/core/store_learning.py \
+cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/store_learning.py \
   --session-id "hook-debugging" \
   --type WORKING_SOLUTION \
   --content "TypeScript hooks require npm install in .claude/hooks/ before they work. The build.sh script compiles TS to JS in dist/." \
