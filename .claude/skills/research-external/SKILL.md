@@ -168,17 +168,17 @@ opc-run scripts/mcp/nia_docs.py \
   --package "$LIBRARY" \
   --registry "$REGISTRY" \
   --query "$TOPIC" \
-  --limit 10)
+  --limit 10
 
 # If thorough depth, also grep for specific patterns
 opc-run scripts/mcp/nia_docs.py \
   --package "$LIBRARY" \
-  --grep "$TOPIC")
+  --grep "$TOPIC"
 
 # Supplement with official docs if URL known
 opc-run scripts/mcp/firecrawl_scrape.py \
   --url "https://docs.example.com/api/$TOPIC" \
-  --format markdown)
+  --format markdown
 ```
 
 **Thorough depth additions:**
@@ -223,13 +223,13 @@ Use ALL available MCP tools - comprehensive multi-source research.
 **Step 2a: Library documentation (nia-docs)**
 ```bash
 opc-run scripts/mcp/nia_docs.py \
-  --search "$TOPIC")
+  --search "$TOPIC"
 ```
 
 **Step 2b: Web research (perplexity)**
 ```bash
 opc-run scripts/mcp/perplexity_search.py \
-  --research "$TOPIC")
+  --research "$TOPIC"
 ```
 
 **Step 2c: Specific documentation (firecrawl)**
@@ -237,7 +237,7 @@ opc-run scripts/mcp/perplexity_search.py \
 # Scrape relevant documentation pages found in perplexity results
 opc-run scripts/mcp/firecrawl_scrape.py \
   --url "$FOUND_DOC_URL" \
-  --format markdown)
+  --format markdown
 ```
 
 **Thorough depth additions:**

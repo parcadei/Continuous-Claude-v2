@@ -484,7 +484,7 @@ async def run_setup_wizard() -> None:
     )
 
     # Step 0: Backup global ~/.claude (safety first)
-    console.print("\n[bold]Step 0/12: Backing up global Claude configuration...[/bold]")
+    console.print("\n[bold]Step 0/13: Backing up global Claude configuration...[/bold]")
     from scripts.setup.claude_integration import (
         backup_global_claude_dir,
         get_global_claude_dir,
@@ -501,7 +501,7 @@ async def run_setup_wizard() -> None:
         console.print("  [dim]No existing ~/.claude found (clean install)[/dim]")
 
     # Step 1: Check prerequisites (with installation offers)
-    console.print("\n[bold]Step 1/12: Checking system requirements...[/bold]")
+    console.print("\n[bold]Step 1/13: Checking system requirements...[/bold]")
     prereqs = await check_prerequisites_with_install_offers()
 
     if prereqs["docker"]:
@@ -526,7 +526,7 @@ async def run_setup_wizard() -> None:
         sys.exit(1)
 
     # Step 2: Database config
-    console.print("\n[bold]Step 2/12: Database Configuration[/bold]")
+    console.print("\n[bold]Step 2/13: Database Configuration[/bold]")
     console.print("  Choose your database backend:")
     console.print("    [bold]docker[/bold]    - PostgreSQL in Docker (recommended)")
     console.print("    [bold]embedded[/bold]  - Embedded PostgreSQL (no Docker needed)")
@@ -566,14 +566,14 @@ async def run_setup_wizard() -> None:
         db_config["mode"] = "docker"
 
     # Step 3: API keys
-    console.print("\n[bold]Step 3/12: API Keys (Optional)[/bold]")
+    console.print("\n[bold]Step 3/13: API Keys (Optional)[/bold]")
     if Confirm.ask("Configure API keys?", default=False):
         api_keys = await prompt_api_keys()
     else:
         api_keys = {"perplexity": "", "nia": "", "braintrust": ""}
 
     # Step 4: Generate .env
-    console.print("\n[bold]Step 4/12: Generating configuration...[/bold]")
+    console.print("\n[bold]Step 4/13: Generating configuration...[/bold]")
     config = {"database": db_config, "api_keys": api_keys}
     env_path = Path.cwd() / ".env"
     generate_env_file(config, env_path)
@@ -581,7 +581,7 @@ async def run_setup_wizard() -> None:
 
     # Step 5: Container stack (Sandbox Infrastructure)
     runtime = prereqs.get("container_runtime", "docker")
-    console.print(f"\n[bold]Step 5/12: Container Stack (Sandbox Infrastructure)[/bold]")
+    console.print(f"\n[bold]Step 5/13: Container Stack (Sandbox Infrastructure)[/bold]")
     console.print("  The sandbox requires PostgreSQL and Redis for:")
     console.print("  - Agent coordination and scheduling")
     console.print("  - Build cache and LSP index storage")
@@ -609,7 +609,7 @@ async def run_setup_wizard() -> None:
             console.print(f"  You can start manually with: {runtime} compose up -d")
 
     # Step 6: Migrations
-    console.print("\n[bold]Step 6/12: Database Setup[/bold]")
+    console.print("\n[bold]Step 6/13: Database Setup[/bold]")
     if Confirm.ask("Run database migrations?", default=True):
         from scripts.setup.docker_setup import run_migrations, set_container_runtime
 
@@ -622,7 +622,7 @@ async def run_setup_wizard() -> None:
             console.print(f"  [red]ERROR[/red] {result.get('error', 'Unknown error')}")
 
     # Step 7: Claude Code Integration
-    console.print("\n[bold]Step 7/12: Claude Code Integration[/bold]")
+    console.print("\n[bold]Step 7/13: Claude Code Integration[/bold]")
     from scripts.setup.claude_integration import (
         analyze_conflicts,
         backup_claude_dir,
@@ -737,7 +737,7 @@ async def run_setup_wizard() -> None:
     console.print("  OPC_HOME points to this repository for Python scripts.")
     console.print("  PATH includes ~/.claude/bin for opc-run wrapper.")
 
-    opc_home = Path.cwd().parent  # opc/ -> continuous-claude/
+    opc_home = _project_root.parent  # opc/ -> continuous-claude/
     shell_rc = Path.home() / ".bashrc"
     if (Path.home() / ".zshrc").exists():
         shell_rc = Path.home() / ".zshrc"
