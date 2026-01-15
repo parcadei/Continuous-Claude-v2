@@ -1,0 +1,25 @@
+#!/bin/bash
+# OPC Python runner - executes scripts from OPC repository
+# Usage: opc-run scripts/core/recall_learnings.py --query "..."
+#        opc-run -m runtime.harness scripts/ast_grep_find.py --pattern "..."
+
+set -e
+
+# Ensure common paths are in PATH (for uv, etc.)
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:/usr/local/bin:$PATH"
+
+if [ -z "$OPC_HOME" ]; then
+    echo "Error: OPC_HOME not set. Run wizard or add to ~/.bashrc:" >&2
+    echo "  export OPC_HOME=/path/to/continuous-claude" >&2
+    exit 1
+fi
+
+OPC_DIR="$OPC_HOME/opc"
+
+if [ ! -d "$OPC_DIR" ]; then
+    echo "Error: OPC directory not found: $OPC_DIR" >&2
+    exit 1
+fi
+
+cd "$OPC_DIR"
+PYTHONPATH=. exec uv run python "$@"

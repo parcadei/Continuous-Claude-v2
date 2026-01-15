@@ -24,7 +24,7 @@ Search through previous sessions to find relevant decisions, approaches that wor
 ### Primary: Artifact Index (rich context)
 
 ```bash
-uv run python scripts/core/artifact_query.py "<query>" [--outcome SUCCEEDED|FAILED] [--limit N]
+opc-run scripts/core/artifact_query.py "<query>" [--outcome SUCCEEDED|FAILED] [--limit N]
 ```
 
 This searches handoffs with post-mortems (what worked, what failed, key decisions).
@@ -41,13 +41,13 @@ This searches `.git/claude/commits/*/reasoning.md` for build failures and fixes.
 
 ```bash
 # Search for authentication-related work
-uv run python scripts/core/artifact_query.py "authentication OAuth JWT"
+opc-run scripts/core/artifact_query.py "authentication OAuth JWT"
 
 # Find only successful approaches
-uv run python scripts/core/artifact_query.py "implement agent" --outcome SUCCEEDED
+opc-run scripts/core/artifact_query.py "implement agent" --outcome SUCCEEDED
 
 # Find what failed (to avoid repeating mistakes)
-uv run python scripts/core/artifact_query.py "hook implementation" --outcome FAILED
+opc-run scripts/core/artifact_query.py "hook implementation" --outcome FAILED
 
 # Search build/test reasoning
 bash "$CLAUDE_PROJECT_DIR/.claude/scripts/search-reasoning.sh" "TypeError"
@@ -90,7 +90,7 @@ bash "$CLAUDE_PROJECT_DIR/.claude/scripts/search-reasoning.sh" "TypeError"
 ## No Results?
 
 **Artifact Index empty:**
-- Run `uv run python scripts/core/artifact_index.py --all` to index existing handoffs
+- Run `opc-run scripts/core/artifact_index.py --all` to index existing handoffs
 - Create handoffs with post-mortem sections for future recall
 
 **Reasoning files empty:**

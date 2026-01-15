@@ -21,7 +21,7 @@ MEMORY LAYER (PostgreSQL + pgvector)
 - Learnings extracted automatically at session end
 - Semantic search with embeddings
 
-RECALL: uv run python opc/scripts/recall_temporal_facts.py --query "your topic"
+RECALL: opc-run scripts/recall_temporal_facts.py --query "your topic"
 
 HOOKS (9 event types registered)
 --------------------------------
@@ -54,7 +54,7 @@ Pre-built index: /tmp/claude-symbol-index/symbols.json
 
 SETUP
 -----
-Run: uv run python opc/scripts/setup/wizard.py
+Run: opc-run scripts/setup/wizard.py
 
 Options:
   [1] SQLite only (simple, offline)

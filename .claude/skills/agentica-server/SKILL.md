@@ -53,7 +53,7 @@ Must start in this order (each in a separate terminal):
 ### Terminal 1: Claude Proxy
 
 ```bash
-uv run python scripts/agentica/claude_proxy.py --port 8080
+opc-run scripts/agentica/claude_proxy.py --port 8080
 ```
 
 ### Terminal 2: Agentica Server
@@ -68,7 +68,7 @@ INFERENCE_ENDPOINT_URL=http://localhost:8080/v1/chat/completions uv run agentica
 ### Terminal 3: Your Agent Script
 
 ```bash
-S_M_BASE_URL=http://localhost:2345 uv run python scripts/agentica/your_script.py
+S_M_BASE_URL=http://localhost:2345 opc-run scripts/agentica/your_script.py
 ```
 
 ## Health Checks

@@ -19,19 +19,19 @@ Universal code quality tool supporting 70+ linters for 40+ languages via qlty CL
 
 ```bash
 # Check changed files with auto-fix
-uv run python -m runtime.harness scripts/qlty_check.py --fix
+opc-run -m runtime.harness scripts/qlty_check.py --fix
 
 # Check all files
-uv run python -m runtime.harness scripts/qlty_check.py --all
+opc-run -m runtime.harness scripts/qlty_check.py --all
 
 # Format files
-uv run python -m runtime.harness scripts/qlty_check.py --fmt
+opc-run -m runtime.harness scripts/qlty_check.py --fmt
 
 # Get metrics
-uv run python -m runtime.harness scripts/qlty_check.py --metrics
+opc-run -m runtime.harness scripts/qlty_check.py --metrics
 
 # Find code smells
-uv run python -m runtime.harness scripts/qlty_check.py --smells
+opc-run -m runtime.harness scripts/qlty_check.py --smells
 ```
 
 ## Parameters
@@ -55,21 +55,21 @@ uv run python -m runtime.harness scripts/qlty_check.py --smells
 ### After Implementation
 ```bash
 # Auto-fix what's possible, see what remains
-uv run python -m runtime.harness scripts/qlty_check.py --fix
+opc-run -m runtime.harness scripts/qlty_check.py --fix
 ```
 
 ### Quality Report
 ```bash
 # Get metrics for changed code
-uv run python -m runtime.harness scripts/qlty_check.py --metrics
+opc-run -m runtime.harness scripts/qlty_check.py --metrics
 
 # Find complexity hotspots
-uv run python -m runtime.harness scripts/qlty_check.py --smells
+opc-run -m runtime.harness scripts/qlty_check.py --smells
 ```
 
 ### Initialize in New Repo
 ```bash
-uv run python -m runtime.harness scripts/qlty_check.py --init --cwd /path/to/repo
+opc-run -m runtime.harness scripts/qlty_check.py --init --cwd /path/to/repo
 ```
 
 ## Direct CLI (if qlty installed)

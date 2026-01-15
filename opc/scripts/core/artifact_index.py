@@ -21,46 +21,15 @@ Examples:
 import argparse
 import hashlib
 import json
-import os
 import re
 import sqlite3
 from datetime import datetime
 from pathlib import Path
 
-# Load .env files for DATABASE_URL (cross-platform)
-try:
-    from dotenv import load_dotenv
-    # Global ~/.claude/.env
-    global_env = Path.home() / ".claude" / ".env"
-    if global_env.exists():
-        load_dotenv(global_env)
-    # Local opc/.env
-    opc_env = Path(__file__).parent.parent.parent / ".env"
-    if opc_env.exists():
-        load_dotenv(opc_env, override=True)
-except ImportError:
-    pass  # dotenv not required
+from scripts.core.db.config import get_postgres_url, load_env_files, use_postgres
 
-
-# =============================================================================
-# DATABASE BACKEND SELECTION
-# =============================================================================
-
-def get_postgres_url() -> str | None:
-    """Get PostgreSQL URL from environment variables."""
-    return os.environ.get("DATABASE_URL") or os.environ.get("OPC_POSTGRES_URL")
-
-
-def use_postgres() -> bool:
-    """Check if PostgreSQL should be used as backend."""
-    url = get_postgres_url()
-    if not url:
-        return False
-    try:
-        import psycopg2  # noqa: F401
-        return True
-    except ImportError:
-        return False
+# Load .env files (single source of truth)
+load_env_files()
 
 
 # =============================================================================

@@ -462,13 +462,18 @@ def install_opc_integration(
             shutil.copytree(opc_servers, target_servers)
             result["installed_servers"] = len(list(target_servers.glob("*")))
 
-        # Copy plugins (e.g., braintrust-tracing)
+        # Copy plugins - MERGE, don't overwrite (user has cache, marketplace data)
         opc_plugins = opc_source / "plugins"
         target_plugins = target_dir / "plugins"
         if opc_plugins.exists():
-            if target_plugins.exists():
-                shutil.rmtree(target_plugins)
-            shutil.copytree(opc_plugins, target_plugins)
+            target_plugins.mkdir(parents=True, exist_ok=True)
+            # Copy each OPC plugin individually, preserving user's other data
+            for plugin_dir in opc_plugins.iterdir():
+                if plugin_dir.is_dir():
+                    target_plugin = target_plugins / plugin_dir.name
+                    if target_plugin.exists():
+                        shutil.rmtree(target_plugin)
+                    shutil.copytree(plugin_dir, target_plugin)
 
         # Copy runtime (MCP harness for servers)
         opc_runtime = opc_source / "runtime"
@@ -478,62 +483,27 @@ def install_opc_integration(
                 shutil.rmtree(target_runtime)
             shutil.copytree(opc_runtime, target_runtime)
 
+        # Copy bin/ (opc-run wrapper script)
+        opc_bin = opc_source / "bin"
+        target_bin = target_dir / "bin"
+        if opc_bin.exists():
+            if target_bin.exists():
+                shutil.rmtree(target_bin)
+            shutil.copytree(opc_bin, target_bin)
+            # Ensure scripts are executable
+            for script in target_bin.glob("*"):
+                if script.is_file():
+                    script.chmod(script.stat().st_mode | 0o111)
+
         # Copy settings.json
         opc_settings_path = opc_source / "settings.json"
         target_settings_path = target_dir / "settings.json"
         if opc_settings_path.exists():
             shutil.copy2(opc_settings_path, target_settings_path)
 
-        # Copy scripts/core/ for memory/artifact support
-        # This enables recall_learnings, store_learning, and artifact_* scripts
-        opc_scripts_core = opc_source.parent / "opc" / "scripts" / "core"
-        target_scripts_core = target_dir / "scripts" / "core"
-        if opc_scripts_core.exists():
-            target_scripts_core.parent.mkdir(parents=True, exist_ok=True)
-            if target_scripts_core.exists():
-                shutil.rmtree(target_scripts_core)
-            shutil.copytree(opc_scripts_core, target_scripts_core)
-            result["installed_scripts"] = len(list(target_scripts_core.rglob("*.py")))
-
-        # Copy scripts/math/ for math computation support
-        # This enables sympy_compute, pint_compute, math_router, etc.
-        opc_scripts_math = opc_source.parent / "opc" / "scripts" / "math"
-        target_scripts_math = target_dir / "scripts" / "math"
-        if opc_scripts_math.exists():
-            if target_scripts_math.exists():
-                shutil.rmtree(target_scripts_math)
-            shutil.copytree(opc_scripts_math, target_scripts_math)
-            result["installed_scripts"] += len(list(target_scripts_math.rglob("*.py")))
-
-        # Copy scripts/tldr/ for TLDR hook integration
-        # This enables symbol indexing for smart-search-router
-        opc_scripts_tldr = opc_source.parent / "opc" / "scripts" / "tldr"
-        target_scripts_tldr = target_dir / "scripts" / "tldr"
-        if opc_scripts_tldr.exists():
-            if target_scripts_tldr.exists():
-                shutil.rmtree(target_scripts_tldr)
-            shutil.copytree(opc_scripts_tldr, target_scripts_tldr)
-            result["installed_scripts"] += len(list(target_scripts_tldr.rglob("*.py")))
-
-        # Copy individual root scripts used by skills/hooks
-        # These are referenced by skills like /qlty-check, /ast-grep-find, /mcp-chaining
-        root_scripts = [
-            "ast_grep_find.py",          # /ast-grep-find skill
-            "braintrust_analyze.py",     # session-end-cleanup hook
-            "qlty_check.py",             # /qlty-check skill
-            "research_implement_pipeline.py",  # /mcp-chaining skill
-            "test_research_pipeline.py", # /mcp-chaining skill
-            "multi_tool_pipeline.py",    # /skill-developer example
-            "recall_temporal_facts.py",  # /system_overview skill
-        ]
-        opc_scripts_root = opc_source.parent / "opc" / "scripts"
-        target_scripts_root = target_dir / "scripts"
-        target_scripts_root.mkdir(parents=True, exist_ok=True)
-        for script_name in root_scripts:
-            src = opc_scripts_root / script_name
-            if src.exists():
-                shutil.copy2(src, target_scripts_root / script_name)
-                result["installed_scripts"] += 1
+        # NOTE: Python scripts are NOT copied here.
+        # They run from $OPC_HOME/opc/scripts/ where venv and dependencies are.
+        # Skills/hooks use $OPC_HOME to reference the OPC repository.
 
         # Merge user items if requested
         if merge_user_items and existing and conflicts:

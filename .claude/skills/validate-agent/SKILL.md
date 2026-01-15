@@ -39,7 +39,7 @@ Before web research, check if we've done similar work before:
 
 ```bash
 # Query Artifact Index for relevant past work
-uv run python scripts/braintrust_analyze.py --rag-judge --plan-file <plan-path>
+opc-run scripts/braintrust_analyze.py --rag-judge --plan-file <plan-path>
 ```
 
 This returns:

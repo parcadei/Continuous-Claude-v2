@@ -103,7 +103,7 @@ allowed-tools: [Bash, Read]
 Run the pipeline:
 
 \`\`\`bash
-uv run python -m runtime.harness scripts/my_pipeline.py --arg1 "value"
+opc-run -m runtime.harness scripts/my_pipeline.py --arg1 "value"
 \`\`\`
 
 ### Parameters

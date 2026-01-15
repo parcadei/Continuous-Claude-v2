@@ -24,45 +24,18 @@ Examples:
 """
 
 import argparse
-import os
 import sqlite3
 from pathlib import Path
 
-from dotenv import load_dotenv
+from scripts.core.db.config import get_postgres_url, load_env_files, use_postgres
 
-# Load .env files for DATABASE_URL (cross-platform)
-# 1. Global ~/.claude/.env
-global_env = Path.home() / ".claude" / ".env"
-if global_env.exists():
-    load_dotenv(global_env)
-
-# 2. Local opc/.env (relative to script location)
-opc_env = Path(__file__).parent.parent.parent / ".env"
-if opc_env.exists():
-    load_dotenv(opc_env, override=True)
-
-
-def get_postgres_url() -> str | None:
-    """Get PostgreSQL URL from environment if available."""
-    return os.environ.get("DATABASE_URL") or os.environ.get("CONTINUOUS_CLAUDE_DB_URL")
+# Load .env files (single source of truth)
+load_env_files()
 
 
 def get_sqlite_path() -> Path:
     """Get SQLite database path."""
     return Path(".claude/cache/artifact-index/context.db")
-
-
-def use_postgres() -> bool:
-    """Check if PostgreSQL should be used."""
-    url = get_postgres_url()
-    if not url:
-        return False
-    # Try to import psycopg2, fall back to SQLite if not available
-    try:
-        import psycopg2  # noqa: F401
-        return True
-    except ImportError:
-        return False
 
 
 # PostgreSQL operations

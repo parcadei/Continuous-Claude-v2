@@ -77,9 +77,9 @@ TASK: Identify MDP structure in the skill.
 
 Query Ragie:
 ```bash
-uv run python scripts/ragie_query.py -q "MDP state space definition" -p decision-theory
-uv run python scripts/ragie_query.py -q "action space sequential decisions" -p decision-theory
-uv run python scripts/ragie_query.py -q "POMDP partial observability" -p decision-theory
+opc-run scripts/ragie_query.py -q "MDP state space definition" -p decision-theory
+opc-run scripts/ragie_query.py -q "action space sequential decisions" -p decision-theory
+opc-run scripts/ragie_query.py -q "POMDP partial observability" -p decision-theory
 ```
 
 Read the input skill and answer:
@@ -118,9 +118,9 @@ TASK: Design policy and termination conditions.
 
 Query Ragie:
 ```bash
-uv run python scripts/ragie_query.py -q "policy deterministic stochastic" -p decision-theory
-uv run python scripts/ragie_query.py -q "episodic termination conditions" -p decision-theory
-uv run python scripts/ragie_query.py -q "reward function design" -p decision-theory
+opc-run scripts/ragie_query.py -q "policy deterministic stochastic" -p decision-theory
+opc-run scripts/ragie_query.py -q "episodic termination conditions" -p decision-theory
+opc-run scripts/ragie_query.py -q "reward function design" -p decision-theory
 ```
 
 Using Agent 1's states and actions, answer:
@@ -156,9 +156,9 @@ TASK: Extract constraints from the skill.
 
 Query Ragie:
 ```bash
-uv run python scripts/ragie_query.py -q "temporal logic LTL operators" -p modal-logic
-uv run python scripts/ragie_query.py -q "epistemic logic knowledge" -p modal-logic
-uv run python scripts/ragie_query.py -q "deontic logic obligations" -p modal-logic
+opc-run scripts/ragie_query.py -q "temporal logic LTL operators" -p modal-logic
+opc-run scripts/ragie_query.py -q "epistemic logic knowledge" -p modal-logic
+opc-run scripts/ragie_query.py -q "deontic logic obligations" -p modal-logic
 ```
 
 Read the input skill and identify:
@@ -201,9 +201,9 @@ TASK: Verify consistency and completeness.
 
 Query Ragie:
 ```bash
-uv run python scripts/ragie_query.py -q "safety properties verification" -p modal-logic
-uv run python scripts/ragie_query.py -q "liveness properties eventually" -p modal-logic
-uv run python scripts/ragie_query.py -q "model checking CTL" -p modal-logic
+opc-run scripts/ragie_query.py -q "safety properties verification" -p modal-logic
+opc-run scripts/ragie_query.py -q "liveness properties eventually" -p modal-logic
+opc-run scripts/ragie_query.py -q "model checking CTL" -p modal-logic
 ```
 
 Check:
@@ -286,13 +286,13 @@ Claude:
 
 ```bash
 # Decision theory partition
-uv run python scripts/ragie_query.py -q "your question" -p decision-theory
+opc-run scripts/ragie_query.py -q "your question" -p decision-theory
 
 # Modal logic partition
-uv run python scripts/ragie_query.py -q "your question" -p modal-logic
+opc-run scripts/ragie_query.py -q "your question" -p modal-logic
 
 # With reranking for better results
-uv run python scripts/ragie_query.py -q "your question" -p decision-theory --rerank
+opc-run scripts/ragie_query.py -q "your question" -p decision-theory --rerank
 ```
 
 ## Files Created

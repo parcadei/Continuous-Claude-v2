@@ -182,21 +182,21 @@ For long-running operations like `builder`, use the async script:
 
 ```bash
 # Start context builder async
-uv run python -m runtime.harness scripts/repoprompt_async.py \
+opc-run -m runtime.harness scripts/repoprompt_async.py \
     --action start --task "understand the auth system"
 
 # With workspace switch
-uv run python -m runtime.harness scripts/repoprompt_async.py \
+opc-run -m runtime.harness scripts/repoprompt_async.py \
     --action start --workspace "MyProject" --task "explore API patterns"
 
 # Check status
-uv run python -m runtime.harness scripts/repoprompt_async.py --action status
+opc-run -m runtime.harness scripts/repoprompt_async.py --action status
 
 # Get result when done
-uv run python -m runtime.harness scripts/repoprompt_async.py --action result
+opc-run -m runtime.harness scripts/repoprompt_async.py --action result
 
 # Kill if needed
-uv run python -m runtime.harness scripts/repoprompt_async.py --action kill
+opc-run -m runtime.harness scripts/repoprompt_async.py --action kill
 ```
 
 ## Note

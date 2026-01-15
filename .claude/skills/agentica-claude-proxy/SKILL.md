@@ -121,7 +121,7 @@ cat workspace/test.txt
 
 ```bash
 # Terminal 1: Proxy
-uv run python scripts/agentica/claude_proxy.py --port 8080
+opc-run scripts/agentica/claude_proxy.py --port 8080
 
 # Terminal 2: Agentica Server
 cd workspace/agentica-research/agentica-server

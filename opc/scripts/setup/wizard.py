@@ -732,8 +732,47 @@ async def run_setup_wizard() -> None:
             else:
                 console.print(f"  [red]ERROR[/red] {result.get('error', 'Unknown error')}")
 
-    # Step 8: Math Features (Optional)
-    console.print("\n[bold]Step 8/12: Math Features (Optional)[/bold]")
+    # Step 8: Set OPC_HOME and PATH for scripts
+    console.print("\n[bold]Step 8/13: Setting OPC_HOME and PATH[/bold]")
+    console.print("  OPC_HOME points to this repository for Python scripts.")
+    console.print("  PATH includes ~/.claude/bin for opc-run wrapper.")
+
+    opc_home = Path.cwd().parent  # opc/ -> continuous-claude/
+    shell_rc = Path.home() / ".bashrc"
+    if (Path.home() / ".zshrc").exists():
+        shell_rc = Path.home() / ".zshrc"
+
+    opc_home_line = f'export OPC_HOME="{opc_home}"'
+    path_line = 'export PATH="$HOME/.claude/bin:$PATH"'
+
+    # Check if already set
+    rc_content = shell_rc.read_text() if shell_rc.exists() else ""
+    needs_opc_home = "OPC_HOME" not in rc_content
+    needs_path = ".claude/bin" not in rc_content
+
+    if needs_opc_home or needs_path:
+        lines_to_add = []
+        if needs_opc_home:
+            lines_to_add.append(opc_home_line)
+        if needs_path:
+            lines_to_add.append(path_line)
+
+        if Confirm.ask(f"Add OPC environment to {shell_rc.name}?", default=True):
+            with open(shell_rc, "a") as f:
+                f.write(f"\n# OPC (Claude Continuity Kit)\n")
+                for line in lines_to_add:
+                    f.write(f"{line}\n")
+            console.print(f"  [green]OK[/green] Added to {shell_rc.name}")
+            console.print(f"  [yellow]NOTE[/yellow] Run: source ~/{shell_rc.name}")
+        else:
+            console.print(f"  [yellow]WARN[/yellow] You must manually add:")
+            for line in lines_to_add:
+                console.print(f"    {line}")
+    else:
+        console.print(f"  [dim]OPC environment already in {shell_rc.name}[/dim]")
+
+    # Step 9: Math Features (Optional)
+    console.print("\n[bold]Step 9/13: Math Features (Optional)[/bold]")
     console.print("  Math features include:")
     console.print("    - SymPy: symbolic algebra, calculus, equation solving")
     console.print("    - Z3: SMT solver for constraint satisfaction & proofs")
@@ -791,8 +830,8 @@ async def run_setup_wizard() -> None:
         console.print("  Skipped math features")
         console.print("  [dim]Install later with: uv sync --extra math[/dim]")
 
-    # Step 9: TLDR Code Analysis Tool
-    console.print("\n[bold]Step 9/12: TLDR Code Analysis Tool[/bold]")
+    # Step 10: TLDR Code Analysis Tool
+    console.print("\n[bold]Step 10/13: TLDR Code Analysis Tool[/bold]")
     console.print("  TLDR provides token-efficient code analysis for LLMs:")
     console.print("    - 95% token savings vs reading raw files")
     console.print("    - 155x faster queries with daemon mode")
@@ -942,8 +981,8 @@ async def run_setup_wizard() -> None:
         console.print("  Skipped TLDR installation")
         console.print("  [dim]Install later with: uv tool install llm-tldr[/dim]")
 
-    # Step 10: Diagnostics Tools (Shift-Left Feedback)
-    console.print("\n[bold]Step 10/12: Diagnostics Tools (Shift-Left Feedback)[/bold]")
+    # Step 11: Diagnostics Tools (Shift-Left Feedback)
+    console.print("\n[bold]Step 11/13: Diagnostics Tools (Shift-Left Feedback)[/bold]")
     console.print("  Claude gets immediate type/lint feedback after editing files.")
     console.print("  This catches errors before tests run (shift-left).")
     console.print("")
@@ -980,8 +1019,8 @@ async def run_setup_wizard() -> None:
     console.print("  [dim]Note: Currently only Python diagnostics are wired up.[/dim]")
     console.print("  [dim]TypeScript, Go, Rust coming soon.[/dim]")
 
-    # Step 11: Loogle (Lean 4 type search for /prove skill)
-    console.print("\n[bold]Step 11/12: Loogle (Lean 4 Type Search)[/bold]")
+    # Step 12: Loogle (Lean 4 type search for /prove skill)
+    console.print("\n[bold]Step 12/13: Loogle (Lean 4 Type Search)[/bold]")
     console.print("  Loogle enables type-aware search of Mathlib theorems:")
     console.print("    - Used by /prove skill for theorem proving")
     console.print("    - Search by type signature (e.g., 'Nontrivial _ ↔ _')")

@@ -168,16 +168,16 @@ echo "BRAINTRUST_API_KEY=${BRAINTRUST_API_KEY:+set}"
 ### Query Braintrust Directly
 ```bash
 # List recent sessions
-uv run python -m runtime.harness scripts/braintrust_analyze.py --sessions 5
+opc-run -m runtime.harness scripts/braintrust_analyze.py --sessions 5
 
 # Analyze last session
-uv run python -m runtime.harness scripts/braintrust_analyze.py --last-session
+opc-run -m runtime.harness scripts/braintrust_analyze.py --last-session
 
 # Replay specific session
-uv run python -m runtime.harness scripts/braintrust_analyze.py --replay <session-id>
+opc-run -m runtime.harness scripts/braintrust_analyze.py --replay <session-id>
 
 # Find sub-agent traces (orphaned roots)
-uv run python -m runtime.harness scripts/braintrust_analyze.py --agent-stats
+opc-run -m runtime.harness scripts/braintrust_analyze.py --agent-stats
 ```
 
 ### Debug Hook Execution

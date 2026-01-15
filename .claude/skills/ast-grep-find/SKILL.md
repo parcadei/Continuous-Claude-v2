@@ -19,26 +19,26 @@ Structural code search that understands syntax. Find patterns like function call
 
 ### Search for a pattern
 ```bash
-uv run python -m runtime.harness scripts/ast_grep_find.py \
+opc-run -m runtime.harness scripts/ast_grep_find.py \
     --pattern "import asyncio" --language python
 ```
 
 ### Search in specific directory
 ```bash
-uv run python -m runtime.harness scripts/ast_grep_find.py \
+opc-run -m runtime.harness scripts/ast_grep_find.py \
     --pattern "async def \$FUNC(\$\$\$)" --language python --path "./src"
 ```
 
 ### Refactor/replace pattern
 ```bash
-uv run python -m runtime.harness scripts/ast_grep_find.py \
+opc-run -m runtime.harness scripts/ast_grep_find.py \
     --pattern "console.log(\$MSG)" --replace "logger.info(\$MSG)" \
     --language javascript
 ```
 
 ### Dry run (preview changes)
 ```bash
-uv run python -m runtime.harness scripts/ast_grep_find.py \
+opc-run -m runtime.harness scripts/ast_grep_find.py \
     --pattern "print(\$X)" --replace "logger.info(\$X)" \
     --language python --dry-run
 ```
@@ -67,15 +67,15 @@ uv run python -m runtime.harness scripts/ast_grep_find.py \
 
 ```bash
 # Find all function definitions
-uv run python -m runtime.harness scripts/ast_grep_find.py \
+opc-run -m runtime.harness scripts/ast_grep_find.py \
     --pattern "def \$FUNC(\$\$\$):" --language python
 
 # Find console.log calls
-uv run python -m runtime.harness scripts/ast_grep_find.py \
+opc-run -m runtime.harness scripts/ast_grep_find.py \
     --pattern "console.log(\$\$\$)" --language javascript
 
 # Replace print with logging
-uv run python -m runtime.harness scripts/ast_grep_find.py \
+opc-run -m runtime.harness scripts/ast_grep_find.py \
     --pattern "print(\$X)" --replace "logging.info(\$X)" \
     --language python --dry-run
 ```

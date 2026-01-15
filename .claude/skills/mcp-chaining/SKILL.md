@@ -38,13 +38,13 @@ A pipeline that chains these tools:
 
 ```bash
 # Dry-run pipeline (preview plan without changes)
-uv run python -m runtime.harness scripts/research_implement_pipeline.py \
+opc-run -m runtime.harness scripts/research_implement_pipeline.py \
     --topic "async error handling python" \
     --target-dir "./workspace/pipeline-test" \
     --dry-run --verbose
 
 # Run tests
-uv run python -m runtime.harness scripts/test_research_pipeline.py --test all
+opc-run -m runtime.harness scripts/test_research_pipeline.py --test all
 
 # View the pipeline script
 cat scripts/research_implement_pipeline.py

@@ -108,8 +108,8 @@ async def store_learning_v2(
     if not content or not content.strip():
         return {"success": False, "error": "No content provided"}
 
-    # Get backend - prefer postgres if DATABASE_URL is set
-    if os.environ.get("DATABASE_URL"):
+    # Get backend - prefer postgres if any postgres URL is set
+    if os.environ.get("OPC_POSTGRES_URL") or os.environ.get("CONTINUOUS_CLAUDE_DB_URL") or os.environ.get("DATABASE_URL"):
         backend = "postgres"
     else:
         backend = get_default_backend()
@@ -236,8 +236,8 @@ async def store_learning(
         }
     }
 
-    # Get backend - prefer postgres if DATABASE_URL is set
-    if os.environ.get("DATABASE_URL"):
+    # Get backend - prefer postgres if any postgres URL is set
+    if os.environ.get("OPC_POSTGRES_URL") or os.environ.get("CONTINUOUS_CLAUDE_DB_URL") or os.environ.get("DATABASE_URL"):
         backend = "postgres"
     else:
         backend = get_default_backend()

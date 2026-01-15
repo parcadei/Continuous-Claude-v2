@@ -26,7 +26,6 @@ The session_start hook ensures this daemon is running.
 """
 
 import argparse
-import os
 import signal
 import sqlite3
 import subprocess
@@ -35,19 +34,10 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from dotenv import load_dotenv
+from scripts.core.db.config import get_postgres_url, load_env_files, use_postgres
 
-# Load .env files for DATABASE_URL (cross-platform)
-# 1. Global ~/.claude/.env (API keys, may have DB config)
-global_env = Path.home() / ".claude" / ".env"
-if global_env.exists():
-    load_dotenv(global_env)
-
-# 2. Local opc/.env (relative to script location)
-# Script is at opc/scripts/core/memory_daemon.py, .env is at opc/.env
-opc_env = Path(__file__).parent.parent.parent / ".env"
-if opc_env.exists():
-    load_dotenv(opc_env, override=True)  # Override with project-specific values
+# Load .env files (single source of truth)
+load_env_files()
 
 # Global config
 POLL_INTERVAL = 60  # seconds
@@ -71,23 +61,6 @@ def log(msg: str):
             f.write(line)
     except Exception:
         pass  # Don't crash on log failures
-
-
-def get_postgres_url() -> str | None:
-    """Get PostgreSQL URL from environment."""
-    return os.environ.get("DATABASE_URL") or os.environ.get("CONTINUOUS_CLAUDE_DB_URL")
-
-
-def use_postgres() -> bool:
-    """Check if PostgreSQL is available."""
-    url = get_postgres_url()
-    if not url:
-        return False
-    try:
-        import psycopg2  # noqa: F401
-        return True
-    except ImportError:
-        return False
 
 
 # Database operations - PostgreSQL

@@ -29,4 +29,4 @@ Examples:
 - `perplexity__perplexity_ask`
 
 ## Testing
-Test with: `uv run python -m runtime.harness scripts/<script>.py --help`
+Test with: `opc-run -m runtime.harness scripts/<script>.py --help`

@@ -114,11 +114,12 @@ def get_connection_string() -> str:
     Raises:
         ValueError: If no URL is set in production mode.
     """
-    # Check env vars in priority order (DATABASE_URL is what wizard generates)
+    # Check env vars in priority order
+    # OPC_POSTGRES_URL first - allows override when DATABASE_URL is set by another project
     url = (
-        os.environ.get("DATABASE_URL")
-        or os.environ.get("OPC_POSTGRES_URL")
+        os.environ.get("OPC_POSTGRES_URL")
         or os.environ.get("AGENTICA_POSTGRES_URL")
+        or os.environ.get("DATABASE_URL")
     )
 
     if url:
