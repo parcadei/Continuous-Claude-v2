@@ -19,7 +19,7 @@ Meta-skill for creating new Claude Code skills, including skills that wrap MCP p
 
 Skills live in `.claude/skills/<skill-name>/`:
 
-```
+```text
 .claude/skills/my-skill/
 ├── SKILL.md          # Required: Main skill definition
 ├── scripts/          # Optional: Supporting scripts
@@ -157,7 +157,7 @@ cat $CLAUDE_CC_DIR/.claude/rules/mcp-scripts.md
 Look at existing skills for patterns:
 
 ```bash
-ls $CLAUDE_PROJECT_DIR/.claude/skills/
-cat $CLAUDE_PROJECT_DIR/.claude/skills/commit/SKILL.md
-cat $CLAUDE_PROJECT_DIR/.claude/skills/firecrawl-scrape/SKILL.md
+ls $CLAUDE_CC_DIR/.claude/skills/
+cat $CLAUDE_CC_DIR/.claude/skills/commit/SKILL.md
+cat $CLAUDE_CC_DIR/.claude/skills/firecrawl-scrape/SKILL.md
 ```

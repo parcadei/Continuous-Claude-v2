@@ -31,7 +31,7 @@ The `/commit` skill:
 
 When you see these in user prompts, use the commit skill:
 - "commit", "push", "save changes"
-- "push to github", "push changes"
+- "push to GitHub", "push changes"
 - "commit and push"
 
 ## After Commit
