@@ -523,11 +523,12 @@ def parse_handoff_yaml(file_path: Path) -> dict:
     task_match = re.search(r"phase-(\d+)-(\d+)", file_path.stem)
     task_number = None
     if task_match:
-        # Combine major.minor into single number (e.g., 1.7 -> 17)
-        task_number = int(task_match.group(1)) * 10 + int(task_match.group(2))
+        # Combine major.minor into single number (e.g., 1.11 -> 111, 2.1 -> 201)
+        # Use base 100 to prevent collisions (phase-1-11 vs phase-2-1)
+        task_number = int(task_match.group(1)) * 100 + int(task_match.group(2))
 
-    # Get outcome (already in canonical format in YAML)
-    outcome = frontmatter.get("outcome", "UNKNOWN")
+    # Get outcome and normalize to canonical format
+    outcome = normalize_outcome(frontmatter.get("outcome", "UNKNOWN"))
 
     # Build task summary from goal or done_this_session
     task_summary = body.get("goal", "")
