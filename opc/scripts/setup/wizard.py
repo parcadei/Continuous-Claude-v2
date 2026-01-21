@@ -1072,6 +1072,14 @@ async def run_setup_wizard() -> None:
         console.print("  Skipped TLDR installation")
         console.print("  [dim]Install later with: uv tool install llm-tldr[/dim]")
 
+        # Ask to disable hooks since they are pre-configured in settings.json
+        if Confirm.ask("\n  Disable TLDR hooks in settings.json? (Avoids crashes if TLDR missing)", default=False):
+            settings_path = get_global_claude_dir() / "settings.json"
+            if settings_path.exists():
+                from scripts.setup.claude_integration import strip_tldr_hooks_from_settings
+                if strip_tldr_hooks_from_settings(settings_path):
+                    console.print("  [green]OK[/green] TLDR hooks disabled")
+
     # Step 10: Diagnostics Tools (Shift-Left Feedback)
     console.print("\n[bold]Step 11/13: Diagnostics Tools (Shift-Left Feedback)[/bold]")
     console.print("  Claude gets immediate type/lint feedback after editing files.")

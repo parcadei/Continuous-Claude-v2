@@ -678,6 +678,111 @@ def install_opc_integration_symlink(
     return result
 
 
+def strip_tldr_hooks_from_settings(settings_path: Path) -> bool:
+    """Remove TLDR hooks from settings.json file.
+
+    Removes:
+    - PreToolUse:Read -> tldr-read-enforcer.mjs
+    - PreToolUse:Grep -> smart-search-router.mjs
+    - PreToolUse:Task -> tldr-context-inject.mjs (keeps other Task hooks)
+    - SessionStart:startup|resume -> session-start-tldr-cache.mjs
+
+    Args:
+        settings_path: Path to settings.json file
+
+    Returns:
+        True if successfully modified, False otherwise
+    """
+    if not settings_path.exists():
+        return False
+
+    try:
+        settings = json.loads(settings_path.read_text())
+
+        if "hooks" not in settings:
+            return True
+
+        modified = False
+
+        # Strip PreToolUse hooks
+        if "PreToolUse" in settings["hooks"]:
+            new_pretooluse = []
+            for hook_group in settings["hooks"]["PreToolUse"]:
+                matcher = hook_group.get("matcher")
+
+                # Remove entire Read hook group (only has tldr-read-enforcer)
+                if matcher == "Read":
+                    hooks = hook_group.get("hooks", [])
+                    if any("tldr-read-enforcer" in h.get("command", "") for h in hooks):
+                        modified = True
+                        continue  # Skip this entire group
+
+                # Remove entire Grep hook group (only has smart-search-router)
+                elif matcher == "Grep":
+                    hooks = hook_group.get("hooks", [])
+                    if any("smart-search-router" in h.get("command", "") for h in hooks):
+                        modified = True
+                        continue  # Skip this entire group
+
+                # For Task hooks, remove only tldr-context-inject, keep others
+                elif matcher == "Task":
+                    hooks = hook_group.get("hooks", [])
+                    new_hooks = [
+                        h for h in hooks if "tldr-context-inject" not in h.get("command", "")
+                    ]
+                    if len(new_hooks) != len(hooks):
+                        modified = True
+                        hook_group["hooks"] = new_hooks
+                    if new_hooks:  # Only keep if there are remaining hooks
+                        new_pretooluse.append(hook_group)
+                    elif len(hooks) > 0:  # Had hooks, but all were removed
+                        continue  # Skip this group entirely
+                    else:
+                        new_pretooluse.append(hook_group)
+                else:
+                    new_pretooluse.append(hook_group)
+
+            settings["hooks"]["PreToolUse"] = new_pretooluse
+
+        # Strip SessionStart hooks
+        if "SessionStart" in settings["hooks"]:
+            new_sessionstart = []
+            for hook_group in settings["hooks"]["SessionStart"]:
+                matcher = hook_group.get("matcher", "")
+
+                # For startup|resume matcher, remove tldr-cache hook
+                if "startup" in matcher or "resume" in matcher:
+                    hooks = hook_group.get("hooks", [])
+                    new_hooks = [
+                        h
+                        for h in hooks
+                        if "session-start-tldr-cache" not in h.get("command", "")
+                    ]
+                    if len(new_hooks) != len(hooks):
+                        modified = True
+                        hook_group["hooks"] = new_hooks
+                    if new_hooks:  # Only keep if there are remaining hooks
+                        new_sessionstart.append(hook_group)
+                    elif len(hooks) > 0:  # Had hooks but all removed
+                        continue
+                    else:
+                        new_sessionstart.append(hook_group)
+                else:
+                    new_sessionstart.append(hook_group)
+
+            settings["hooks"]["SessionStart"] = new_sessionstart
+
+        # Write back if modified
+        if modified:
+            settings_path.write_text(json.dumps(settings, indent=2))
+
+        return True
+
+    except Exception:
+        return False
+
+
+
 def get_platform_info() -> dict[str, str]:
     """Get current platform information.
 
