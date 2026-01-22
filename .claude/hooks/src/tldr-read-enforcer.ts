@@ -476,7 +476,7 @@ ${callerLines.join('\n')}${searchContext.callers.length > 10 ? `\n  ... and ${se
     hookSpecificOutput: {
       hookEventName: 'PreToolUse',
       permissionDecision: 'deny',
-      permissionDecisionReason: `📊 TLDR Context (${layerNames}) - 95% token savings:
+      permissionDecisionReason: `✅ TLDR Enhanced Read (${layerNames}) - 95% token savings:
 ${searchContext ? `🔗 Context: ${contextSource}` : ''}${definitionSection}
 
 ${tldrContext}${crossFileSection}

@@ -603,7 +603,7 @@ ${callerLines.join("\n")}${searchContext.callers.length > 10 ? `
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
       permissionDecision: "deny",
-      permissionDecisionReason: `\u{1F4CA} TLDR Context (${layerNames}) - 95% token savings:
+      permissionDecisionReason: `\u2705 TLDR Enhanced Read (${layerNames}) - 95% token savings:
 ${searchContext ? `\u{1F517} Context: ${contextSource}` : ""}${definitionSection}
 
 ${tldrContext}${crossFileSection}
