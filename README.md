@@ -189,6 +189,37 @@ uv run python -m scripts.setup.wizard
 | 10 | TLDR code analysis tool |
 | 11-12 | Diagnostics tools + Loogle (optional) |
 
+
+#### To Uninstall:
+
+```
+cd Continuous-Claude-v3/opc
+  uv run python -m scripts.setup.wizard --uninstall
+```
+
+**What it does**
+
+1. Archives your current setup → Moves ~/.claude to ~/.claude-v3.archived.<timestamp>
+2. Restores your backup → Finds the most recent ~/.claude.backup.* (created during install) and restores it
+3. Preserves user data → Copies these back from the archive:
+
+  - history.jsonl (your command history)
+  - mcp_config.json (MCP servers)
+  - .env (API keys)
+  - projects.json (project configs)
+  - file-history/ directory
+  - projects/ directory
+4. Removes CC-v3 additions → Everything else (hooks, skills, agents, rules)
+
+
+**Safety Features**
+
+- Your current setup is archived with timestamp - nothing gets deleted
+- The wizard asks for confirmation before proceeding
+- It restores from the backup that was made during installation
+- All your Claude Code settings stay intact
+
+
 ### Remote Database Setup
 
 By default, CC-v3 runs PostgreSQL locally via Docker. For remote database setups:
