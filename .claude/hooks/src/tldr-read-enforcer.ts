@@ -10,8 +10,8 @@
  */
 
 import { readFileSync, existsSync, statSync } from 'fs';
-import { basename, extname } from 'path';
-import { queryDaemonSync, DaemonResponse, trackHookActivitySync } from './daemon-client';
+import { basename, extname, resolve } from 'path';
+import { queryDaemonSync, DaemonResponse, trackHookActivitySync } from './daemon-client.js';
 
 // Search context from smart-search-router
 interface SearchContext {
@@ -371,7 +371,12 @@ async function main() {
     return;
   }
 
-  const filePath = input.tool_input.file_path || '';
+  const rawFilePath = input.tool_input.file_path || '';
+  // resolve() guarantees an absolute path: if rawFilePath is already absolute it returns
+  // it as-is; if relative, it resolves against projectCwd. Falls back to process.cwd()
+  // if input.cwd is absent (hook spec guarantees it, but be defensive).
+  const projectCwd = input.cwd || process.cwd();
+  const filePath = resolve(projectCwd, rawFilePath);
 
   // Allow non-code files
   if (!isCodeFile(filePath)) {
