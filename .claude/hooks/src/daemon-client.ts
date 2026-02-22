@@ -11,7 +11,7 @@
  */
 
 import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
-import { execSync, spawnSync } from 'child_process';
+import { execSync, spawn } from 'child_process';
 import { join, resolve } from 'path';
 import { tmpdir } from 'os';
 import * as net from 'net';
@@ -385,23 +385,44 @@ export function tryStartDaemon(projectDir: string): boolean {
       const tldrPath = join(projectDir, 'opc', 'packages', 'tldr-code');
       let started = false;
 
-      // Try local dev installation first (only if it exists)
+      // Use spawn+detach so daemon survives as independent background process.
+      // Do NOT use spawnSync — it kills the child process on timeout, which happens
+      // during initial indexing (30-60s) and causes repeated daemon spawns.
+
+      // Try local dev installation first (only if uv is available AND tldr path exists).
+      // spawn() emits 'error' asynchronously for ENOENT — not catchable after unref().
+      // Guard: check uv is in PATH synchronously, then check child.pid after spawn.
       if (existsSync(tldrPath)) {
-        const result = spawnSync('uv', ['run', 'tldr', 'daemon', 'start', '--project', projectDir], {
-          timeout: 10000,
-          stdio: 'ignore',
-          cwd: tldrPath,
-        });
-        started = result.status === 0;
+        try {
+          execSync('uv --version', { stdio: 'ignore', timeout: 2000 });
+          const child = spawn('uv', ['run', 'tldr', 'daemon', 'start', '--project', projectDir], {
+            detached: true,
+            stdio: 'ignore',
+            windowsHide: true,
+            cwd: tldrPath,
+          });
+          // Register unconditionally — error fires when pid is undefined (spawn failed),
+          // so the handler must be attached before the pid check, not inside it.
+          child.on('error', () => { /* uv disappeared between check and spawn */ });
+          if (child.pid !== undefined) {
+            child.unref();
+            started = true;
+          }
+          // If child.pid is undefined the OS rejected the spawn — fall through to fallback
+        } catch {
+          // uv not available — fall through to global tldr fallback below
+        }
       }
 
-      // Fallback to global tldr if local didn't work
-      // Skip fallback in dev mode (TLDR_DEV=1) to prevent duplicate daemons
+      // Fallback to global tldr if local didn't start (or TLDR_DEV is set)
       if (!started && !process.env.TLDR_DEV) {
-        spawnSync('tldr', ['daemon', 'start', '--project', projectDir], {
-          timeout: 5000,
+        const child = spawn('tldr', ['daemon', 'start', '--project', projectDir], {
+          detached: true,
           stdio: 'ignore',
+          windowsHide: true,
         });
+        child.on('error', () => { /* tldr not in PATH — callers degrade gracefully */ });
+        child.unref();
       }
 
       // Wait for daemon to become reachable (up to 10s for slow starts)
@@ -416,6 +437,30 @@ export function tryStartDaemon(projectDir: string): boolean {
         // Brief wait
         const end = Date.now() + 100;
         while (Date.now() < end) { /* spin */ }
+      }
+
+      // Last-resort fallback: uv was used but daemon never became reachable.
+      // This covers the case where uv is in PATH but tldr is not installed in
+      // the uv environment — uv exits non-zero silently, no PID file is written.
+      // Without this, started=true suppresses the global fallback and every
+      // subsequent invocation spins for 10s.
+      if (started && !isDaemonProcessRunning(projectDir) && !isDaemonReachable(projectDir) && !process.env.TLDR_DEV) {
+        const child = spawn('tldr', ['daemon', 'start', '--project', projectDir], {
+          detached: true,
+          stdio: 'ignore',
+          windowsHide: true,
+        });
+        child.on('error', () => {});
+        child.unref();
+
+        // Give the global daemon a brief window to become reachable for the current request.
+        // Without this wait, isDaemonReachable() below always returns false immediately.
+        const lrStart = Date.now();
+        while (Date.now() - lrStart < 3000) {
+          if (isDaemonReachable(projectDir)) break;
+          const wait = Date.now() + 100;
+          while (Date.now() < wait) { /* spin */ }
+        }
       }
 
       return isDaemonReachable(projectDir);
