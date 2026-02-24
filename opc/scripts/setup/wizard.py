@@ -740,6 +740,7 @@ async def run_setup_wizard() -> None:
                 console.print(f"  [green]OK[/green] Installed {result['installed_rules']} rules")
                 console.print(f"  [green]OK[/green] Installed {result['installed_agents']} agents")
                 console.print(f"  [green]OK[/green] Installed {result['installed_servers']} MCP servers")
+                console.print(f"  [green]OK[/green] Installed {result['installed_scripts']} scripts")
                 if result["merged_items"]:
                     console.print(
                         f"  [green]OK[/green] Merged {len(result['merged_items'])} custom items"
@@ -802,6 +803,7 @@ async def run_setup_wizard() -> None:
                 console.print(f"  [green]OK[/green] Installed {result['installed_rules']} rules")
                 console.print(f"  [green]OK[/green] Installed {result['installed_agents']} agents")
                 console.print(f"  [green]OK[/green] Installed {result['installed_servers']} MCP servers")
+                console.print(f"  [green]OK[/green] Installed {result['installed_scripts']} scripts")
 
                 # Build TypeScript hooks
                 console.print("  Building TypeScript hooks...")
