@@ -1,6 +1,7 @@
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
-import { execSync } from 'child_process';
+import { execSync, spawn } from 'child_process';
 
 interface SessionStartInput {
   type?: 'startup' | 'resume' | 'clear' | 'compact';  // Legacy field
@@ -308,6 +309,82 @@ function getUnmarkedHandoffs(): UnmarkedHandoff[] {
   }
 }
 
+/**
+ * Start global memory extraction daemon if not running.
+ *
+ * The memory daemon monitors for stale sessions (heartbeat > 5 min)
+ * and automatically extracts learnings when sessions end.
+ *
+ * Returns status message or null if daemon was already running.
+ */
+function ensureMemoryDaemon(): string | null {
+  const pidFile = path.join(os.homedir(), '.claude', 'memory-daemon.pid');
+
+  // Check if already running
+  if (fs.existsSync(pidFile)) {
+    try {
+      const pid = parseInt(fs.readFileSync(pidFile, 'utf-8').trim(), 10);
+      if (!isNaN(pid)) {
+        // Check if process exists (kill -0)
+        try {
+          process.kill(pid, 0);
+          return null; // Already running
+        } catch {
+          // Process not found — stale PID file
+        }
+      }
+    } catch {
+      // Can't read PID file
+    }
+    // Remove stale PID file
+    try { fs.unlinkSync(pidFile); } catch { /* ignore */ }
+  }
+
+  // Find daemon script
+  const hookDir = path.dirname(new URL(import.meta.url).pathname);
+  const possibleLocations = [
+    // 1. Relative to compiled hook (development: .claude/hooks/dist/ → opc/scripts/core/)
+    path.resolve(hookDir, '..', '..', '..', 'opc', 'scripts', 'core', 'memory_daemon.py'),
+    // 2. In .claude/scripts/core/ (wizard-installed)
+    path.resolve(hookDir, '..', 'scripts', 'core', 'memory_daemon.py'),
+    // 3. Global ~/.claude/scripts/core/
+    path.join(os.homedir(), '.claude', 'scripts', 'core', 'memory_daemon.py'),
+  ];
+
+  let daemonScript: string | null = null;
+  for (const loc of possibleLocations) {
+    if (fs.existsSync(loc)) {
+      daemonScript = loc;
+      break;
+    }
+  }
+
+  if (!daemonScript) {
+    console.error('Warning: memory_daemon.py not found, cannot auto-start memory daemon');
+    return null;
+  }
+
+  try {
+    // cwd = opc/ directory (3 levels up from the script)
+    const cwd = path.resolve(daemonScript, '..', '..', '..');
+    const logFile = path.join(os.homedir(), '.claude', 'memory-daemon.log');
+
+    const logFd = fs.openSync(logFile, 'a');
+    const child = spawn('uv', ['run', daemonScript, 'start'], {
+      cwd,
+      stdio: ['ignore', logFd, logFd],
+      detached: true,
+    });
+    child.unref();
+    fs.closeSync(logFd);
+
+    return 'Memory daemon: Started';
+  } catch (e) {
+    console.error(`Warning: Failed to start memory daemon: ${e}`);
+    return null;
+  }
+}
+
 async function main() {
   const input: SessionStartInput = JSON.parse(await readStdin());
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
@@ -555,6 +632,12 @@ async function main() {
       }
       // For startup without ledger, stay silent (normal case)
     }
+  }
+
+  // Ensure memory daemon is running (auto-extracts learnings from ended sessions)
+  const daemonStatus = ensureMemoryDaemon();
+  if (daemonStatus) {
+    console.error(`✓ ${daemonStatus}`);
   }
 
   // Output with proper format per Claude Code docs

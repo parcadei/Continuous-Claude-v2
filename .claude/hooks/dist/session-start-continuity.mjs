@@ -1,7 +1,8 @@
 // src/session-start-continuity.ts
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
-import { execSync } from "child_process";
+import { execSync, spawn } from "child_process";
 function buildHandoffDirName(sessionName, sessionId) {
   const uuidShort = sessionId.replace(/-/g, "").slice(0, 8);
   return `${sessionName}-${uuidShort}`;
@@ -157,6 +158,62 @@ function getUnmarkedHandoffs() {
     });
   } catch (error) {
     return [];
+  }
+}
+function ensureMemoryDaemon() {
+  const pidFile = path.join(os.homedir(), ".claude", "memory-daemon.pid");
+  if (fs.existsSync(pidFile)) {
+    try {
+      const pid = parseInt(fs.readFileSync(pidFile, "utf-8").trim(), 10);
+      if (!isNaN(pid)) {
+        try {
+          process.kill(pid, 0);
+          return null;
+        } catch {
+        }
+      }
+    } catch {
+    }
+    try {
+      fs.unlinkSync(pidFile);
+    } catch {
+    }
+  }
+  const hookDir = path.dirname(new URL(import.meta.url).pathname);
+  const possibleLocations = [
+    // 1. Relative to compiled hook (development: .claude/hooks/dist/ → opc/scripts/core/)
+    path.resolve(hookDir, "..", "..", "..", "opc", "scripts", "core", "memory_daemon.py"),
+    // 2. In .claude/scripts/core/ (wizard-installed)
+    path.resolve(hookDir, "..", "scripts", "core", "memory_daemon.py"),
+    // 3. Global ~/.claude/scripts/core/
+    path.join(os.homedir(), ".claude", "scripts", "core", "memory_daemon.py")
+  ];
+  let daemonScript = null;
+  for (const loc of possibleLocations) {
+    if (fs.existsSync(loc)) {
+      daemonScript = loc;
+      break;
+    }
+  }
+  if (!daemonScript) {
+    console.error("Warning: memory_daemon.py not found, cannot auto-start memory daemon");
+    return null;
+  }
+  try {
+    const cwd = path.resolve(daemonScript, "..", "..", "..");
+    const logFile = path.join(os.homedir(), ".claude", "memory-daemon.log");
+    const logFd = fs.openSync(logFile, "a");
+    const child = spawn("uv", ["run", daemonScript, "start"], {
+      cwd,
+      stdio: ["ignore", logFd, logFd],
+      detached: true
+    });
+    child.unref();
+    fs.closeSync(logFd);
+    return "Memory daemon: Started";
+  } catch (e) {
+    console.error(`Warning: Failed to start memory daemon: ${e}`);
+    return null;
   }
 }
 async function main() {
@@ -374,6 +431,10 @@ All handoffs in ${handoffDir}:
       }
     }
   }
+  const daemonStatus = ensureMemoryDaemon();
+  if (daemonStatus) {
+    console.error(`\u2713 ${daemonStatus}`);
+  }
   const output = { result: "continue" };
   if (message) {
     output.message = message;
@@ -388,10 +449,10 @@ All handoffs in ${handoffDir}:
   console.log(JSON.stringify(output));
 }
 async function readStdin() {
-  return new Promise((resolve) => {
+  return new Promise((resolve2) => {
     let data = "";
     process.stdin.on("data", (chunk) => data += chunk);
-    process.stdin.on("end", () => resolve(data));
+    process.stdin.on("end", () => resolve2(data));
   });
 }
 main().catch(console.error);
