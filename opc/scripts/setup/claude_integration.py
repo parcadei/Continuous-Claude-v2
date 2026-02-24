@@ -431,6 +431,30 @@ def _copy_scripts(opc_source: Path, target_dir: Path) -> int:
     return count
 
 
+def _copy_dotfile_scripts(opc_source: Path, target_dir: Path) -> int:
+    """Copy root-level scripts from .claude/scripts/ (e.g. status.py).
+
+    _copy_scripts() handles opc/scripts/ subdirs and ROOT_SCRIPTS.
+    This handles the .claude/scripts/ root files that settings.json
+    references directly (e.g. statusLine -> status.py).
+    """
+    count = 0
+    src_scripts = opc_source / "scripts"
+    dst_scripts = target_dir / "scripts"
+
+    if not src_scripts.exists():
+        return count
+
+    dst_scripts.mkdir(parents=True, exist_ok=True)
+
+    for script in src_scripts.iterdir():
+        if script.is_file() and script.suffix in (".py", ".sh"):
+            shutil.copy2(script, dst_scripts / script.name)
+            count += 1
+
+    return count
+
+
 def install_opc_integration(
     target_dir: Path,
     opc_source: Path,
@@ -538,6 +562,9 @@ def install_opc_integration(
 
         # Copy scripts (core, math, tldr directories + root scripts)
         result["installed_scripts"] = _copy_scripts(opc_source, target_dir)
+
+        # Copy root scripts from .claude/scripts/ (e.g. status.py for statusLine)
+        result["installed_scripts"] += _copy_dotfile_scripts(opc_source, target_dir)
 
         # Merge user items if requested
         if merge_user_items and existing and conflicts:
@@ -669,6 +696,9 @@ def install_opc_integration_symlink(
 
         # Copy scripts (core, math, tldr directories + root scripts)
         _copy_scripts(opc_source, target_dir)
+
+        # Copy root scripts from .claude/scripts/ (e.g. status.py for statusLine)
+        _copy_dotfile_scripts(opc_source, target_dir)
 
         result["success"] = True
 
