@@ -1353,16 +1353,20 @@ async def run_uninstall_wizard() -> None:
         if Confirm.ask("\n  Remove TLDR CLI tool?", default=False):
             import subprocess
 
-            remove_result = subprocess.run(
-                ["uv", "tool", "uninstall", "llm-tldr"],
-                capture_output=True,
-                text=True,
-                timeout=30,
-            )
-            if remove_result.returncode == 0:
-                console.print("  [green]OK[/green] TLDR removed")
-            else:
-                console.print("  [yellow]WARN[/yellow] Could not remove TLDR")
+            try:
+                remove_result = subprocess.run(
+                    ["uv", "tool", "uninstall", "llm-tldr"],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                )
+                if remove_result.returncode == 0:
+                    console.print("  [green]OK[/green] TLDR removed")
+                else:
+                    console.print("  [yellow]WARN[/yellow] Could not remove TLDR")
+                    console.print("  Remove manually: uv tool uninstall llm-tldr")
+            except (subprocess.TimeoutExpired, OSError) as e:
+                console.print(f"  [yellow]WARN[/yellow] Could not remove TLDR: {e}")
                 console.print("  Remove manually: uv tool uninstall llm-tldr")
 
 
