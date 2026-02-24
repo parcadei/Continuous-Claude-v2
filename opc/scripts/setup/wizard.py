@@ -628,7 +628,7 @@ async def run_setup_wizard() -> None:
 
     # Step 5: Container stack (Sandbox Infrastructure)
     runtime = prereqs.get("container_runtime", "docker")
-    console.print(f"\n[bold]Step 6/15: Container Stack (Sandbox Infrastructure)[/bold]")
+    console.print("\n[bold]Step 6/15: Container Stack (Sandbox Infrastructure)[/bold]")
     console.print("  The sandbox requires PostgreSQL and Redis for:")
     console.print("  - Agent coordination and scheduling")
     console.print("  - Build cache and LSP index storage")
@@ -1104,6 +1104,17 @@ async def run_setup_wizard() -> None:
             )
             if result.returncode == 0:
                 console.print("  [green]OK[/green] qlty installed")
+                # Verify installation
+                verify = subprocess.run(
+                    ["qlty", "--version"],
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                )
+                if verify.returncode == 0:
+                    console.print(f"  [green]OK[/green] Verified: {verify.stdout.strip()}")
+                else:
+                    console.print("  [yellow]WARN[/yellow] qlty installed but not on PATH")
             else:
                 console.print("  [yellow]WARN[/yellow] Installation failed")
                 console.print("  Install manually: curl -fsSL https://qlty.sh | sh")
@@ -1154,17 +1165,29 @@ async def run_setup_wizard() -> None:
 
             if result and result.returncode == 0:
                 console.print("  [green]OK[/green] ast-grep installed")
+                # Verify installation
+                sg_cmd = "sg" if shutil.which("sg") else "ast-grep"
+                verify = subprocess.run(
+                    [sg_cmd, "--version"],
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                )
+                if verify.returncode == 0:
+                    console.print(f"  [green]OK[/green] Verified: {verify.stdout.strip()}")
+                else:
+                    console.print("  [yellow]WARN[/yellow] ast-grep installed but not on PATH")
             elif result:
                 console.print("  [yellow]WARN[/yellow] Installation failed")
-                console.print("  Install manually: brew install ast-grep")
+                console.print("  Install manually: https://github.com/ast-grep/ast-grep#installation")
         except subprocess.TimeoutExpired:
             console.print("  [yellow]WARN[/yellow] Installation timed out")
-            console.print("  Install manually: brew install ast-grep")
+            console.print("  Install manually: https://github.com/ast-grep/ast-grep#installation")
         except Exception as e:
             console.print(f"  [red]ERROR[/red] {e}")
     else:
         console.print("  Skipped ast-grep installation")
-        console.print("  [dim]Install later: brew install ast-grep[/dim]")
+        console.print("  [dim]Install later: https://github.com/ast-grep/ast-grep#installation[/dim]")
 
     # Step 10d: Diagnostics Tools (Shift-Left Feedback)
     console.print("\n[bold]Step 13/15: Diagnostics Tools (Shift-Left Feedback)[/bold]")
