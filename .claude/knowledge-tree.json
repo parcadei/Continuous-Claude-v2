@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-02-22T19:30:31.002709+00:00",
+  "updated_at": "2026-03-01T00:56:57.973099+00:00",
   "project": {
     "name": "continuous-claude",
     "description": "> Give Claude a notebook, memory, specialized assistants, and autonomous development capability — so every conversation builds on the last [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://claude.ai/code)",
@@ -728,10 +728,14 @@
         "key_files": null
       },
       ".claude\\skills\\notion-bridge/": {
-        "purpose": "Project directory",
+        "purpose": "Markdown documentation",
         "key_files": null
       },
       ".claude\\skills\\notion-bridge\\notion-bridge/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\notion-bridge\\references/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -999,6 +1003,10 @@
         "purpose": "Project directory",
         "key_files": null
       },
+      ".playwright-mcp/": {
+        "purpose": "Project directory",
+        "key_files": null
+      },
       ".ralph/": {
         "purpose": "JSON data/config",
         "key_files": [
@@ -1115,7 +1123,31 @@
           "package.json"
         ]
       },
+      "forge-landing\\.claude/": {
+        "purpose": "Project directory",
+        "key_files": null
+      },
+      "forge-landing\\.claude\\cache/": {
+        "purpose": "Project directory",
+        "key_files": null
+      },
+      "forge-landing\\.claude\\cache\\agents/": {
+        "purpose": "Agent definitions",
+        "key_files": null
+      },
+      "forge-landing\\.claude\\plans/": {
+        "purpose": "Project directory",
+        "key_files": null
+      },
       "forge-landing\\app/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
+      "forge-landing\\app\\chart-05/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
+      "forge-landing\\app\\chart-07/": {
         "purpose": "React/TypeScript components",
         "key_files": null
       },
@@ -1123,7 +1155,23 @@
         "purpose": "UI components",
         "key_files": null
       },
+      "forge-landing\\app\\cta-01/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
+      "forge-landing\\app\\feature-01/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
       "forge-landing\\app\\hero-01/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
+      "forge-landing\\app\\hero-11/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
+      "forge-landing\\app\\insights/": {
         "purpose": "React/TypeScript components",
         "key_files": null
       },
@@ -1133,6 +1181,14 @@
       },
       "forge-landing\\app\\nexus\\components/": {
         "purpose": "UI components",
+        "key_files": null
+      },
+      "forge-landing\\app\\projects/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
+      "forge-landing\\app\\testimonial-04/": {
+        "purpose": "React/TypeScript components",
         "key_files": null
       },
       "forge-landing\\assets/": {
@@ -1147,8 +1203,44 @@
         "purpose": "UI components",
         "key_files": null
       },
+      "forge-landing\\components\\kibo-ui/": {
+        "purpose": "Project directory",
+        "key_files": null
+      },
+      "forge-landing\\components\\kibo-ui\\avatar-stack/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
+      "forge-landing\\components\\kibo-ui\\calendar/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
+      "forge-landing\\components\\kibo-ui\\contribution-graph/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
+      "forge-landing\\components\\kibo-ui\\dropzone/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
+      "forge-landing\\components\\kibo-ui\\gantt/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
+      "forge-landing\\components\\kibo-ui\\kanban/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
+      "forge-landing\\components\\kibo-ui\\table/": {
+        "purpose": "React/TypeScript components",
+        "key_files": null
+      },
       "forge-landing\\components\\shadcn-space/": {
         "purpose": "Project directory",
+        "key_files": null
+      },
+      "forge-landing\\components\\shadcn-space\\animated-text/": {
+        "purpose": "React/TypeScript components",
         "key_files": null
       },
       "forge-landing\\components\\shadcn-space\\animations/": {
@@ -1157,6 +1249,10 @@
       },
       "forge-landing\\components\\shadcn-space\\blocks/": {
         "purpose": "Project directory",
+        "key_files": null
+      },
+      "forge-landing\\components\\shadcn-space\\number-ticker/": {
+        "purpose": "React/TypeScript components",
         "key_files": null
       },
       "forge-landing\\components\\ui/": {
@@ -1632,6 +1728,14 @@
     "source": "ROADMAP.md",
     "current": null,
     "completed": [
+      {
+        "title": "Fourth Presentation Suite — Premium Visual Upgrade (v4)",
+        "completed": "2026-02-28"
+      },
+      {
+        "title": "Fourth Presentation Suite — Visual Polish Upgrade",
+        "completed": "2026-02-28"
+      },
       {
         "title": "[feat] add forge-landing Next.js project (frontend-design skill v1.2.0 test) (2026-02-22) `68b035b`",
         "completed": null

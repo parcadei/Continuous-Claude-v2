@@ -210,6 +210,8 @@ cat ~/.claude/ai-dev-tasks/generate-tasks.md
 ### 2.3 Generate Parent Tasks (Informed by Memory)
 Present 5-7 high-level tasks. Wait for "Go" confirmation.
 
+**Tracer bullet ordering:** Order tasks to build the simplest end-to-end path first (happy path through the full stack), then layer error handling, edge cases, and optimizations. This validates wiring early and surfaces integration issues before investing in edge cases.
+
 **Use memory context:**
 - If past implementation had specific phases, follow that structure
 - If past implementation had issues, add preventive tasks
@@ -236,6 +238,17 @@ Create `/tasks/tasks-<feature>.md`
 | VERIFY | arbiter | Full suite + typecheck + lint. No modifications. |
 
 Task atomicity: max 3-5 files, 1 behavior, 1-3 test cases per slice.
+
+### Periodic REFACTOR Phase
+
+After every 5 completed tasks (or when lint/typecheck surfaces duplication warnings), optionally spawn a cleanup pass:
+
+```
+Task(subagent_type: "strategic-refactorer" OR "judge")
+  prompt: "Review the last 5 completed tasks for duplication, dead code, and abstraction opportunities. Refactor only what tests already cover."
+```
+
+This prevents accumulation of tactical code debt across many small GREEN passes. Skip if the codebase is clean.
 
 ### Iteration Control [C:10]
 
