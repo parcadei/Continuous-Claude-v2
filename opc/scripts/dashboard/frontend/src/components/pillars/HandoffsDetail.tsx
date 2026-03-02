@@ -19,25 +19,41 @@ interface HandoffsDetailProps {
   onOpenChange: (open: boolean) => void
 }
 
-type OutcomeFilter = 'all' | 'success' | 'partial' | 'blocked' | 'unknown'
+type OutcomeFilter = 'all' | 'succeeded' | 'partial_plus' | 'partial_minus' | 'failed' | 'unknown'
 
 const OUTCOME_CONFIG: Record<string, { label: string; className: string }> = {
-  success: {
-    label: 'success',
+  succeeded: {
+    label: 'succeeded',
     className: 'bg-green-500/15 text-green-600 border-green-500/30',
   },
-  partial: {
-    label: 'partial',
+  partial_plus: {
+    label: 'partial+',
     className: 'bg-yellow-500/15 text-yellow-600 border-yellow-500/30',
   },
-  blocked: {
-    label: 'blocked',
+  partial_minus: {
+    label: 'partial-',
+    className: 'bg-orange-500/15 text-orange-600 border-orange-500/30',
+  },
+  failed: {
+    label: 'failed',
     className: 'bg-red-500/15 text-red-600 border-red-500/30',
   },
   unknown: {
     label: 'unknown',
     className: 'bg-muted text-muted-foreground border-muted-foreground/30',
   },
+}
+
+/** Normalize status from API (may be uppercase, null, or variant forms) to a config key. */
+function normalizeStatus(raw: string | null | undefined): string {
+  if (!raw) return 'unknown'
+  const lower = raw.toLowerCase()
+  if (lower in OUTCOME_CONFIG) return lower
+  // Legacy aliases
+  if (lower === 'success') return 'succeeded'
+  if (lower === 'partial') return 'partial_plus'
+  if (lower === 'blocked') return 'failed'
+  return 'unknown'
 }
 
 
@@ -90,15 +106,15 @@ export function HandoffsDetail({ open, onOpenChange }: HandoffsDetailProps) {
 
   const filteredHandoffs = handoffs.filter((h) => {
     if (filter === 'all') return true
-    if (filter === 'unknown') return h.status == null
-    return h.status === filter
+    return normalizeStatus(h.status) === filter
   })
 
   const filterButtons: { value: OutcomeFilter; label: string }[] = [
     { value: 'all', label: 'All' },
-    { value: 'success', label: 'Success' },
-    { value: 'partial', label: 'Partial' },
-    { value: 'blocked', label: 'Blocked' },
+    { value: 'succeeded', label: 'Succeeded' },
+    { value: 'partial_plus', label: 'Partial+' },
+    { value: 'partial_minus', label: 'Partial-' },
+    { value: 'failed', label: 'Failed' },
     { value: 'unknown', label: 'Unknown' },
   ]
 
@@ -149,8 +165,8 @@ export function HandoffsDetail({ open, onOpenChange }: HandoffsDetailProps) {
 
               <div className="space-y-4">
                 {filteredHandoffs.map((handoff) => {
-                  const effectiveStatus = handoff.status ?? 'unknown'
-                  const outcomeConfig = OUTCOME_CONFIG[effectiveStatus]
+                  const effectiveStatus = normalizeStatus(handoff.status)
+                  const outcomeConfig = OUTCOME_CONFIG[effectiveStatus] ?? OUTCOME_CONFIG.unknown
                   const isExpanded = expandedId === handoff.id
 
                   return (
@@ -158,10 +174,10 @@ export function HandoffsDetail({ open, onOpenChange }: HandoffsDetailProps) {
                       <div
                         className={cn(
                           'absolute left-1.5 top-2 h-3 w-3 rounded-full border-2 bg-background',
-                          handoff.status === 'success' && 'border-green-500',
-                          handoff.status === 'partial' && 'border-yellow-500',
-                          handoff.status === 'blocked' && 'border-red-500',
-                          !handoff.status && 'border-muted-foreground'
+                          effectiveStatus === 'succeeded' && 'border-green-500',
+                          (effectiveStatus === 'partial_plus' || effectiveStatus === 'partial_minus') && 'border-yellow-500',
+                          effectiveStatus === 'failed' && 'border-red-500',
+                          effectiveStatus === 'unknown' && 'border-muted-foreground'
                         )}
                       />
 
