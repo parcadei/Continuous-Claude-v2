@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { PillarHealth, PillarStatus } from '@/types'
-import { cn } from '@/lib/utils'
+import { cn, formatTimeAgo } from '@/lib/utils'
 
 interface PillarCardProps {
   health: PillarHealth
@@ -84,24 +84,28 @@ const PILLAR_ICONS: Record<string, ReactNode> = {
       />
     </svg>
   ),
+  ralph: (
+    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+      />
+    </svg>
+  ),
+  braintrust: (
+    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M3 3v18h18M7 16l4-8 4 4 4-8"
+      />
+    </svg>
+  ),
 }
 
-function formatTimeAgo(dateStr: string | null): string {
-  if (!dateStr) return 'Never'
-
-  const date = new Date(dateStr)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMins / 60)
-  const diffDays = Math.floor(diffHours / 24)
-
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  if (diffHours < 24) return `${diffHours}h ago`
-  if (diffDays < 7) return `${diffDays}d ago`
-  return date.toLocaleDateString()
-}
 
 function formatPillarName(name: string): string {
   const names: Record<string, string> = {
@@ -110,6 +114,8 @@ function formatPillarName(name: string): string {
     pageindex: 'PageIndex',
     roadmap: 'Roadmap',
     handoffs: 'Handoffs',
+    ralph: 'Ralph',
+    braintrust: 'Braintrust',
   }
   return names[name] || name.charAt(0).toUpperCase() + name.slice(1)
 }
@@ -122,13 +128,15 @@ export function PillarCard({ health, onViewDetails }: PillarCardProps) {
     <Card
       role="region"
       aria-label={`${formatPillarName(health.name)} pillar - ${statusConfig.label}`}
+      onClick={onViewDetails}
       className={cn(
         'relative overflow-hidden transition-all duration-200',
-        'border-l-[3px] hover-lift bento-shadow',
+        'border-l-[3px] hover-lift bento-shadow hover:shadow-md transition-shadow',
         `status-${health.status} status-border-left`,
         health.status === 'online' && 'hover:status-glow',
         health.status === 'degraded' && 'hover:status-glow-degraded',
-        health.status === 'offline' && 'hover:status-glow-offline'
+        health.status === 'offline' && 'hover:status-glow-offline',
+        onViewDetails && 'cursor-pointer'
       )}
     >
       <CardHeader className="pb-2">
@@ -147,7 +155,7 @@ export function PillarCard({ health, onViewDetails }: PillarCardProps) {
                 {formatPillarName(health.name)}
               </CardTitle>
               <p className="text-xs text-muted-foreground">
-                {formatTimeAgo(health.last_activity)}
+                {health.last_activity ? formatTimeAgo(health.last_activity) : 'Never'}
               </p>
             </div>
           </div>
@@ -172,6 +180,8 @@ export function PillarCard({ health, onViewDetails }: PillarCardProps) {
               {health.name === 'pageindex' && 'indexed'}
               {health.name === 'roadmap' && '% complete'}
               {health.name === 'handoffs' && 'documents'}
+              {health.name === 'ralph' && 'tasks'}
+              {health.name === 'braintrust' && 'sessions'}
             </p>
           </div>
           {onViewDetails && (

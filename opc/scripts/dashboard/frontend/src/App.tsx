@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useRef, useState } from 'react'
-import { toast, Toaster } from 'sonner'
+import { Toaster } from 'sonner'
 import { Header } from '@/components/layout/Header'
 import { PillarGrid } from '@/components/pillars/PillarGrid'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -7,14 +7,19 @@ import { fetchHealth } from '@/lib/api'
 import { showPillarStatusToast } from '@/lib/toast'
 import { useHealthStore } from '@/stores/healthStore'
 import { useNotificationStore } from '@/stores/notificationStore'
+import { useActivityStore, type HealthChange, type Activity } from '@/stores/activityStore'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import type { HealthResponse, PillarHealth } from '@/types'
 import { useBrowserNotifications } from '@/hooks'
+import { UserGuide } from '@/components/UserGuide'
+import { ActivityFeed } from '@/components/activity/ActivityFeed'
 import { MemoryDetail } from '@/components/pillars/MemoryDetail'
 import { KnowledgeDetail } from '@/components/pillars/KnowledgeDetail'
 import { PageIndexDetail } from '@/components/pillars/PageIndexDetail'
 import { RoadmapDetail } from '@/components/pillars/RoadmapDetail'
 import { HandoffsDetail } from '@/components/pillars/HandoffsDetail'
+import { RalphDetail } from '@/components/pillars/RalphDetail'
+import { BraintrustDetail } from '@/components/pillars/BraintrustDetail'
 import './index.css'
 
 function App() {
@@ -22,13 +27,77 @@ function App() {
   const { addNotification } = useNotificationStore()
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [activeDetail, setActiveDetail] = useState<string | null>(null)
+  const [guideOpen, setGuideOpen] = useState(false)
   const { notifyOffline } = useBrowserNotifications()
 
   const previousPillarsRef = useRef<Record<string, PillarHealth>>({})
 
-  const handleHealthUpdate = useCallback((data: HealthResponse) => {
-    Object.entries(data.pillars).forEach(([name, health]) => {
+  const handleHealthUpdate = useCallback((data: HealthResponse | { type?: string; pillar: string; status: string; count: number }) => {
+    const { addActivityFromHealthChange } = useActivityStore.getState()
+
+    // Handle single-pillar WebSocket update
+    if ('pillar' in data && typeof data.pillar === 'string') {
+      const { pillars: currentPillars } = useHealthStore.getState()
+      const name = data.pillar
+      const health: PillarHealth = {
+        name,
+        status: data.status as PillarHealth['status'],
+        count: data.count,
+        last_activity: new Date().toISOString(),
+        error: null,
+      }
       const previous = previousPillarsRef.current[name]
+
+      if (previous) {
+        const change: HealthChange = {}
+        if (previous.status !== health.status) {
+          change.status = { from: previous.status, to: health.status }
+        }
+        if (previous.count !== health.count) {
+          change.count = { from: previous.count, to: health.count }
+        }
+        if (Object.keys(change).length > 0) {
+          addActivityFromHealthChange(name, change)
+        }
+      }
+
+      if (previous && previous.status !== health.status) {
+        showPillarStatusToast(name, health.status, previous.status)
+        addNotification({
+          type: health.status === 'offline' ? 'error' :
+                health.status === 'degraded' ? 'warning' : 'success',
+          title: `${name} Status Changed`,
+          message: `${previous.status} -> ${health.status}`,
+          pillar: name,
+        })
+        if (health.status === 'offline') {
+          notifyOffline(name)
+        }
+      }
+
+      const updatedPillars = { ...currentPillars, [name]: health }
+      setHealth({ pillars: updatedPillars })
+      previousPillarsRef.current[name] = health
+      return
+    }
+
+    // Handle full health response (from HTTP polling)
+    const fullData = data as HealthResponse
+    Object.entries(fullData.pillars).forEach(([name, health]) => {
+      const previous = previousPillarsRef.current[name]
+      if (previous) {
+        const change: HealthChange = {}
+        if (previous.status !== health.status) {
+          change.status = { from: previous.status, to: health.status }
+        }
+        if (previous.count !== health.count) {
+          change.count = { from: previous.count, to: health.count }
+        }
+        if (Object.keys(change).length > 0) {
+          addActivityFromHealthChange(name, change)
+        }
+      }
+
       if (previous && previous.status !== health.status) {
         showPillarStatusToast(name, health.status, previous.status)
 
@@ -46,13 +115,25 @@ function App() {
       }
     })
 
-    setHealth(data)
-    previousPillarsRef.current = data.pillars
+    setHealth(fullData)
+    previousPillarsRef.current = fullData.pillars
   }, [setHealth, addNotification, notifyOffline])
 
   const { isConnected } = useWebSocket({
     project: 'continuous-claude',
     onHealthUpdate: handleHealthUpdate,
+    onActivity: (event) => useActivityStore.getState().addActivity({
+      pillar: event.pillar,
+      type: (event.action as Activity['type']) || 'status_change',
+      description: event.action,
+      timestamp: new Date(event.timestamp),
+      metadata: event.details,
+    }),
+    onNotification: (event) => useNotificationStore.getState().addNotification({
+      type: event.level === 'info' ? 'info' : event.level === 'warning' ? 'warning' : 'error',
+      title: event.level.charAt(0).toUpperCase() + event.level.slice(1),
+      message: event.message,
+    }),
   })
 
   const loadHealth = useCallback(async () => {
@@ -76,6 +157,24 @@ function App() {
     return () => clearInterval(interval)
   }, [loadHealth])
 
+  // Keyboard shortcuts for pillar navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+
+      const keyMap: Record<string, string> = {
+        m: 'memory', k: 'knowledge', p: 'pageindex',
+        r: 'roadmap', h: 'handoffs', a: 'ralph', b: 'braintrust',
+      }
+
+      if (e.key === 'Escape') setActiveDetail(null)
+      else if (keyMap[e.key]) setActiveDetail(keyMap[e.key])
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   const handleViewDetails = (pillar: string) => {
     setActiveDetail(pillar)
   }
@@ -83,14 +182,14 @@ function App() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
-        <Header isConnected={isConnected} />
+        <Header isConnected={isConnected} onRefreshData={loadHealth} onOpenGuide={() => setGuideOpen(true)} />
 
       <main className="container max-w-screen-2xl px-4 py-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">System Status</h2>
             <p className="text-sm text-muted-foreground">
-              Monitor the 5 pillars of Continuous Claude
+              Monitor the 7 pillars of Continuous Claude
             </p>
           </div>
           {lastUpdated && (
@@ -116,15 +215,17 @@ function App() {
         </div>
 
         <div className="mt-8">
+          <h3 className="mb-4 text-lg font-semibold">Activity</h3>
+          <div className="rounded-lg border border-border bg-card">
+            <ActivityFeed maxItems={50} />
+          </div>
+        </div>
+
+        <div className="mt-8">
           <h3 className="mb-4 text-lg font-semibold">Quick Actions</h3>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             <button
-              onClick={() => {
-                const healthSummary = Object.entries(pillars)
-                  .map(([name, health]) => `${name}: ${health.status}`)
-                  .join(', ')
-                toast.success(`Health: ${healthSummary}`)
-              }}
+              onClick={() => window.open('/api/health', '_blank')}
               className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -214,6 +315,52 @@ function App() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
+
+            <button
+              onClick={() => setActiveDetail('ralph')}
+              className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M12 8V4m0 4a4 4 0 100 8 4 4 0 000-8zm-6 4H2m4 0a6 6 0 1012 0m-2 0h4"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">Ralph Monitor</p>
+                <p className="text-xs text-muted-foreground">AI agent oversight</p>
+              </div>
+              <svg className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <button
+              onClick={() => setActiveDetail('braintrust')}
+              className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/10 text-violet-500">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M3 13h2v8H3zm6-4h2v12H9zm6-3h2v15h-2zm6-3h2v18h-2z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">Braintrust Evals</p>
+                <p className="text-xs text-muted-foreground">Session analytics</p>
+              </div>
+              <svg className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
       </main>
@@ -253,6 +400,15 @@ function App() {
         open={activeDetail === 'handoffs'}
         onOpenChange={(open) => !open && setActiveDetail(null)}
       />
+      <RalphDetail
+        open={activeDetail === 'ralph'}
+        onOpenChange={(open) => !open && setActiveDetail(null)}
+      />
+      <BraintrustDetail
+        open={activeDetail === 'braintrust'}
+        onOpenChange={(open) => !open && setActiveDetail(null)}
+      />
+      <UserGuide open={guideOpen} onOpenChange={setGuideOpen} />
       </div>
     </ErrorBoundary>
   )

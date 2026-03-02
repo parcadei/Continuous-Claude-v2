@@ -8,6 +8,12 @@ import type {
   HandoffDetail,
   Learning,
   PageIndexResponse,
+  RalphTasksResponse,
+  RalphStateResponse,
+  BraintrustDailyActivity,
+  BraintrustAgentStat,
+  BraintrustSkillStat,
+  BraintrustSession,
 } from '@/types'
 
 const API_BASE = '/api'
@@ -108,6 +114,32 @@ export async function fetchPageIndexDocuments(params?: {
 
   const query = searchParams.toString()
   return fetchJson<PageIndexResponse>(`/pillars/pageindex/documents${query ? `?${query}` : ''}`)
+}
+
+// Ralph
+export async function fetchRalphTasks(): Promise<RalphTasksResponse> {
+  return fetchJson<RalphTasksResponse>('/pillars/ralph/tasks')
+}
+
+export async function fetchRalphState(): Promise<RalphStateResponse> {
+  return fetchJson<RalphStateResponse>('/pillars/ralph/state')
+}
+
+// Braintrust
+export async function fetchBraintrustWeekly(): Promise<{ daily: BraintrustDailyActivity[] }> {
+  return fetchJson('/pillars/braintrust/weekly-summary')
+}
+
+export async function fetchBraintrustAgents(): Promise<{ agents: BraintrustAgentStat[] }> {
+  return fetchJson('/pillars/braintrust/agent-stats')
+}
+
+export async function fetchBraintrustSkills(): Promise<{ skills: BraintrustSkillStat[] }> {
+  return fetchJson('/pillars/braintrust/skill-stats')
+}
+
+export async function fetchBraintrustSessions(limit = 10): Promise<{ sessions: BraintrustSession[] }> {
+  return fetchJson(`/pillars/braintrust/sessions?limit=${limit}`)
 }
 
 export { ApiError }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import {
   Sheet,
   SheetContent,
@@ -16,7 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { cn } from '@/lib/utils'
+import { cn, formatTimeAgo } from '@/lib/utils'
 import { fetchPageIndexDocuments } from '@/lib/api'
 import type { IndexedDocument } from '@/types'
 
@@ -45,22 +45,7 @@ const STATUS_CONFIG: Record<IndexStatus, { label: string; variant: string; icon:
   },
 }
 
-function formatTimeAgo(dateStr: string | null): string {
-  if (!dateStr) return 'Never'
 
-  const date = new Date(dateStr)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMins / 60)
-  const diffDays = Math.floor(diffHours / 24)
-
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  if (diffHours < 24) return `${diffHours}h ago`
-  if (diffDays < 7) return `${diffDays}d ago`
-  return date.toLocaleDateString()
-}
 
 function getLanguageColor(language: string): string {
   const colors: Record<string, string> = {
@@ -81,7 +66,23 @@ export function PageIndexDetail({ open, onOpenChange }: PageIndexDetailProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<IndexStatus | 'all'>('all')
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      setDebouncedSearch(value)
+    }, 300)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -90,7 +91,7 @@ export function PageIndexDetail({ open, onOpenChange }: PageIndexDetailProps) {
     setLoading(true)
     setError(null)
 
-    fetchPageIndexDocuments({ page: 1, page_size: 100, search: searchQuery || undefined })
+    fetchPageIndexDocuments({ page: 1, page_size: 100, search: debouncedSearch || undefined })
       .then((data) => {
         if (cancelled) return
         setDocuments(data.documents)
@@ -105,7 +106,7 @@ export function PageIndexDetail({ open, onOpenChange }: PageIndexDetailProps) {
       })
 
     return () => { cancelled = true }
-  }, [open, searchQuery])
+  }, [open, debouncedSearch])
 
   const filteredDocuments = useMemo(() => {
     return documents.filter((doc) => {
@@ -175,7 +176,7 @@ export function PageIndexDetail({ open, onOpenChange }: PageIndexDetailProps) {
               <Input
                 placeholder="Filter by path..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="pl-8"
               />
             </div>
@@ -297,7 +298,7 @@ function DocumentRow({ document }: { document: IndexedDocument }) {
           </div>
           <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
             <span className={getLanguageColor(document.language)}>{document.language}</span>
-            <span>{formatTimeAgo(document.indexed_at)}</span>
+            <span>{document.indexed_at ? formatTimeAgo(document.indexed_at) : 'Never'}</span>
           </div>
         </div>
         <Badge variant="outline" className={cn('shrink-0 text-xs', statusConfig.variant)}>

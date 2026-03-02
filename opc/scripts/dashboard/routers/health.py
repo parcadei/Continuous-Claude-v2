@@ -14,6 +14,8 @@ from dashboard.services.knowledge import KnowledgePillarService
 from dashboard.services.pageindex import PageIndexPillarService
 from dashboard.services.roadmap import RoadmapPillarService
 from dashboard.services.handoffs import HandoffsPillarService
+from dashboard.services.ralph import RalphPillarService
+from dashboard.services.braintrust import BraintrustPillarService
 
 router = APIRouter(prefix="/api", tags=["health"])
 
@@ -22,6 +24,8 @@ knowledge_service = KnowledgePillarService()
 pageindex_service = PageIndexPillarService()
 roadmap_service = RoadmapPillarService()
 handoffs_service = HandoffsPillarService()
+ralph_service = RalphPillarService()
+braintrust_service = BraintrustPillarService()
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -36,6 +40,8 @@ async def get_health() -> HealthResponse:
     pageindex_health = await pageindex_service.check_health()
     roadmap_health = await roadmap_service.check_health()
     handoffs_health = await handoffs_service.check_health()
+    ralph_health = await ralph_service.check_health()
+    braintrust_health = await braintrust_service.check_health()
 
     return HealthResponse(
         pillars={
@@ -44,6 +50,8 @@ async def get_health() -> HealthResponse:
             "pageindex": pageindex_health,
             "roadmap": roadmap_health,
             "handoffs": handoffs_health,
+            "ralph": ralph_health,
+            "braintrust": braintrust_health,
         }
     )
 
@@ -54,6 +62,8 @@ PILLAR_SERVICES = {
     "pageindex": pageindex_service,
     "roadmap": roadmap_service,
     "handoffs": handoffs_service,
+    "ralph": ralph_service,
+    "braintrust": braintrust_service,
 }
 
 

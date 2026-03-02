@@ -135,3 +135,61 @@ export interface WebSocketMessage {
   action: 'subscribe' | 'unsubscribe'
   project: string
 }
+
+// Ralph types
+export type RalphTaskStatus = 'pending' | 'in_progress' | 'reviewing' | 'complete' | 'failed' | 'blocked' | 'skipped'
+
+export interface RalphTask {
+  id: string
+  name: string
+  status: RalphTaskStatus
+  agent: string | null
+  duration_s: number | null
+  retries: number
+  depends_on: string[]
+  files: string[]
+  started_at: string | null
+  completed_at: string | null
+  last_error: string | null
+}
+
+export interface RalphTasksResponse {
+  tasks: RalphTask[]
+  tasks_by_status: Record<string, number>
+}
+
+export interface RalphStateResponse {
+  active: boolean
+  story_id: string
+  stage: string
+  iteration: number
+  max_iterations: number
+  progress: { completed: number; total: number; pct: number }
+  retry_queue: Array<{ task_id: string; attempt: number; error: string }>
+}
+
+// Braintrust types
+export interface BraintrustDailyActivity {
+  day: string
+  sessions: number
+  tool_calls: number
+}
+
+export interface BraintrustAgentStat {
+  agent: string
+  runs: number
+  sessions: number
+}
+
+export interface BraintrustSkillStat {
+  skill: string
+  activations: number
+  sessions: number
+}
+
+export interface BraintrustSession {
+  session_id: string
+  started: string
+  ended: string
+  span_count: number
+}

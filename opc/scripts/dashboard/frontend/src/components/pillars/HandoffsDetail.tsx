@@ -12,14 +12,14 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { fetchHandoffs, fetchHandoff } from '@/lib/api'
 import type { HandoffSummary, HandoffDetail } from '@/types'
-import { cn } from '@/lib/utils'
+import { cn, formatTimeAgo } from '@/lib/utils'
 
 interface HandoffsDetailProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-type OutcomeFilter = 'all' | 'success' | 'partial' | 'blocked'
+type OutcomeFilter = 'all' | 'success' | 'partial' | 'blocked' | 'unknown'
 
 const OUTCOME_CONFIG: Record<string, { label: string; className: string }> = {
   success: {
@@ -34,24 +34,12 @@ const OUTCOME_CONFIG: Record<string, { label: string; className: string }> = {
     label: 'blocked',
     className: 'bg-red-500/15 text-red-600 border-red-500/30',
   },
+  unknown: {
+    label: 'unknown',
+    className: 'bg-muted text-muted-foreground border-muted-foreground/30',
+  },
 }
 
-function formatTimeAgo(dateStr: string | null): string {
-  if (!dateStr) return 'Unknown'
-
-  const date = new Date(dateStr)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMins / 60)
-  const diffDays = Math.floor(diffHours / 24)
-
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins} minutes ago`
-  if (diffHours < 24) return `${diffHours} hours ago`
-  if (diffDays < 7) return `${diffDays} days ago`
-  return date.toLocaleDateString()
-}
 
 export function HandoffsDetail({ open, onOpenChange }: HandoffsDetailProps) {
   const [handoffs, setHandoffs] = useState<HandoffSummary[]>([])
@@ -102,6 +90,7 @@ export function HandoffsDetail({ open, onOpenChange }: HandoffsDetailProps) {
 
   const filteredHandoffs = handoffs.filter((h) => {
     if (filter === 'all') return true
+    if (filter === 'unknown') return h.status == null
     return h.status === filter
   })
 
@@ -110,6 +99,7 @@ export function HandoffsDetail({ open, onOpenChange }: HandoffsDetailProps) {
     { value: 'success', label: 'Success' },
     { value: 'partial', label: 'Partial' },
     { value: 'blocked', label: 'Blocked' },
+    { value: 'unknown', label: 'Unknown' },
   ]
 
   return (
@@ -159,9 +149,8 @@ export function HandoffsDetail({ open, onOpenChange }: HandoffsDetailProps) {
 
               <div className="space-y-4">
                 {filteredHandoffs.map((handoff) => {
-                  const outcomeConfig = handoff.status
-                    ? OUTCOME_CONFIG[handoff.status]
-                    : null
+                  const effectiveStatus = handoff.status ?? 'unknown'
+                  const outcomeConfig = OUTCOME_CONFIG[effectiveStatus]
                   const isExpanded = expandedId === handoff.id
 
                   return (
@@ -183,7 +172,7 @@ export function HandoffsDetail({ open, onOpenChange }: HandoffsDetailProps) {
                               {handoff.title || handoff.id}
                             </p>
                             <p className="mt-1 text-xs text-muted-foreground">
-                              {formatTimeAgo(handoff.created_at)}
+                              {handoff.created_at ? formatTimeAgo(handoff.created_at) : 'Unknown'}
                             </p>
                           </div>
 
@@ -194,14 +183,12 @@ export function HandoffsDetail({ open, onOpenChange }: HandoffsDetailProps) {
                             >
                               {handoff.source === 'db' ? 'DB' : 'File'}
                             </Badge>
-                            {outcomeConfig && (
-                              <Badge
-                                variant="outline"
-                                className={cn('text-[10px]', outcomeConfig.className)}
-                              >
-                                {outcomeConfig.label}
-                              </Badge>
-                            )}
+                            <Badge
+                              variant="outline"
+                              className={cn('text-[10px]', outcomeConfig.className)}
+                            >
+                              {outcomeConfig.label}
+                            </Badge>
                           </div>
                         </div>
 

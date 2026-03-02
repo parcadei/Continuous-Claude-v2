@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
+import { cn, formatTimeAgo } from '@/lib/utils'
 import { useActivityStore, type Activity, type ActivityType } from '@/stores/activityStore'
 
 interface ActivityFeedProps {
@@ -69,23 +69,43 @@ const PILLAR_ICONS: Record<string, ReactNode> = {
       />
     </svg>
   ),
+  ralph: (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M14.121 14.121A3 3 0 109.88 9.88m4.242 4.242L9.88 9.88m4.242 4.242l2.829 2.829M9.88 9.88L7.05 7.05m0 0a7 7 0 1010 10"
+      />
+    </svg>
+  ),
+  braintrust: (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+      />
+    </svg>
+  ),
 }
 
 const TYPE_CONFIG: Record<ActivityType, { label: string; className: string }> = {
   status_change: {
-    label: 'status_change',
+    label: 'Status',
     className: 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30',
   },
   count_change: {
-    label: 'count_change',
+    label: 'Count',
     className: 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30',
   },
   error: {
-    label: 'error',
+    label: 'Error',
     className: 'bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30',
   },
   recovery: {
-    label: 'recovery',
+    label: 'Recovery',
     className: 'bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/30',
   },
 }
@@ -104,21 +124,10 @@ const PILLARS = [
   { value: 'pageindex', label: 'PageIndex' },
   { value: 'roadmap', label: 'Roadmap' },
   { value: 'handoffs', label: 'Handoffs' },
+  { value: 'ralph', label: 'Ralph' },
+  { value: 'braintrust', label: 'Braintrust' },
 ] as const
 
-function formatTimeAgo(date: Date): string {
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMins / 60)
-  const diffDays = Math.floor(diffHours / 24)
-
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  if (diffHours < 24) return `${diffHours}h ago`
-  if (diffDays < 7) return `${diffDays}d ago`
-  return date.toLocaleDateString()
-}
 
 function ActivityItem({ activity }: { activity: Activity }) {
   const pillarIcon = PILLAR_ICONS[activity.pillar] || <ActivityIcon className="h-4 w-4" />
@@ -140,7 +149,7 @@ function ActivityItem({ activity }: { activity: Activity }) {
         <p className="text-sm text-foreground truncate">{activity.description}</p>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <Clock className="h-3 w-3" />
-          <span>{formatTimeAgo(activity.timestamp)}</span>
+          <span>{formatTimeAgo(activity.timestamp.toISOString())}</span>
         </div>
       </div>
     </div>

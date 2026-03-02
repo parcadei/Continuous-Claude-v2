@@ -16,9 +16,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
-import { fetchLearnings } from '@/lib/api'
-import type { Learning } from '@/types'
-import { cn } from '@/lib/utils'
+import { fetchLearnings, fetchMemoryDetails } from '@/lib/api'
+import type { Learning, MemoryDetails } from '@/types'
+import { cn, formatTimeAgo } from '@/lib/utils'
 
 interface MemoryDetailProps {
   open: boolean
@@ -45,31 +45,69 @@ const TYPE_COLORS: Record<string, string> = {
   OPEN_THREAD: 'bg-yellow-500/15 text-yellow-500 border-yellow-500/30',
 }
 
-function formatTimeAgo(dateStr: string): string {
-  const date = new Date(dateStr)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMins / 60)
-  const diffDays = Math.floor(diffHours / 24)
-
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  if (diffHours < 24) return `${diffHours}h ago`
-  if (diffDays < 7) return `${diffDays}d ago`
-  return date.toLocaleDateString()
+const CONFIDENCE_COLORS: Record<string, string> = {
+  high: 'bg-green-500/15 text-green-500 border-green-500/30',
+  medium: 'bg-amber-500/15 text-amber-500 border-amber-500/30',
+  low: 'bg-red-500/15 text-red-500 border-red-500/30',
 }
 
-function truncateContent(content: string, maxLength = 150): string {
-  if (content.length <= maxLength) return content
-  return content.slice(0, maxLength).trim() + '...'
-}
 
-function LearningCard({ learning }: { learning: Learning }) {
-  const typeColor = TYPE_COLORS[learning.type] || 'bg-muted text-muted-foreground'
+function StatsSummary({ details }: { details: MemoryDetails }) {
+  const entries = Object.entries(details.by_type).filter(([, count]) => count > 0)
 
   return (
-    <div className="p-3 rounded-lg border bg-card hover:bg-accent/5 transition-colors">
+    <div className="rounded-lg border bg-muted/30 p-3 space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          Breakdown
+        </span>
+        <span className="text-xs text-muted-foreground">
+          {details.total_count} total
+        </span>
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {entries.map(([type, count]) => (
+          <Badge
+            key={type}
+            variant="outline"
+            className={cn('text-xs font-medium', TYPE_COLORS[type] || 'bg-muted text-muted-foreground')}
+          >
+            {type.replace(/_/g, ' ')}: {count}
+          </Badge>
+        ))}
+      </div>
+      {Object.keys(details.by_scope).length > 0 && (
+        <div className="flex gap-2 pt-0.5">
+          {Object.entries(details.by_scope).map(([scope, count]) => (
+            <span key={scope} className="text-xs text-muted-foreground">
+              {scope}: {count}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function LearningCard({
+  learning,
+  expanded,
+  onToggle,
+}: {
+  learning: Learning
+  expanded: boolean
+  onToggle: () => void
+}) {
+  const typeColor = TYPE_COLORS[learning.type] || 'bg-muted text-muted-foreground'
+  const confidenceColor =
+    CONFIDENCE_COLORS[learning.confidence?.toLowerCase()] ||
+    'bg-muted text-muted-foreground border-muted'
+
+  return (
+    <div
+      className="p-3 rounded-lg border bg-card hover:bg-accent/5 transition-colors cursor-pointer"
+      onClick={onToggle}
+    >
       <div className="flex items-start justify-between gap-2 mb-2">
         <Badge variant="outline" className={cn('text-xs font-medium', typeColor)}>
           {learning.type}
@@ -79,18 +117,37 @@ function LearningCard({ learning }: { learning: Learning }) {
         </span>
       </div>
 
-      <p className="text-sm text-foreground mb-2">
-        {truncateContent(learning.content)}
+      <p className={cn('text-sm text-foreground mb-2', !expanded && 'line-clamp-2')}>
+        {learning.content}
       </p>
 
-      {learning.context && (
+      {expanded && (
+        <>
+          {learning.context && (
+            <p className="text-xs text-muted-foreground mb-2">
+              Context: {learning.context}
+            </p>
+          )}
+
+          {learning.confidence && (
+            <Badge
+              variant="outline"
+              className={cn('text-xs font-medium mb-2', confidenceColor)}
+            >
+              {learning.confidence} confidence
+            </Badge>
+          )}
+        </>
+      )}
+
+      {!expanded && learning.context && (
         <p className="text-xs text-muted-foreground mb-2">
           Context: {learning.context}
         </p>
       )}
 
       {learning.tags && learning.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1 mb-2">
           {learning.tags.map((tag) => (
             <Badge
               key={tag}
@@ -102,6 +159,26 @@ function LearningCard({ learning }: { learning: Learning }) {
           ))}
         </div>
       )}
+
+      <div className="flex items-center justify-end">
+        <span className="text-xs text-muted-foreground flex items-center gap-1">
+          {expanded ? (
+            <>
+              Show less
+              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+              </svg>
+            </>
+          ) : (
+            <>
+              Show more
+              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </>
+          )}
+        </span>
+      </div>
     </div>
   )
 }
@@ -192,6 +269,8 @@ export function MemoryDetail({ open, onOpenChange }: MemoryDetailProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [searchDebounce, setSearchDebounce] = useState('')
+  const [details, setDetails] = useState<MemoryDetails | null>(null)
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
 
   // Debounce search input
   useEffect(() => {
@@ -201,6 +280,17 @@ export function MemoryDetail({ open, onOpenChange }: MemoryDetailProps) {
     }, 300)
     return () => clearTimeout(timer)
   }, [search])
+
+  // Fetch stats summary when panel opens
+  useEffect(() => {
+    if (open) {
+      fetchMemoryDetails()
+        .then(setDetails)
+        .catch(() => {
+          // Non-critical — don't surface stats errors to users
+        })
+    }
+  }, [open])
 
   const loadLearnings = useCallback(
     async (resetPage = false) => {
@@ -254,6 +344,18 @@ export function MemoryDetail({ open, onOpenChange }: MemoryDetailProps) {
     setPage(1)
   }
 
+  const toggleExpanded = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
+  }
+
   const hasFilters = Boolean(searchDebounce || typeFilter)
   const hasMore = learnings.length < total
 
@@ -268,6 +370,9 @@ export function MemoryDetail({ open, onOpenChange }: MemoryDetailProps) {
         </SheetHeader>
 
         <div className="flex flex-col gap-3 py-4 flex-shrink-0">
+          {/* Stats Summary */}
+          {details && <StatsSummary details={details} />}
+
           {/* Search Input */}
           <div className="relative">
             <svg
@@ -382,7 +487,12 @@ export function MemoryDetail({ open, onOpenChange }: MemoryDetailProps) {
           ) : (
             <div className="space-y-3 pb-4">
               {learnings.map((learning) => (
-                <LearningCard key={learning.id} learning={learning} />
+                <LearningCard
+                  key={learning.id}
+                  learning={learning}
+                  expanded={expandedIds.has(learning.id)}
+                  onToggle={() => toggleExpanded(learning.id)}
+                />
               ))}
 
               {hasMore && (

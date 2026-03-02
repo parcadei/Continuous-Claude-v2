@@ -224,7 +224,7 @@ export function KnowledgeDetail({ open, onOpenChange }: KnowledgeDetailProps) {
             Knowledge Tree
           </SheetTitle>
           <SheetDescription>
-            Project structure and configuration from .knowledge/tree.yml
+            Project structure and configuration from .claude/knowledge-tree.json
           </SheetDescription>
         </SheetHeader>
 
@@ -293,6 +293,43 @@ export function KnowledgeDetail({ open, onOpenChange }: KnowledgeDetailProps) {
 
           {!isLoading && !error && !isEmpty && (
             <>
+              {/* Summary header */}
+              <div className="mb-4 rounded-lg border bg-muted/30 p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Overview</span>
+                  <span className="text-xs text-muted-foreground font-mono">{Object.keys(tree).length} top-level entries</span>
+                </div>
+                {/* Metadata fields */}
+                {(() => {
+                  const META_KEYS = ['project_name', 'version', 'last_updated', 'name', 'updated_at', 'created_at', 'description']
+                  const metaEntries = META_KEYS
+                    .filter((k) => k in tree && typeof (tree as Record<string, unknown>)[k] !== 'object')
+                    .map((k) => [k, String((tree as Record<string, unknown>)[k])] as [string, string])
+
+                  return metaEntries.length > 0 ? (
+                    <div className="flex flex-wrap gap-x-4 gap-y-1">
+                      {metaEntries.map(([k, v]) => (
+                        <div key={k} className="flex items-center gap-1 text-xs">
+                          <span className="text-muted-foreground">{k}:</span>
+                          <span className="font-medium truncate max-w-[120px]">{v}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null
+                })()}
+                {/* Top-level key badges */}
+                <div className="flex flex-wrap gap-1">
+                  {Object.keys(tree).map((k) => (
+                    <span
+                      key={k}
+                      className="inline-flex items-center rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground border border-border/50"
+                    >
+                      {k}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex items-center gap-2 mb-4">
                 <Button
                   variant="outline"

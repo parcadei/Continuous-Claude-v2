@@ -8,7 +8,7 @@ interface PillarGridProps {
   onViewDetails?: (pillar: string) => void
 }
 
-const PILLAR_ORDER = ['memory', 'knowledge', 'pageindex', 'roadmap', 'handoffs']
+const PILLAR_ORDER = ['memory', 'knowledge', 'pageindex', 'roadmap', 'handoffs', 'ralph', 'braintrust']
 
 function PillarSkeleton() {
   return (
@@ -34,8 +34,8 @@ function PillarSkeleton() {
 export function PillarGrid({ health, isLoading, onViewDetails }: PillarGridProps) {
   if (isLoading || !health) {
     return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {Array.from({ length: 5 }).map((_, i) => (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7">
+        {Array.from({ length: 7 }).map((_, i) => (
           <PillarSkeleton key={i} />
         ))}
       </div>
@@ -43,7 +43,7 @@ export function PillarGrid({ health, isLoading, onViewDetails }: PillarGridProps
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7">
       {PILLAR_ORDER.map((pillarName) => {
         const pillar = health.pillars[pillarName]
         if (!pillar) return null

@@ -104,10 +104,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
 
           switch (data.type) {
             case 'health_update':
-              callbacksRef.current.onHealthUpdate?.({
-                pillars: data.pillars,
-                timestamp: data.timestamp,
-              })
+              // Pass raw event through — supports both full-response
+              // ({ pillars: {...} }) and single-pillar ({ pillar, status, count }) shapes
+              callbacksRef.current.onHealthUpdate?.(data)
               break
             case 'activity':
               callbacksRef.current.onActivity?.(data as ActivityEvent)

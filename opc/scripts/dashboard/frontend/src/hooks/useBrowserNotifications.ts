@@ -39,8 +39,6 @@ export function useBrowserNotifications() {
     if (document.hasFocus()) return null // Don't notify if tab is focused
 
     const notification = new Notification(title, {
-      icon: '/vite.svg',
-      badge: '/vite.svg',
       ...options,
     })
 

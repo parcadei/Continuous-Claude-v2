@@ -15,6 +15,8 @@ from dashboard.services.memory import MemoryPillarService
 from dashboard.services.knowledge import KnowledgePillarService
 from dashboard.services.pageindex import PageIndexPillarService
 from dashboard.services.handoffs import HandoffsPillarService
+from dashboard.services.ralph import RalphPillarService
+from dashboard.services.braintrust import BraintrustPillarService
 from dashboard.services.roadmap import RoadmapPillarService
 from dashboard.websocket.events import HealthUpdateEvent
 
@@ -44,6 +46,8 @@ class HealthMonitor:
             "pageindex": PageIndexPillarService(),
             "handoffs": HandoffsPillarService(),
             "roadmap": RoadmapPillarService(),
+            "ralph": RalphPillarService(),
+            "braintrust": BraintrustPillarService(),
         }
 
     async def check_all_pillars(self) -> dict[str, PillarHealth]:
@@ -59,10 +63,12 @@ class HealthMonitor:
             self._services["pageindex"].check_health(),
             self._services["handoffs"].check_health(),
             self._services["roadmap"].check_health(),
+            self._services["ralph"].check_health(),
+            self._services["braintrust"].check_health(),
             return_exceptions=True
         )
 
-        pillar_names = ["memory", "knowledge", "pageindex", "handoffs", "roadmap"]
+        pillar_names = ["memory", "knowledge", "pageindex", "handoffs", "roadmap", "ralph", "braintrust"]
         health_results = {}
 
         for name, result in zip(pillar_names, results):
