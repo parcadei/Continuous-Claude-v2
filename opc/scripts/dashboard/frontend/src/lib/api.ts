@@ -14,6 +14,8 @@ import type {
   BraintrustAgentStat,
   BraintrustSkillStat,
   BraintrustSession,
+  SessionsResponse,
+  SystemHealthReport,
 } from '@/types'
 
 const API_BASE = '/api'
@@ -140,6 +142,16 @@ export async function fetchBraintrustSkills(): Promise<{ skills: BraintrustSkill
 
 export async function fetchBraintrustSessions(limit = 10): Promise<{ sessions: BraintrustSession[] }> {
   return fetchJson(`/pillars/braintrust/sessions?limit=${limit}`)
+}
+
+// Sessions
+export async function fetchSessions(includeStale = true): Promise<SessionsResponse> {
+  return fetchJson<SessionsResponse>(`/sessions?include_stale=${includeStale}`)
+}
+
+// System Health
+export async function fetchSystemHealthReport(): Promise<SystemHealthReport> {
+  return fetchJson<SystemHealthReport>('/system-health/report')
 }
 
 export { ApiError }

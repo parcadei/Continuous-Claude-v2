@@ -20,6 +20,8 @@ import { RoadmapDetail } from '@/components/pillars/RoadmapDetail'
 import { HandoffsDetail } from '@/components/pillars/HandoffsDetail'
 import { RalphDetail } from '@/components/pillars/RalphDetail'
 import { BraintrustDetail } from '@/components/pillars/BraintrustDetail'
+import { SystemHealthDetail } from '@/components/pillars/SystemHealthDetail'
+import { SessionsDetail } from '@/components/pillars/SessionsDetail'
 import './index.css'
 
 function App() {
@@ -179,6 +181,7 @@ function App() {
       const keyMap: Record<string, string> = {
         m: 'memory', k: 'knowledge', p: 'pageindex',
         r: 'roadmap', h: 'handoffs', a: 'ralph', b: 'braintrust',
+        x: 'system-health', s: 'sessions',
       }
 
       if (e.key === 'Escape') setActiveDetail(null)
@@ -237,7 +240,7 @@ function App() {
 
         <div className="mt-8">
           <h3 className="mb-4 text-lg font-semibold">Quick Actions</h3>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
             <button
               onClick={() => window.open('/api/health', '_blank')}
               className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
@@ -375,6 +378,52 @@ function App() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
+
+            <button
+              onClick={() => setActiveDetail('system-health')}
+              className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">System Health</p>
+                <p className="text-xs text-muted-foreground">Full diagnostic</p>
+              </div>
+              <svg className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <button
+              onClick={() => setActiveDetail('sessions')}
+              className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-500">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">Active Sessions</p>
+                <p className="text-xs text-muted-foreground">Terminal sessions</p>
+              </div>
+              <svg className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
       </main>
@@ -420,6 +469,14 @@ function App() {
       />
       <BraintrustDetail
         open={activeDetail === 'braintrust'}
+        onOpenChange={(open) => !open && setActiveDetail(null)}
+      />
+      <SystemHealthDetail
+        open={activeDetail === 'system-health'}
+        onOpenChange={(open) => !open && setActiveDetail(null)}
+      />
+      <SessionsDetail
+        open={activeDetail === 'sessions'}
         onOpenChange={(open) => !open && setActiveDetail(null)}
       />
       <UserGuide open={guideOpen} onOpenChange={setGuideOpen} />

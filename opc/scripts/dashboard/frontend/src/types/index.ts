@@ -193,3 +193,49 @@ export interface BraintrustSession {
   ended: string
   span_count: number
 }
+
+// Sessions types
+export type SessionStatus = 'active' | 'idle' | 'stale'
+
+export interface SessionFileClaim {
+  file_path: string
+  claimed_at: string | null
+}
+
+export interface SessionAgentSummary {
+  total: number
+  failed: number
+}
+
+export interface SessionInfo {
+  id: string
+  project: string | null
+  working_on: string | null
+  status: SessionStatus
+  last_heartbeat: string | null
+  started_at: string | null
+  file_claims: SessionFileClaim[]
+  agent_summary: SessionAgentSummary
+}
+
+export interface SessionsResponse {
+  sessions: SessionInfo[]
+  counts: Record<SessionStatus, number>
+  total: number
+  error?: string
+}
+
+// System Health types
+export type SubsystemStatus = 'HEALTHY' | 'DEGRADED' | 'FAILING'
+
+export interface SubsystemCheck {
+  status: SubsystemStatus
+  evidence: Record<string, unknown>
+  recommendations: string[]
+}
+
+export interface SystemHealthReport {
+  overall: SubsystemStatus
+  checked_at: string
+  subsystems: Record<string, SubsystemCheck>
+}

@@ -28,6 +28,8 @@ from dashboard.routers.pageindex import router as pageindex_router
 from dashboard.routers.ralph import router as ralph_router
 from dashboard.routers.braintrust import router as braintrust_router
 from dashboard.routers.roadmap import router as roadmap_router
+from dashboard.routers.system_health import router as system_health_router
+from dashboard.routers.sessions import router as sessions_router
 from dashboard.tasks.health_monitor import HealthMonitor
 from dashboard.websocket.manager import ConnectionManager
 
@@ -88,6 +90,8 @@ app.include_router(pageindex_router)
 app.include_router(ralph_router)
 app.include_router(braintrust_router)
 app.include_router(roadmap_router)
+app.include_router(system_health_router)
+app.include_router(sessions_router)
 
 # Static files configuration
 STATIC_DIR = Path(__file__).parent / "static"
