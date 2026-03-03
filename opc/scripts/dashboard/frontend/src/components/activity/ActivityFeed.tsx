@@ -172,6 +172,7 @@ export function ActivityFeed({ maxItems = 50, className }: ActivityFeedProps) {
   const [selectedPillar, setSelectedPillar] = useState<string>('')
   const [selectedTimeRange, setSelectedTimeRange] = useState<string>('all')
 
+  const activities = useActivityStore((state) => state.activities)
   const getFilteredActivities = useActivityStore((state) => state.getFilteredActivities)
 
   const filteredActivities = useMemo(() => {
@@ -180,7 +181,7 @@ export function ActivityFeed({ maxItems = 50, className }: ActivityFeedProps) {
       timeRange: selectedTimeRange as 'hour' | '24h' | '7d' | 'all',
       maxItems,
     })
-  }, [getFilteredActivities, selectedPillar, selectedTimeRange, maxItems])
+  }, [getFilteredActivities, activities, selectedPillar, selectedTimeRange, maxItems])
 
   const selectedPillarLabel = PILLARS.find((p) => p.value === selectedPillar)?.label || 'All pillars'
   const selectedTimeLabel =

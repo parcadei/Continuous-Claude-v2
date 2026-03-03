@@ -140,8 +140,22 @@ function App() {
     setIsRefreshing(true)
     try {
       const data = await fetchHealth()
+      const isFirstLoad = Object.keys(previousPillarsRef.current).length === 0
       setHealth(data)
       previousPillarsRef.current = data.pillars
+
+      // Seed activity feed on first load so it's never empty
+      if (isFirstLoad) {
+        const { addActivity } = useActivityStore.getState()
+        Object.entries(data.pillars).forEach(([name, health]) => {
+          addActivity({
+            pillar: name,
+            type: 'status_change',
+            description: `${name} is ${health.status} (${health.count} items)`,
+            timestamp: new Date(),
+          })
+        })
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch health data')
     } finally {

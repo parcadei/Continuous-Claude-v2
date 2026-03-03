@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-03-02T23:24:52.520194+00:00",
+  "updated_at": "2026-03-03T01:56:50.415105+00:00",
   "project": {
     "name": "continuous-claude",
     "description": "> Give Claude a notebook, memory, specialized assistants, and autonomous development capability — so every conversation builds on the last [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://claude.ai/code)",
@@ -579,6 +579,10 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\find-skills/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\firecrawl-scrape/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -972,6 +976,18 @@
         "key_files": null
       },
       ".claude\\skills\\validate-agent/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\vercel-cli/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\vercel-cli\\command/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\vercel-cli\\references/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -1725,13 +1741,21 @@
       ]
     },
     "entry_points": {
-      "cli": "opc\\scripts\\pageindex\\cli/"
+      "cli": ".claude\\skills\\vercel-cli/"
     }
   },
   "goals": {
     "source": "ROADMAP.md",
     "current": null,
     "completed": [
+      {
+        "title": "[fix](dashboard) handoffs scan both directories, Ralph status online when idle (2026-03-03) `bcd323e`",
+        "completed": null
+      },
+      {
+        "title": "[fix](dashboard) HandoffsDetail crash on uppercase status values from API (2026-03-02) `35fd59c`",
+        "completed": null
+      },
       {
         "title": "[feat](dashboard) session dashboard UX overhaul — WebSocket, panels, DRY cleanup (2026-03-02) `97d7950`",
         "completed": null
@@ -2045,7 +2069,5 @@
   },
   "critical_info": {
     "env_vars": ".env.example"
-  },
-  "_stale": true,
-  "_invalidated_at": "2026-03-03T00:12:21.028Z"
+  }
 }

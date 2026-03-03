@@ -18,7 +18,7 @@ from dashboard.services.handoffs import HandoffsPillarService
 from dashboard.services.ralph import RalphPillarService
 from dashboard.services.braintrust import BraintrustPillarService
 from dashboard.services.roadmap import RoadmapPillarService
-from dashboard.websocket.events import HealthUpdateEvent
+from dashboard.websocket.events import ActivityEvent, HealthUpdateEvent
 
 if TYPE_CHECKING:
     from dashboard.websocket.manager import ConnectionManager
@@ -113,12 +113,21 @@ class HealthMonitor:
                 changed = await self.detect_changes(current_states)
 
                 for name, health in changed.items():
+                    prev = self._previous_states.get(name)
                     event = HealthUpdateEvent(
                         pillar=name,
                         status=health.status.value,
                         count=health.count,
                     )
                     await self._connection_manager.broadcast(event.model_dump())
+
+                    action = "status_changed" if prev and prev.status != health.status else "count_changed"
+                    activity = ActivityEvent(
+                        pillar=name,
+                        action=action,
+                        details={"status": health.status.value, "count": health.count},
+                    )
+                    await self._connection_manager.broadcast(activity.model_dump())
 
                 self._previous_states = current_states
                 await asyncio.sleep(self._interval)
