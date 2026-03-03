@@ -22,36 +22,73 @@ router = APIRouter(prefix="/api/pillars/handoffs", tags=["handoffs"])
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 HANDOFF_PATTERN = "HANDOFF-*.md"
 VALID_OUTCOMES = ("SUCCEEDED", "PARTIAL_PLUS", "PARTIAL_MINUS", "FAILED", "UNKNOWN")
+THOUGHTS_HANDOFFS_DIR = Path(os.environ.get(
+    "THOUGHTS_HANDOFFS_DIR",
+    str(Path.home() / "thoughts" / "shared" / "handoffs")
+))
 
 
 def _scan_handoff_files() -> list[dict[str, Any]]:
-    """Scan for HANDOFF-*.md files in .claude directory.
+    """Scan for handoff files in .claude/ and thoughts/shared/handoffs/.
 
     Returns:
-        List of handoff dicts with file metadata.
+        List of handoff dicts with file metadata, deduplicated by stem.
     """
-    claude_dir = PROJECT_ROOT / ".claude"
-    handoffs = []
+    seen_stems: set[str] = set()
+    handoffs: list[dict[str, Any]] = []
 
-    if not claude_dir.exists():
-        return handoffs
-
-    for file_path in claude_dir.glob(HANDOFF_PATTERN):
+    def _add_file(file_path: Path, source_label: str) -> None:
+        if file_path.stem in seen_stems:
+            return
+        seen_stems.add(file_path.stem)
         try:
             stat = file_path.stat()
-            name = file_path.stem.replace("HANDOFF-", "")
+            name = file_path.stem.replace("HANDOFF-", "").replace("auto-handoff-", "")
+            # Extract status from YAML frontmatter if available
+            status = _extract_status(file_path)
             handoffs.append({
                 "id": f"file:{file_path.name}",
                 "title": name,
-                "status": "UNKNOWN",
+                "status": status,
                 "created_at": datetime.fromtimestamp(stat.st_mtime).isoformat(),
-                "source": "file",
+                "source": source_label,
                 "file_path": str(file_path),
             })
         except Exception as e:
             logger.debug(f"Error reading handoff file {file_path}: {e}")
 
+    # Legacy: .claude/HANDOFF-*.md
+    claude_dir = PROJECT_ROOT / ".claude"
+    if claude_dir.exists():
+        for f in claude_dir.glob(HANDOFF_PATTERN):
+            _add_file(f, "claude")
+
+    # Primary: thoughts/shared/handoffs/ (recursive)
+    if THOUGHTS_HANDOFFS_DIR.exists():
+        for ext in ("*.md", "*.yaml", "*.yml"):
+            for f in THOUGHTS_HANDOFFS_DIR.rglob(ext):
+                _add_file(f, "thoughts")
+
     return handoffs
+
+
+def _extract_status(file_path: Path) -> str:
+    """Try to extract outcome/status from handoff file frontmatter.
+
+    Looks for 'outcome:' or 'status:' lines in YAML files or MD frontmatter.
+    """
+    try:
+        text = file_path.read_text(encoding="utf-8", errors="replace")[:2000]
+        for line in text.splitlines():
+            stripped = line.strip()
+            for prefix in ("outcome:", "status:"):
+                if stripped.lower().startswith(prefix):
+                    value = stripped[len(prefix):].strip().strip("'\"").upper()
+                    if value in VALID_OUTCOMES:
+                        return value
+    except Exception:
+        pass
+    return "UNKNOWN"
 
 
 async def _get_db_handoffs(
@@ -149,29 +186,42 @@ async def get_handoff(handoff_id: str) -> dict[str, Any]:
     if handoff_id.startswith("file:"):
         filename = handoff_id[5:]
 
-        # Validate filename pattern (HANDOFF-*.md only)
-        if not re.match(r'^HANDOFF-[A-Za-z0-9_-]+\.md$', filename):
+        # Validate filename: handoff files (*.md, *.yaml, *.yml)
+        if not re.match(r'^[\w.@\-]+\.(md|yaml|yml)$', filename):
             raise HTTPException(status_code=400, detail="Invalid filename format")
 
-        claude_dir = PROJECT_ROOT / ".claude"
-        file_path = (claude_dir / filename).resolve()
+        # Search both directories for the file
+        allowed_dirs = [PROJECT_ROOT / ".claude"]
+        if THOUGHTS_HANDOFFS_DIR.exists():
+            allowed_dirs.append(THOUGHTS_HANDOFFS_DIR)
 
-        # Verify path is within allowed directory
-        if not str(file_path).startswith(str(claude_dir.resolve())):
-            raise HTTPException(status_code=403, detail="Access denied")
+        file_path = None
+        for search_dir in allowed_dirs:
+            # Search recursively in thoughts dir, flat in .claude
+            candidates = list(search_dir.rglob(filename)) if search_dir == THOUGHTS_HANDOFFS_DIR else [search_dir / filename]
+            for candidate in candidates:
+                if candidate.exists():
+                    # Verify path is within allowed directory
+                    resolved = candidate.resolve()
+                    if str(resolved).startswith(str(search_dir.resolve())):
+                        file_path = resolved
+                        break
+            if file_path:
+                break
 
-        if not file_path.exists():
+        if not file_path:
             raise HTTPException(status_code=404, detail="Handoff file not found")
 
         try:
             stat = file_path.stat()
-            content = file_path.read_text(encoding="utf-8")
-            name = file_path.stem.replace("HANDOFF-", "")
+            content = file_path.read_text(encoding="utf-8", errors="replace")
+            name = file_path.stem.replace("HANDOFF-", "").replace("auto-handoff-", "")
+            status = _extract_status(file_path)
 
             return {
                 "id": handoff_id,
                 "title": name,
-                "status": "UNKNOWN",
+                "status": status,
                 "created_at": datetime.fromtimestamp(stat.st_mtime).isoformat(),
                 "source": "file",
                 "file_path": str(file_path),

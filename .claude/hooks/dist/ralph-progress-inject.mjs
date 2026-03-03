@@ -140,6 +140,7 @@ async function main() {
   const total = tasks.length;
   const completed = tasks.filter((t) => t.status === "complete" || t.status === "completed").length;
   const inProgress = tasks.filter((t) => t.status === "in_progress").length;
+  const reviewing = tasks.filter((t) => t.status === "reviewing").length;
   const failed = tasks.filter((t) => t.status === "failed").length;
   const pct = total > 0 ? Math.round(completed / total * 100) : 0;
   const retryCount = (unified.retry_queue || []).length;
@@ -151,6 +152,7 @@ async function main() {
     `RALPH: ${unified.story_id} ${bar} ${completed}/${total} (${pct}%)`
   ];
   if (inProgress > 0) parts.push(`active: ${inProgress}`);
+  if (reviewing > 0) parts.push(`reviewing: ${reviewing}`);
   if (failed > 0) parts.push(`failed: ${failed}`);
   if (retryCount > 0) parts.push(`retry: ${retryCount}`);
   parts.push(`commit: ${lastCommitTime}`);

@@ -71,8 +71,9 @@ class RalphPillarService(BasePillarService):
                     except ValueError:
                         pass
 
-        active = state.get("session", {}).get("active", False)
-        status = PillarStatus.ONLINE if active else PillarStatus.DEGRADED
+        # State file exists and parsed OK = ONLINE (idle or active)
+        # No state file or parse error = OFFLINE (handled above)
+        status = PillarStatus.ONLINE
 
         return PillarHealth(
             name=self.name,

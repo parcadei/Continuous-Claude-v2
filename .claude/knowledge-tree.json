@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-03-01T00:56:57.973099+00:00",
+  "updated_at": "2026-03-02T23:24:52.520194+00:00",
   "project": {
     "name": "continuous-claude",
     "description": "> Give Claude a notebook, memory, specialized assistants, and autonomous development capability — so every conversation builds on the last [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://claude.ai/code)",
@@ -748,6 +748,10 @@
         "key_files": null
       },
       ".claude\\skills\\pageindex-search/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\paper-design/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -1729,6 +1733,18 @@
     "current": null,
     "completed": [
       {
+        "title": "[feat](dashboard) session dashboard UX overhaul — WebSocket, panels, DRY cleanup (2026-03-02) `97d7950`",
+        "completed": null
+      },
+      {
+        "title": "PPTX Design Revolution — From Corporate Template to Agency-Quality",
+        "completed": "2026-03-01"
+      },
+      {
+        "title": "[feat] add paper-design skill v1.1.0 for visual UI design via MCP (2026-03-01) `241f8ff`",
+        "completed": null
+      },
+      {
         "title": "Fourth Presentation Suite — Premium Visual Upgrade (v4)",
         "completed": "2026-02-28"
       },
@@ -2029,5 +2045,7 @@
   },
   "critical_info": {
     "env_vars": ".env.example"
-  }
+  },
+  "_stale": true,
+  "_invalidated_at": "2026-03-03T00:12:21.028Z"
 }

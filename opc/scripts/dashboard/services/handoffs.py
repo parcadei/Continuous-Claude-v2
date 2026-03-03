@@ -23,6 +23,42 @@ logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent.parent
 HANDOFF_PATTERN = "HANDOFF-*.md"
+THOUGHTS_HANDOFFS_DIR = Path(os.environ.get(
+    "THOUGHTS_HANDOFFS_DIR",
+    str(Path.home() / "thoughts" / "shared" / "handoffs")
+))
+
+
+def _collect_all_handoff_files() -> list[tuple[Path, str]]:
+    """Collect handoff files from all known directories.
+
+    Scans:
+    1. PROJECT_ROOT/.claude/ for HANDOFF-*.md (legacy pattern)
+    2. ~/thoughts/shared/handoffs/ recursively for *.md, *.yaml, *.yml
+
+    Returns:
+        List of (path, source_label) tuples, deduplicated by filename stem.
+    """
+    seen_stems: set[str] = set()
+    results: list[tuple[Path, str]] = []
+
+    # Legacy: .claude/HANDOFF-*.md
+    claude_dir = PROJECT_ROOT / ".claude"
+    if claude_dir.exists():
+        for f in claude_dir.glob(HANDOFF_PATTERN):
+            if f.stem not in seen_stems:
+                seen_stems.add(f.stem)
+                results.append((f, "claude"))
+
+    # Primary: thoughts/shared/handoffs/ (recursive)
+    if THOUGHTS_HANDOFFS_DIR.exists():
+        for ext in ("*.md", "*.yaml", "*.yml"):
+            for f in THOUGHTS_HANDOFFS_DIR.rglob(ext):
+                if f.stem not in seen_stems:
+                    seen_stems.add(f.stem)
+                    results.append((f, "thoughts"))
+
+    return results
 
 
 class HandoffsPillarService(BasePillarService):
@@ -65,13 +101,13 @@ class HandoffsPillarService(BasePillarService):
             logger.debug(f"Handoffs DB check: {e}")
 
         try:
-            handoff_files = list(self._claude_dir.glob(HANDOFF_PATTERN))
-            file_count = len(handoff_files)
+            all_files = _collect_all_handoff_files()
+            file_count = len(all_files)
             files_available = True
 
-            if handoff_files and not last_activity:
-                newest = max(handoff_files, key=lambda f: f.stat().st_mtime)
-                last_activity = datetime.fromtimestamp(newest.stat().st_mtime)
+            if all_files and not last_activity:
+                newest = max(all_files, key=lambda t: t[0].stat().st_mtime)
+                last_activity = datetime.fromtimestamp(newest[0].stat().st_mtime)
         except Exception as e:
             errors.append(f"Files: {str(e)}")
             logger.debug(f"Handoffs file check: {e}")
@@ -122,15 +158,16 @@ class HandoffsPillarService(BasePillarService):
             logger.debug(f"Handoffs details DB fetch failed: {e}")
 
         try:
-            handoff_files = list(self._claude_dir.glob(HANDOFF_PATTERN))
+            all_files = _collect_all_handoff_files()
             details["file_handoffs"] = [
                 {
                     "name": f.name,
                     "path": str(f),
+                    "source": source,
                     "modified": datetime.fromtimestamp(f.stat().st_mtime).isoformat(),
                 }
-                for f in sorted(
-                    handoff_files, key=lambda x: x.stat().st_mtime, reverse=True
+                for f, source in sorted(
+                    all_files, key=lambda t: t[0].stat().st_mtime, reverse=True
                 )
             ]
         except Exception as e:
