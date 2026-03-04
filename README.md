@@ -13,7 +13,7 @@
 
 - [**What Is This?**](#what-is-this) — The 30-second explanation
 - [**Can I Build Software Without Coding?**](#-can-i-build-software-without-knowing-how-to-code) — Yes, and here's how
-- [**What Makes This Fork Special?**](#-what-makes-this-fork-special) — Maestro, Ralph, 119+ skills, persistent memory, and more
+- [**What Makes This Fork Special?**](#-what-makes-this-fork-special) — Maestro, Ralph, 120+ skills, persistent memory, and more
 - [**Who Is This For?**](#who-is-this-for) — Marketing, sales, ops, product, engineering
 - [**Quick Start**](#quick-start) — Install in 5 minutes
 - [**What You Get**](#what-you-get) — Skills, agents, hooks, rules, browser automation
@@ -149,7 +149,7 @@ You: "Go ahead"
 </details>
 
 <details>
-<summary><strong>119+ Skills</strong> — Pre-built workflows triggered by describing what you want</summary>
+<summary><strong>120+ Skills</strong> — Pre-built workflows triggered by describing what you want</summary>
 
 Skills are pre-built workflows you trigger by describing what you want:
 
@@ -256,6 +256,24 @@ See the [Dashboard README](opc/scripts/dashboard/README.md) for full API referen
 
 </details>
 
+<details>
+<summary><strong>Frontend Design Pipeline</strong> — Visual design, component libraries, and production-grade UI</summary>
+
+Build production-quality interfaces from concept to code:
+
+- **Paper.design MCP** — 24 tools for visual UI design directly on canvas (create artboards, write HTML, screenshot, iterate)
+- **ui-ux-pro-max skill** — 50 design styles, 200+ patterns for layout, typography, color, and interaction
+- **frontend-design skill** — Production-grade frontend code generation with anti-AI-slop guardrails
+- **3-tier component search** — shadcn/ui (primitives) → shadcnspace (premium blocks) → Kibo UI (composites like kanban, gantt, editor)
+- **95 auto-routed skills** — `skill-activation-prompt` hook matches your intent to the right skill automatically
+
+```
+"Design a dashboard for tracking sales metrics"
+→ Paper canvas mockup → component selection → production React/Next.js code
+```
+
+</details>
+
 ---
 
 ## Who Is This For?
@@ -301,8 +319,8 @@ The wizard walks you through 12 steps:
 3. ✅ Sets up the database and API keys (optional)
 4. ✅ Starts Docker containers for PostgreSQL
 5. ✅ Installs 31 specialized agents
-6. ✅ Installs 119+ skill workflows
-7. ✅ Installs 90+ lifecycle hooks
+6. ✅ Installs 120+ skill workflows
+7. ✅ Installs 120 lifecycle hooks
 8. ✅ Installs code analysis tools (95% efficiency boost)
 9. ✅ Installs math capabilities (optional)
 10. ✅ Configures diagnostics and linting
@@ -331,7 +349,7 @@ That's it. You're now using Continuous Claude.
 
 ## What You Get
 
-### Skills (119+)
+### Skills (120+)
 
 **What they are:** Pre-built workflows you trigger by describing what you want
 
@@ -430,7 +448,7 @@ That's it. You're now using Continuous Claude.
 
 </details>
 
-### Hooks (90+)
+### Hooks (120)
 
 **What they are:** Background helpers that run automatically at specific moments
 
@@ -479,7 +497,7 @@ That's it. You're now using Continuous Claude.
 
 </details>
 
-### Rules (23)
+### Rules (24)
 
 **What they are:** Guidelines that keep Claude consistent and safe
 
@@ -911,10 +929,10 @@ Then you can use all features (`/build`, `/fix`, etc.) with full context about y
 
 ```mermaid
 graph TB
-    UP[User Prompt] --> HL[Hook Layer<br/>90+ hooks]
+    UP[User Prompt] --> HL[Hook Layer<br/>120 hooks]
     HL --> CC[Claude Core]
     CC --> TE[Tool Execution]
-    CC --> SK[Skills - 119+]
+    CC --> SK[Skills - 120+]
     CC --> AG[Agents - 31]
     CC --> MS[Memory System]
     SK --> AG
@@ -1140,7 +1158,7 @@ Chain:
 | **PreToolUse** | tldr-read-enforcer, smart-search-router | Token savings, route searches |
 | **PostToolUse** | post-edit-diagnostics, handoff-index | Type check, update indexes |
 | **PreCompact** | pre-compact-continuity | Auto-save before context clears |
-| **UserPromptSubmit** | skill-activation-prompt, memory-awareness | Suggest skills, recall learnings |
+| **UserPromptSubmit** | skill-activation-prompt, memory-awareness | Route to skills (95 auto-matched), recall learnings |
 | **SubagentStop** | subagent-stop-continuity | Save agent state |
 | **SessionEnd** | session-end-cleanup, session-outcome | Extract learnings, cleanup |
 | **Ralph hooks** | ralph-delegation-enforcer, ralph-task-monitor, ralph-retry-reminder, ralph-progress-inject | Enforce delegation, track progress, bounded iterations |
@@ -1243,11 +1261,11 @@ Two complementary browser automation systems:
 continuous-claude/
 ├── .claude/
 │   ├── agents/           # 31 specialized AI agents
-│   ├── hooks/            # 90+ lifecycle hooks
+│   ├── hooks/            # 120 lifecycle hooks
 │   │   ├── src/          # TypeScript source
 │   │   └── dist/         # Compiled JavaScript
-│   ├── skills/           # 119+ modular capabilities
-│   ├── rules/            # 23 system policies
+│   ├── skills/           # 120+ modular capabilities
+│   ├── rules/            # 24 system policies
 │   ├── docs/architecture/ # Navigable architecture docs
 │   ├── scripts/          # Python utilities
 │   └── settings.json     # Hook configuration
