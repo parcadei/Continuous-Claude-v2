@@ -5,11 +5,21 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://claude.ai/code)
 
-**Continuous Claude transforms how you work with Claude Code** — whether you're writing code, analyzing data, creating content, or researching topics. Instead of starting fresh every time, Claude remembers what you've worked on and gets smarter with each session.
+**Continuous Claude transforms Claude Code into a persistent, learning development environment.** Build features, fix bugs, analyze data, research topics, or create content — with an AI that remembers your project, delegates to specialist agents, and gets smarter every session. Stop re-explaining context. Stop managing prompts. Describe what you want and let the system orchestrate the work.
 
 ---
 
-**Navigate:** [What Is This?](#what-is-this) | [No-Code?](#-can-i-build-software-without-knowing-how-to-code) | [Fork Features](#-what-makes-this-fork-special) | [Who Is This For?](#who-is-this-for) | [Quick Start](#quick-start) | [What You Get](#what-you-get) | [Use Cases](#common-use-cases) | [FAQ](#common-questions) | [Developers](#for-developers)
+### Contents
+
+- [**What Is This?**](#what-is-this) — The 30-second explanation
+- [**Can I Build Software Without Coding?**](#-can-i-build-software-without-knowing-how-to-code) — Yes, and here's how
+- [**What Makes This Fork Special?**](#-what-makes-this-fork-special) — Maestro, Ralph, 119+ skills, persistent memory, and more
+- [**Who Is This For?**](#who-is-this-for) — Marketing, sales, ops, product, engineering
+- [**Quick Start**](#quick-start) — Install in 5 minutes
+- [**What You Get**](#what-you-get) — Skills, agents, hooks, rules, browser automation
+- [**Common Use Cases**](#common-use-cases) — 8 real workflows from exploration to autonomous builds
+- [**Common Questions**](#common-questions) — API keys, privacy, uninstall, comparisons
+- [**For Developers**](#for-developers) — Architecture, memory system, hooks, Ralph internals
 
 ---
 
