@@ -191,6 +191,30 @@ Claude: Opens browser → takes snapshot → fills email and password →
 No Selenium scripts. No Playwright config. Just describe what to test.
 ```
 
+### Session Dashboard: Live Observability
+
+**The Problem:** With 7 subsystems running (memory, knowledge tree, PageIndex, roadmap, handoffs, Ralph, Braintrust), you have no visibility into what's healthy, degraded, or offline without manually querying each one.
+
+**Our Solution:** A real-time dashboard that monitors all 7 pillars from a single browser tab.
+
+| What You See | Details |
+|--------------|---------|
+| **Pillar cards** | Status (healthy/degraded/offline), item counts, last activity for each pillar |
+| **Detail panels** | Deep-dive into any pillar: browse learnings, view roadmap goals, inspect Ralph tasks |
+| **Activity feed** | Real-time timeline of status changes and events across all pillars |
+| **Active sessions** | See all running Claude Code terminals with file claims and agent summaries |
+| **System health** | Full diagnostic report across all subsystems in one click |
+
+```bash
+# Quick start (development)
+cd opc/scripts && uv run python -m dashboard.main       # Backend on :3434
+cd opc/scripts/dashboard/frontend && npm run dev          # Frontend with hot reload
+```
+
+Keyboard shortcuts (`m`emory, `k`nowledge, `r`oadmap, etc.) let you jump to any pillar instantly. WebSocket delivers updates in real time without polling.
+
+See the [Dashboard README](opc/scripts/dashboard/README.md) for full API reference, architecture, and development guide.
+
 ---
 
 ## Why Use It?
@@ -867,6 +891,9 @@ graph TB
     MS --> CL[Continuity<br/>Ledgers + Handoffs]
     MS --> CO[Coordination<br/>Cross-terminal]
     CL --> RM[ROADMAP<br/>Auto-sync]
+    SD[Session Dashboard<br/>7-pillar monitoring] --> MS
+    SD --> AG
+    SD --> CL
 ```
 
 > **Detailed architecture diagrams:** [System Overview](docs/architecture/diagrams/01-system-overview.md) | [Hook Lifecycle](docs/architecture/diagrams/02-hook-lifecycle.md) | [Memory System](docs/architecture/diagrams/03-memory-system.md) | [Agent Orchestration](docs/architecture/diagrams/04-agent-orchestration.md) | [Continuity Flow](docs/architecture/diagrams/05-continuity-flow.md) | [TLDR Stack](docs/architecture/diagrams/06-tldr-analysis-stack.md)
@@ -1173,7 +1200,13 @@ continuous-claude/
 │   │   └── tldr-code/    # 5-layer code analysis
 │   ├── scripts/
 │   │   ├── setup/        # Wizard, Docker, integration
-│   │   └── core/         # recall_learnings, store_learning
+│   │   ├── core/         # recall_learnings, store_learning
+│   │   └── dashboard/    # Session Dashboard (FastAPI + React)
+│   │       ├── routers/  # 10 API route modules
+│   │       ├── services/ # 9 pillar health services
+│   │       ├── websocket/# Real-time WebSocket manager
+│   │       ├── frontend/ # React + shadcn/ui + Vite
+│   │       └── static/   # Production build output
 │   └── docker/
 │       └── init-schema.sql  # 4-table PostgreSQL schema
 ├── thoughts/

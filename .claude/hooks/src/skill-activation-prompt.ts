@@ -16,6 +16,10 @@ import {
     SkillMatch,
 } from './skill-validation-prompt.js';
 
+// Import graph resolution from skill-router
+import { buildEnhancedLookupResult } from './skill-router.js';
+import type { SkillRulesConfig } from './shared/skill-router-types.js';
+
 interface HookInput {
     session_id: string;
     transcript_path: string;
@@ -559,6 +563,44 @@ Do NOT skip this step. The skill provides:
                     output += '    using the word in everyday language?"\n\n';
                 }
 
+                // Resolve graph fields for matched skills
+                const graphRules = rules as unknown as SkillRulesConfig;
+                const graphInfoMap = new Map<string, { prereqs: string[]; peers: string[] }>();
+                for (const skill of confirmedSkills) {
+                    try {
+                        const priorityValue = skill.config.priority === 'critical' ? 3 : skill.config.priority === 'high' ? 2 : 1;
+                        const enhanced = buildEnhancedLookupResult(
+                            { skillName: skill.name, source: skill.matchType, priorityValue },
+                            graphRules
+                        );
+                        const prereqs = [
+                            ...(enhanced.prerequisites?.require || []),
+                            ...(enhanced.prerequisites?.suggest || []),
+                        ];
+                        const peers = enhanced.coActivation?.peers || [];
+                        if (prereqs.length > 0 || peers.length > 0) {
+                            graphInfoMap.set(skill.name, { prereqs, peers });
+                        }
+                    } catch {
+                        // Graph resolution is non-critical — skip on error
+                    }
+                }
+
+                // Helper to format skill line with graph info
+                const formatSkill = (s: MatchedSkill): string => {
+                    let line = `  → ${s.name}\n`;
+                    const info = graphInfoMap.get(s.name);
+                    if (info) {
+                        if (info.prereqs.length > 0) {
+                            line += `     Prerequisites: ${info.prereqs.join(', ')}\n`;
+                        }
+                        if (info.peers.length > 0) {
+                            line += `     Also consider: ${info.peers.join(', ')}\n`;
+                        }
+                    }
+                    return line;
+                };
+
                 // Group confirmed skills by priority
                 const critical = confirmedSkills.filter(s => s.config.priority === 'critical');
                 const high = confirmedSkills.filter(s => s.config.priority === 'high');
@@ -567,25 +609,25 @@ Do NOT skip this step. The skill provides:
 
                 if (critical.length > 0) {
                     output += '⚠️ CRITICAL SKILLS (REQUIRED):\n';
-                    critical.forEach(s => output += `  → ${s.name}\n`);
+                    critical.forEach(s => output += formatSkill(s));
                     output += '\n';
                 }
 
                 if (high.length > 0) {
                     output += '📚 RECOMMENDED SKILLS:\n';
-                    high.forEach(s => output += `  → ${s.name}\n`);
+                    high.forEach(s => output += formatSkill(s));
                     output += '\n';
                 }
 
                 if (medium.length > 0) {
                     output += '💡 SUGGESTED SKILLS:\n';
-                    medium.forEach(s => output += `  → ${s.name}\n`);
+                    medium.forEach(s => output += formatSkill(s));
                     output += '\n';
                 }
 
                 if (low.length > 0) {
                     output += '📌 OPTIONAL SKILLS:\n';
-                    low.forEach(s => output += `  → ${s.name}\n`);
+                    low.forEach(s => output += formatSkill(s));
                     output += '\n';
                 }
 

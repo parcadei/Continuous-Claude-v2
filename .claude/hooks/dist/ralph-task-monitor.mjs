@@ -210,14 +210,12 @@ async function main() {
   for (const task of tasksToUpdate) {
     const taskId = String(task.id);
     if (outcome.success) {
-      const reviewGate = unified.review_gate !== false;
-      const command = reviewGate ? "task-review-start" : "task-complete";
-      log2.info(`Agent completed task ${taskId} -> ${command}`, { agentType, taskName: task.name, reviewGate });
+      log2.info(`Agent completed task ${taskId}`, { agentType, taskName: task.name });
       spawnSync("python", [
         v2Script,
         "-p",
         projectDir,
-        command,
+        "task-complete",
         "--id",
         taskId
       ], { encoding: "utf-8", timeout: 5e3 });

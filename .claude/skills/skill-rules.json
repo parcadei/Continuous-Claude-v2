@@ -1755,6 +1755,467 @@
                     "(which|what).*?mcp.*?(tool|use)"
                 ]
             }
+        },
+        "arscontexta-health": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Run vault health diagnostics - schema compliance, orphan detection, link health, staleness",
+            "promptTriggers": {
+                "keywords": [
+                    "/arscontexta:health",
+                    "vault health",
+                    "check vault",
+                    "knowledge system health",
+                    "vault diagnostics"
+                ],
+                "intentPatterns": [
+                    "(check|run|show).*?(vault|knowledge).*?(health|status|diagnostics)",
+                    "what.*?needs.*?fixing.*?(vault|knowledge)",
+                    "maintenance.*?report"
+                ]
+            },
+            "coActivate": ["arscontexta-verify"],
+            "coActivateMode": "any"
+        },
+        "arscontexta-setup": {
+            "type": "workflow",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Scaffold a new knowledge system from first principles via discovery interview",
+            "promptTriggers": {
+                "keywords": [
+                    "/arscontexta:setup",
+                    "setup knowledge system",
+                    "create vault",
+                    "scaffold knowledge"
+                ],
+                "intentPatterns": [
+                    "(setup|create|scaffold|initialize).*?(knowledge|vault|skill.*?graph)"
+                ]
+            }
+        },
+        "arscontexta-architect": {
+            "type": "planning",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Research-backed evolution advice for your knowledge system architecture",
+            "promptTriggers": {
+                "keywords": [
+                    "/arscontexta:architect",
+                    "evolve knowledge system",
+                    "vault architecture"
+                ],
+                "intentPatterns": [
+                    "(evolve|improve|restructure).*?(knowledge|vault).*?(system|architecture)"
+                ]
+            },
+            "prerequisites": {
+                "suggest": ["arscontexta-health", "arscontexta-stats"]
+            }
+        },
+        "arscontexta-ask": {
+            "type": "research",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Query the bundled research knowledge graph (cognitive science, Zettelkasten, agent architecture)",
+            "promptTriggers": {
+                "keywords": [
+                    "/arscontexta:ask",
+                    "research knowledge methodology",
+                    "zettelkasten research"
+                ],
+                "intentPatterns": [
+                    "(research|ask|query).*?(knowledge.*?methodology|zettelkasten|note.*?taking)"
+                ]
+            }
+        },
+        "arscontexta-help": {
+            "type": "meta",
+            "enforcement": "suggest",
+            "priority": "low",
+            "description": "Contextual guidance and command discovery for arscontexta",
+            "promptTriggers": {
+                "keywords": [
+                    "/arscontexta:help",
+                    "arscontexta help",
+                    "vault commands"
+                ],
+                "intentPatterns": [
+                    "(what|how).*?arscontexta.*?(do|commands|help)"
+                ]
+            }
+        },
+        "arscontexta-reseed": {
+            "type": "workflow",
+            "enforcement": "suggest",
+            "priority": "low",
+            "description": "Re-derive knowledge system from first principles when accumulated drift exceeds adjustment",
+            "promptTriggers": {
+                "keywords": [
+                    "/arscontexta:reseed",
+                    "reseed vault",
+                    "re-derive knowledge"
+                ],
+                "intentPatterns": [
+                    "(reseed|re-derive|regenerate).*?(vault|knowledge)"
+                ]
+            },
+            "prerequisites": {
+                "require": ["arscontexta-health"]
+            }
+        },
+        "arscontexta-tutorial": {
+            "type": "meta",
+            "enforcement": "suggest",
+            "priority": "low",
+            "description": "Interactive walkthrough for new arscontexta users",
+            "promptTriggers": {
+                "keywords": [
+                    "/arscontexta:tutorial",
+                    "arscontexta tutorial",
+                    "learn arscontexta"
+                ],
+                "intentPatterns": [
+                    "(learn|tutorial|walkthrough).*?arscontexta"
+                ]
+            }
+        },
+        "arscontexta-recommend": {
+            "type": "research",
+            "enforcement": "suggest",
+            "priority": "low",
+            "description": "Get research-backed architecture advice for knowledge system design",
+            "promptTriggers": {
+                "keywords": [
+                    "/arscontexta:recommend"
+                ],
+                "intentPatterns": [
+                    "(recommend|advise).*?(knowledge|vault).*?(architecture|structure)"
+                ]
+            }
+        },
+        "arscontexta-upgrade": {
+            "type": "workflow",
+            "enforcement": "suggest",
+            "priority": "low",
+            "description": "Apply plugin knowledge base updates to an existing vault",
+            "promptTriggers": {
+                "keywords": [
+                    "/arscontexta:upgrade",
+                    "upgrade arscontexta",
+                    "update vault plugin"
+                ],
+                "intentPatterns": [
+                    "(upgrade|update).*?arscontexta"
+                ]
+            }
+        },
+        "arscontexta-add-domain": {
+            "type": "workflow",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Add a new knowledge domain to an existing vault",
+            "promptTriggers": {
+                "keywords": [
+                    "/arscontexta:add-domain",
+                    "add domain",
+                    "new knowledge area"
+                ],
+                "intentPatterns": [
+                    "(add|create).*?(new)?.*?(domain|area|topic).*?(vault|knowledge)"
+                ]
+            }
+        },
+        "arscontexta-document": {
+            "type": "process",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Extract structured records from source material into the knowledge vault (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/document",
+                    "extract records",
+                    "mine this",
+                    "process this source",
+                    "document this deployment",
+                    "capture this config"
+                ],
+                "intentPatterns": [
+                    "(extract|mine|document|capture|process).*?(records?|knowledge|config|deployment|infrastructure)",
+                    "(add|create).*?(infrastructure|deployment).*?record"
+                ]
+            },
+            "prerequisites": {
+                "suggest": ["arscontexta-seed"]
+            },
+            "coActivate": ["arscontexta-connect"],
+            "coActivateMode": "any"
+        },
+        "arscontexta-connect": {
+            "type": "process",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Find cross-platform connections between infrastructure records and update indices (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/connect",
+                    "find connections",
+                    "update indices",
+                    "connect records",
+                    "link records"
+                ],
+                "intentPatterns": [
+                    "(find|discover|update).*?(connections?|links?|indices)",
+                    "connect.*?(these)?.*?records?"
+                ]
+            },
+            "prerequisites": {
+                "suggest": ["arscontexta-document"]
+            },
+            "coActivate": ["arscontexta-verify"],
+            "coActivateMode": "any"
+        },
+        "arscontexta-verify": {
+            "type": "validation",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Quality gate - verify description quality, schema compliance, and record health (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/verify",
+                    "verify records",
+                    "check record quality",
+                    "quality gate"
+                ],
+                "intentPatterns": [
+                    "(verify|validate|check).*?(record|note|infrastructure).*?(quality|health|schema)"
+                ]
+            },
+            "prerequisites": {
+                "suggest": ["arscontexta-document", "arscontexta-connect"]
+            }
+        },
+        "arscontexta-update": {
+            "type": "process",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Refresh existing records with new information, update verified_date (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/update",
+                    "update record",
+                    "refresh record",
+                    "update infrastructure"
+                ],
+                "intentPatterns": [
+                    "(update|refresh).*?(record|infrastructure|deployment)"
+                ]
+            },
+            "prerequisites": {
+                "suggest": ["arscontexta-verify"]
+            },
+            "coActivate": ["arscontexta-connect"],
+            "coActivateMode": "any"
+        },
+        "arscontexta-next": {
+            "type": "meta",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "What should I work on next? Evaluates vault conditions and recommends actions (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/next",
+                    "what next",
+                    "what should I work on",
+                    "vault priorities"
+                ],
+                "intentPatterns": [
+                    "what.*?(should|can).*?(work on|do next|prioritize)",
+                    "next.*?(task|action|priority)"
+                ]
+            }
+        },
+        "arscontexta-seed": {
+            "type": "process",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Seed vault with initial records from external sources (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/seed",
+                    "seed vault",
+                    "populate vault",
+                    "initial records"
+                ],
+                "intentPatterns": [
+                    "(seed|populate|initialize).*?(vault|records)"
+                ]
+            }
+        },
+        "arscontexta-retrospect": {
+            "type": "process",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Triage accumulated observations and tensions - promote, implement, archive, or keep (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/retrospect",
+                    "retrospect",
+                    "triage observations",
+                    "review tensions"
+                ],
+                "intentPatterns": [
+                    "(retrospect|review|triage).*?(observations?|tensions?)"
+                ]
+            },
+            "prerequisites": {
+                "suggest": ["arscontexta-stats"]
+            }
+        },
+        "arscontexta-validate": {
+            "type": "validation",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Schema compliance validation for vault records (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/validate",
+                    "validate schema",
+                    "check schema compliance"
+                ],
+                "intentPatterns": [
+                    "(validate|check).*?schema"
+                ]
+            }
+        },
+        "arscontexta-learn": {
+            "type": "research",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Deep research with provenance tracking - learn about a topic and create sourced records (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/learn",
+                    "research this topic",
+                    "learn about"
+                ],
+                "intentPatterns": [
+                    "(learn|research|study).*?(about|topic|subject)"
+                ]
+            }
+        },
+        "arscontexta-stats": {
+            "type": "meta",
+            "enforcement": "suggest",
+            "priority": "low",
+            "description": "Show vault statistics - record counts, platform distribution, link density (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/stats",
+                    "vault stats",
+                    "vault statistics",
+                    "record counts"
+                ],
+                "intentPatterns": [
+                    "(show|get|display).*?(vault|record).*?(stats|statistics|counts)"
+                ]
+            }
+        },
+        "arscontexta-graph": {
+            "type": "meta",
+            "enforcement": "suggest",
+            "priority": "low",
+            "description": "Visualize vault graph structure - connections, clusters, orphans (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/graph",
+                    "vault graph",
+                    "show connections",
+                    "visualize links"
+                ],
+                "intentPatterns": [
+                    "(show|visualize|graph).*?(connections?|links?|structure)"
+                ]
+            }
+        },
+        "arscontexta-pipeline": {
+            "type": "workflow",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Run the full processing pipeline: triage > document > connect > update > verify (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/pipeline",
+                    "run pipeline",
+                    "full processing"
+                ],
+                "intentPatterns": [
+                    "(run|execute).*?(full)?.*?pipeline"
+                ]
+            },
+            "prerequisites": {
+                "require": ["arscontexta-document"]
+            },
+            "coActivate": ["arscontexta-connect", "arscontexta-verify"],
+            "coActivateMode": "all",
+            "loading": "eager-prerequisites"
+        },
+        "arscontexta-remember": {
+            "type": "process",
+            "enforcement": "suggest",
+            "priority": "low",
+            "description": "Store a learning or insight in the vault memory space (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/remember"
+                ],
+                "intentPatterns": []
+            }
+        },
+        "arscontexta-refactor": {
+            "type": "process",
+            "enforcement": "suggest",
+            "priority": "low",
+            "description": "Refactor vault structure - merge, split, or reorganize records (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/refactor vault",
+                    "reorganize records",
+                    "restructure vault"
+                ],
+                "intentPatterns": [
+                    "(refactor|reorganize|restructure).*?(vault|records)"
+                ]
+            }
+        },
+        "arscontexta-ralph": {
+            "type": "workflow",
+            "enforcement": "suggest",
+            "priority": "low",
+            "description": "Ralph-mode autonomous vault processing (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/ralph vault"
+                ],
+                "intentPatterns": [
+                    "ralph.*?vault"
+                ]
+            }
+        },
+        "arscontexta-tasks": {
+            "type": "meta",
+            "enforcement": "suggest",
+            "priority": "low",
+            "description": "View and manage vault maintenance tasks (requires vault cwd)",
+            "promptTriggers": {
+                "keywords": [
+                    "/tasks vault"
+                ],
+                "intentPatterns": [
+                    "(vault|knowledge).*?tasks"
+                ]
+            }
         }
     },
     "agents": {
@@ -2232,6 +2693,24 @@
                     "azure.*?(swa|static|container)",
                     "(frontend|backend).*?deploy.*?azure",
                     "staticwebapp.*?(config|deploy)"
+                ]
+            }
+        },
+        "knowledge-guide": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Proactive methodology guidance agent - monitors note creation, suggests connections, flags quality issues",
+            "promptTriggers": {
+                "keywords": [
+                    "knowledge methodology",
+                    "note quality",
+                    "vault guidance",
+                    "methodology advice"
+                ],
+                "intentPatterns": [
+                    "(guide|advise|help).*?(knowledge|vault|note).*?(methodology|quality|structure)",
+                    "(suggest|recommend).*?(connections|improvements).*?(vault|records)"
                 ]
             }
         }
