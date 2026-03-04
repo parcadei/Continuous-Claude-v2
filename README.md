@@ -9,6 +9,10 @@
 
 ---
 
+**Navigate:** [What Is This?](#what-is-this) | [No-Code?](#-can-i-build-software-without-knowing-how-to-code) | [Fork Features](#-what-makes-this-fork-special) | [Who Is This For?](#who-is-this-for) | [Quick Start](#quick-start) | [What You Get](#what-you-get) | [Use Cases](#common-use-cases) | [FAQ](#common-questions) | [Developers](#for-developers)
+
+---
+
 ## What Is This?
 
 Think of Claude Code as having a brilliant assistant who helps you with tasks. The problem? Every time you close the conversation, they forget everything you did together. When you start a new chat, you have to explain your project from scratch.
@@ -57,7 +61,14 @@ The system handles the technical complexity. You focus on what you want it to do
 
 This fork includes significant improvements over the original Continuous Claude, developed through real-world use:
 
-### 🎼 Maestro: The Orchestrator (Our Flagship Improvement)
+> **Why Continuous Claude?**
+>
+> - **Stop Repeating Yourself** — Context persists across sessions. Claude recalls past work automatically. Decisions and learnings accumulate like compound interest.
+> - **Work Faster** — Delegate to specialized agents. Get structured workflows instead of back-and-forth prompting. Set-and-forget autonomous builds with Ralph.
+> - **Stay Organized** — Automatic session summaries and handoffs. Track progress on multi-day projects. Resume exactly where you left off.
+
+<details>
+<summary><strong>Maestro: The Orchestrator</strong> — Coordinates specialist agents like a project manager</summary>
 
 **The Problem:** Complex tasks require coordinating multiple specialists — researcher, planner, builder, tester, reviewer. Managing this manually is tedious and error-prone.
 
@@ -87,7 +98,10 @@ You: "Approved, go ahead"
 Maestro: [Executes each phase, reports progress, delivers working system]
 ```
 
-### 🤖 Ralph: Autonomous Development Mode
+</details>
+
+<details>
+<summary><strong>Ralph: Autonomous Development Mode</strong> — Describe a feature, approve a plan, come back to working code</summary>
 
 **The Problem:** Even with Maestro, you're still in the loop for every decision. Sometimes you just want to describe a feature, approve the plan, and come back to working code.
 
@@ -122,7 +136,10 @@ You: "Go ahead"
 [Walk away. Come back to: working form, passing tests, clean commit]
 ```
 
-### 📚 119+ Skills (vs. Original ~50)
+</details>
+
+<details>
+<summary><strong>119+ Skills</strong> — Pre-built workflows triggered by describing what you want</summary>
 
 Skills are pre-built workflows you trigger by describing what you want:
 
@@ -135,7 +152,10 @@ Skills are pre-built workflows you trigger by describing what you want:
 | `/ralph` | Autonomous feature development | "Build this feature while I'm away" |
 | `/premortem` | Identifies what could go wrong | "What risks does this plan have?" |
 
-### 🧠 Persistent Memory System
+</details>
+
+<details>
+<summary><strong>Persistent Memory System</strong> — Context persists across sessions via learning memory and document intelligence</summary>
 
 **The Problem:** Every Claude conversation starts fresh. You waste time re-explaining your project, preferences, and past decisions.
 
@@ -160,7 +180,10 @@ We integrated PageIndex — a reasoning-based retrieval system that achieved 98.
 
 **In Practice:** Start a new session, and Claude already knows your project, your preferences, what you tried last time, AND can intelligently navigate your reference documents.
 
-### 🔍 95% Token Efficiency (TLDR System)
+</details>
+
+<details>
+<summary><strong>95% Token Efficiency (TLDR System)</strong> — Analyzes code structure instead of reading every line</summary>
 
 **The Problem:** Claude normally reads entire files to understand code, burning through your token budget quickly.
 
@@ -168,7 +191,10 @@ We integrated PageIndex — a reasoning-based retrieval system that achieved 98.
 
 **The Benefit:** Same understanding, 95% fewer tokens. Longer conversations, more complex projects, lower costs.
 
-### 🌐 Browser Automation (Two Systems)
+</details>
+
+<details>
+<summary><strong>Browser Automation</strong> — Two systems for controlling web browsers via natural language</summary>
 
 **The Problem:** Testing web apps, filling forms, and scraping data requires manual browser interaction or complex scripting.
 
@@ -191,7 +217,10 @@ Claude: Opens browser → takes snapshot → fills email and password →
 No Selenium scripts. No Playwright config. Just describe what to test.
 ```
 
-### Session Dashboard: Live Observability
+</details>
+
+<details>
+<summary><strong>Session Dashboard</strong> — Real-time monitoring of all 7 subsystems from a single browser tab</summary>
 
 **The Problem:** With 7 subsystems running (memory, knowledge tree, PageIndex, roadmap, handoffs, Ralph, Braintrust), you have no visibility into what's healthy, degraded, or offline without manually querying each one.
 
@@ -215,46 +244,7 @@ Keyboard shortcuts (`m`emory, `k`nowledge, `r`oadmap, etc.) let you jump to any 
 
 See the [Dashboard README](opc/scripts/dashboard/README.md) for full API reference, architecture, and development guide.
 
----
-
-## Why Use It?
-
-### For Everyone
-
-**Stop Repeating Yourself**
-- Context persists across sessions — no more "here's my project again"
-- Claude recalls relevant past work automatically
-- Decisions and learnings accumulate like compound interest
-
-**Work Faster**
-- Delegate research, analysis, and implementation to specialized agents
-- Get structured workflows instead of back-and-forth prompting
-- Set-and-forget autonomous builds with Ralph
-- Natural language triggers — just describe what you want
-
-**Stay Organized**
-- Automatic session summaries and handoffs
-- Track progress on multi-day projects
-- Resume exactly where you left off
-
-### For Technical Users
-
-**95% Efficiency Boost**
-- Analyzes code structure instead of reading every line (like scanning a table of contents instead of the whole book)
-- Smart search finds relevant code instantly
-- Pattern detection finds similar code across your project
-
-**Developer Workflows**
-- Test-driven development with automatic test generation
-- Risk analysis before implementation ("What could go wrong?" checklist)
-- Automated code review with multiple specialized reviewers
-- Cross-file refactoring with impact analysis
-- Browser automation for E2E testing and web interaction
-
-**Advanced Capabilities**
-- Mathematical proof verification (for those who need formal guarantees)
-- Symbolic computation for equations and constraints
-- Machine-verified proofs without learning specialized syntax
+</details>
 
 ---
 
@@ -329,7 +319,183 @@ That's it. You're now using Continuous Claude.
 
 ---
 
-## How It Works (Simple Explanation)
+## What You Get
+
+### Skills (119+)
+
+**What they are:** Pre-built workflows you trigger by describing what you want
+
+**How you use them:**
+- Natural language: "Fix this bug"
+- Direct command: `/fix bug "description"`
+- Workflow: `/workflow` asks what you want to do, routes you
+
+**Do I need to code?** No. Skills work via natural language.
+
+<details>
+<summary>See full skill categories and examples</summary>
+
+| What You Say | What Happens |
+|--------------|--------------|
+| "Fix the login bug" | `/fix` workflow → investigate → plan → implement → test → commit |
+| "Build a user dashboard" | `/build` workflow → clarify → design → validate → implement |
+| "What could go wrong with this plan?" | `/premortem` → TIGERS (clear threats) + ELEPHANTS (unspoken concerns) |
+| "Research authentication patterns" | `oracle` agent → searches web, docs, examples |
+| "Find all calls to this function" | `tldr impact` → structural analysis, not text search |
+| "Build this while I'm away" | `/ralph` → autonomous PRD → tasks → agents → verify → commit |
+| "Done for today" | `create_handoff` → saves state for next session |
+
+**Key workflows:**
+
+- **Research:** oracle (web search), scout (codebase exploration), nia-docs (library documentation)
+- **Planning:** premortem (risk analysis), discovery-interview (clarify vague ideas)
+- **Building:** /build (greenfield or brownfield), /tdd (test-first), /refactor (safe transformation)
+- **Fixing:** /fix (bugs), /security (vulnerabilities), /review (code review)
+- **Continuity:** create_handoff, resume_handoff, continuity_ledger
+
+**Examples:**
+- `create_handoff` — Save your session state before ending
+- `premortem` — Risk analysis (TIGERS & ELEPHANTS)
+- `tldr-code` — Analyze code structure (95% token savings)
+- `perplexity-search` — AI-powered web search
+- `qlty-check` — Run 70+ linters and auto-fix issues
+
+</details>
+
+### Agents (31)
+
+**What they are:** Specialized AI assistants Claude delegates work to
+
+**How you use them:**
+- Automatic: Workflows spawn them (you don't manage)
+- Manual: `/agent scout "find authentication code"`
+
+**Why they help:** Preserve context (agent does research, returns summary), parallel work (spawn multiple agents at once), specialization (each agent has a focused role and detailed prompt).
+
+**Do I need to code?** No. Agents work on your behalf.
+
+<details>
+<summary>See full agent roster (31 agents across 8 categories)</summary>
+
+**Implementation (4)**
+- **kraken** — Test-driven implementation with strict TDD workflow
+- **spark** — Lightweight fixes and quick tweaks
+- **architect** — Feature planning with API integration
+- **phoenix** — Refactoring and framework migrations
+
+**Testing (3)**
+- **arbiter** — Unit and integration test validation
+- **atlas** — End-to-end and acceptance testing
+- **validate-agent** — Validate plans against best practices
+
+**Code Review (8)**
+- **critic**, **judge**, **liaison** — Different review perspectives
+- **review-agent**, **plan-reviewer** — Structured reviews
+- **react-perf-reviewer**, **ui-compliance-reviewer**, **surveyor** — Specialized reviews
+
+**Debugging (3)**
+- **debug-agent** — Issue investigation via logs/code
+- **sleuth** — Root cause investigation
+- **profiler** — Performance profiling and race conditions
+
+**Research (5)**
+- **scout** — Codebase exploration (90% accurate vs. 60% for generic search)
+- **oracle** — External research (web, docs, GitHub)
+- **pathfinder** — External repository analysis
+- **session-analyst**, **braintrust-analyst** — Session analysis
+
+**Orchestration (3)**
+- **maestro** — Multi-step task orchestration
+- **plan-agent** — Lightweight planning with research
+- **onboard** — Codebase onboarding
+
+**Documentation (3)**
+- **scribe** — Documentation generation
+- **herald** — Release management
+- **memory-extractor** — Learning extraction
+
+**Security + Specialized (2)**
+- **aegis** — Security vulnerability analysis
+- **agentica-agent** — Build Python agents using Agentica SDK
+
+</details>
+
+### Hooks (90+)
+
+**What they are:** Background helpers that run automatically at specific moments
+
+**How you use them:** You don't — they're automatic. They activate on events like "session start" or "before file read."
+
+**Do I need to code?** No. Hooks work invisibly.
+
+<details>
+<summary>See hook lifecycle phases and examples</summary>
+
+**When you start a session:**
+- Loads your continuity ledger (where you left off)
+- Registers your session in the database
+- Recalls relevant memories from past work
+
+**Before Claude reads a file:**
+- Checks if a summary already exists (95% token savings)
+- Routes searches to structural tools instead of text grep
+- Claims the file (prevents conflicts if multiple terminals open)
+
+**After you edit a file:**
+- Runs type checking and linting automatically
+- Updates code indexes
+- Tracks which files changed (for testing later)
+
+**During autonomous builds (Ralph):**
+- Enforces Ralph delegation rules — blocks direct code edits
+- Monitors agent progress, retries, and iteration limits
+- Injects progress context and retry reminders
+
+**Before running out of tokens:**
+- Automatically creates a handoff document
+- Saves state so you can resume later
+- Re-indexes modified code
+
+**After your session ends:**
+- Detects stale heartbeat (you closed Claude)
+- Spawns background analysis to extract learnings
+- Stores memories for future recall
+
+**Key hooks:**
+- **tldr-read-enforcer** — Returns code summaries instead of full files (token savings)
+- **smart-search-router** — Routes text searches to structural analysis tools
+- **post-edit-diagnostics** — Runs type checking after you edit code
+- **memory-awareness** — Surfaces relevant learnings from past sessions
+
+</details>
+
+### Rules (23)
+
+**What they are:** Guidelines that keep Claude consistent and safe
+
+- **Evidence-based claims** — No "this is faster" without benchmarks
+- **Read before write** — Always check existing code before changes
+- **Minimal comments** — Code should be self-explanatory
+- **Security-first** — Never commit secrets, always validate input
+- **Git safety** — Confirm before destructive operations
+- **Delegation** — Use agents for complex tasks to preserve main context
+
+**Do I need to code?** No. Rules are policy, not code.
+
+### Browser Automation
+
+**What it is:** Two systems for controlling web browsers — `agent-browser` (headless CLI) and `claude-in-chrome` (visual MCP)
+
+**How you use it:** "Test the login flow" or "Fill out this form" or "Take a screenshot of the dashboard"
+
+**What it enables:** E2E testing, form filling, web scraping, visual verification — all via natural language
+
+**Do I need to code?** No. Describe what you want to test or interact with.
+
+---
+
+<details>
+<summary><h2>How It Works (Simple Explanation)</h2></summary>
 
 ### The Problem
 
@@ -395,137 +561,14 @@ Continuous Claude: Read 1,200 tokens (functions, calls, logic flows)
 Result: Same understanding, 95% fewer tokens
 ```
 
----
-
-## What You Get
-
-### 119+ Skills (Pre-Built Workflows)
-
-Skills are like apps you trigger by asking naturally. No need to memorize commands.
-
-| What You Say | What Happens |
-|--------------|--------------|
-| "Fix the login bug" | `/fix` workflow → investigate → plan → implement → test → commit |
-| "Build a user dashboard" | `/build` workflow → clarify → design → validate → implement |
-| "What could go wrong with this plan?" | `/premortem` → TIGERS (clear threats) + ELEPHANTS (unspoken concerns) |
-| "Research authentication patterns" | `oracle` agent → searches web, docs, examples |
-| "Find all calls to this function" | `tldr impact` → structural analysis, not text search |
-| "Build this while I'm away" | `/ralph` → autonomous PRD → tasks → agents → verify → commit |
-| "Done for today" | `create_handoff` → saves state for next session |
-
-**Key workflows:**
-
-- **Research:** oracle (web search), scout (codebase exploration), nia-docs (library documentation)
-- **Planning:** premortem (risk analysis), discovery-interview (clarify vague ideas)
-- **Building:** /build (greenfield or brownfield), /tdd (test-first), /refactor (safe transformation)
-- **Fixing:** /fix (bugs), /security (vulnerabilities), /review (code review)
-- **Continuity:** create_handoff, resume_handoff, continuity_ledger
-
-### 31 Specialized Agents
-
-Agents are AI assistants focused on specific tasks. Claude delegates to them automatically.
-
-**Implementation (4)**
-- **kraken** — Test-driven implementation with strict TDD workflow
-- **spark** — Lightweight fixes and quick tweaks
-- **architect** — Feature planning with API integration
-- **phoenix** — Refactoring and framework migrations
-
-**Testing (3)**
-- **arbiter** — Unit and integration test validation
-- **atlas** — End-to-end and acceptance testing
-- **validate-agent** — Validate plans against best practices
-
-**Code Review (8)**
-- **critic**, **judge**, **liaison** — Different review perspectives
-- **review-agent**, **plan-reviewer** — Structured reviews
-- **react-perf-reviewer**, **ui-compliance-reviewer**, **surveyor** — Specialized reviews
-
-**Debugging (3)**
-- **debug-agent** — Issue investigation via logs/code
-- **sleuth** — Root cause investigation
-- **profiler** — Performance profiling and race conditions
-
-**Research (5)**
-- **scout** — Codebase exploration (90% accurate vs. 60% for generic search)
-- **oracle** — External research (web, docs, GitHub)
-- **pathfinder** — External repository analysis
-- **session-analyst**, **braintrust-analyst** — Session analysis
-
-**Orchestration (3)**
-- **maestro** — Multi-step task orchestration
-- **plan-agent** — Lightweight planning with research
-- **onboard** — Codebase onboarding
-
-**Documentation (3)**
-- **scribe** — Documentation generation
-- **herald** — Release management
-- **memory-extractor** — Learning extraction
-
-**Security + Specialized (2)**
-- **aegis** — Security vulnerability analysis
-- **agentica-agent** — Build Python agents using Agentica SDK
-
-### 90+ Hooks (Automatic Helpers)
-
-Hooks run in the background at specific moments — you don't call them directly.
-
-**When you start a session:**
-- Loads your continuity ledger (where you left off)
-- Registers your session in the database
-- Recalls relevant memories from past work
-
-**Before Claude reads a file:**
-- Checks if a summary already exists (95% token savings)
-- Routes searches to structural tools instead of text grep
-- Claims the file (prevents conflicts if multiple terminals open)
-
-**After you edit a file:**
-- Runs type checking and linting automatically
-- Updates code indexes
-- Tracks which files changed (for testing later)
-
-**During autonomous builds (Ralph):**
-- Enforces Ralph delegation rules — blocks direct code edits
-- Monitors agent progress, retries, and iteration limits
-- Injects progress context and retry reminders
-
-**Before running out of tokens:**
-- Automatically creates a handoff document
-- Saves state so you can resume later
-- Re-indexes modified code
-
-**After your session ends:**
-- Detects stale heartbeat (you closed Claude)
-- Spawns background analysis to extract learnings
-- Stores memories for future recall
-
-### 23 Rules (System Policies)
-
-Rules keep Claude consistent and safe:
-
-- **Evidence-based claims** — No "this is faster" without benchmarks
-- **Read before write** — Always check existing code before changes
-- **Minimal comments** — Code should be self-explanatory
-- **Security-first** — Never commit secrets, always validate input
-- **Git safety** — Confirm before destructive operations
-- **Delegation** — Use agents for complex tasks to preserve main context
-
-### Browser Automation
-
-**What it is:** Two systems for controlling web browsers — `agent-browser` (headless CLI) and `claude-in-chrome` (visual MCP)
-
-**How you use it:** "Test the login flow" or "Fill out this form" or "Take a screenshot of the dashboard"
-
-**What it enables:** E2E testing, form filling, web scraping, visual verification — all via natural language
-
-**Do I need to code?** No. Describe what you want to test or interact with.
+</details>
 
 ---
 
 ## Common Use Cases
 
-### "I Need to Understand This Codebase"
+<details>
+<summary><strong>"I Need to Understand This Codebase"</strong></summary>
 
 ```
 > /explore deep --focus "authentication"
@@ -540,7 +583,10 @@ Spawns scout agent:
 Result: Structured understanding in ~5 minutes
 ```
 
-### "I Have a Vague Idea, Need Help Clarifying"
+</details>
+
+<details>
+<summary><strong>"I Have a Vague Idea, Need Help Clarifying"</strong></summary>
 
 ```
 > "I want to improve our user onboarding, not sure how"
@@ -554,7 +600,10 @@ Triggers /discovery-interview:
 Result: Spec document ready for /build
 ```
 
-### "This Is Broken, Help Me Fix It"
+</details>
+
+<details>
+<summary><strong>"This Is Broken, Help Me Fix It"</strong></summary>
 
 ```
 > /fix bug "users can't upload files over 10MB"
@@ -569,7 +618,10 @@ Workflow:
 Result: Fixed, tested, documented
 ```
 
-### "Build This Feature for Me"
+</details>
+
+<details>
+<summary><strong>"Build This Feature for Me"</strong></summary>
 
 ```
 > /build greenfield "user dashboard with activity feed"
@@ -584,7 +636,10 @@ Workflow:
 Result: Complete feature with tests and documentation
 ```
 
-### "What Could Go Wrong?"
+</details>
+
+<details>
+<summary><strong>"What Could Go Wrong?"</strong></summary>
 
 ```
 > /premortem thoughts/shared/plans/user-dashboard.md
@@ -603,7 +658,10 @@ Output:
 Action: Blocks until you accept risks or mitigate
 ```
 
-### "Research This Topic for Me"
+</details>
+
+<details>
+<summary><strong>"Research This Topic for Me"</strong></summary>
 
 ```
 > "Research how other SaaS apps handle webhook retries"
@@ -617,7 +675,10 @@ Spawns oracle agent:
 Result: Structured findings with sources
 ```
 
-### "Build This Feature While I'm Away"
+</details>
+
+<details>
+<summary><strong>"Build This Feature While I'm Away"</strong></summary>
 
 ```
 > /ralph "Add a contact form with email validation and spam filtering"
@@ -637,7 +698,10 @@ Ralph (autonomously):
 You return: Working feature, passing tests, clean commit ready for review
 ```
 
-### "Test This Web App End-to-End"
+</details>
+
+<details>
+<summary><strong>"Test This Web App End-to-End"</strong></summary>
 
 ```
 > "Run E2E tests on our staging login flow"
@@ -651,82 +715,14 @@ Workflow:
 Result: Visual verification without writing Selenium or Playwright scripts
 ```
 
----
-
-## Components Explained Simply
-
-### Skills (119+)
-
-**What they are:** Pre-built workflows you trigger by describing what you want
-
-**How you use them:**
-- Natural language: "Fix this bug"
-- Direct command: `/fix bug "description"`
-- Workflow: `/workflow` asks what you want to do, routes you
-
-**Examples:**
-- `create_handoff` — Save your session state before ending
-- `premortem` — Risk analysis (TIGERS & ELEPHANTS)
-- `tldr-code` — Analyze code structure (95% token savings)
-- `perplexity-search` — AI-powered web search
-- `qlty-check` — Run 70+ linters and auto-fix issues
-
-**Do I need to code?** No. Skills work via natural language.
-
-### Agents (31)
-
-**What they are:** Specialized AI assistants Claude delegates work to
-
-**How you use them:**
-- Automatic: Workflows spawn them (you don't manage)
-- Manual: `/agent scout "find authentication code"`
-
-**Why they help:**
-- **Preserve context** — Agent does research, returns summary
-- **Parallel work** — Spawn multiple agents at once
-- **Specialization** — Each agent has a focused role and detailed prompt
-
-**Examples:**
-- `scout` explores codebases without reading every file
-- `oracle` researches external topics (web, docs, APIs)
-- `sleuth` investigates bugs with root cause analysis
-- `kraken` implements features with test-driven development
-
-**Do I need to code?** No. Agents work on your behalf.
-
-### Hooks (90+)
-
-**What they are:** Background helpers that run automatically at specific moments
-
-**How you use them:**
-- You don't — they're automatic
-- They activate on events like "session start" or "before file read"
-
-**Examples:**
-- **tldr-read-enforcer** — Returns code summaries instead of full files (token savings)
-- **smart-search-router** — Routes text searches to structural analysis tools
-- **post-edit-diagnostics** — Runs type checking after you edit code
-- **memory-awareness** — Surfaces relevant learnings from past sessions
-
-**Do I need to code?** No. Hooks work invisibly.
-
-### Rules (23)
-
-**What they are:** Guidelines that keep Claude consistent
-
-**Examples:**
-- Don't claim something is "faster" without benchmarks
-- Ask before deleting files or running destructive git commands
-- Use agents for complex tasks to keep main context clean
-- Read files before editing them
-
-**Do I need to code?** No. Rules are policy, not code.
+</details>
 
 ---
 
 ## Common Questions
 
-### Do I Need to Code?
+<details>
+<summary><strong>Do I Need to Code?</strong></summary>
 
 **Short answer:** No.
 
@@ -738,7 +734,10 @@ Result: Visual verification without writing Selenium or Playwright scripts
 
 If you can describe what you want, Continuous Claude can do it.
 
-### What If Something Breaks?
+</details>
+
+<details>
+<summary><strong>What If Something Breaks?</strong></summary>
 
 **Common issues:**
 
@@ -771,7 +770,10 @@ uv run python -m scripts.setup.wizard
 - [Documentation](https://github.com/parcadei/continuous-claude/tree/main/docs) — detailed guides
 - [Architecture Docs](.claude/docs/architecture/INDEX.md) — navigable system diagrams
 
-### How Do I Uninstall?
+</details>
+
+<details>
+<summary><strong>How Do I Uninstall?</strong></summary>
 
 ```bash
 cd continuous-claude/opc
@@ -790,7 +792,10 @@ This will:
 
 Your Claude Code setup returns to exactly how it was before installation.
 
-### Do I Need API Keys?
+</details>
+
+<details>
+<summary><strong>Do I Need API Keys?</strong></summary>
 
 **Optional API keys** (features work without them):
 
@@ -809,7 +814,10 @@ Your Claude Code setup returns to exactly how it was before installation.
 
 API keys unlock optional research features, not core functionality.
 
-### What About Privacy?
+</details>
+
+<details>
+<summary><strong>What About Privacy?</strong></summary>
 
 **Data stored locally:**
 - Continuity ledgers (Markdown files in `thoughts/`)
@@ -828,7 +836,10 @@ API keys unlock optional research features, not core functionality.
 
 **No data leaves your machine** except what you explicitly share with Claude or optional third-party APIs.
 
-### Can I Use This with Existing Projects?
+</details>
+
+<details>
+<summary><strong>Can I Use This with Existing Projects?</strong></summary>
 
 **Yes.** After installation:
 
@@ -851,7 +862,10 @@ The onboard agent will:
 
 Then you can use all features (`/build`, `/fix`, etc.) with full context about your project.
 
-### How Does It Compare to X?
+</details>
+
+<details>
+<summary><strong>How Does It Compare to X?</strong></summary>
 
 **vs. GitHub Copilot:**
 - Copilot autocompletes as you type (editor-focused)
@@ -868,6 +882,8 @@ Then you can use all features (`/build`, `/fix`, etc.) with full context about y
 - Continuous Claude adds memory, agents, and workflows
 - Like upgrading from a chat interface to a development environment
 
+</details>
+
 ---
 
 ## For Developers
@@ -875,7 +891,13 @@ Then you can use all features (`/build`, `/fix`, etc.) with full context about y
 <details>
 <summary>Click to expand technical architecture, code analysis, and advanced features</summary>
 
-### Architecture Overview
+**For Technical Users:**
+- **95% Efficiency Boost** — Analyzes code structure instead of reading every line. Smart search finds relevant code instantly. Pattern detection finds similar code across your project.
+- **Developer Workflows** — Test-driven development with automatic test generation. Risk analysis before implementation. Automated code review with multiple specialized reviewers. Cross-file refactoring with impact analysis. Browser automation for E2E testing.
+- **Advanced Capabilities** — Mathematical proof verification (for those who need formal guarantees). Symbolic computation for equations and constraints. Machine-verified proofs without learning specialized syntax.
+
+<details>
+<summary><strong>Architecture Overview</strong></summary>
 
 ```mermaid
 graph TB
@@ -898,7 +920,10 @@ graph TB
 
 > **Detailed architecture diagrams:** [System Overview](docs/architecture/diagrams/01-system-overview.md) | [Hook Lifecycle](docs/architecture/diagrams/02-hook-lifecycle.md) | [Memory System](docs/architecture/diagrams/03-memory-system.md) | [Agent Orchestration](docs/architecture/diagrams/04-agent-orchestration.md) | [Continuity Flow](docs/architecture/diagrams/05-continuity-flow.md) | [TLDR Stack](docs/architecture/diagrams/06-tldr-analysis-stack.md)
 
-### The 5-Layer Code Analysis Stack
+</details>
+
+<details>
+<summary><strong>5-Layer Code Analysis Stack</strong></summary>
 
 **Problem:** Reading a 1,000-line file costs ~23,000 tokens and provides mostly irrelevant details.
 
@@ -939,7 +964,7 @@ tldr dead src/ --entry main cli
 tldr arch src/
 ```
 
-### Semantic Index
+#### Semantic Index
 
 Beyond structural analysis, TLDR builds a semantic index:
 
@@ -954,7 +979,10 @@ tldr daemon semantic "find authentication logic"
 
 The index uses all 5 layers plus 10 lines of surrounding code — not just docstrings.
 
-### Memory System Architecture
+</details>
+
+<details>
+<summary><strong>Memory System Architecture</strong></summary>
 
 **How it works:**
 
@@ -995,7 +1023,10 @@ uv run python scripts/core/store_learning.py \
     --confidence high
 ```
 
-### Continuity System
+</details>
+
+<details>
+<summary><strong>Continuity System</strong></summary>
 
 **Ledgers (within-session):** Track state during work
 
@@ -1044,7 +1075,10 @@ status: complete
 2. Write integration tests
 ```
 
-### Workflow Examples
+</details>
+
+<details>
+<summary><strong>Workflow Examples</strong></summary>
 
 **Test-Driven Development:**
 
@@ -1085,7 +1119,10 @@ Chain:
   ✅ VERIFY → Audit axioms, confirm zero sorries
 ```
 
-### Hook Integration Points
+</details>
+
+<details>
+<summary><strong>Hook Integration Points</strong></summary>
 
 | Event | Key Hooks | What They Do |
 |-------|-----------|--------------|
@@ -1098,7 +1135,10 @@ Chain:
 | **SessionEnd** | session-end-cleanup, session-outcome | Extract learnings, cleanup |
 | **Ralph hooks** | ralph-delegation-enforcer, ralph-task-monitor, ralph-retry-reminder, ralph-progress-inject | Enforce delegation, track progress, bounded iterations |
 
-### Ralph Architecture
+</details>
+
+<details>
+<summary><strong>Ralph Architecture</strong></summary>
 
 Ralph is the autonomous development orchestrator — Maestro's "set and forget" mode.
 
@@ -1142,7 +1182,10 @@ Attempt 5: BLOCKED → requires user intervention
 | `ralph-scheduler.py` | Task ordering: ready-tasks, parallel-batch, critical-path |
 | `ralph-skill-query.py` | Routes tasks to optimal agents |
 
-### Browser Automation Architecture
+</details>
+
+<details>
+<summary><strong>Browser Automation Architecture</strong></summary>
 
 Two complementary browser automation systems:
 
@@ -1167,7 +1210,10 @@ Two complementary browser automation systems:
 - Use refs from snapshots (`@e1`), never stale references
 - Preflight checks catch 80% of test failures before they happen
 
-### Environment Variables
+</details>
+
+<details>
+<summary><strong>Environment Variables</strong></summary>
 
 | Variable | Purpose | Required |
 |----------|---------|----------|
@@ -1178,7 +1224,10 @@ Two complementary browser automation systems:
 | `PERPLEXITY_API_KEY` | Web search | No |
 | `NIA_API_KEY` | Documentation search | No |
 
-### Directory Structure
+</details>
+
+<details>
+<summary><strong>Directory Structure</strong></summary>
 
 ```
 continuous-claude/
@@ -1217,7 +1266,10 @@ continuous-claude/
 └── docs/                 # Documentation
 ```
 
-### Remote Database Setup
+</details>
+
+<details>
+<summary><strong>Remote Database Setup</strong></summary>
 
 For production or team setups, use a remote PostgreSQL instance:
 
@@ -1243,7 +1295,10 @@ psql -h hostname -U user -d continuous_claude -f docker/init-schema.sql
 - **Supabase:** Enable via Database Extensions page
 - **Azure:** Use Extensions pane to enable pgvector
 
-### Installation Modes
+</details>
+
+<details>
+<summary><strong>Installation Modes</strong></summary>
 
 | Mode | How It Works | Best For |
 |------|--------------|----------|
@@ -1271,7 +1326,10 @@ ln -s "$REPO/.claude/agents" ~/.claude/agents
 ls -la ~/.claude | grep -E "rules|skills|hooks|agents"
 ```
 
-### Contributing
+</details>
+
+<details>
+<summary><strong>Contributing</strong></summary>
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 - Adding skills
@@ -1279,6 +1337,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 - Developing hooks
 - Extending TLDR
 - Testing workflows
+
+</details>
 
 </details>
 
