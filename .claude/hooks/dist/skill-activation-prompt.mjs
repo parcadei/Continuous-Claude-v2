@@ -963,10 +963,11 @@ async function main2() {
       logHook(data.session_id, "skill-activation-prompt");
     } catch {
     }
+    let workflowMessage = "";
     const workflowTrigger = checkWorkflowTriggers(data.prompt);
     if (workflowTrigger && workflowTrigger.confidence >= 0.9) {
       const confidencePct = Math.round(workflowTrigger.confidence * 100);
-      const autoInvokeMessage = `
+      workflowMessage = `
 \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501
 \u{1F680} WORKFLOW DETECTED: /${workflowTrigger.skill}
 \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501
@@ -984,13 +985,14 @@ Do NOT skip this step. The skill provides:
 
 \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501
 `;
-      outputWithMessage(autoInvokeMessage);
-      process.exit(0);
     }
     const patternInference = runPatternInference(data.prompt, projectDir);
     const semanticQuery = detectSemanticQuery(data.prompt);
     const matchedSkills = [];
     const messages = [];
+    if (workflowMessage) {
+      messages.push(workflowMessage);
+    }
     for (const [skillName, config] of Object.entries(rules.skills)) {
       const triggers = config.promptTriggers;
       if (!triggers) {
@@ -1202,18 +1204,7 @@ Do NOT skip this step. The skill provides:
           output += "\n";
         }
         if (confirmedSkills.length > 0) {
-          const skillInvocations = confirmedSkills.map((s) => {
-            const skillToolName = s.name.replace(/^(arscontexta)-/, "$1:");
-            return `{ "skill": "${skillToolName}" }`;
-          });
-          if (skillInvocations.length === 1) {
-            output += `ACTION: Use Skill tool BEFORE responding with: ${skillInvocations[0]}
-`;
-          } else {
-            output += "ACTION: Use Skill tool BEFORE responding:\n";
-            skillInvocations.forEach((inv) => output += `  \u2192 ${inv}
-`);
-          }
+          output += "ACTION: Use Skill tool BEFORE responding\n";
         }
         if (confirmedAgents.length > 0) {
           output += "ACTION: Use Task tool with agent for exploration\n";

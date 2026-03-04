@@ -1618,6 +1618,61 @@
                     "npx.*?shadcn",
                     "(tailwind|radix).*?(component|ui)"
                 ]
+            },
+            "coActivate": [
+                "react-perf"
+            ]
+        },
+        "ui-ux-pro-max": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "UI/UX design intelligence - 50 styles, 200+ rules for visual design, typography, color, and layout",
+            "promptTriggers": {
+                "keywords": [
+                    "dark mode",
+                    "color palette",
+                    "typography",
+                    "font pairing",
+                    "spacing",
+                    "responsive design",
+                    "mobile responsive",
+                    "landing page design",
+                    "ui design",
+                    "ux guidelines",
+                    "hover state",
+                    "animation",
+                    "glassmorphism",
+                    "bento grid"
+                ],
+                "intentPatterns": [
+                    "(design|style|theme).*?(page|component|app|ui)",
+                    "(dark|light).*?mode",
+                    "(color|palette|typography|font).*?(choose|select|pair|pick)",
+                    "(responsive|mobile).*?(design|layout)",
+                    "(improve|enhance).*?(ui|ux|design|look|style)"
+                ]
+            }
+        },
+        "frontend-design": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Frontend design skill - bold, distinctive, production-grade UI with creative direction",
+            "promptTriggers": {
+                "keywords": [
+                    "/frontend-design",
+                    "bold design",
+                    "aesthetic direction",
+                    "creative frontend",
+                    "distinctive ui",
+                    "production frontend"
+                ],
+                "intentPatterns": [
+                    "(bold|distinctive|creative|striking).*?(design|frontend|ui)",
+                    "(design|build).*?(landing|hero|portfolio).*(page|site)",
+                    "(aesthetic|visual).*?(direction|identity|style)"
+                ]
             }
         },
         "systematic-debugging": {
@@ -1775,7 +1830,9 @@
                     "maintenance.*?report"
                 ]
             },
-            "coActivate": ["arscontexta-verify"],
+            "coActivate": [
+                "arscontexta-verify"
+            ],
             "coActivateMode": "any"
         },
         "arscontexta-setup": {
@@ -1811,7 +1868,10 @@
                 ]
             },
             "prerequisites": {
-                "suggest": ["arscontexta-health", "arscontexta-stats"]
+                "suggest": [
+                    "arscontexta-health",
+                    "arscontexta-stats"
+                ]
             }
         },
         "arscontexta-ask": {
@@ -1862,7 +1922,9 @@
                 ]
             },
             "prerequisites": {
-                "require": ["arscontexta-health"]
+                "require": [
+                    "arscontexta-health"
+                ]
             }
         },
         "arscontexta-tutorial": {
@@ -1947,9 +2009,13 @@
                 ]
             },
             "prerequisites": {
-                "suggest": ["arscontexta-seed"]
+                "suggest": [
+                    "arscontexta-seed"
+                ]
             },
-            "coActivate": ["arscontexta-connect"],
+            "coActivate": [
+                "arscontexta-connect"
+            ],
             "coActivateMode": "any"
         },
         "arscontexta-connect": {
@@ -1971,9 +2037,13 @@
                 ]
             },
             "prerequisites": {
-                "suggest": ["arscontexta-document"]
+                "suggest": [
+                    "arscontexta-document"
+                ]
             },
-            "coActivate": ["arscontexta-verify"],
+            "coActivate": [
+                "arscontexta-verify"
+            ],
             "coActivateMode": "any"
         },
         "arscontexta-verify": {
@@ -1993,7 +2063,10 @@
                 ]
             },
             "prerequisites": {
-                "suggest": ["arscontexta-document", "arscontexta-connect"]
+                "suggest": [
+                    "arscontexta-document",
+                    "arscontexta-connect"
+                ]
             }
         },
         "arscontexta-update": {
@@ -2013,9 +2086,13 @@
                 ]
             },
             "prerequisites": {
-                "suggest": ["arscontexta-verify"]
+                "suggest": [
+                    "arscontexta-verify"
+                ]
             },
-            "coActivate": ["arscontexta-connect"],
+            "coActivate": [
+                "arscontexta-connect"
+            ],
             "coActivateMode": "any"
         },
         "arscontexta-next": {
@@ -2070,7 +2147,9 @@
                 ]
             },
             "prerequisites": {
-                "suggest": ["arscontexta-stats"]
+                "suggest": [
+                    "arscontexta-stats"
+                ]
             }
         },
         "arscontexta-validate": {
@@ -2155,9 +2234,14 @@
                 ]
             },
             "prerequisites": {
-                "require": ["arscontexta-document"]
+                "require": [
+                    "arscontexta-document"
+                ]
             },
-            "coActivate": ["arscontexta-connect", "arscontexta-verify"],
+            "coActivate": [
+                "arscontexta-connect",
+                "arscontexta-verify"
+            ],
             "coActivateMode": "all",
             "loading": "eager-prerequisites"
         },
@@ -2214,6 +2298,53 @@
                 ],
                 "intentPatterns": [
                     "(vault|knowledge).*?tasks"
+                ]
+            }
+        },
+        "vercel-cli": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Autonomous Vercel CLI agent for deployments, marketplace, Supabase, auth, and infrastructure tasks",
+            "promptTriggers": {
+                "keywords": [
+                    "/vercel-cli",
+                    "vercel cli",
+                    "deploy to vercel",
+                    "vercel deployment",
+                    "supabase setup",
+                    "vercel marketplace",
+                    "edge functions",
+                    "serverless functions"
+                ],
+                "intentPatterns": [
+                    "(deploy|push|ship).*?vercel",
+                    "vercel.*?(project|deployment|domain|env|function)",
+                    "supabase.*?(setup|auth|database)",
+                    "(install|add).*?vercel.*?(integration|marketplace)",
+                    "vercel.*?edge.*?function",
+                    "vercel.*?serverless"
+                ]
+            }
+        },
+        "fourth-presentation-suite": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "medium",
+            "description": "Generate Fourth-branded EBR/QBR and sales presentations with professional design system",
+            "promptTriggers": {
+                "keywords": [
+                    "/fourth-presentation-suite",
+                    "fourth presentation",
+                    "ebr presentation",
+                    "qbr presentation",
+                    "sales deck",
+                    "fourth brand"
+                ],
+                "intentPatterns": [
+                    "(create|generate|build).*?(ebr|qbr|presentation|deck)",
+                    "fourth.*?(brand|style|presentation)",
+                    "(executive|business|quarterly).*?review"
                 ]
             }
         }
@@ -2637,15 +2768,37 @@
                     "re-render",
                     "server component",
                     "react audit",
-                    "next.js performance"
+                    "next.js performance",
+                    "hydration error",
+                    "hydration mismatch",
+                    "lazy loading",
+                    "code splitting",
+                    "react suspense",
+                    "ISR",
+                    "SSG",
+                    "SSR",
+                    "use client",
+                    "use server",
+                    "next/image",
+                    "error boundary",
+                    "useMemo",
+                    "useCallback",
+                    "React.memo"
                 ],
                 "intentPatterns": [
-                    "(optimize|improve).*?(react|next)",
-                    "(bundle|waterfall|rerender).*?(fix|reduce|prevent)",
-                    "performance.*?(audit|review|check).*?(react|next|component)",
-                    "(react|next).*?(slow|fast|optimize|performance)"
+                    "(optimize|improve).*?(react|next|component)",
+                    "(bundle|waterfall|rerender|re-render).*?(fix|reduce|prevent)",
+                    "performance.*?(audit|review|check).*(react|next|component)",
+                    "(react|next).*?(slow|fast|optimize|performance)",
+                    "(hydration|SSR|SSG|ISR).*?(error|issue|fix|setup)",
+                    "(lazy|dynamic).*?(load|import|split)",
+                    "(suspense|streaming).*?(boundary|fallback|render)",
+                    "(memo|useMemo|useCallback).*?(optimize|unnecessary|re-render)"
                 ]
-            }
+            },
+            "coActivate": [
+                "ui-audit"
+            ]
         },
         "ui-audit": {
             "type": "domain",
@@ -2662,15 +2815,23 @@
                     "ux check",
                     "focus states",
                     "aria label",
-                    "wcag"
+                    "wcag",
+                    "screen reader",
+                    "keyboard navigation",
+                    "color contrast",
+                    "tab order"
                 ],
                 "intentPatterns": [
                     "(accessibility|a11y).*?(check|audit|review)",
                     "(ui|ux|design).*?(audit|review|compliance)",
                     "(check|verify).*?(accessibility|a11y)",
-                    "(focus|aria|wcag).*?(state|label|compliance)"
+                    "(focus|aria|wcag).*?(state|label|compliance)",
+                    "(screen.reader|keyboard).*?(navigation|support|test)"
                 ]
-            }
+            },
+            "coActivate": [
+                "react-perf"
+            ]
         },
         "azure-deployment": {
             "type": "domain",

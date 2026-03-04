@@ -70,8 +70,8 @@ describe('Arscontexta Data Integrity', () => {
   // ── Skill Count & Existence ──────────────────────────────────────
 
   describe('Skill Count & Existence', () => {
-    it('should have exactly 91 skills', () => {
-      expect(Object.keys(rules.skills).length).toBe(91);
+    it('should have exactly 95 skills', () => {
+      expect(Object.keys(rules.skills).length).toBe(95);
     });
 
     it('should have exactly 18 agents', () => {

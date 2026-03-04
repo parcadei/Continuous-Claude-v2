@@ -354,11 +354,13 @@ async function main() {
         try { logHook(data.session_id, 'skill-activation-prompt'); } catch { /* never break */ }
 
         // Phase 2: Check for high-confidence workflow triggers FIRST
-        // Output message directly - UserPromptSubmit hooks inject context, they don't truly block
+        // Instead of exiting early, save the workflow message and continue to skill matching
+        // so supplementary skills (react-perf, ui-audit, etc.) still get suggested alongside workflows
+        let workflowMessage = '';
         const workflowTrigger = checkWorkflowTriggers(data.prompt);
         if (workflowTrigger && workflowTrigger.confidence >= 0.90) {
             const confidencePct = Math.round(workflowTrigger.confidence * 100);
-            const autoInvokeMessage = `
+            workflowMessage = `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🚀 WORKFLOW DETECTED: /${workflowTrigger.skill}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -376,9 +378,7 @@ Do NOT skip this step. The skill provides:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `;
-            // Output as valid JSON - message gets injected into Claude's context
-            outputWithMessage(autoInvokeMessage);
-            process.exit(0);
+            // Continue to skill matching — don't exit early
         }
 
         // CHANGE 1: Run pattern inference EARLY on all prompts
@@ -389,6 +389,11 @@ Do NOT skip this step. The skill provides:
 
         const matchedSkills: MatchedSkill[] = [];
         const messages: string[] = [];
+
+        // Prepend workflow message if detected (continues to skill matching below)
+        if (workflowMessage) {
+            messages.push(workflowMessage);
+        }
 
         // Check each skill for matches
         for (const [skillName, config] of Object.entries(rules.skills)) {
