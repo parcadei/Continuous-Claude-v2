@@ -125,8 +125,8 @@ function main() {
         const input = readFileSync(0, 'utf-8');
         const data: HookInput = JSON.parse(input);
 
-        // Only process PreToolUse for Task tool
-        if (data.event !== 'PreToolUse' || data.tool_name !== 'Task') {
+        // Only process PreToolUse for Agent/Task tool
+        if (data.event !== 'PreToolUse' || (data.tool_name !== 'Agent' && data.tool_name !== 'Task')) {
             console.log(JSON.stringify({ result: 'allow' }));
             return;
         }

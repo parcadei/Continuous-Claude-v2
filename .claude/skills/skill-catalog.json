@@ -1,0 +1,72 @@
+{
+  "version": "1.0",
+  "description": "Maps project stack indicators to available skills.sh packages for proactive skill acquisition",
+  "stacks": {
+    "react": {
+      "indicators": ["react", "react-dom", "@types/react"],
+      "indicatorFiles": ["package.json"],
+      "skills": [
+        {
+          "name": "react-best-practices",
+          "source": "vercel-labs/agent-skills@react-best-practices",
+          "publisher": "vercel-labs",
+          "description": "React patterns, hooks, performance optimization"
+        },
+        {
+          "name": "composition-patterns",
+          "source": "vercel-labs/agent-skills@composition-patterns",
+          "publisher": "vercel-labs",
+          "description": "Component composition and code organization"
+        }
+      ]
+    },
+    "react-native": {
+      "indicators": ["react-native", "expo"],
+      "indicatorFiles": ["package.json"],
+      "skills": [
+        {
+          "name": "react-native",
+          "source": "vercel-labs/agent-skills@react-native",
+          "publisher": "vercel-labs",
+          "description": "React Native mobile development patterns"
+        }
+      ]
+    },
+    "nextjs": {
+      "indicators": ["next", "@next/font", "next/image"],
+      "indicatorFiles": ["package.json", "next.config.js", "next.config.ts", "next.config.mjs"],
+      "skills": [
+        {
+          "name": "web-design-guidelines",
+          "source": "vercel-labs/agent-skills@web-design-guidelines",
+          "publisher": "vercel-labs",
+          "description": "Web design and UI/UX guidelines"
+        }
+      ]
+    },
+    "azure": {
+      "indicators": ["@azure/identity", "@azure/keyvault-secrets", "azure-identity", "azure.identity", "@azure/bicep-indicator"],
+      "indicatorFiles": ["package.json", "pyproject.toml", "requirements.txt"],
+      "skills": [
+        {
+          "name": "azure-deploy",
+          "source": "microsoft/azure-skills@azure-deploy",
+          "publisher": "microsoft",
+          "description": "Azure deployment patterns and infrastructure as code"
+        },
+        {
+          "name": "azure-ai",
+          "source": "microsoft/azure-skills@azure-ai",
+          "publisher": "microsoft",
+          "description": "Azure AI services integration"
+        },
+        {
+          "name": "azure-aigateway",
+          "source": "microsoft/azure-skills@azure-aigateway",
+          "publisher": "microsoft",
+          "description": "Azure AI Gateway and API management"
+        }
+      ]
+    }
+  }
+}

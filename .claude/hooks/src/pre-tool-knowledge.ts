@@ -67,7 +67,7 @@ function isImplementationTask(input: PreToolUseInput): boolean {
   const taskPrompt = String(input.tool_input?.prompt || '').toLowerCase();
   const subagentType = String(input.tool_input?.subagent_type || '').toLowerCase();
 
-  if (toolName !== 'task') return false;
+  if (toolName !== 'agent' && toolName !== 'task') return false;
 
   for (const trigger of IMPLEMENTATION_TRIGGERS) {
     if (taskPrompt.includes(trigger) || subagentType.includes(trigger)) {

@@ -123,7 +123,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  if (input.tool_name !== 'Task') {
+  if (input.tool_name !== 'Agent' && input.tool_name !== 'Task') {
     outputContinue();
     return;
   }

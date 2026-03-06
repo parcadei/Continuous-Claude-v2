@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-03-03T14:02:30.901862+00:00",
+  "updated_at": "2026-03-06T12:07:30.445199+00:00",
   "project": {
     "name": "continuous-claude",
     "description": "> Give Claude a notebook, memory, specialized assistants, and autonomous development capability — so every conversation builds on the last [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://claude.ai/code)",
@@ -525,6 +525,14 @@
         "purpose": "Build/utility scripts",
         "key_files": null
       },
+      ".claude\\skills\\create-better-skills.bak/": {
+        "purpose": "Project directory",
+        "key_files": null
+      },
+      ".claude\\skills\\create-better-skills.bak\\scripts/": {
+        "purpose": "Build/utility scripts",
+        "key_files": null
+      },
       ".claude\\skills\\create_handoff/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -605,6 +613,28 @@
       },
       ".claude\\skills\\fourth-presentation-builder\\references/": {
         "purpose": "Project directory",
+        "key_files": null
+      },
+      ".claude\\skills\\fourth-presentation-suite/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\fourth-presentation-suite\\assets/": {
+        "purpose": "Asset files",
+        "key_files": null
+      },
+      ".claude\\skills\\fourth-presentation-suite\\html-engine/": {
+        "purpose": "Markdown documentation",
+        "key_files": [
+          "README.md"
+        ]
+      },
+      ".claude\\skills\\fourth-presentation-suite\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\fourth-presentation-suite\\scripts/": {
+        "purpose": "Build/utility scripts",
         "key_files": null
       },
       ".claude\\skills\\frontend-slides/": {
@@ -887,6 +917,30 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\skill-creator/": {
+        "purpose": "Project directory",
+        "key_files": null
+      },
+      ".claude\\skills\\skill-creator\\agents/": {
+        "purpose": "Agent definitions",
+        "key_files": null
+      },
+      ".claude\\skills\\skill-creator\\assets/": {
+        "purpose": "Asset files",
+        "key_files": null
+      },
+      ".claude\\skills\\skill-creator\\eval-viewer/": {
+        "purpose": "Python modules",
+        "key_files": null
+      },
+      ".claude\\skills\\skill-creator\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\skill-creator\\scripts/": {
+        "purpose": "Build/utility scripts",
+        "key_files": null
+      },
       ".claude\\skills\\skill-developer/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -989,6 +1043,18 @@
       },
       ".claude\\skills\\vercel-cli\\references/": {
         "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\vet-skill/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\vet-skill\\docs/": {
+        "purpose": "Documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\vet-skill\\scripts/": {
+        "purpose": "Build/utility scripts",
         "key_files": null
       },
       ".claude\\skills\\weekly-report/": {
@@ -1141,152 +1207,6 @@
           "README.md"
         ]
       },
-      "forge-landing/": {
-        "purpose": "JSON data/config",
-        "key_files": [
-          "package.json"
-        ]
-      },
-      "forge-landing\\.claude/": {
-        "purpose": "Project directory",
-        "key_files": null
-      },
-      "forge-landing\\.claude\\cache/": {
-        "purpose": "Project directory",
-        "key_files": null
-      },
-      "forge-landing\\.claude\\cache\\agents/": {
-        "purpose": "Agent definitions",
-        "key_files": null
-      },
-      "forge-landing\\.claude\\plans/": {
-        "purpose": "Project directory",
-        "key_files": null
-      },
-      "forge-landing\\app/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\app\\chart-05/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\app\\chart-07/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\app\\components/": {
-        "purpose": "UI components",
-        "key_files": null
-      },
-      "forge-landing\\app\\cta-01/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\app\\feature-01/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\app\\hero-01/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\app\\hero-11/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\app\\insights/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\app\\nexus/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\app\\nexus\\components/": {
-        "purpose": "UI components",
-        "key_files": null
-      },
-      "forge-landing\\app\\projects/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\app\\testimonial-04/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\assets/": {
-        "purpose": "Asset files",
-        "key_files": null
-      },
-      "forge-landing\\assets\\logo/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\components/": {
-        "purpose": "UI components",
-        "key_files": null
-      },
-      "forge-landing\\components\\kibo-ui/": {
-        "purpose": "Project directory",
-        "key_files": null
-      },
-      "forge-landing\\components\\kibo-ui\\avatar-stack/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\components\\kibo-ui\\calendar/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\components\\kibo-ui\\contribution-graph/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\components\\kibo-ui\\dropzone/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\components\\kibo-ui\\gantt/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\components\\kibo-ui\\kanban/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\components\\kibo-ui\\table/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\components\\shadcn-space/": {
-        "purpose": "Project directory",
-        "key_files": null
-      },
-      "forge-landing\\components\\shadcn-space\\animated-text/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\components\\shadcn-space\\animations/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\components\\shadcn-space\\blocks/": {
-        "purpose": "Project directory",
-        "key_files": null
-      },
-      "forge-landing\\components\\shadcn-space\\number-ticker/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\components\\ui/": {
-        "purpose": "React/TypeScript components",
-        "key_files": null
-      },
-      "forge-landing\\lib/": {
-        "purpose": "Library code",
-        "key_files": null
-      },
       "fourth-transformation/": {
         "purpose": "Project directory",
         "key_files": [
@@ -1296,6 +1216,18 @@
       },
       "fourth-transformation\\public/": {
         "purpose": "Public assets",
+        "key_files": null
+      },
+      "fourth-transformation\\screens/": {
+        "purpose": "Project directory",
+        "key_files": null
+      },
+      "fourth-transformation\\screens\\assets/": {
+        "purpose": "Asset files",
+        "key_files": null
+      },
+      "fourth-transformation\\screens\\screenshots/": {
+        "purpose": "Project directory",
         "key_files": null
       },
       "fourth-transformation\\src/": {
@@ -1358,7 +1290,9 @@
       },
       "opc\\scripts\\dashboard/": {
         "purpose": "Python modules",
-        "key_files": null
+        "key_files": [
+          "README.md"
+        ]
       },
       "opc\\scripts\\dashboard\\frontend/": {
         "purpose": "JSON data/config",
@@ -1628,6 +1562,10 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      "thoughts\\shared\\handoffs\\kraken-agents-panel/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       "thoughts\\shared\\handoffs\\kraken-onboarding-wizard/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -1657,7 +1595,7 @@
         "key_files": null
       },
       "thoughts\\shared\\plans/": {
-        "purpose": "Project directory",
+        "purpose": "Markdown documentation",
         "key_files": null
       }
     }
@@ -1697,9 +1635,7 @@
       "files": [
         ".claude\\reviews/",
         ".claude\\skills\\frontend-slides\\components/",
-        "forge-landing\\app\\components/",
-        "forge-landing\\app\\nexus\\components/",
-        "forge-landing\\components/"
+        "spark-frontend-experiment\\nexus\\components/"
       ],
       "description": "UI Components - layer component",
       "related": []
@@ -1726,7 +1662,7 @@
       "add_component": [
         ".claude\\reviews/",
         ".claude\\skills\\frontend-slides\\components/",
-        "forge-landing\\app\\components/"
+        "spark-frontend-experiment\\nexus\\components/"
       ],
       "add_test": [
         ".claude\\hooks\\src\\__tests__/",
@@ -1750,8 +1686,27 @@
   },
   "goals": {
     "source": "ROADMAP.md",
-    "current": null,
+    "current": {
+      "title": "LinkMap Code Review, Refactor & Cleanup",
+      "description": "Overall assessment: Strong codebase (B+/A-). Clean architecture, solid state management, comprehensive features. Issues are mostly dead code, inconsistent error handling, and minor robustness gaps.; `chrome.windows.getCurrent()` resolves async, but `handleStateUpdate()` can fire before it resolves; Started: 2026-03-05"
+    },
     "completed": [
+      {
+        "title": "Dashboard Phase 1 — Fix HIGH Priority Bugs",
+        "completed": "2026-03-05"
+      },
+      {
+        "title": "Skills.sh Vetting Pipeline — Code Review Remediation + Testing",
+        "completed": "2026-03-05"
+      },
+      {
+        "title": "Dashboard Final Review via Browser Automation",
+        "completed": "2026-03-05"
+      },
+      {
+        "title": "[feat](dashboard) add System Health Report and Sessions sidebar panels (2026-03-03) `4ec578e`",
+        "completed": null
+      },
       {
         "title": "[fix](dashboard) activity feed always empty — seed on load, broadcast events, fix reactivity (2026-03-03) `8d503e1`",
         "completed": null
@@ -2077,7 +2032,5 @@
   },
   "critical_info": {
     "env_vars": ".env.example"
-  },
-  "_stale": true,
-  "_invalidated_at": "2026-03-03T23:08:52.372Z"
+  }
 }

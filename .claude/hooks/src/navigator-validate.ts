@@ -80,8 +80,8 @@ Remove the model parameter to inherit the parent model.
 async function main() {
   const input: PreToolUseInput = JSON.parse(readStdin());
 
-  // Only process Task tool calls
-  if (input.tool_name !== 'Task') {
+  // Only process Agent/Task tool calls
+  if (input.tool_name !== 'Agent' && input.tool_name !== 'Task') {
     outputContinue();
     return;
   }

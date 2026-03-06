@@ -46,8 +46,8 @@ async function main(): Promise<void> {
   const tool = input.tool || input.tool_name;
   const model = input.tool_input?.model;
 
-  // Only block Task with model="haiku"
-  if (tool !== 'Task' || model?.toLowerCase() !== 'haiku') {
+  // Only block Agent/Task with model="haiku"
+  if ((tool !== 'Agent' && tool !== 'Task') || model?.toLowerCase() !== 'haiku') {
     console.log('{}');
     return;
   }

@@ -49,8 +49,8 @@ async function main(): Promise<void> {
   const tool = input.tool || input.tool_name;
   const subagentType = input.tool_input?.subagent_type;
 
-  // Only intercept Task with subagent_type="Explore"
-  if (tool !== 'Task' || subagentType?.toLowerCase() !== 'explore') {
+  // Only intercept Agent/Task with subagent_type="Explore"
+  if ((tool !== 'Agent' && tool !== 'Task') || subagentType?.toLowerCase() !== 'explore') {
     console.log('{}');
     return;
   }

@@ -35,6 +35,9 @@ The #1 failure mode of AI-generated presentations is text walls on white backgro
 - Charts without an insight title ("Revenue Data" instead of "Revenue Grew 23% YoY")
 - Every container styled as a glass card (use varied container types)
 - Raw usage stats without business outcome translation
+- Emoji or Unicode codepoints as icons (use Lucide SVG icons via CDN — see Icon Rules below)
+- Static cards for data with time-series dimensions (use tabs or accordions for interactivity)
+- Improvised hybrid layouts when the Content-to-Layout table prescribes a specific pattern
 
 ---
 
@@ -112,7 +115,7 @@ Copy this `:root` block VERBATIM into every HTML presentation. Do NOT approximat
    - `fourth-logo-backdrop-left` — left edge, vertically centered (offset -120px)
    - `fourth-logo-backdrop-large` — 800px, even more subtle (2.5% opacity)
 5. **Every slide**: Small watermark logo or icon at bottom-right (`fourth-logo-watermark` class, 80px, 8% opacity).
-6. **Logo data URIs**: Read the base64-encoded `data:image/png;base64,...` strings directly from `html-engine/themes/fourth-executive.html`. They are embedded in the `<img>` tags near the end of the template. Copy them exactly — do NOT attempt to recreate or approximate logo images.
+6. **Logo data URIs**: The base64-encoded `data:image/png;base64,...` strings are in `references/logo-data-uris.md`. Read that file ONLY when you need to copy the URIs into `<img>` tags — do NOT hold the base64 content in working memory. The theme template (`fourth-executive.html`) uses `{{FOURTH_LOGO_WHITE}}` and `{{FOURTH_IQ_ICON}}` placeholders — replace these with the actual data URIs from `references/logo-data-uris.md` when generating slides. Copy them exactly — do NOT attempt to recreate or approximate logo images.
 
 ### Banned Patterns [BLOCK — using any of these is an error]
 
@@ -122,8 +125,77 @@ Copy this `:root` block VERBATIM into every HTML presentation. Do NOT approximat
 | `--bg-primary: #0C2B46` | `--bg-primary: #0A1929` | Old mid-blue value. v6 uses near-black Fourth Midnight. |
 | `--fourth-hot-red: #D9373B` | `--fourth-hot-red: #D81632` | Wrong red. Use the corrected brand-essentials value. |
 | `--fourth-purple: #9279B2` | `--fourth-purple: #9678B6` | Wrong purple. Use the corrected brand-essentials value. |
-| Text-only "FOURTH" as a substitute for the logo `<img>` | `<img src="data:image/png;base64,..." class="fourth-logo-hero">` | The logo is an image, not text. Always use the base64 data URI from the theme. |
+| Text-only "FOURTH" as a substitute for the logo `<img>` | `<img src="data:image/png;base64,..." class="fourth-logo-hero">` | The logo is an image, not text. Always use the base64 data URI from `references/logo-data-uris.md`. |
 | `rgba(12, 74, 125, ...)` as the only glow color on all slides | Rotate through teal, sunrise, purple, and sky glows | Using Deep Blue glow on every slide = no color variety. Rotate the 4-color system. |
+
+### Icon Rules [CRITICAL — BLOCK if violated]
+
+**NEVER use emoji or Unicode codepoints as icons.** All icons MUST be Lucide SVG icons loaded via CDN. This is a BLOCKING rule — any emoji character used as an icon (including in `icon-box` containers, alert icons, navigation arrows, or decorative elements) produces an incorrect presentation.
+
+**1. Required CDN Include:**
+
+Add to `<head>`:
+```html
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+```
+
+Add at the end of `<body>`, AFTER all content:
+```html
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+    });
+</script>
+```
+
+**IMPORTANT:** Pin the Lucide version (e.g., `@0.460.0`) — do NOT use `@latest`, which can break if the package structure changes.
+
+**2. Icon Usage Pattern:**
+
+CORRECT:
+```html
+<div class="icon-box icon-box-teal">
+    <i data-lucide="target" style="width: 20px; height: 20px;"></i>
+</div>
+```
+
+WRONG (BLOCKED):
+```html
+<div class="icon-box icon-box-teal">🎯</div>
+```
+
+**3. Common EBR/QBR Icon Mapping:**
+
+| Concept | Lucide Icon Name | Use For |
+|---|---|---|
+| Performance / metrics | `bar-chart-3` | KPI slides, analytics sections |
+| Growth / improvement | `trending-up` | Positive change indicators |
+| Decline / concern | `trending-down` | Negative change indicators |
+| Users / people | `users` | Workforce, headcount, team |
+| Calendar / timeline | `calendar` | Date ranges, scheduling |
+| Target / goal | `target` | Goals, targets, objectives |
+| Support / help | `life-buoy` | Support resources, help center |
+| Training / education | `graduation-cap` | Training programs, learning |
+| Revenue / money | `dollar-sign` | Financial metrics |
+| Savings / efficiency | `piggy-bank` | Cost reduction, savings |
+| Settings / config | `settings` | Platform configuration |
+| Check / success | `check-circle` | Completed items, success |
+| Warning / alert | `alert-triangle` | Warnings, attention needed |
+| Info / details | `info` | Information callouts |
+| Location / region | `map-pin` | Regional data, locations |
+| Time / clock | `clock` | Time-based metrics |
+| Star / rating | `star` | Ratings, favorites |
+| Shield / security | `shield-check` | Compliance, security |
+| Megaphone / news | `megaphone` | Announcements, updates |
+| Book / documentation | `book-open` | Documentation, resources |
+| Rocket / launch | `rocket` | New features, launches |
+| Award / achievement | `award` | Achievements, milestones |
+
+**4. Icon Sizing:**
+
+Inside `icon-box` containers: `width: 20px; height: 20px;`
+Inline with text: `width: 16px; height: 16px; vertical-align: middle;`
+Hero/feature cards: `width: 24px; height: 24px;`
 
 ---
 
@@ -157,9 +229,9 @@ Use the Content-to-Layout Decision Table (Section 3) to assign each piece of cla
 
 ---
 
-## 3. Content-to-Layout Decision Table
+## 3. Content-to-Layout Decision Table [MANDATORY]
 
-This is the primary design tool. Before creating any slide, match content to layout:
+This is the primary design tool. Before creating any slide, match content to layout. **If content matches a layout in this table, that layout MUST be used. This is a BLOCKING rule — improvised hybrid layouts are an error when the table prescribes a specific pattern.**
 
 | Content Type | Layout | NOT This |
 |---|---|---|
@@ -184,7 +256,48 @@ This is the primary design tool. Before creating any slide, match content to lay
 | Feature comparison | Matrix table with check/cross marks | Bullet list of features |
 | Key takeaway or claim | Problem slide (dark bg, one statement) | One of many bullets |
 
-**Rule**: If content matches a visual format, use it. Bullets are the LAST resort, not the default.
+**Rule [BLOCK]**: If content matches a layout in this table, that layout MUST be used. Bullets are the LAST resort, not the default. Improvising a hybrid layout when the table prescribes a specific pattern is an error.
+
+### Prescribed HTML Templates
+
+**Platform Engagement / Usage Metrics → Stat Row:**
+```html
+<div class="stat-row">
+    <div class="stat-card stat-good">
+        <div class="stat-value" data-target="346000" data-suffix="K">346K</div>
+        <div class="stat-label">TOTAL LOGINS</div>
+        <div class="stat-change positive"><i data-lucide="trending-up"></i> +12% QoQ</div>
+    </div>
+    <!-- Repeat for each metric. Status classes: stat-good, stat-watch, stat-action -->
+</div>
+```
+
+**Support & Resources / Feature Lists → Three-Column Icon+Label:**
+```html
+<div class="three-col">
+    <div class="feature-card">
+        <div class="icon-box icon-box-teal"><i data-lucide="life-buoy"></i></div>
+        <h3>Customer Success Portal</h3>
+        <p>24/7 support at help.hotschedules.com</p>
+    </div>
+    <!-- Repeat for each feature. NEVER use emoji in icon-box. -->
+</div>
+```
+
+**Proven Results / Outcomes → Hero-Stat + Chart + Highlight:**
+```html
+<div class="two-col">
+    <div>
+        <div class="hero-stat" data-target="15" data-suffix="%">15%</div>
+        <h3>Sales Uplift</h3>
+        <p>Whataburger saw measurable improvement after Fourth platform adoption.</p>
+    </div>
+    <div>
+        <canvas class="chart" data-type="bar" data-labels='["Before","After"]' data-values='[82,97]'></canvas>
+        <div class="highlight-box">Key supporting detail or customer quote</div>
+    </div>
+</div>
+```
 
 ### EBR/QBR Slide Sequence (recommended)
 
@@ -494,12 +607,21 @@ fourth-presentation-suite          <- This skill: Fourth brand, design-first wor
 ```
 
 **Before building any presentation, read in this order:**
-1. `html-engine/themes/fourth-executive.html` -- **READ FIRST.** Copy the `:root` CSS variables and logo base64 data URIs directly from this file. Do not approximate or recreate them. This is the source of truth for all colors, backgrounds, and logo assets.
-2. This file -- Fourth-specific workflow, design rules, and PPTX API reference
-3. `html-engine/STYLE_PRESETS.md` -- CSS custom properties and style presets (Phase 1 only)
-4. `html-engine/components/midnight-components.html` -- Reusable HTML components (Phase 1 only)
-5. `references/brand-essentials.md` -- color palette, fonts, tone (loose guide)
-6. `references/layout-catalog.md` -- layout selection with prescriptive decision logic
+1. `html-engine/themes/fourth-executive.html` -- **READ FIRST.** Copy the `:root` CSS variables directly from this file. Do not approximate or recreate them. This is the source of truth for all colors, backgrounds, and layout patterns. Logo `<img>` tags use `{{FOURTH_LOGO_WHITE}}` and `{{FOURTH_IQ_ICON}}` placeholders — you will replace these with real data URIs from step 2.
+2. `references/logo-data-uris.md` -- **Read ONLY when copying logo URIs into `<img>` tags.** Contains 2 base64-encoded PNG data URIs (~166KB total). Copy the URI for `FOURTH_LOGO_WHITE` into hero, closing, and watermark `<img>` tags. Copy `FOURTH_IQ_ICON` into backdrop and iq-mark `<img>` tags. Do NOT hold this file's content in working memory after copying — it is large and only needed during `<img>` tag construction.
+3. This file -- Fourth-specific workflow, design rules, and PPTX API reference
+4. `html-engine/STYLE_PRESETS.md` -- CSS custom properties and style presets (Phase 1 only)
+5. `html-engine/components/midnight-components.html` -- Reusable HTML components (Phase 1 only)
+6. `references/brand-essentials.md` -- color palette, fonts, tone (loose guide)
+7. `references/layout-catalog.md` -- layout selection with prescriptive decision logic
+
+### Context Management [CRITICAL]
+
+The logo data URIs are ~166KB of base64 text. To avoid exceeding your context window:
+- **DO**: Read `references/logo-data-uris.md` → immediately copy the URIs into your `<img>` tags → move on. Treat it as a clipboard operation.
+- **DO NOT**: Read the logo file early and hold it in memory while planning slides. Read it LAST, right before writing the final HTML.
+- **DO NOT**: Attempt to paraphrase, compress, or re-encode the base64 strings. Copy verbatim.
+- **Recommended workflow**: Build the entire HTML structure with `{{FOURTH_LOGO_WHITE}}` and `{{FOURTH_IQ_ICON}}` placeholders first. Then, as the final step, read `references/logo-data-uris.md` and do a find-replace to insert the actual data URIs.
 
 ---
 
@@ -518,8 +640,17 @@ v5 replaces the uniform glass-card-for-everything approach with a toolkit of dis
 | Progress bar (`_add_progress_bar_shape`) | Gap metrics, completion status | Track (20% alpha) + fill (solid). Optional percentage label. |
 | Data card row | Gap slide rows | 4% white fill + status-colored bottom border |
 | Split panel | Mutual commitments | Two tinted columns (deep blue / sky blue) with vertical accent bars |
+| Icon box | Feature cards, resource items, three-column layouts | 48x48px rounded container with Lucide icon. NEVER emoji. |
 
 **Rule:** No more than 3 glass cards on any single slide. If you have 4+ containers, use accent strips or data card rows instead.
+
+**Stat Row Data Model [MANDATORY]:** Every stat card MUST include all 4 fields:
+1. `value` — the metric number (e.g., "346K", "$2.1M", "94%")
+2. `label` — what it measures (e.g., "TOTAL LOGINS", "REVENUE")
+3. `change` — period-over-period delta with direction (e.g., "+12% QoQ", "-3% MoM")
+4. `status` — good/watch/action driving the accent color
+
+A stat card with only value and label is INCOMPLETE. The change delta and status color are what make stat rows superior to plain KPI grids.
 
 ### 9.2 Status Differentiation
 
@@ -566,6 +697,38 @@ Subtle visual depth without overwhelming content:
 | Progress ring track | 8% alpha | KPI slide background arc |
 | Card bottom borders | 25% alpha | Gap slide status indicator |
 
+### 9.6 Interactive Element Guidance
+
+The component library (`midnight-components.html`) includes 8 Alpine.js interactive components. Use them to increase information density without cluttering slides.
+
+**Required CDN Includes (in this order — collapse MUST load before Alpine core):**
+```html
+<!-- Alpine.js Collapse Plugin (MUST load first) -->
+<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+<!-- Alpine.js Core -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+```
+
+**Component-to-Use-Case Table:**
+
+| Component | Use When | NOT For |
+|---|---|---|
+| Tabs (pill/underline) | Quarterly data views, multi-metric dashboards, before/after comparisons with 3+ states | Simple 2-item before/after (use two-column instead) |
+| Accordion | Appendix drilldown, multi-region breakdowns, FAQ-style detail expansion | Main deck slides with 3 or fewer items |
+| Collapsible | Supplementary detail under KPIs, methodology notes, data source attribution | Primary narrative content that all viewers need |
+| Modal | Deep-dive data tables, full datasets behind summaries, detailed methodology | Core narrative or content every viewer must see |
+| Tooltip | Metric definitions, abbreviation explanations, footnote-style context | Long text or paragraph explanations |
+| Carousel | Case studies, testimonials, location highlights, multi-example evidence | Primary data or metrics (too hidden for key data) |
+| Toggle | Annual/Monthly view switching, with/without normalization toggles | More than 2 states (use tabs instead) |
+| Dropdown | Metric selector, time range filter, region picker | Primary navigation or slide switching |
+
+**Main Deck vs Appendix Guidance:**
+
+- **Main deck**: Keep interactions simple. Use tabs for quarterly data views and tooltips for metric definitions. Avoid modals and accordions in the main narrative — they hide information the audience needs to see.
+- **Appendix**: Use the full interactive toolkit. Accordions for regional breakdowns, modals for complete data tables, collapsibles for methodology notes, carousels for additional case studies.
+
+**Rule:** Never add interactivity for decoration. Every interactive element must serve a concrete information-density purpose — it should compress 2+ views into one slide or reveal detail that would otherwise require an extra slide.
+
 ---
 
 ## 10. Quality Checklist
@@ -588,6 +751,12 @@ Run this checklist BEFORE delivering any presentation. Design quality first, bra
 - [ ] Category labels present on content and KPI slides
 - [ ] At least one chart or data visualization in any deck with numeric claims
 - [ ] Container variety: no more than 3 glass cards per slide
+- [ ] No emoji or Unicode codepoints as icons — all icons are Lucide SVG via `<i data-lucide="...">`
+- [ ] Lucide CDN included in `<head>` and `lucide.createIcons()` called at end of `<body>`
+- [ ] Stat row cards include all 4 fields: value, label, change delta, and status color
+- [ ] Interactive elements (tabs, accordions, collapsibles) used where data density warrants
+- [ ] Content-to-Layout decision table was followed — no improvised hybrid layouts
+- [ ] Feature lists use three-column icon+label layout, not two-column bullet lists
 - [ ] Status colors used consistently (teal=good, amber=watch, red=action)
 - [ ] No slide would embarrass a VP in a boardroom
 
@@ -600,7 +769,7 @@ Run this checklist BEFORE delivering any presentation. Design quality first, bra
 - [ ] No pure black (#000000) -- use Midnight Navy (#002747)
 - [ ] No Teal text on white backgrounds (accent only, fails contrast)
 - [ ] Minimum 14pt text size on all slides
-- [ ] Logo IMAGE (base64 data URI from theme, NOT text) on title and closing slides — ALWAYS required
+- [ ] Logo IMAGE (base64 data URI from `references/logo-data-uris.md`, NOT text) on title and closing slides — ALWAYS required
 
 ### Structural Quality
 

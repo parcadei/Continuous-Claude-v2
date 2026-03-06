@@ -447,6 +447,34 @@
                 ]
             }
         },
+        "vet-skill": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Vet and register external skills from skills.sh through structural validation, trigger accuracy evaluation, and automatic registration into the routing graph",
+            "promptTriggers": {
+                "keywords": [
+                    "/vet-skill",
+                    "vet skill",
+                    "vet this skill",
+                    "evaluate skill",
+                    "register skill",
+                    "skill vetting",
+                    "check skill quality",
+                    "skill accuracy",
+                    "unvetted skills",
+                    "external skill"
+                ],
+                "intentPatterns": [
+                    "vet.*?skill",
+                    "(evaluate|check|test|validate).*?(external|installed|new).*?skill",
+                    "(register|add).*?skill.*?(routing|graph|rules)",
+                    "skill.*?(quality|accuracy|trigger)",
+                    "unvetted.*?skill",
+                    "(run|start).*?vetting"
+                ]
+            }
+        },
         "github-search": {
             "type": "domain",
             "enforcement": "suggest",
@@ -2346,6 +2374,34 @@
                     "fourth.*?(brand|style|presentation)",
                     "(executive|business|quarterly).*?review"
                 ]
+            }
+        },
+        "find-skills": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Helps users discover and install agent skills when they ask questions like how do I do X or find a skill for X",
+            "promptTriggers": {
+                "keywords": [
+                    "find",
+                    "skills",
+                    "find-skills",
+                    "discover",
+                    "install",
+                    "agent",
+                    "skill",
+                    "capability",
+                    "extend"
+                ],
+                "intentPatterns": [
+                    "(install|find)[^.]{0,80}(skill|capability|agent)",
+                    "find.*?skills"
+                ]
+            },
+            "source": {
+                "registry": "internal",
+                "installedAt": "2026-03-04T00:00:00Z",
+                "trustTier": "trusted"
             }
         }
     },

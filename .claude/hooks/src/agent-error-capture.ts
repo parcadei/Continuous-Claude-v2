@@ -189,8 +189,8 @@ async function main() {
       return;
     }
 
-    // Only process Task tool results
-    if (input.tool_name !== 'Task') {
+    // Only process Agent/Task tool results
+    if (input.tool_name !== 'Agent' && input.tool_name !== 'Task') {
       outputContinue();
       return;
     }

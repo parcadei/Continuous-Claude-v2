@@ -1,0 +1,31 @@
+{
+    "version": 1,
+    "description": "Trusted publisher organizations for skills.sh. Skills from these orgs skip full eval and register at 'trusted' tier.",
+    "publishers": [
+        {
+            "org": "vercel-labs",
+            "tier": "trusted",
+            "reason": "Skills.sh maintainers, top-tier quality"
+        },
+        {
+            "org": "anthropics",
+            "tier": "trusted",
+            "reason": "Claude creators"
+        },
+        {
+            "org": "anthropic",
+            "tier": "trusted",
+            "reason": "Claude creators (alternate org name)"
+        },
+        {
+            "org": "microsoft",
+            "tier": "trusted",
+            "reason": "Major publisher, enterprise quality"
+        },
+        {
+            "org": "google-labs",
+            "tier": "trusted",
+            "reason": "Major publisher"
+        }
+    ]
+}

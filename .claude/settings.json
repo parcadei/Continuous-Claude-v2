@@ -19,7 +19,7 @@
         ]
       },
       {
-        "matcher": "Task",
+        "matcher": "Agent",
         "hooks": [
           {
             "type": "command",
@@ -125,6 +125,16 @@
             "type": "command",
             "command": "node C:/Users/david.hayes/.claude/hooks/dist/test-before-done.mjs",
             "timeout": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node C:/Users/david.hayes/.claude/hooks/dist/skill-context-inject.mjs",
+            "timeout": 5000
           }
         ]
       }
@@ -294,7 +304,7 @@
         ]
       },
       {
-        "matcher": "Task",
+        "matcher": "Agent",
         "hooks": [
           {
             "type": "command",

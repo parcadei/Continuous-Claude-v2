@@ -23,7 +23,7 @@ export type TaskType =
 
 // Valid agents per task type (for validation)
 export const VALID_AGENTS: Record<TaskType, string[]> = {
-  RESEARCH: ['scout', 'oracle', 'pathfinder', 'Explore', 'explore'],
+  RESEARCH: ['scout', 'oracle', 'pathfinder'],
   IMPLEMENTATION: ['kraken', 'spark', 'architect', 'plan-agent', 'strategic-refactorer'],
   DEBUGGING: ['debug-agent', 'sleuth', 'profiler', 'spark', 'aegis', 'principal-debugger'],
   REFACTORING: ['phoenix', 'spark', 'strategic-refactorer', 'kraken'],
