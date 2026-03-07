@@ -6,7 +6,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
 var VALID_AGENTS = {
-  RESEARCH: ["scout", "oracle", "pathfinder", "Explore", "explore"],
+  RESEARCH: ["scout", "oracle", "pathfinder"],
   IMPLEMENTATION: ["kraken", "spark", "architect", "plan-agent", "strategic-refactorer"],
   DEBUGGING: ["debug-agent", "sleuth", "profiler", "spark", "aegis", "principal-debugger"],
   REFACTORING: ["phoenix", "spark", "strategic-refactorer", "kraken"],

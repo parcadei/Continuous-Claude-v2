@@ -18,6 +18,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { writeStateWithLock } from './shared/atomic-write.js';
 
 interface UserPromptSubmitInput {
   session_id: string;
@@ -94,7 +95,7 @@ function loadSmarterState(stateFile: string): SmarterState | null {
 }
 
 function saveSmarterState(stateFile: string, state: SmarterState): void {
-  fs.writeFileSync(stateFile, JSON.stringify(state, null, 2));
+  writeStateWithLock(stateFile, JSON.stringify(state, null, 2));
 }
 
 function isResolutionConfirmation(prompt: string): boolean {

@@ -130,13 +130,7 @@
       },
       {
         "matcher": "Skill",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node C:/Users/david.hayes/.claude/hooks/dist/skill-context-inject.mjs",
-            "timeout": 5000
-          }
-        ]
+        "hooks": []
       }
     ],
     "UserPromptSubmit": [

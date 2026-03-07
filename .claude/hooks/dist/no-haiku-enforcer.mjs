@@ -18,7 +18,7 @@ async function main() {
   }
   const tool = input.tool || input.tool_name;
   const model = input.tool_input?.model;
-  if (tool !== "Task" || model?.toLowerCase() !== "haiku") {
+  if (tool !== "Agent" && tool !== "Task" || model?.toLowerCase() !== "haiku") {
     console.log("{}");
     return;
   }

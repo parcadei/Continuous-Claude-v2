@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { execSync } from 'child_process';
+import { execSync, spawnSync } from 'child_process';
 import { readRalphUnifiedState, RalphUnifiedState } from './shared/state-schema.js';
 
 interface SessionStartInput {
@@ -354,21 +354,19 @@ async function buildUnifiedContext(projectDir: string): Promise<string> {
   if (currentGoal) {
     const opcDir = process.env.CLAUDE_OPC_DIR || path.join(process.env.USERPROFILE || '', '.claude');
     try {
-      const escapedGoal = currentGoal.replace(/"/g, '').substring(0, 100);
-      const isWindows = process.platform === 'win32';
-      const cmd = isWindows
-        ? `cd /d "${opcDir}" && set PYTHONPATH=. && uv run python scripts/core/recall_learnings.py ` +
-          `--query "${escapedGoal}" --k 3 --text-only`
-        : `cd "${opcDir}" && PYTHONPATH=. uv run python scripts/core/recall_learnings.py ` +
-          `--query "${escapedGoal}" --k 3 --text-only`;
-
-      const result = execSync(cmd, {
+      const queryText = currentGoal.replace(/"/g, '').substring(0, 100);
+      const proc = spawnSync('uv', [
+        'run', 'python', 'scripts/core/recall_learnings.py',
+        '--query', queryText, '--k', '3', '--text-only'
+      ], {
+        cwd: opcDir,
         encoding: 'utf-8',
         timeout: 5000,
         stdio: ['pipe', 'pipe', 'pipe'],
-        shell: isWindows ? 'cmd.exe' : true
+        env: { ...process.env, PYTHONPATH: '.' },
       });
 
+      const result = proc.stdout || '';
       if (result && !result.includes('No results') && result.trim().length > 20) {
         sections.push(`## Relevant Memories\n${result.substring(0, 600)}`);
       }

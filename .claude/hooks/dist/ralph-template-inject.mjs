@@ -82,7 +82,7 @@ function main() {
   try {
     const input = readFileSync(0, "utf-8");
     const data = JSON.parse(input);
-    if (data.event !== "PreToolUse" || data.tool_name !== "Task") {
+    if (data.event !== "PreToolUse" || data.tool_name !== "Agent" && data.tool_name !== "Task") {
       console.log(JSON.stringify({ result: "allow" }));
       return;
     }

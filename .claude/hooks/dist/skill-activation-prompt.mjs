@@ -1221,6 +1221,113 @@ Do NOT skip this step. The skill provides:
         }
       }
       messages.push(output);
+    } else if (prompt.split(/\s+/).length >= 4 && !workflowMessage) {
+      const technicalIndicators = /\b(deploy|database|api|endpoint|component|migration|docker|kubernetes|terraform|graphql|websocket|authentication|authorization|oauth|jwt|ci\/cd|pipeline|monitoring|logging|caching|queue|worker|microservice|serverless|lambda|cdn|ssl|nginx|redis|elasticsearch|mongodb|postgres|mysql|kafka|rabbitmq|grpc|protobuf|wasm|webpack|vite|rollup|esbuild|tailwind|sass|scss|styled|prisma|drizzle|sequelize|mongoose|typeorm|jest|vitest|cypress|playwright|puppeteer|selenium|storybook|chromatic|figma|sketch)\b/i;
+      if (technicalIndicators.test(prompt)) {
+        const stopWords = /* @__PURE__ */ new Set([
+          "the",
+          "a",
+          "an",
+          "is",
+          "are",
+          "was",
+          "were",
+          "be",
+          "been",
+          "this",
+          "that",
+          "these",
+          "those",
+          "it",
+          "its",
+          "i",
+          "you",
+          "we",
+          "they",
+          "my",
+          "your",
+          "our",
+          "their",
+          "me",
+          "him",
+          "her",
+          "us",
+          "them",
+          "do",
+          "does",
+          "did",
+          "will",
+          "would",
+          "could",
+          "should",
+          "can",
+          "may",
+          "might",
+          "have",
+          "has",
+          "had",
+          "not",
+          "no",
+          "and",
+          "or",
+          "but",
+          "if",
+          "then",
+          "with",
+          "for",
+          "from",
+          "into",
+          "onto",
+          "upon",
+          "about",
+          "after",
+          "before",
+          "to",
+          "of",
+          "by",
+          "up",
+          "out",
+          "off",
+          "on",
+          "in",
+          "at",
+          "as",
+          "how",
+          "what",
+          "where",
+          "which",
+          "who",
+          "when",
+          "why",
+          "want",
+          "need",
+          "help",
+          "please",
+          "make",
+          "get",
+          "set",
+          "add",
+          "use",
+          "like",
+          "just",
+          "also",
+          "very",
+          "really",
+          "some",
+          "any",
+          "all",
+          "each"
+        ]);
+        const words = prompt.toLowerCase().split(/\s+/).filter((w) => w.length >= 3 && !stopWords.has(w)).slice(0, 3);
+        if (words.length >= 1) {
+          const searchTopic = words.join(" ");
+          messages.push(
+            `[i] No registered skills match this task. Search for relevant skills:
+  npx skills find "${searchTopic}"
+Or use /find-skills to discover and install skills for this domain.`
+          );
+        }
+      }
     }
     const rawSessionId = data.session_id || process.env.CLAUDE_SESSION_ID || process.env.CLAUDE_PPID || "default";
     const sessionId = rawSessionId.slice(0, 8);

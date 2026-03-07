@@ -136,7 +136,7 @@ function checkWorkflowTriggers(prompt: string): WorkflowTrigger | null {
 }
 
 interface SkillRule {
-    type: 'guardrail' | 'domain';
+    type: string;
     enforcement: 'block' | 'suggest' | 'warn';
     priority: 'critical' | 'high' | 'medium' | 'low';
     promptTriggers?: PromptTriggers;

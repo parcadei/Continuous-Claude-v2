@@ -154,7 +154,7 @@ async function main() {
   } catch {
     return;
   }
-  if (input.tool_name !== "Task") return;
+  if (input.tool_name !== "Agent" && input.tool_name !== "Task") return;
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
   const unified = readRalphUnifiedState(projectDir);
   if (!unified?.session?.active) return;

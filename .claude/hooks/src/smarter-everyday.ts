@@ -27,6 +27,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { spawn } from 'child_process';
+import { writeStateWithLock } from './shared/atomic-write.js';
+import { getSessionStatePath } from './shared/session-isolation.js';
 
 interface PostToolUseInput {
   session_id: string;
@@ -101,8 +103,8 @@ const FAILURE_PATTERNS = [
 // Turns to wait before declaring victory (no edit to tracked file)
 const VICTORY_TURN_THRESHOLD = 3;
 
-function getStateFilePath(projectDir: string): string {
-  return path.join(projectDir, '.claude', 'smarter-everyday-state.json');
+function getStateFilePath(_projectDir: string): string {
+  return getSessionStatePath('smarter-everyday');
 }
 
 function loadState(stateFile: string, sessionId: string): SmarterState {
@@ -140,7 +142,7 @@ function saveState(stateFile: string, state: SmarterState): void {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  fs.writeFileSync(stateFile, JSON.stringify(state, null, 2));
+  writeStateWithLock(stateFile, JSON.stringify(state, null, 2));
 }
 
 function isTestCommand(command: string): boolean {

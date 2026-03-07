@@ -132,7 +132,7 @@ async function main() {
       console.log(JSON.stringify(makeAllowOutput()));
       return;
     }
-    if (input.tool_name !== "Task") {
+    if (input.tool_name !== "Agent" && input.tool_name !== "Task") {
       console.log(JSON.stringify(makeAllowOutput()));
       return;
     }

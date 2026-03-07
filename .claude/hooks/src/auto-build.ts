@@ -40,6 +40,11 @@ function isHookSourceFile(filePath: string): boolean {
   if (!filePath) return false;
   // Normalize to forward slashes for consistent matching
   const normalized = filePath.replace(/\\/g, '/');
+
+  // Don't trigger build for repo edits — build uses ~/.claude/ source, not repo
+  const repoPath = (process.env.USERPROFILE || process.env.HOME || '') + '/continuous-claude';
+  if (normalized.startsWith(repoPath.replace(/\\/g, '/'))) return false;
+
   return normalized.includes('.claude/hooks/src/') && normalized.endsWith('.ts');
 }
 

@@ -5,7 +5,7 @@
  * Provides type-safe interface between TypeScript hooks and Python logic.
  */
 
-import { execSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import type { ValidationResult, PatternInferenceResult, PatternType } from './pattern-selector.js';
@@ -31,17 +31,18 @@ export function callValidateComposition(
   operator: string = ';'
 ): ValidationResult {
   const expr = `${patternA} ${operator}[${scope}] ${patternB}`;
-  const cmd = `uv run python scripts/validate_composition.py --json "${expr}"`;
 
   try {
-    const stdout = execSync(cmd, {
+    const proc = spawnSync('uv', [
+      'run', 'python', 'scripts/validate_composition.py', '--json', expr
+    ], {
       cwd: PROJECT_DIR,
       encoding: 'utf-8',
       timeout: 10000,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
-    const result = JSON.parse(stdout);
+    const result = JSON.parse(proc.stdout || '');
 
     // Map Python snake_case to TypeScript camelCase
     return {
@@ -70,19 +71,17 @@ export function callValidateComposition(
  * @returns PatternInferenceResult with pattern, confidence, and signals
  */
 export function callPatternInference(prompt: string): PatternInferenceResult {
-  // Escape double quotes and backslashes for shell safety
-  const escaped = prompt.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-  const cmd = `uv run python scripts/agentica_patterns/pattern_inference.py "${escaped}"`;
-
   try {
-    const stdout = execSync(cmd, {
+    const proc = spawnSync('uv', [
+      'run', 'python', 'scripts/agentica_patterns/pattern_inference.py', prompt
+    ], {
       cwd: PROJECT_DIR,
       encoding: 'utf-8',
       timeout: 10000,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
-    const result = JSON.parse(stdout);
+    const result = JSON.parse(proc.stdout || '');
 
     return {
       pattern: result.pattern as PatternType,

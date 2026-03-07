@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Explore to Scout Redirect Hook - PreToolUse (Task)
+ * Explore to Scout Rewrite Hook - PreToolUse (Agent)
  *
- * Intercepts Task tool calls with subagent_type="Explore" and
- * redirects to "scout" which uses Sonnet instead of Haiku.
+ * Silently rewrites subagent_type="Explore" to "scout" using modifiedInput.
+ * Eliminates the deny+retry round-trip that wasted tokens and latency.
  *
  * Per ~/.claude/rules/use-scout-not-explore.md:
  * - Explore uses Haiku - fast but inaccurate
@@ -23,8 +23,8 @@ interface HookInput {
 interface HookOutput {
   hookSpecificOutput?: {
     hookEventName: string;
-    permissionDecision?: string;
-    permissionDecisionReason?: string;
+    modifiedInput?: Record<string, unknown>;
+    additionalContext?: string;
   };
 }
 
@@ -55,19 +55,12 @@ async function main(): Promise<void> {
     return;
   }
 
+  // Silently rewrite Explore -> scout (no deny/retry needed)
   const output: HookOutput = {
     hookSpecificOutput: {
       hookEventName: 'PreToolUse',
-      permissionDecision: 'deny',
-      permissionDecisionReason: `🔄 REDIRECT: Explore → scout
-
-Per ~/.claude/rules/use-scout-not-explore.md:
-- Explore uses Haiku (inaccurate for codebase exploration)
-- Scout uses Sonnet with detailed prompt (accurate results)
-
-**Fix:** Change subagent_type from "Explore" to "scout"
-
-Or use tools directly (Grep, Glob, Read) for high-accuracy exploration.`,
+      modifiedInput: { subagent_type: 'scout' },
+      additionalContext: 'Explore -> scout: upgraded for accuracy (Sonnet vs Haiku)',
     },
   };
 

@@ -6,7 +6,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
 var VALID_AGENTS = {
-  RESEARCH: ["scout", "oracle", "pathfinder", "Explore", "explore"],
+  RESEARCH: ["scout", "oracle", "pathfinder"],
   IMPLEMENTATION: ["kraken", "spark", "architect", "plan-agent", "strategic-refactorer"],
   DEBUGGING: ["debug-agent", "sleuth", "profiler", "spark", "aegis", "principal-debugger"],
   REFACTORING: ["phoenix", "spark", "strategic-refactorer", "kraken"],
@@ -92,7 +92,7 @@ Remove the model parameter to inherit the parent model.
 }
 async function main() {
   const input = JSON.parse(readStdin());
-  if (input.tool_name !== "Task") {
+  if (input.tool_name !== "Agent" && input.tool_name !== "Task") {
     outputContinue();
     return;
   }

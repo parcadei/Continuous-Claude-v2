@@ -9,6 +9,171 @@ var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require
 // src/user-confirmation-detector.ts
 import * as fs from "fs";
 import * as path from "path";
+
+// src/shared/atomic-write.ts
+import {
+  writeFileSync,
+  renameSync as renameSync2,
+  unlinkSync,
+  existsSync as existsSync2,
+  openSync,
+  closeSync,
+  readFileSync,
+  statSync as statSync2,
+  constants
+} from "fs";
+import { dirname, basename, join as join2 } from "path";
+
+// src/shared/logger.ts
+import { appendFileSync, existsSync, mkdirSync, statSync, renameSync } from "fs";
+import { join } from "path";
+import { homedir } from "os";
+var LOG_DIR = join(homedir(), ".claude", "logs");
+var LOG_FILE = join(LOG_DIR, "hooks.log");
+var MAX_LOG_SIZE = 5 * 1024 * 1024;
+var MIN_LEVEL = process.env.CLAUDE_HOOK_LOG_LEVEL || "info";
+var LEVEL_ORDER = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3
+};
+function shouldLog(level) {
+  return LEVEL_ORDER[level] >= LEVEL_ORDER[MIN_LEVEL];
+}
+function ensureLogDir() {
+  if (!existsSync(LOG_DIR)) {
+    mkdirSync(LOG_DIR, { recursive: true });
+  }
+}
+function rotateIfNeeded() {
+  try {
+    if (existsSync(LOG_FILE)) {
+      const stat = statSync(LOG_FILE);
+      if (stat.size > MAX_LOG_SIZE) {
+        const rotated = LOG_FILE + ".1";
+        renameSync(LOG_FILE, rotated);
+      }
+    }
+  } catch {
+  }
+}
+function getSessionId() {
+  return process.env.CLAUDE_SESSION_ID || void 0;
+}
+function writeLog(entry) {
+  try {
+    ensureLogDir();
+    rotateIfNeeded();
+    appendFileSync(LOG_FILE, JSON.stringify(entry) + "\n");
+  } catch {
+  }
+}
+function createLogger(hookName) {
+  function log2(level, msg, data) {
+    if (!shouldLog(level)) return;
+    const entry = {
+      ts: (/* @__PURE__ */ new Date()).toISOString(),
+      level,
+      hook: hookName,
+      msg,
+      sessionId: getSessionId()
+    };
+    if (data && Object.keys(data).length > 0) {
+      entry.data = data;
+    }
+    writeLog(entry);
+    if (level === "error" || level === "warn") {
+      console.error(`[${hookName}] ${level.toUpperCase()}: ${msg}`);
+    }
+  }
+  return {
+    debug: (msg, data) => log2("debug", msg, data),
+    info: (msg, data) => log2("info", msg, data),
+    warn: (msg, data) => log2("warn", msg, data),
+    error: (msg, data) => log2("error", msg, data)
+  };
+}
+
+// src/shared/atomic-write.ts
+var log = createLogger("atomic-write");
+var LOCK_STALE_MS = 1e4;
+var LOCK_RETRY_MS = 50;
+var LOCK_TIMEOUT_MS = 5e3;
+function atomicWriteSync(filePath, content) {
+  const dir = dirname(filePath);
+  const tmpFile = join2(dir, `.${basename(filePath)}.tmp.${process.pid}`);
+  try {
+    writeFileSync(tmpFile, content, "utf-8");
+    renameSync2(tmpFile, filePath);
+  } catch (err) {
+    try {
+      if (existsSync2(tmpFile)) unlinkSync(tmpFile);
+    } catch {
+    }
+    throw err;
+  }
+}
+function acquireLockSync(filePath, timeoutMs = LOCK_TIMEOUT_MS) {
+  const lockFile = filePath + ".lock";
+  const startTime = Date.now();
+  while (true) {
+    try {
+      const fd = openSync(lockFile, constants.O_CREAT | constants.O_EXCL | constants.O_WRONLY);
+      writeFileSync(fd, `${process.pid}
+${Date.now()}`, "utf-8");
+      closeSync(fd);
+      return true;
+    } catch (err) {
+      if (err.code === "EEXIST") {
+        try {
+          const stat = statSync2(lockFile);
+          if (Date.now() - stat.mtimeMs > LOCK_STALE_MS) {
+            log.warn("Removing stale lock", { lockFile, ageMs: Date.now() - stat.mtimeMs });
+            unlinkSync(lockFile);
+            continue;
+          }
+        } catch {
+          continue;
+        }
+        if (Date.now() - startTime > timeoutMs) {
+          log.error("Lock acquisition timed out", { lockFile, timeoutMs });
+          return false;
+        }
+        const waitUntil = Date.now() + LOCK_RETRY_MS;
+        while (Date.now() < waitUntil) {
+        }
+      } else {
+        log.error("Lock acquisition failed", { lockFile, error: String(err) });
+        return false;
+      }
+    }
+  }
+}
+function releaseLockSync(filePath) {
+  const lockFile = filePath + ".lock";
+  try {
+    if (existsSync2(lockFile)) {
+      unlinkSync(lockFile);
+    }
+  } catch (err) {
+    log.warn("Failed to release lock", { lockFile, error: String(err) });
+  }
+}
+function writeStateWithLock(filePath, content) {
+  const locked = acquireLockSync(filePath);
+  try {
+    atomicWriteSync(filePath, content);
+  } catch (err) {
+    log.error("State write failed", { filePath, error: String(err) });
+  } finally {
+    if (locked) {
+      releaseLockSync(filePath);
+    }
+  }
+}
+
+// src/user-confirmation-detector.ts
 var RESOLUTION_SIGNALS = [
   // Direct confirmations
   /(?:this|it)(?:'s| is)(?: now)? (?:fixed|working|resolved|done)/i,
@@ -51,7 +216,7 @@ function loadSmarterState(stateFile) {
   }
 }
 function saveSmarterState(stateFile, state) {
-  fs.writeFileSync(stateFile, JSON.stringify(state, null, 2));
+  writeStateWithLock(stateFile, JSON.stringify(state, null, 2));
 }
 function isResolutionConfirmation(prompt) {
   if (ANTI_PATTERNS.some((p) => p.test(prompt))) {

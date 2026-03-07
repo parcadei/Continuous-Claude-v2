@@ -13,6 +13,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 import { execFileSync } from 'child_process';
 
 interface PostToolUseInput {
@@ -194,6 +195,20 @@ function findSkillMdPath(skillName: string): string | null {
       return candidate;
     }
   }
+
+  // Search plugin directories: ~/.claude/plugins/*/skills/<skillName>/SKILL.md
+  const pluginsDir = path.join(HOME_DIR, '.claude', 'plugins');
+  if (fs.existsSync(pluginsDir)) {
+    try {
+      for (const pkg of fs.readdirSync(pluginsDir)) {
+        const pluginSkillPath = path.join(pluginsDir, pkg, 'skills', skillName, 'SKILL.md');
+        if (fs.existsSync(pluginSkillPath)) {
+          return pluginSkillPath;
+        }
+      }
+    } catch { /* ignore read errors */ }
+  }
+
   return null;
 }
 
@@ -234,7 +249,7 @@ function runExtractTriggers(skillMdPath: string): ExtractedTriggers | null {
   }
 
   try {
-    const result = execFileSync('python', [EXTRACT_TRIGGERS_SCRIPT, '--skill-path', skillMdPath], {
+    const result = execFileSync('uv', ['run', 'python', EXTRACT_TRIGGERS_SCRIPT, '--skill-path', skillMdPath], {
       encoding: 'utf-8',
       timeout: 10000,
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -256,13 +271,14 @@ function runRegisterSkill(skillName: string, entryJson: string): boolean {
   }
 
   const tempFile = path.join(
-    require('os').tmpdir(),
+    os.tmpdir(),
     `skill-entry-${Date.now()}.json`
   );
   fs.writeFileSync(tempFile, entryJson, 'utf-8');
 
   try {
-    execFileSync('python', [
+    execFileSync('uv', [
+      'run', 'python',
       REGISTER_SCRIPT,
       '--rules-path', SKILL_RULES_PATH,
       '--skill-name', skillName,

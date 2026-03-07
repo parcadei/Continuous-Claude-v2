@@ -211,8 +211,8 @@ describe('Arscontexta Regression', () => {
   // ── Count stability ──────────────────────────────────────────────
 
   describe('Count Stability', () => {
-    it('exactly 95 skills total', () => {
-      expect(Object.keys(rules.skills).length).toBe(95);
+    it('exactly 83 skills total', () => {
+      expect(Object.keys(rules.skills).length).toBe(83);
     });
 
     it('exactly 18 agents total', () => {

@@ -18,23 +18,15 @@ async function main() {
   }
   const tool = input.tool || input.tool_name;
   const subagentType = input.tool_input?.subagent_type;
-  if (tool !== "Task" || subagentType?.toLowerCase() !== "explore") {
+  if (tool !== "Agent" && tool !== "Task" || subagentType?.toLowerCase() !== "explore") {
     console.log("{}");
     return;
   }
   const output = {
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
-      permissionDecision: "deny",
-      permissionDecisionReason: `\u{1F504} REDIRECT: Explore \u2192 scout
-
-Per ~/.claude/rules/use-scout-not-explore.md:
-- Explore uses Haiku (inaccurate for codebase exploration)
-- Scout uses Sonnet with detailed prompt (accurate results)
-
-**Fix:** Change subagent_type from "Explore" to "scout"
-
-Or use tools directly (Grep, Glob, Read) for high-accuracy exploration.`
+      modifiedInput: { subagent_type: "scout" },
+      additionalContext: "Explore -> scout: upgraded for accuracy (Sonnet vs Haiku)"
     }
   };
   console.log(JSON.stringify(output));

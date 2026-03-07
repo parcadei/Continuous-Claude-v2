@@ -17,6 +17,7 @@
 import { spawn } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import { writeStateWithLock } from './shared/atomic-write.js';
 
 interface PreCompactInput {
   trigger: 'manual' | 'auto';
@@ -149,7 +150,7 @@ async function main() {
   try {
     const stateData = fs.existsSync(stateFile) ? JSON.parse(fs.readFileSync(stateFile, 'utf-8')) : {};
     stateData.last_launched = Date.now();
-    fs.writeFileSync(stateFile, JSON.stringify(stateData));
+    writeStateWithLock(stateFile, JSON.stringify(stateData, null, 2));
   } catch { /* fail open */ }
 
   // Run extraction in background (non-blocking)

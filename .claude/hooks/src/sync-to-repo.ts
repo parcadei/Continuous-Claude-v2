@@ -79,6 +79,11 @@ function shouldSync(filePath: string): boolean {
   const normalized = filePath.replace(/\\/g, '/');
   if (!normalized.includes('.claude/')) return false;
 
+  // Don't sync when the edited file is inside the repo itself
+  // This prevents the revert loop: edit in repo → hook copies old ~/.claude/ version back
+  const normalizedRepo = REPO_DIR.replace(/\\/g, '/');
+  if (normalized.startsWith(normalizedRepo)) return false;
+
   // Check if it's a never-sync file
   const basename = path.basename(filePath);
   if (NEVER_SYNC.includes(basename)) return false;

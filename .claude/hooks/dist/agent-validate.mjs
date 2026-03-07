@@ -83,7 +83,7 @@ async function main() {
     outputContinue();
     return;
   }
-  if (input.tool_name !== "Task") {
+  if (input.tool_name !== "Agent" && input.tool_name !== "Task") {
     outputContinue();
     return;
   }

@@ -80,6 +80,142 @@ function hasCodeFiles(projectDir) {
   }
   return false;
 }
+function checkExternalSkillStaleness() {
+  const result = { needsRevetting: [], stale: [] };
+  const homeDir = process.env.HOME || process.env.USERPROFILE || "";
+  const rulesPath = path.join(homeDir, ".claude", "skills", "skill-rules.json");
+  const lockPath = path.join(homeDir, ".agents", ".skill-lock.json");
+  if (!fs.existsSync(rulesPath)) return result;
+  try {
+    const rules = JSON.parse(fs.readFileSync(rulesPath, "utf-8"));
+    const skills = rules.skills || {};
+    let lockData = {};
+    if (fs.existsSync(lockPath)) {
+      try {
+        const lock = JSON.parse(fs.readFileSync(lockPath, "utf-8"));
+        lockData = lock.skills || {};
+      } catch {
+      }
+    }
+    const now = Date.now();
+    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1e3;
+    for (const [name, skill] of Object.entries(skills)) {
+      if (!skill.source || skill.source.registry !== "skills.sh") continue;
+      const dateStr = skill.source.updatedAt || skill.source.installedAt;
+      if (dateStr) {
+        const timestamp = new Date(dateStr).getTime();
+        if (now - timestamp > THIRTY_DAYS_MS) {
+          result.stale.push(name);
+        }
+      }
+      if (lockData[name] && skill.source.folderHash) {
+        if (lockData[name].skillFolderHash !== skill.source.folderHash) {
+          result.needsRevetting.push(name);
+        }
+      }
+    }
+  } catch {
+  }
+  return result;
+}
+function detectProjectStack(projectDir) {
+  const stack = [];
+  const pkgPath = path.join(projectDir, "package.json");
+  if (fs.existsSync(pkgPath)) {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
+      const allDeps = { ...pkg.dependencies, ...pkg.devDependencies };
+      stack.push(...Object.keys(allDeps));
+    } catch {
+    }
+  }
+  const pyprojectPath = path.join(projectDir, "pyproject.toml");
+  if (fs.existsSync(pyprojectPath)) {
+    try {
+      const content = fs.readFileSync(pyprojectPath, "utf-8");
+      const depMatches = content.match(/^\s*"?([a-zA-Z0-9_-]+)"?\s*[>=<~^]/gm);
+      if (depMatches) {
+        stack.push(...depMatches.map((m) => m.trim().replace(/[">=<~^ ]/g, "")));
+      }
+    } catch {
+    }
+  }
+  try {
+    const topLevelFiles = fs.readdirSync(projectDir);
+    if (topLevelFiles.some((f) => f.endsWith(".bicep") || f.endsWith(".bicepparam"))) {
+      stack.push("@azure/bicep-indicator");
+    }
+    if (topLevelFiles.includes("Cargo.toml")) {
+      stack.push("rust-indicator");
+    }
+    if (topLevelFiles.includes("go.mod")) {
+      stack.push("go-indicator");
+    }
+    for (const entry of topLevelFiles) {
+      try {
+        const subPath = path.join(projectDir, entry);
+        const stat = fs.statSync(subPath);
+        if (!stat.isDirectory() || entry.startsWith(".") || entry === "node_modules") continue;
+        const subFiles = fs.readdirSync(subPath);
+        if (subFiles.includes("package.json")) {
+          try {
+            const pkg = JSON.parse(fs.readFileSync(path.join(subPath, "package.json"), "utf-8"));
+            const allDeps = { ...pkg.dependencies, ...pkg.devDependencies };
+            stack.push(...Object.keys(allDeps));
+          } catch {
+          }
+        }
+        if (subFiles.includes("pyproject.toml")) {
+          try {
+            const content = fs.readFileSync(path.join(subPath, "pyproject.toml"), "utf-8");
+            const depMatches = content.match(/^\s*"?([a-zA-Z0-9_-]+)"?\s*[>=<~^]/gm);
+            if (depMatches) {
+              stack.push(...depMatches.map((m) => m.trim().replace(/[">=<~^ ]/g, "")));
+            }
+          } catch {
+          }
+        }
+        if (subFiles.some((f) => f.endsWith(".bicep") || f.endsWith(".bicepparam"))) {
+          if (!stack.includes("@azure/bicep-indicator")) {
+            stack.push("@azure/bicep-indicator");
+          }
+        }
+      } catch {
+      }
+    }
+  } catch {
+  }
+  return stack;
+}
+function findRecommendedSkills(projectStack, installedSkills) {
+  const homeDir = process.env.HOME || process.env.USERPROFILE || "";
+  const catalogPath = path.join(homeDir, ".claude", "skills", "skill-catalog.json");
+  if (!fs.existsSync(catalogPath)) return [];
+  let catalog;
+  try {
+    catalog = JSON.parse(fs.readFileSync(catalogPath, "utf-8"));
+  } catch {
+    return [];
+  }
+  const recommendations = [];
+  for (const [stackName, stackDef] of Object.entries(catalog.stacks)) {
+    const matched = stackDef.indicators.some(
+      (ind) => projectStack.some((dep) => dep.toLowerCase() === ind.toLowerCase())
+    );
+    const fileMatched = (stackDef.fileIndicators || []).some((pattern) => {
+      const ext = pattern.replace("*", "");
+      return projectStack.some((dep) => dep.includes(ext + "-indicator") || dep.toLowerCase().includes(ext));
+    });
+    if (matched || fileMatched) {
+      for (const skill of stackDef.skills) {
+        if (!installedSkills.has(skill.name)) {
+          recommendations.push({ ...skill, stackName });
+        }
+      }
+    }
+  }
+  return recommendations;
+}
 async function main() {
   const input = await readStdin();
   if (!input.trim()) {
@@ -107,34 +243,86 @@ async function main() {
   let treeGenFailed = false;
   if (!status.tree || isTreeStale(projectDir)) {
     if (hasCodeFiles(projectDir)) {
-      console.error("\u{1F4CA} Generating knowledge tree...");
+      console.error("[*] Generating knowledge tree...");
       const generated = generateTree(projectDir);
       if (generated) {
-        console.error("\u2713 Knowledge tree generated");
+        console.error("[ok] Knowledge tree generated");
         status.tree = true;
       } else {
-        console.error("\u26A0 Failed to generate knowledge tree");
+        console.error("[!] Failed to generate knowledge tree");
         treeGenFailed = true;
       }
     }
   }
-  if (status.tree && status.roadmap && !treeGenFailed) {
+  const skillStaleness = checkExternalSkillStaleness();
+  const hasSkillIssues = skillStaleness.needsRevetting.length > 0 || skillStaleness.stale.length > 0;
+  let skillRecommendations = [];
+  try {
+    const homeDir = process.env.HOME || process.env.USERPROFILE || "";
+    const rulesPath = path.join(homeDir, ".claude", "skills", "skill-rules.json");
+    const installedSkills = /* @__PURE__ */ new Set();
+    if (fs.existsSync(rulesPath)) {
+      try {
+        const rules = JSON.parse(fs.readFileSync(rulesPath, "utf-8"));
+        for (const name of Object.keys(rules.skills || {})) {
+          installedSkills.add(name);
+        }
+      } catch {
+      }
+    }
+    const projectStack = detectProjectStack(projectDir);
+    if (projectStack.length > 0) {
+      skillRecommendations = findRecommendedSkills(projectStack, installedSkills);
+    }
+  } catch {
+  }
+  const hasRecommendations = skillRecommendations.length > 0;
+  if (status.tree && status.roadmap && !treeGenFailed && !hasSkillIssues && !hasRecommendations) {
     console.log(JSON.stringify({ result: "continue" }));
     return;
   }
-  if (!hasCodeFiles(projectDir)) {
+  if (!hasCodeFiles(projectDir) && !hasSkillIssues && !hasRecommendations) {
     console.log(JSON.stringify({ result: "continue" }));
     return;
   }
   const missing = [];
   if (!status.roadmap) missing.push("ROADMAP.md");
   if (treeGenFailed) missing.push("knowledge-tree.json (generation failed - agents will lack project context)");
-  if (missing.length === 0) {
+  const skillWarnings = [];
+  if (skillStaleness.needsRevetting.length > 0) {
+    skillWarnings.push(`[!] ${skillStaleness.needsRevetting.length} skill(s) updated externally, need re-vetting: ${skillStaleness.needsRevetting.join(", ")}. Run /vet-skill --all-unvetted`);
+  }
+  if (skillStaleness.stale.length > 0) {
+    skillWarnings.push(`[i] ${skillStaleness.stale.length} skill(s) installed 30+ days ago without update check: ${skillStaleness.stale.join(", ")}. Run npx skills check`);
+  }
+  const skillRecommendationMessages = [];
+  if (skillRecommendations.length > 0) {
+    const lines = skillRecommendations.map(
+      (r) => `  - ${r.name} (${r.publisher}): npx skills add ${r.source} -g -y`
+    );
+    skillRecommendationMessages.push(
+      `[i] Skills available for this project stack:
+${lines.join("\n")}
+Install relevant skills to enhance your work on this project.`
+    );
+  }
+  if (missing.length === 0 && skillWarnings.length === 0 && skillRecommendationMessages.length === 0) {
     console.log(JSON.stringify({ result: "continue" }));
     return;
   }
-  const message = `\u{1F4CB} Project partially initialized. Missing: ${missing.join(", ")}. Run /init-project for full Continuous Claude setup.`;
-  console.error(`\u2139 ${message}`);
+  let message = "";
+  if (missing.length > 0) {
+    message += `[!] Project partially initialized. Missing: ${missing.join(", ")}. Run /init-project for full Continuous Claude setup.`;
+  }
+  if (skillWarnings.length > 0) {
+    if (message) message += " | ";
+    message += skillWarnings.join(" | ");
+  }
+  if (skillRecommendationMessages.length > 0) {
+    if (message) message += "\n";
+    message += skillRecommendationMessages.join("\n");
+  }
+  console.error(message);
   const output = {
     result: "continue",
     message

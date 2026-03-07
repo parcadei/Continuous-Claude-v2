@@ -45,9 +45,9 @@ Memory Storage (if learning detected)
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  recall_learnings.py ──┬──→ PostgreSQL + pgvector           │
-│  store_learning.py ────┤      └─ archival_memory table      │
-│                        │      └─ BGE-large embeddings       │
-│  memory_daemon.py ─────┘         (1024 dimensions)          │
+│  store_learning.py ────┘      └─ archival_memory table      │
+│                               └─ BGE-large embeddings       │
+│                                  (1024 dimensions)          │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 
@@ -76,7 +76,7 @@ PageIndex Layer:
 │                                                              │
 │  UserPromptSubmit ─→ heartbeat                               │
 │                      memory-awareness                        │
-│                      skill-activation                        │
+│                      skill-activation-prompt                 │
 │                                                              │
 │  PreToolUse ───────→ file-claims (can BLOCK)                 │
 │                      ralph-delegation-enforcer (can BLOCK)   │

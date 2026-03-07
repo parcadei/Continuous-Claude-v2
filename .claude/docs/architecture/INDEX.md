@@ -33,8 +33,8 @@
         ▼           ▼           ▼           ▼           ▼
 ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
 │  MEMORY  │ │  HOOKS   │ │  AGENTS  │ │ PAGEINDEX│ │ WORKFLOWS│
-│PostgreSQL│ │100+ TS/JS│ │18+ types │ │Doc search│ │Ralph/    │
-│+pgvector │ │intercepts│ │Task tool │ │LLM reason│ │Maestro   │
+│PostgreSQL│ │92 src,23 │ │31 agents │ │Doc search│ │Ralph/    │
+│+pgvector │ │registered│ │Task tool │ │LLM reason│ │Maestro   │
 └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────────┘
 ```
 
