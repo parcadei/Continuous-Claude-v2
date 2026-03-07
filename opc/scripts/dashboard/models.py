@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 
@@ -22,6 +22,7 @@ class PillarHealth(BaseModel):
     count: int = 0
     last_activity: Optional[datetime] = None
     error: Optional[str] = None
+    details: Optional[Dict[str, Any]] = None
 
 
 class HealthResponse(BaseModel):

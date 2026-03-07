@@ -43,6 +43,7 @@
 /* Session Dashboard - Real-Time Monitoring Theme */
 /* Based on: Bento Box Grid + Real-Time Monitoring + Dark Mode */
 :root {
+  color-scheme: light;
   --radius: 0.625rem;
 
   /* Light mode (minimal - dashboard is dark-first) */
@@ -81,6 +82,7 @@
 
 /* Dark mode - Primary theme for monitoring dashboard */
 .dark {
+  color-scheme: dark;
   /* Deep space black with subtle blue tint */
   --background: oklch(0.12 0.02 260);
   --foreground: oklch(0.95 0.01 260);
@@ -128,6 +130,9 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+  *:focus-visible {
+    @apply outline-2 outline-ring outline-offset-2;
   }
   body {
     @apply bg-background text-foreground antialiased;

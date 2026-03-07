@@ -2,13 +2,17 @@
 
 Queries the sessions, file_claims, and agent_runs tables
 to provide a unified view of all Claude sessions.
+Also reads per-session hook/skill activity from local JSON files.
 """
 from __future__ import annotations
 
+import json
 import logging
 import os
+import re
 import sys
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -204,3 +208,54 @@ class SessionsService:
         except Exception as e:
             logger.warning(f"Session detail failed: {e}")
             return None
+
+    async def get_session_activity(
+        self,
+        session_id: str,
+        activity_dir: str | None = None,
+    ) -> dict[str, Any] | None:
+        """Read per-session hook/skill activity from local JSON files.
+
+        Args:
+            session_id: The session UUID to look up.
+            activity_dir: Override directory for activity files.
+                Defaults to ~/.claude/cache/session-activity/
+
+        Returns:
+            Activity dict with hooks, skills, and summary counts,
+            or None if not found / invalid.
+        """
+        # Sanitize session_id: only allow UUID-like characters
+        if not re.match(r'^[a-zA-Z0-9_-]+$', session_id):
+            return None
+
+        if activity_dir is None:
+            home = os.environ.get("USERPROFILE") or os.environ.get("HOME", "")
+            activity_dir = str(Path(home) / ".claude" / "cache" / "session-activity")
+
+        filepath = Path(activity_dir) / f"{session_id}.json"
+
+        if not filepath.is_file():
+            return None
+
+        try:
+            raw = filepath.read_text(encoding="utf-8")
+            data = json.loads(raw)
+        except (json.JSONDecodeError, OSError) as e:
+            logger.warning(f"Failed to read session activity {session_id}: {e}")
+            return None
+
+        hooks = data.get("hooks", [])
+        skills = data.get("skills", [])
+
+        total_hooks = sum(h.get("count", 0) for h in hooks)
+        total_skills = sum(s.get("count", 0) for s in skills)
+
+        return {
+            "session_id": data.get("session_id", session_id),
+            "started_at": data.get("started_at"),
+            "hooks": hooks,
+            "skills": skills,
+            "total_hooks": total_hooks,
+            "total_skills": total_skills,
+        }

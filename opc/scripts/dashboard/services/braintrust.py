@@ -50,6 +50,7 @@ class BraintrustPillarService(BasePillarService):
     BTQL_URL = "https://api.braintrust.dev/btql"
     PROJECT_URL = "https://api.braintrust.dev/v1/project"
     CACHE_TTL = 60  # seconds
+    _consecutive_failures: int = 0
 
     def __init__(self):
         super().__init__("braintrust")
@@ -185,6 +186,7 @@ class BraintrustPillarService(BasePillarService):
         """)
 
         if rows:
+            self._consecutive_failures = 0
             count = rows[0].get("session_count", 0)
             return PillarHealth(
                 name=self.name,
@@ -192,6 +194,14 @@ class BraintrustPillarService(BasePillarService):
                 count=count,
             )
 
+        self._consecutive_failures += 1
+        if self._consecutive_failures < 3:
+            return PillarHealth(
+                name=self.name,
+                status=PillarStatus.DEGRADED,
+                count=0,
+                error=f"API flaky ({self._consecutive_failures}/3 failures)",
+            )
         return PillarHealth(
             name=self.name,
             status=PillarStatus.OFFLINE,

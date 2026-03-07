@@ -109,8 +109,9 @@ export type WebSocketEventType = 'health_update' | 'activity' | 'notification'
 
 export interface HealthUpdateEvent {
   type: 'health_update'
-  pillars: Record<string, PillarHealth>
-  changed: string[]
+  pillar: string
+  status: string
+  count: number
   timestamp: string
 }
 
@@ -225,6 +226,22 @@ export interface SessionsResponse {
   error?: string
 }
 
+// Session Activity types
+export interface SessionActivityEntry {
+  name: string
+  first_seen: string
+  count: number
+}
+
+export interface SessionActivity {
+  session_id: string
+  started_at: string | null
+  hooks: SessionActivityEntry[]
+  skills: SessionActivityEntry[]
+  total_hooks: number
+  total_skills: number
+}
+
 // System Health types
 export type SubsystemStatus = 'HEALTHY' | 'DEGRADED' | 'FAILING'
 
@@ -234,8 +251,119 @@ export interface SubsystemCheck {
   recommendations: string[]
 }
 
+// Skills types
+export interface SkillInfo {
+  name: string
+  type: string
+  enforcement: string
+  priority: string
+  description: string
+  co_activate: string[]
+}
+
+export interface GraphEdge {
+  source: string
+  target: string
+  type: string
+}
+
+export interface SkillsDetails {
+  skills: SkillInfo[]
+  agents: Array<{ name: string; type: string; description: string }>
+  graph_edges: GraphEdge[]
+  hook: { compiled: boolean; source_exists: boolean; dist_path: string }
+  activations: SkillActivations
+  stats: {
+    total_skills: number
+    total_agents: number
+    by_type: Record<string, number>
+    arscontexta_count: number
+  }
+}
+
+export interface SkillGraphData {
+  nodes: Array<{
+    id: string
+    label: string
+    type: string
+    description: string
+    enforcement: string
+  }>
+  edges: GraphEdge[]
+}
+
+export interface SkillActivations {
+  by_hook: Record<string, number>
+  total_fires: number
+  sessions_with_fires: number
+  total_sessions: number
+}
+
+export interface HookEvent {
+  hook_name: string
+  event_type: string
+  skill_matched: string | null
+  details: Record<string, unknown>
+  timestamp: string
+}
+
+// Agents types
+export interface AgentSpawnEvent {
+  timestamp: string
+  name: string
+  session_id: string
+  success: boolean
+}
+
+export interface AgentsTelemetry {
+  total_spawns: number
+  success_count: number
+  failure_count: number
+  by_agent: Record<string, number>
+  unique_sessions: number
+  recent_spawns: AgentSpawnEvent[]
+}
+
+export interface AgentsDetailsResponse {
+  telemetry: AgentsTelemetry
+  agent_types: string[]
+}
+
 export interface SystemHealthReport {
   overall: SubsystemStatus
   checked_at: string
   subsystems: Record<string, SubsystemCheck>
+}
+
+// File Claims types
+export interface FileClaim {
+  file_path: string
+  session_id: string
+  project: string
+  claimed_at: string | null
+}
+
+export interface FileClaimsResponse {
+  claims: FileClaim[]
+  total: number
+  by_project: Record<string, number>
+  error?: string
+}
+
+// MCP Servers types
+export interface MCPServerInfo {
+  name: string
+  command: string | null
+  args: string[]
+  transport: 'stdio' | 'http' | 'sse'
+  enabled: boolean
+  url?: string
+  env_keys: string[]
+}
+
+export interface MCPServersResponse {
+  servers: MCPServerInfo[]
+  total: number
+  enabled_count: number
+  disabled_count: number
 }

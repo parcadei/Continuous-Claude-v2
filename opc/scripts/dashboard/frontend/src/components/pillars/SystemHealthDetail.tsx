@@ -114,7 +114,7 @@ function SubsystemCard({ name, check, expanded, onToggle }: {
       {expanded && (
         <div className="border-t border-border px-4 pb-4 pt-3 space-y-3">
           {/* Evidence metrics */}
-          {evidenceEntries.length > 0 && (
+          {evidenceEntries.length > 0 ? (
             <div className="space-y-1.5">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Evidence</p>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1">
@@ -126,10 +126,10 @@ function SubsystemCard({ name, check, expanded, onToggle }: {
                 ))}
               </div>
             </div>
-          )}
+          ) : null}
 
           {/* Error message */}
-          {check.evidence.error && (
+          {!!check.evidence.error && (
             <div className="rounded-md bg-destructive/10 p-2">
               <p className="text-xs text-destructive font-mono">{String(check.evidence.error)}</p>
             </div>

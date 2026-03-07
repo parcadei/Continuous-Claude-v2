@@ -68,7 +68,7 @@ export function PageIndexDetail({ open, onOpenChange }: PageIndexDetailProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<IndexStatus | 'all'>('all')
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const handleSearchChange = (value: string) => {
     setSearchQuery(value)

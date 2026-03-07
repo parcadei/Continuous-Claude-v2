@@ -12,9 +12,10 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -28,8 +29,13 @@ from dashboard.routers.pageindex import router as pageindex_router
 from dashboard.routers.ralph import router as ralph_router
 from dashboard.routers.braintrust import router as braintrust_router
 from dashboard.routers.roadmap import router as roadmap_router
+from dashboard.routers.skills import router as skills_router
+from dashboard.routers.hook_events import router as hook_events_router
 from dashboard.routers.system_health import router as system_health_router
 from dashboard.routers.sessions import router as sessions_router
+from dashboard.routers.file_claims import router as file_claims_router
+from dashboard.routers.agents import router as agents_router
+from dashboard.routers.mcp_servers import router as mcp_servers_router
 from dashboard.tasks.health_monitor import HealthMonitor
 from dashboard.websocket.manager import ConnectionManager
 
@@ -81,6 +87,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Expose WS manager on app state for router access (e.g., hook_events broadcast)
+app.state.ws_manager = manager
+
 # Include routers
 app.include_router(health_router)
 app.include_router(handoffs_router)
@@ -92,6 +101,23 @@ app.include_router(braintrust_router)
 app.include_router(roadmap_router)
 app.include_router(system_health_router)
 app.include_router(sessions_router)
+app.include_router(skills_router)
+app.include_router(hook_events_router)
+app.include_router(file_claims_router)
+app.include_router(agents_router)
+app.include_router(mcp_servers_router)
+
+class CacheHeaderMiddleware(BaseHTTPMiddleware):
+    """Add immutable cache headers for Vite hashed assets."""
+
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith("/assets/"):
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        return response
+
+
+app.add_middleware(CacheHeaderMiddleware)
 
 # Static files configuration
 STATIC_DIR = Path(__file__).parent / "static"

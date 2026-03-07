@@ -44,11 +44,14 @@ class RoadmapPillarService(BasePillarService):
             count = number of completed items
         """
         try:
-            completed, _ = self._parse_roadmap()
+            completed, planned = self._parse_roadmap()
+            total = completed + planned
+            percentage = round((completed / total) * 100) if total > 0 else 0
             return PillarHealth(
                 name=self.name,
                 status=PillarStatus.ONLINE,
-                count=completed,
+                count=percentage,
+                details={"completed": completed, "planned": planned, "total": total},
             )
         except FileNotFoundError as e:
             return PillarHealth(

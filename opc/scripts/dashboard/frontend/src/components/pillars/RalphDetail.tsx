@@ -131,7 +131,7 @@ export function RalphDetail({ open, onOpenChange }: RalphDetailProps) {
 
   useEffect(() => {
     if (!open) return
-    const interval = setInterval(() => loadData(), 5000)
+    const interval = setInterval(() => loadData(), 30000)
     return () => clearInterval(interval)
   }, [open, loadData])
 

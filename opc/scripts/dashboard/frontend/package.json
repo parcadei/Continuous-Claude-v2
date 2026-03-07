@@ -12,7 +12,9 @@
     "test:run": "vitest run"
   },
   "dependencies": {
+    "@dagrejs/dagre": "^2.0.4",
     "@tailwindcss/vite": "^4.1.18",
+    "@xyflow/react": "^12.10.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.563.0",

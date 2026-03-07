@@ -22,6 +22,7 @@ async def list_learnings(
     page_size: int = Query(20, ge=1, le=100, description="Number of records per page"),
     search: Optional[str] = Query(None, description="Search text in content"),
     type_filter: Optional[str] = Query(None, description="Filter by learning type"),
+    exclude_type: Optional[str] = Query(None, description="Exclude a specific learning type"),
 ) -> dict[str, Any]:
     """List learnings with page-based pagination and optional filtering."""
     offset = (page - 1) * page_size
@@ -40,6 +41,11 @@ async def list_learnings(
         if type_filter:
             where_clauses.append(f"metadata::jsonb->>'type' = ${param_idx}")
             params.append(type_filter)
+            param_idx += 1
+
+        if exclude_type and not type_filter:
+            where_clauses.append(f"(metadata::jsonb->>'type' IS NULL OR metadata::jsonb->>'type' != ${param_idx})")
+            params.append(exclude_type)
             param_idx += 1
 
         where_sql = ""

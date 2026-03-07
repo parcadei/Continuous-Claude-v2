@@ -36,12 +36,14 @@ class PageIndexPillarService(BasePillarService):
         try:
             pool = await get_pool()
             async with pool.acquire() as conn:
-                count = await conn.fetchval("SELECT COUNT(*) FROM pageindex_trees")
+                total_docs = await conn.fetchval("SELECT COUNT(*) FROM pageindex_trees")
 
+            indexed = total_docs or 0
             return PillarHealth(
                 name="pageindex",
                 status=PillarStatus.ONLINE,
-                count=count or 0,
+                count=indexed,
+                details={"total": indexed, "indexed": indexed, "pending": 0, "failed": 0},
             )
         except Exception as e:
             logger.warning(f"PageIndex health check failed: {e}")

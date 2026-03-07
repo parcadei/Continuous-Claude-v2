@@ -15,7 +15,14 @@ import type {
   BraintrustSkillStat,
   BraintrustSession,
   SessionsResponse,
+  SessionActivity,
   SystemHealthReport,
+  SkillsDetails,
+  SkillGraphData,
+  HookEvent,
+  FileClaimsResponse,
+  AgentsDetailsResponse,
+  MCPServersResponse,
 } from '@/types'
 
 const API_BASE = '/api'
@@ -59,12 +66,14 @@ export async function fetchLearnings(params?: {
   page_size?: number
   search?: string
   type_filter?: string
+  exclude_type?: string
 }): Promise<LearningsResponse> {
   const searchParams = new URLSearchParams()
   if (params?.page) searchParams.set('page', String(params.page))
   if (params?.page_size) searchParams.set('page_size', String(params.page_size))
   if (params?.search) searchParams.set('search', params.search)
   if (params?.type_filter) searchParams.set('type_filter', params.type_filter)
+  if (params?.exclude_type) searchParams.set('exclude_type', params.exclude_type)
 
   const query = searchParams.toString()
   return fetchJson<LearningsResponse>(`/pillars/memory/learnings${query ? `?${query}` : ''}`)
@@ -149,9 +158,41 @@ export async function fetchSessions(includeStale = true): Promise<SessionsRespon
   return fetchJson<SessionsResponse>(`/sessions?include_stale=${includeStale}`)
 }
 
+export async function fetchSessionActivity(sessionId: string): Promise<SessionActivity> {
+  return fetchJson<SessionActivity>(`/sessions/${encodeURIComponent(sessionId)}/activity`)
+}
+
 // System Health
 export async function fetchSystemHealthReport(): Promise<SystemHealthReport> {
   return fetchJson<SystemHealthReport>('/system-health/report')
+}
+
+// Skills
+export async function fetchSkillsDetails(): Promise<SkillsDetails> {
+  return fetchJson<SkillsDetails>('/pillars/skills/details')
+}
+
+export async function fetchSkillGraph(): Promise<SkillGraphData> {
+  return fetchJson<SkillGraphData>('/pillars/skills/graph')
+}
+
+export async function fetchHookEvents(limit = 50): Promise<{ events: HookEvent[]; total: number }> {
+  return fetchJson(`/hook-events?limit=${limit}`)
+}
+
+// Agents
+export async function fetchAgentsDetails(): Promise<AgentsDetailsResponse> {
+  return fetchJson<AgentsDetailsResponse>('/pillars/agents/details')
+}
+
+// File Claims
+export async function fetchActiveFileClaims(): Promise<FileClaimsResponse> {
+  return fetchJson<FileClaimsResponse>('/file-claims/active')
+}
+
+// MCP Servers
+export async function fetchMCPServers(): Promise<MCPServersResponse> {
+  return fetchJson<MCPServersResponse>('/mcp-servers')
 }
 
 export { ApiError }

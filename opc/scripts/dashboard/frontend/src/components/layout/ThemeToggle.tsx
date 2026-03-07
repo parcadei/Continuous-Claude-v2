@@ -12,9 +12,9 @@ type Theme = 'light' | 'dark' | 'system'
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {
-      return (localStorage.getItem('theme') as Theme) || 'dark'
+      return (localStorage.getItem('theme') as Theme) || 'system'
     }
-    return 'dark'
+    return 'system'
   })
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9">
+        <Button variant="ghost" size="icon" className="h-10 w-10">
           <svg
             className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
             fill="none"

@@ -266,6 +266,7 @@ export function MemoryDetail({ open, onOpenChange }: MemoryDetailProps) {
   const [pageSize] = useState(20)
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<string | null>(null)
+  const [showAutoExtracted, setShowAutoExtracted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [searchDebounce, setSearchDebounce] = useState('')
@@ -304,6 +305,7 @@ export function MemoryDetail({ open, onOpenChange }: MemoryDetailProps) {
           page_size: pageSize,
           search: searchDebounce || undefined,
           type_filter: typeFilter || undefined,
+          exclude_type: !showAutoExtracted && !typeFilter ? 'session_learning' : undefined,
         })
 
         if (resetPage || currentPage === 1) {
@@ -318,7 +320,7 @@ export function MemoryDetail({ open, onOpenChange }: MemoryDetailProps) {
         setLoading(false)
       }
     },
-    [page, pageSize, searchDebounce, typeFilter]
+    [page, pageSize, searchDebounce, typeFilter, showAutoExtracted]
   )
 
   // Load data when sheet opens or filters change
@@ -326,7 +328,7 @@ export function MemoryDetail({ open, onOpenChange }: MemoryDetailProps) {
     if (open) {
       loadLearnings(true)
     }
-  }, [open, searchDebounce, typeFilter, loadLearnings])
+  }, [open, searchDebounce, typeFilter, showAutoExtracted, loadLearnings])
 
   // Load more when page changes (but not on initial load)
   useEffect(() => {
@@ -470,7 +472,20 @@ export function MemoryDetail({ open, onOpenChange }: MemoryDetailProps) {
               </Button>
             )}
 
-            <span className="text-xs text-muted-foreground ml-auto">
+            <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none ml-auto">
+              <input
+                type="checkbox"
+                checked={showAutoExtracted}
+                onChange={(e) => {
+                  setShowAutoExtracted(e.target.checked)
+                  setPage(1)
+                }}
+                className="h-3.5 w-3.5 rounded border-input accent-primary"
+              />
+              Show auto-extracted
+            </label>
+
+            <span className="text-xs text-muted-foreground">
               {total} total
             </span>
           </div>

@@ -16,6 +16,9 @@ from dashboard.services.roadmap import RoadmapPillarService
 from dashboard.services.handoffs import HandoffsPillarService
 from dashboard.services.ralph import RalphPillarService
 from dashboard.services.braintrust import BraintrustPillarService
+from dashboard.services.skills import SkillsPillarService
+from dashboard.services.agents import AgentsPillarService
+from dashboard.services.mcp_servers import MCPServersPillarService
 
 router = APIRouter(prefix="/api", tags=["health"])
 
@@ -26,6 +29,9 @@ roadmap_service = RoadmapPillarService()
 handoffs_service = HandoffsPillarService()
 ralph_service = RalphPillarService()
 braintrust_service = BraintrustPillarService()
+skills_service = SkillsPillarService()
+agents_service = AgentsPillarService()
+mcp_servers_service = MCPServersPillarService()
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -42,6 +48,9 @@ async def get_health() -> HealthResponse:
     handoffs_health = await handoffs_service.check_health()
     ralph_health = await ralph_service.check_health()
     braintrust_health = await braintrust_service.check_health()
+    skills_health = await skills_service.check_health()
+    agents_health = await agents_service.check_health()
+    mcp_servers_health = await mcp_servers_service.check_health()
 
     return HealthResponse(
         pillars={
@@ -52,6 +61,9 @@ async def get_health() -> HealthResponse:
             "handoffs": handoffs_health,
             "ralph": ralph_health,
             "braintrust": braintrust_health,
+            "skills": skills_health,
+            "agents": agents_health,
+            "mcp-servers": mcp_servers_health,
         }
     )
 
@@ -64,6 +76,9 @@ PILLAR_SERVICES = {
     "handoffs": handoffs_service,
     "ralph": ralph_service,
     "braintrust": braintrust_service,
+    "skills": skills_service,
+    "agents": agents_service,
+    "mcp-servers": mcp_servers_service,
 }
 
 

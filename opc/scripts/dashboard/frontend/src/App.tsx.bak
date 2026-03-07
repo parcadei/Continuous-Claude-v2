@@ -1,0 +1,234 @@
+import { useEffect, useState, useCallback } from 'react'
+import { Header } from '@/components/layout/Header'
+import { PillarGrid } from '@/components/pillars/PillarGrid'
+import { fetchHealth } from '@/lib/api'
+import type { HealthResponse } from '@/types'
+import './index.css'
+
+function App() {
+  const [health, setHealth] = useState<HealthResponse | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [isConnected, setIsConnected] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+
+  const loadHealth = useCallback(async () => {
+    try {
+      const data = await fetchHealth()
+      setHealth(data)
+      setError(null)
+      setLastUpdated(new Date())
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch health data')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadHealth()
+
+    const interval = setInterval(loadHealth, 10000)
+    return () => clearInterval(interval)
+  }, [loadHealth])
+
+  useEffect(() => {
+    let ws: WebSocket | null = null
+    let reconnectTimeout: number
+
+    const connect = () => {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      const wsUrl = `${protocol}//${window.location.host}/ws`
+
+      ws = new WebSocket(wsUrl)
+
+      ws.onopen = () => {
+        setIsConnected(true)
+        ws?.send(JSON.stringify({ action: 'subscribe', project: 'continuous-claude' }))
+      }
+
+      ws.onclose = () => {
+        setIsConnected(false)
+        reconnectTimeout = window.setTimeout(connect, 5000)
+      }
+
+      ws.onerror = () => {
+        setIsConnected(false)
+      }
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data)
+          if (data.type === 'health_update') {
+            setHealth({ pillars: data.pillars })
+            setLastUpdated(new Date())
+          }
+        } catch {
+          // Ignore parse errors
+        }
+      }
+    }
+
+    connect()
+
+    return () => {
+      clearTimeout(reconnectTimeout)
+      ws?.close()
+    }
+  }, [])
+
+  const handleViewDetails = (pillar: string) => {
+    // TODO: Open detail sheet
+    console.log('View details for:', pillar)
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header isConnected={isConnected} />
+
+      <main className="container max-w-screen-2xl px-4 py-6">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">System Status</h2>
+            <p className="text-sm text-muted-foreground">
+              Monitor the 5 pillars of Continuous Claude
+            </p>
+          </div>
+          {lastUpdated && (
+            <p className="text-xs text-muted-foreground">
+              Updated {lastUpdated.toLocaleTimeString()}
+            </p>
+          )}
+        </div>
+
+        {error && (
+          <div className="mb-6 flex items-start gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+            <svg className="h-5 w-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <strong>Error:</strong> {error}
+            </div>
+          </div>
+        )}
+
+        <PillarGrid health={health} isLoading={isLoading} onViewDetails={handleViewDetails} />
+
+        <div className="mt-8">
+          <h3 className="mb-4 text-lg font-semibold">Quick Actions</h3>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <a
+              href="/api/health"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">Health API</p>
+                <p className="text-xs text-muted-foreground">View raw JSON</p>
+              </div>
+              <svg className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+
+            <a
+              href="/api/pillars/memory/learnings"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-chart-2/10 text-chart-2">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">Browse Learnings</p>
+                <p className="text-xs text-muted-foreground">Memory API</p>
+              </div>
+              <svg className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+
+            <a
+              href="/api/pillars/roadmap/goals"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-chart-3/10 text-chart-3">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">Roadmap Goals</p>
+                <p className="text-xs text-muted-foreground">Progress tracker</p>
+              </div>
+              <svg className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+
+            <a
+              href="/api/pillars/handoffs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-chart-5/10 text-chart-5">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">Handoff Documents</p>
+                <p className="text-xs text-muted-foreground">Session transfers</p>
+              </div>
+              <svg className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </main>
+
+      <footer className="border-t border-border py-4">
+        <div className="container max-w-screen-2xl px-4">
+          <p className="text-center text-xs text-muted-foreground">
+            Session Dashboard v1.0 | Backend: FastAPI | Frontend: React + shadcn/ui
+          </p>
+        </div>
+      </footer>
+    </div>
+  )
+}
+
+export default App

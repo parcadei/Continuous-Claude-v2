@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef, useState } from 'react'
+import { useEffect, useCallback, useRef, useState, lazy, Suspense } from 'react'
 import { Toaster } from 'sonner'
 import { Header } from '@/components/layout/Header'
 import { PillarGrid } from '@/components/pillars/PillarGrid'
@@ -13,15 +13,18 @@ import type { HealthResponse, PillarHealth } from '@/types'
 import { useBrowserNotifications } from '@/hooks'
 import { UserGuide } from '@/components/UserGuide'
 import { ActivityFeed } from '@/components/activity/ActivityFeed'
-import { MemoryDetail } from '@/components/pillars/MemoryDetail'
-import { KnowledgeDetail } from '@/components/pillars/KnowledgeDetail'
-import { PageIndexDetail } from '@/components/pillars/PageIndexDetail'
-import { RoadmapDetail } from '@/components/pillars/RoadmapDetail'
-import { HandoffsDetail } from '@/components/pillars/HandoffsDetail'
-import { RalphDetail } from '@/components/pillars/RalphDetail'
-import { BraintrustDetail } from '@/components/pillars/BraintrustDetail'
-import { SystemHealthDetail } from '@/components/pillars/SystemHealthDetail'
-import { SessionsDetail } from '@/components/pillars/SessionsDetail'
+const MemoryDetail = lazy(() => import('@/components/pillars/MemoryDetail').then(m => ({ default: m.MemoryDetail })))
+const KnowledgeDetail = lazy(() => import('@/components/pillars/KnowledgeDetail').then(m => ({ default: m.KnowledgeDetail })))
+const PageIndexDetail = lazy(() => import('@/components/pillars/PageIndexDetail').then(m => ({ default: m.PageIndexDetail })))
+const RoadmapDetail = lazy(() => import('@/components/pillars/RoadmapDetail').then(m => ({ default: m.RoadmapDetail })))
+const HandoffsDetail = lazy(() => import('@/components/pillars/HandoffsDetail').then(m => ({ default: m.HandoffsDetail })))
+const RalphDetail = lazy(() => import('@/components/pillars/RalphDetail').then(m => ({ default: m.RalphDetail })))
+const BraintrustDetail = lazy(() => import('@/components/pillars/BraintrustDetail').then(m => ({ default: m.BraintrustDetail })))
+const SkillsDetail = lazy(() => import('@/components/pillars/SkillsDetail'))
+const SystemHealthDetail = lazy(() => import('@/components/pillars/SystemHealthDetail').then(m => ({ default: m.SystemHealthDetail })))
+const SessionsDetail = lazy(() => import('@/components/pillars/SessionsDetail').then(m => ({ default: m.SessionsDetail })))
+const AgentsDetail = lazy(() => import('@/components/pillars/AgentsDetail').then(m => ({ default: m.AgentsDetail })))
+const MCPServersDetail = lazy(() => import('@/components/pillars/MCPServersDetail').then(m => ({ default: m.MCPServersDetail })))
 import './index.css'
 
 function App() {
@@ -153,7 +156,7 @@ function App() {
           addActivity({
             pillar: name,
             type: 'status_change',
-            description: `${name} is ${health.status} (${health.count} items)`,
+            description: `${name} is ${health.status} (${health.count} ${health.count === 1 ? 'item' : 'items'})`,
             timestamp: new Date(),
           })
         })
@@ -167,30 +170,41 @@ function App() {
   }, [setHealth, setError, setLoading])
 
   useEffect(() => {
-    loadHealth()
+    // Skip polling when a detail panel is open (panels load their own data)
+    if (activeDetail !== null) return
 
-    const interval = setInterval(loadHealth, 10000)
+    loadHealth()
+    // Poll less frequently when WebSocket is connected (it pushes updates)
+    const interval = setInterval(loadHealth, isConnected ? 60000 : 10000)
     return () => clearInterval(interval)
-  }, [loadHealth])
+  }, [loadHealth, isConnected, activeDetail])
 
   // Keyboard shortcuts for pillar navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Escape always works to close panels
+      if (e.key === 'Escape') {
+        setActiveDetail(null)
+        return
+      }
+
+      // Suppress shortcuts when typing in inputs or when a panel is open
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      if (activeDetail !== null) return
 
       const keyMap: Record<string, string> = {
         m: 'memory', k: 'knowledge', p: 'pageindex',
         r: 'roadmap', h: 'handoffs', a: 'ralph', b: 'braintrust',
-        x: 'system-health', s: 'sessions',
+        i: 'skills', x: 'system-health', s: 'sessions', g: 'agents',
+        c: 'mcp-servers',
       }
 
-      if (e.key === 'Escape') setActiveDetail(null)
-      else if (keyMap[e.key]) setActiveDetail(keyMap[e.key])
+      if (keyMap[e.key]) setActiveDetail(keyMap[e.key])
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [activeDetail])
 
   const handleViewDetails = (pillar: string) => {
     setActiveDetail(pillar)
@@ -201,12 +215,12 @@ function App() {
       <div className="min-h-screen bg-background">
         <Header isConnected={isConnected} onRefreshData={loadHealth} onOpenGuide={() => setGuideOpen(true)} />
 
-      <main className="container max-w-screen-2xl px-4 py-6">
+      <main id="main-content" className="container max-w-screen-2xl px-4 py-6">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">System Status</h2>
             <p className="text-sm text-muted-foreground">
-              Monitor the 7 pillars of Continuous Claude
+              Monitor the 10 pillars of Continuous Claude
             </p>
           </div>
           {lastUpdated && (
@@ -232,7 +246,6 @@ function App() {
         </div>
 
         <div className="mt-8">
-          <h3 className="mb-4 text-lg font-semibold">Activity</h3>
           <div className="rounded-lg border border-border bg-card">
             <ActivityFeed maxItems={50} />
           </div>
@@ -240,7 +253,7 @@ function App() {
 
         <div className="mt-8">
           <h3 className="mb-4 text-lg font-semibold">Quick Actions</h3>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
             <button
               onClick={() => window.open('/api/health', '_blank')}
               className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
@@ -424,6 +437,52 @@ function App() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
+
+            <button
+              onClick={() => setActiveDetail('agents')}
+              className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-500">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">Agents</p>
+                <p className="text-xs text-muted-foreground">Spawn telemetry</p>
+              </div>
+              <svg className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            <button
+              onClick={() => setActiveDetail('mcp-servers')}
+              className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-500/10 text-teal-500">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="font-medium">MCP Servers</p>
+                <p className="text-xs text-muted-foreground">Server connections</p>
+              </div>
+              <svg className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
       </main>
@@ -431,7 +490,7 @@ function App() {
       <footer className="border-t border-border py-4">
         <div className="container max-w-screen-2xl px-4">
           <p className="text-center text-xs text-muted-foreground">
-            Session Dashboard v1.0 | Backend: FastAPI | Frontend: React + shadcn/ui
+            Session Dashboard | Backend: FastAPI | Frontend: React + shadcn/ui
           </p>
         </div>
       </footer>
@@ -443,42 +502,56 @@ function App() {
         closeButton
       />
 
-      <MemoryDetail
-        open={activeDetail === 'memory'}
-        onOpenChange={(open) => !open && setActiveDetail(null)}
-      />
-      <KnowledgeDetail
-        open={activeDetail === 'knowledge'}
-        onOpenChange={(open) => !open && setActiveDetail(null)}
-      />
-      <PageIndexDetail
-        open={activeDetail === 'pageindex'}
-        onOpenChange={(open) => !open && setActiveDetail(null)}
-      />
-      <RoadmapDetail
-        open={activeDetail === 'roadmap'}
-        onOpenChange={(open) => !open && setActiveDetail(null)}
-      />
-      <HandoffsDetail
-        open={activeDetail === 'handoffs'}
-        onOpenChange={(open) => !open && setActiveDetail(null)}
-      />
-      <RalphDetail
-        open={activeDetail === 'ralph'}
-        onOpenChange={(open) => !open && setActiveDetail(null)}
-      />
-      <BraintrustDetail
-        open={activeDetail === 'braintrust'}
-        onOpenChange={(open) => !open && setActiveDetail(null)}
-      />
-      <SystemHealthDetail
-        open={activeDetail === 'system-health'}
-        onOpenChange={(open) => !open && setActiveDetail(null)}
-      />
-      <SessionsDetail
-        open={activeDetail === 'sessions'}
-        onOpenChange={(open) => !open && setActiveDetail(null)}
-      />
+      <Suspense fallback={null}>
+        <MemoryDetail
+          open={activeDetail === 'memory'}
+          onOpenChange={(open) => !open && setActiveDetail(null)}
+        />
+        <KnowledgeDetail
+          open={activeDetail === 'knowledge'}
+          onOpenChange={(open) => !open && setActiveDetail(null)}
+        />
+        <PageIndexDetail
+          open={activeDetail === 'pageindex'}
+          onOpenChange={(open) => !open && setActiveDetail(null)}
+        />
+        <RoadmapDetail
+          open={activeDetail === 'roadmap'}
+          onOpenChange={(open) => !open && setActiveDetail(null)}
+        />
+        <HandoffsDetail
+          open={activeDetail === 'handoffs'}
+          onOpenChange={(open) => !open && setActiveDetail(null)}
+        />
+        <RalphDetail
+          open={activeDetail === 'ralph'}
+          onOpenChange={(open) => !open && setActiveDetail(null)}
+        />
+        <BraintrustDetail
+          open={activeDetail === 'braintrust'}
+          onOpenChange={(open) => !open && setActiveDetail(null)}
+        />
+        <SkillsDetail
+          open={activeDetail === 'skills'}
+          onOpenChange={(open) => !open && setActiveDetail(null)}
+        />
+        <SystemHealthDetail
+          open={activeDetail === 'system-health'}
+          onOpenChange={(open) => !open && setActiveDetail(null)}
+        />
+        <SessionsDetail
+          open={activeDetail === 'sessions'}
+          onOpenChange={(open) => !open && setActiveDetail(null)}
+        />
+        <AgentsDetail
+          open={activeDetail === 'agents'}
+          onOpenChange={(open) => !open && setActiveDetail(null)}
+        />
+        <MCPServersDetail
+          open={activeDetail === 'mcp-servers'}
+          onOpenChange={(open) => !open && setActiveDetail(null)}
+        />
+      </Suspense>
       <UserGuide open={guideOpen} onOpenChange={setGuideOpen} />
       </div>
     </ErrorBoundary>

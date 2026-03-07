@@ -64,6 +64,50 @@ const PILLAR_DOCS = [
     detail: 'Weekly activity bars, agent/skill usage breakdown, and session list with drill-down.',
     status: 'Count = recent sessions',
   },
+  {
+    name: 'Skills',
+    key: 'skills',
+    description: 'Skill activation monitoring across sessions. Tracks which skills are invoked, hook health tied to skill execution, and the skill dependency graph.',
+    detail: 'Skill activation list, hook health indicators, and a graph view of skill relationships.',
+    status: 'Count = active skills',
+  },
+  {
+    name: 'Sessions',
+    key: 'sessions',
+    description: 'Live Claude Code sessions tracked in the PostgreSQL sessions table. Expandable rows reveal per-session hook and skill invocation counts.',
+    detail: 'Session list with expandable activity rows. The File Claims tab inside this panel shows active file locks across all sessions.',
+    status: 'Count = active sessions',
+  },
+  {
+    name: 'Agents',
+    key: 'agents',
+    description: 'Agent spawn activity captured from hook telemetry. Shows which agent types (scout, kraken, oracle, etc.) have been launched and their completion status.',
+    detail: 'Timeline of agent spawns grouped by type, with duration and outcome indicators.',
+    status: 'Count = total agent invocations',
+  },
+  {
+    name: 'MCP Servers',
+    key: 'mcp',
+    description: 'Configured MCP servers read from .claude.json and .mcp.json. Shows enabled servers, transport type, and reachability.',
+    detail: 'Server list with transport type (stdio/http), status badge, and last-checked timestamp.',
+    status: 'Count = configured servers',
+  },
+]
+
+const KEYBOARD_SHORTCUTS = [
+  { key: 'm', opens: 'Memory' },
+  { key: 'k', opens: 'Knowledge Tree' },
+  { key: 'p', opens: 'PageIndex' },
+  { key: 'r', opens: 'Roadmap' },
+  { key: 'h', opens: 'Handoffs' },
+  { key: 'a', opens: 'Ralph' },
+  { key: 'b', opens: 'Braintrust' },
+  { key: 'i', opens: 'Skills' },
+  { key: 's', opens: 'Sessions' },
+  { key: 'x', opens: 'System Health' },
+  { key: 'g', opens: 'Agents' },
+  { key: 'c', opens: 'MCP Servers' },
+  { key: 'Esc', opens: 'Close panel' },
 ]
 
 const FEATURES = [
@@ -77,7 +121,7 @@ const FEATURES = [
   },
   {
     name: 'Quick Actions',
-    description: 'Four shortcut buttons for common tasks: view raw Health API JSON, browse Memory learnings, check Roadmap goals, and view Handoff documents.',
+    description: 'Eight shortcut buttons for common tasks: view raw Health API JSON, browse Memory learnings, check Roadmap goals, view Handoff documents, and more.',
   },
   {
     name: 'Theme Toggle',
@@ -90,6 +134,14 @@ const FEATURES = [
   {
     name: 'WebSocket Live Updates',
     description: 'The "Live" indicator shows real-time connection status. When connected, health updates stream via WebSocket. Falls back to 10-second polling when disconnected.',
+  },
+  {
+    name: 'Sessions: File Claims Tab',
+    description: 'Inside the Sessions panel, the File Claims tab shows all active file locks held by running sessions. Useful for diagnosing cross-terminal editing conflicts.',
+  },
+  {
+    name: 'Sessions: Expandable Activity',
+    description: 'Each session row in the Sessions panel can be expanded to reveal per-session hook invocation counts and skill activation totals for that session.',
   },
 ]
 
@@ -114,6 +166,7 @@ export function UserGuide({ open, onOpenChange }: UserGuideProps) {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="pillars">Pillars</TabsTrigger>
             <TabsTrigger value="features">Features</TabsTrigger>
+            <TabsTrigger value="shortcuts">Shortcuts</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -122,7 +175,7 @@ export function UserGuide({ open, onOpenChange }: UserGuideProps) {
                 <div className="rounded-lg border border-border/50 bg-card/50 p-4">
                   <h3 className="text-sm font-semibold mb-3">What is the Session Dashboard?</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    The Session Dashboard monitors the 7 pillars of Continuous Claude &mdash; the infrastructure
+                    The Session Dashboard monitors the pillars of Continuous Claude &mdash; the infrastructure
                     that gives Claude persistent memory, project awareness, and autonomous capabilities across sessions.
                   </p>
                 </div>
@@ -197,6 +250,29 @@ export function UserGuide({ open, onOpenChange }: UserGuideProps) {
                     <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
                   </div>
                 ))}
+              </div>
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="shortcuts">
+            <ScrollArea className="h-[calc(100vh-200px)]">
+              <div className="space-y-4 px-4 pb-8 pt-2">
+                <div className="rounded-lg border border-border/50 bg-card/50 p-4">
+                  <h3 className="text-sm font-semibold mb-3">Keyboard Shortcuts</h3>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Press a key while no input is focused to open the corresponding panel directly.
+                  </p>
+                  <div className="space-y-1">
+                    {KEYBOARD_SHORTCUTS.map(({ key, opens }) => (
+                      <div key={key} className="flex items-center gap-3 py-1">
+                        <kbd className="inline-flex items-center justify-center rounded border border-border bg-muted px-2 py-0.5 text-xs font-mono font-semibold min-w-[2rem]">
+                          {key}
+                        </kbd>
+                        <span className="text-sm text-muted-foreground">{opens}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </ScrollArea>
           </TabsContent>

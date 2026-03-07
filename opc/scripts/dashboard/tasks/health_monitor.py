@@ -18,6 +18,9 @@ from dashboard.services.handoffs import HandoffsPillarService
 from dashboard.services.ralph import RalphPillarService
 from dashboard.services.braintrust import BraintrustPillarService
 from dashboard.services.roadmap import RoadmapPillarService
+from dashboard.services.skills import SkillsPillarService
+from dashboard.services.agents import AgentsPillarService
+from dashboard.services.mcp_servers import MCPServersPillarService
 from dashboard.websocket.events import ActivityEvent, HealthUpdateEvent
 
 if TYPE_CHECKING:
@@ -48,10 +51,13 @@ class HealthMonitor:
             "roadmap": RoadmapPillarService(),
             "ralph": RalphPillarService(),
             "braintrust": BraintrustPillarService(),
+            "skills": SkillsPillarService(),
+            "agents": AgentsPillarService(),
+            "mcp-servers": MCPServersPillarService(),
         }
 
     async def check_all_pillars(self) -> dict[str, PillarHealth]:
-        """Check health of all 5 pillar services in parallel.
+        """Check health of all 10 pillar services in parallel.
 
         Returns:
             Dictionary mapping pillar name to PillarHealth result
@@ -65,10 +71,13 @@ class HealthMonitor:
             self._services["roadmap"].check_health(),
             self._services["ralph"].check_health(),
             self._services["braintrust"].check_health(),
+            self._services["skills"].check_health(),
+            self._services["agents"].check_health(),
+            self._services["mcp-servers"].check_health(),
             return_exceptions=True
         )
 
-        pillar_names = ["memory", "knowledge", "pageindex", "handoffs", "roadmap", "ralph", "braintrust"]
+        pillar_names = ["memory", "knowledge", "pageindex", "handoffs", "roadmap", "ralph", "braintrust", "skills", "agents", "mcp-servers"]
         health_results = {}
 
         for name, result in zip(pillar_names, results):

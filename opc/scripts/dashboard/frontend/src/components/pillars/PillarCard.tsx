@@ -104,6 +104,36 @@ const PILLAR_ICONS: Record<string, ReactNode> = {
       />
     </svg>
   ),
+  skills: (
+    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M13 10V3L4 14h7v7l9-11h-7z"
+      />
+    </svg>
+  ),
+  agents: (
+    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+      />
+    </svg>
+  ),
+  'mcp-servers': (
+    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"
+      />
+    </svg>
+  ),
 }
 
 
@@ -116,6 +146,9 @@ function formatPillarName(name: string): string {
     handoffs: 'Handoffs',
     ralph: 'Ralph',
     braintrust: 'Braintrust',
+    skills: 'Skills',
+    agents: 'Agents',
+    'mcp-servers': 'MCP Servers',
   }
   return names[name] || name.charAt(0).toUpperCase() + name.slice(1)
 }
@@ -155,7 +188,7 @@ export function PillarCard({ health, onViewDetails }: PillarCardProps) {
                 {formatPillarName(health.name)}
               </CardTitle>
               <p className="text-xs text-muted-foreground">
-                {health.last_activity ? formatTimeAgo(health.last_activity) : 'Never'}
+                {health.last_activity ? formatTimeAgo(health.last_activity) : 'No activity'}
               </p>
             </div>
           </div>
@@ -177,11 +210,18 @@ export function PillarCard({ health, onViewDetails }: PillarCardProps) {
             <p className="text-xs text-muted-foreground">
               {health.name === 'memory' && 'learnings'}
               {health.name === 'knowledge' && 'entries'}
-              {health.name === 'pageindex' && 'indexed'}
+              {health.name === 'pageindex' && (
+              health.details && typeof health.details.total === 'number' && health.details.total !== health.details.indexed
+                ? `indexed of ${(health.details.total as number).toLocaleString()}`
+                : 'indexed'
+            )}
               {health.name === 'roadmap' && '% complete'}
               {health.name === 'handoffs' && 'documents'}
               {health.name === 'ralph' && 'tasks'}
               {health.name === 'braintrust' && 'sessions'}
+              {health.name === 'skills' && 'registered'}
+              {health.name === 'agents' && 'spawned'}
+              {health.name === 'mcp-servers' && 'servers'}
             </p>
           </div>
           {onViewDetails && (

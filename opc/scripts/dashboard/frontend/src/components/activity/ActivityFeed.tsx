@@ -141,7 +141,7 @@ function ActivityItem({ activity }: { activity: Activity }) {
           <span className="text-xs font-medium text-muted-foreground">{activity.pillar}</span>
           <Badge
             variant="outline"
-            className={cn('text-[10px] px-1.5 py-0 h-4', typeConfig.className)}
+            className={cn('text-[11px] px-1.5 py-0 h-4', typeConfig.className)}
           >
             {typeConfig.label}
           </Badge>

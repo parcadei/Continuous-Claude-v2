@@ -43,12 +43,12 @@ def _scan_handoff_files() -> list[dict[str, Any]]:
         seen_stems.add(file_path.stem)
         try:
             stat = file_path.stat()
-            name = file_path.stem.replace("HANDOFF-", "").replace("auto-handoff-", "")
-            # Extract status from YAML frontmatter if available
-            status = _extract_status(file_path)
+            fields = _parse_handoff_yaml(file_path)
+            status = _infer_status(fields)
+            title = _extract_title(file_path, fields)
             handoffs.append({
                 "id": f"file:{file_path.name}",
-                "title": name,
+                "title": title,
                 "status": status,
                 "created_at": datetime.fromtimestamp(stat.st_mtime).isoformat(),
                 "source": source_label,
@@ -72,23 +72,107 @@ def _scan_handoff_files() -> list[dict[str, Any]]:
     return handoffs
 
 
+def _parse_handoff_yaml(file_path: Path) -> dict[str, Any]:
+    """Parse key fields from a handoff file's YAML frontmatter or body.
+
+    Extracts: outcome, status, done_this_session, blockers, goal.
+    Works for both .md (YAML frontmatter) and .yaml/.yml files.
+
+    Returns:
+        Dict of parsed string fields (values are raw strings from file).
+    """
+    result: dict[str, Any] = {}
+    try:
+        text = file_path.read_text(encoding="utf-8", errors="replace")[:4000]
+        lines = text.splitlines()
+
+        # For .md files, look inside --- frontmatter block first
+        in_frontmatter = False
+        frontmatter_lines: list[str] = []
+        body_lines = lines
+
+        if lines and lines[0].strip() == "---":
+            in_frontmatter = True
+            for i, line in enumerate(lines[1:], start=1):
+                if line.strip() == "---":
+                    body_lines = lines[i + 1:]
+                    in_frontmatter = False
+                    break
+                frontmatter_lines.append(line)
+
+        # Parse key: value pairs from frontmatter (or full file for yaml)
+        search_lines = frontmatter_lines if frontmatter_lines else lines
+        for line in search_lines:
+            stripped = line.strip()
+            for key in ("outcome", "status", "goal", "done_this_session", "blockers"):
+                prefix = key + ":"
+                if stripped.lower().startswith(prefix):
+                    value = stripped[len(prefix):].strip().strip("'\"")
+                    result[key] = value
+                    break
+
+        # Also scan body for outcome/goal if not found in frontmatter
+        if "outcome" not in result or "goal" not in result:
+            for line in body_lines:
+                stripped = line.strip()
+                for key in ("outcome", "goal"):
+                    if key not in result:
+                        prefix = key + ":"
+                        if stripped.lower().startswith(prefix):
+                            value = stripped[len(prefix):].strip().strip("'\"")
+                            result[key] = value
+
+    except Exception:
+        pass
+    return result
+
+
 def _extract_status(file_path: Path) -> str:
     """Try to extract outcome/status from handoff file frontmatter.
 
     Looks for 'outcome:' or 'status:' lines in YAML files or MD frontmatter.
+    Falls back to inferring from done_this_session/blockers fields.
     """
-    try:
-        text = file_path.read_text(encoding="utf-8", errors="replace")[:2000]
-        for line in text.splitlines():
-            stripped = line.strip()
-            for prefix in ("outcome:", "status:"):
-                if stripped.lower().startswith(prefix):
-                    value = stripped[len(prefix):].strip().strip("'\"").upper()
-                    if value in VALID_OUTCOMES:
-                        return value
-    except Exception:
-        pass
+    fields = _parse_handoff_yaml(file_path)
+    return _infer_status(fields)
+
+
+def _infer_status(fields: dict[str, Any]) -> str:
+    """Infer handoff status from parsed YAML fields.
+
+    Priority:
+    1. Explicit outcome: field (must be a valid outcome value)
+    2. Explicit status: field (must be a valid outcome value)
+    3. Infer from done_this_session + blockers
+    4. UNKNOWN
+    """
+    for key in ("outcome", "status"):
+        value = fields.get(key, "").upper()
+        if value in VALID_OUTCOMES:
+            return value
+
+    done = fields.get("done_this_session", "").strip()
+    blockers = fields.get("blockers", "").strip()
+
+    if blockers and blockers.lower() not in ("", "none", "[]", "null"):
+        return "PARTIAL_MINUS"
+    if done and done.lower() not in ("", "none", "[]", "null"):
+        return "PARTIAL_PLUS"
+
     return "UNKNOWN"
+
+
+def _extract_title(file_path: Path, fields: dict[str, Any]) -> str:
+    """Extract display title from parsed fields or filename.
+
+    Uses goal: field if available, otherwise falls back to filename stem.
+    """
+    goal = fields.get("goal", "").strip()
+    if goal:
+        # Truncate very long goals for display
+        return goal[:120]
+    name = file_path.stem.replace("HANDOFF-", "").replace("auto-handoff-", "")
+    return name
 
 
 async def _get_db_handoffs(
@@ -215,12 +299,13 @@ async def get_handoff(handoff_id: str) -> dict[str, Any]:
         try:
             stat = file_path.stat()
             content = file_path.read_text(encoding="utf-8", errors="replace")
-            name = file_path.stem.replace("HANDOFF-", "").replace("auto-handoff-", "")
-            status = _extract_status(file_path)
+            fields = _parse_handoff_yaml(file_path)
+            status = _infer_status(fields)
+            title = _extract_title(file_path, fields)
 
             return {
                 "id": handoff_id,
-                "title": name,
+                "title": title,
                 "status": status,
                 "created_at": datetime.fromtimestamp(stat.st_mtime).isoformat(),
                 "source": "file",

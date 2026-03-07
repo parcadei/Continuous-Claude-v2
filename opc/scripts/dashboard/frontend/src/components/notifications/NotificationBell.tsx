@@ -70,7 +70,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
     <div className={className}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="relative h-9 w-9">
+          <Button variant="ghost" size="icon" className="relative h-10 w-10">
             <svg
               className="h-4 w-4"
               fill="none"
