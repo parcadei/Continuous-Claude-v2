@@ -33,7 +33,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-$VERBOSE && echo "Syncing: $REPO_CLAUDE → $ACTIVE_CLAUDE"
+$VERBOSE && echo "Syncing: $REPO_CLAUDE → $ACTIVE_CLAUDE" || true
 
 SYNC_DIRS="hooks/src rules agents skills"
 
@@ -64,7 +64,7 @@ copy_dir() {
         else
             mkdir -p "$(dirname "$dst_file")"
             cp "$src_file" "$dst_file"
-            $VERBOSE && echo "Copied: $dir/$rel"
+            $VERBOSE && echo "Copied: $dir/$rel" || true
         fi
     done < <(find "$src_path" -type f ! -name "*.pid" ! -name "*.lock" ! -path "*/.tldr/*" ! -path "*/node_modules/*" ! -path "*/cache/*" ! -path "*/dist/*" 2>/dev/null)
 }
@@ -84,7 +84,7 @@ for pattern in "hooks/*.sh" "hooks/*.py" "hooks/*.mjs" "hooks/*.ps1" "hooks/pack
         else
             mkdir -p "$(dirname "$dst_file")"
             cp "$src_file" "$dst_file"
-            $VERBOSE && echo "Copied: $rel"
+            $VERBOSE && echo "Copied: $rel" || true
         fi
     done
 done
@@ -116,15 +116,15 @@ if ! $DRY_RUN && command -v jq &> /dev/null; then
             jq --argjson mcp "$MCP_SERVERS" '.mcpServers = $mcp' "$ACTIVE_SETTINGS" > "$TEMP_SETTINGS" 2>/dev/null
             if [[ $? -eq 0 && -s "$TEMP_SETTINGS" ]]; then
                 mv "$TEMP_SETTINGS" "$ACTIVE_SETTINGS"
-                $VERBOSE && echo "Merged mcpServers into ~/.claude/settings.json"
+                $VERBOSE && echo "Merged mcpServers into ~/.claude/settings.json" || true
             else
                 rm -f "$TEMP_SETTINGS"
-                $VERBOSE && echo "Warning: Failed to merge mcpServers"
+                $VERBOSE && echo "Warning: Failed to merge mcpServers" || true
             fi
         fi
     fi
 elif ! $DRY_RUN; then
-    $VERBOSE && echo "Note: jq not installed, skipping mcpServers merge"
+    $VERBOSE && echo "Note: jq not installed, skipping mcpServers merge" || true
 fi
 
-$VERBOSE && echo "Sync complete: continuous-claude → ~/.claude"
+$VERBOSE && echo "Sync complete: continuous-claude → ~/.claude" || true
