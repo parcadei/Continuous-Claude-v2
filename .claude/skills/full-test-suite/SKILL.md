@@ -1,7 +1,8 @@
 ---
 name: full-test
 description: Complete platform testing suite - functional + frontend design quality testing with graded report
-user_invocable: true
+metadata:
+  user_invocable: true
 ---
 
 # /full-test — Complete Platform Testing Suite

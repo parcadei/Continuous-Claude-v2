@@ -1,7 +1,8 @@
 ---
 name: opc-architecture
 description: OPC Architecture Understanding
-user-invocable: false
+metadata:
+  user-invocable: false
 ---
 
 # OPC Architecture Understanding

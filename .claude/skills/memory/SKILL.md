@@ -1,7 +1,8 @@
 ---
 name: memory
 description: Query and store learnings in the persistent memory system
-user-invocable: true
+metadata:
+  user-invocable: true
 ---
 
 # Memory System

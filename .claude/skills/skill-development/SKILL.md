@@ -1,7 +1,8 @@
 ---
 name: skill-development
 description: Skill Development Rules
-user-invocable: false
+metadata:
+  user-invocable: false
 ---
 
 # Skill Development Rules

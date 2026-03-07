@@ -1,4 +1,5 @@
 ---
+name: tldr-stats
 description: Show full session token usage, costs, TLDR savings, and hook activity
 ---
 

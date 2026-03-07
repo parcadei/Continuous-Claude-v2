@@ -1,13 +1,16 @@
 ---
 name: ui-audit
 description: Web UI compliance audit - 100+ rules for accessibility, performance, UX
-user-invocable: true
 allowed-tools: [Read, Grep, Glob, Bash, Task]
+metadata:
+  user-invocable: true
 ---
 
 # UI Compliance Audit
 
 100+ rules from Vercel Web Interface Guidelines. Covers accessibility, forms, animation, performance, and UX.
+
+Full rule details: `references/audit-rules.md`
 
 ## Activation
 
@@ -22,359 +25,24 @@ allowed-tools: [Read, Grep, Glob, Bash, Task]
 
 ---
 
-## Category 1: CRITICAL - Accessibility
-
-### Semantic HTML & ARIA
-
-#### a11y-button-labels
-**Rule**: Icon-only buttons MUST have `aria-label`.
-
-```tsx
-// BAD
-<button><Icon /></button>
-
-// GOOD
-<button aria-label="Close menu"><Icon /></button>
-```
-
-#### a11y-form-labels
-**Rule**: Form controls need `<label>` or `aria-label`.
-
-```tsx
-// BAD
-<input placeholder="Email" />
-
-// GOOD
-<label>
-  Email
-  <input />
-</label>
-// OR
-<input aria-label="Email" />
-```
-
-#### a11y-keyboard-handlers
-**Rule**: Interactive elements need keyboard handlers (onKeyDown for Enter/Space).
-
-#### a11y-semantic-first
-**Rule**: Use semantic HTML before ARIA. Button over div+role="button".
-
-#### a11y-heading-hierarchy
-**Rule**: Headings must be hierarchical (h1 > h2 > h3). No skipping levels.
-
-#### a11y-skip-link
-**Rule**: Include skip link for keyboard users to bypass navigation.
-
-#### a11y-live-regions
-**Rule**: Async content updates need `aria-live="polite"`.
-
-```tsx
-<div aria-live="polite">{loadingMessage}</div>
-```
-
----
-
-## Category 2: HIGH - Focus States
-
-#### focus-visible-ring
-**Rule**: Interactive elements need visible focus via `focus-visible:ring-*`.
-
-```css
-/* GOOD */
-button:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
-}
-```
-
-#### focus-never-outline-none
-**Rule**: NEVER use `outline-none` without focus replacement.
-
-```css
-/* BAD - Invisible focus */
-*:focus { outline: none; }
-
-/* GOOD - Custom focus */
-*:focus { outline: none; }
-*:focus-visible { ring: 2px solid blue; }
-```
-
-#### focus-visible-over-focus
-**Rule**: Prefer `:focus-visible` over `:focus` (keyboard only, not mouse).
-
-#### focus-within-groups
-**Rule**: Use `:focus-within` for group focus styling (form fields, cards).
-
----
-
-## Category 3: HIGH - Forms
-
-#### form-autocomplete
-**Rule**: Inputs need correct `autocomplete` attribute.
-
-```tsx
-<input type="email" autocomplete="email" />
-<input type="password" autocomplete="current-password" />
-```
-
-#### form-meaningful-names
-**Rule**: Use meaningful `name` attributes for form data.
-
-#### form-correct-types
-**Rule**: Use correct `type` attribute (email, tel, url, password).
-
-#### form-never-block-paste
-**Rule**: NEVER prevent paste on password fields.
-
-```tsx
-// BAD
-<input type="password" onPaste={e => e.preventDefault()} />
-```
-
-#### form-clickable-labels
-**Rule**: Labels must be clickable via `htmlFor` or wrapping.
-
-#### form-disable-spellcheck
-**Rule**: Disable spellcheck on email, codes, usernames.
-
-```tsx
-<input type="email" spellCheck="false" />
-```
-
-#### form-inline-errors
-**Rule**: Show errors inline, not in alerts.
-
-#### form-focus-first-error
-**Rule**: Focus first error field on submit.
-
-#### form-unsaved-warning
-**Rule**: Warn before navigation with unsaved changes.
-
----
-
-## Category 4: MEDIUM - Animation
-
-#### anim-reduced-motion
-**Rule**: Honor `prefers-reduced-motion`.
-
-```css
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-```
-
-#### anim-transform-opacity-only
-**Rule**: Animate ONLY `transform` and `opacity` (GPU-accelerated).
-
-```css
-/* BAD - Triggers layout */
-.animate { transition: width 0.3s; }
-
-/* GOOD - GPU accelerated */
-.animate { transition: transform 0.3s; }
-```
-
-#### anim-no-transition-all
-**Rule**: NEVER use `transition: all`.
-
-```css
-/* BAD */
-.element { transition: all 0.3s; }
-
-/* GOOD */
-.element { transition: opacity 0.3s, transform 0.3s; }
-```
-
-#### anim-svg-transform-box
-**Rule**: SVG transforms on `<g>` need `transform-box: fill-box`.
-
-#### anim-interruptible
-**Rule**: Keep animations interruptible (no pointer-events: none during).
-
----
-
-## Category 5: MEDIUM - Typography
-
-#### typo-ellipsis
-**Rule**: Use proper ellipsis `…` not `...`.
-
-#### typo-curly-quotes
-**Rule**: Use curly quotes `""` not straight `""`.
-
-#### typo-non-breaking-space
-**Rule**: Use `&nbsp;` to prevent awkward line breaks.
-
-#### typo-loading-ellipsis
-**Rule**: Loading states end with `…` (Loading…).
-
-#### typo-tabular-nums
-**Rule**: Use `font-variant-numeric: tabular-nums` for numbers in tables.
-
-```css
-.table-numbers { font-variant-numeric: tabular-nums; }
-```
-
----
-
-## Category 6: MEDIUM - Content Handling
-
-#### content-overflow
-**Rule**: Text containers handle long content via `truncate`, `line-clamp-*`.
-
-```css
-.truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-```
-
-#### content-empty-states
-**Rule**: Handle empty states explicitly (no data, no results).
-
-#### content-variable-length
-**Rule**: Anticipate varied input lengths in UI.
-
----
-
-## Category 7: MEDIUM - Images
-
-#### img-dimensions
-**Rule**: Images MUST have explicit `width` and `height`.
-
-```tsx
-// BAD - CLS
-<img src="photo.jpg" />
-
-// GOOD - Reserved space
-<img src="photo.jpg" width={800} height={600} />
-```
-
-#### img-lazy-loading
-**Rule**: Below-fold images use `loading="lazy"`.
-
-#### img-priority
-**Rule**: LCP images use `priority` or `fetchpriority="high"`.
-
----
-
-## Category 8: MEDIUM - Performance
-
-#### perf-virtualize
-**Rule**: Virtualize lists with >50 items.
-
-#### perf-no-layout-reads
-**Rule**: No layout reads (offsetHeight, getBoundingClientRect) in render.
-
-#### perf-batch-dom
-**Rule**: Batch DOM operations.
-
-#### perf-preconnect
-**Rule**: Add `<link rel="preconnect">` for CDN domains.
-
-#### perf-font-display
-**Rule**: Critical fonts use `font-display: swap`.
-
----
-
-## Category 9: MEDIUM - Navigation & State
-
-#### nav-url-reflects-state
-**Rule**: URL must reflect state (filters, tabs, pagination).
-
-#### nav-deep-linking
-**Rule**: Enable deep-linking to stateful UI.
-
-#### nav-destructive-confirm
-**Rule**: Destructive actions need confirmation dialogs.
-
----
-
-## Category 10: MEDIUM - Touch & Interaction
-
-#### touch-manipulation
-**Rule**: Add `touch-action: manipulation` to remove 300ms delay.
-
-#### touch-overscroll
-**Rule**: Use `overscroll-behavior: contain` in modals.
-
-#### touch-disable-selection
-**Rule**: Disable text selection during drag operations.
-
-#### touch-autofocus
-**Rule**: Use `autoFocus` sparingly (can be disorienting).
-
----
-
-## Category 11: MEDIUM - Dark Mode & Theming
-
-#### dark-color-scheme
-**Rule**: Set `color-scheme: dark` on `<html>` for system defaults.
-
-#### dark-theme-color
-**Rule**: Match `<meta name="theme-color">` to background.
-
-#### dark-select-colors
-**Rule**: Native `<select>` needs explicit colors for dark mode.
-
----
-
-## Category 12: LOW - Localization
-
-#### i18n-date-format
-**Rule**: Use `Intl.DateTimeFormat`, not hardcoded formats.
-
-```typescript
-// BAD
-`${date.getMonth()}/${date.getDate()}`
-
-// GOOD
-new Intl.DateTimeFormat('en-US').format(date)
-```
-
-#### i18n-number-format
-**Rule**: Use `Intl.NumberFormat` for numbers/currency.
-
-#### i18n-no-ip-language
-**Rule**: Detect language via headers, not IP geolocation.
-
----
-
-## Category 13: LOW - Hydration Safety
-
-#### hydration-controlled-inputs
-**Rule**: Inputs with `value` need `onChange` handler.
-
-#### hydration-date-guard
-**Rule**: Guard date/time rendering against SSR/client mismatch.
-
-#### hydration-suppress-warning
-**Rule**: Use `suppressHydrationWarning` sparingly.
-
----
-
-## Category 14: LOW - Content & Copy
-
-#### copy-active-voice
-**Rule**: Use active voice in UI copy.
-
-#### copy-title-case
-**Rule**: Title Case for headings and buttons.
-
-#### copy-numerals
-**Rule**: Use numerals for counts (3 items, not three items).
-
-#### copy-specific-labels
-**Rule**: Specific labels (Save Changes, not Submit).
-
-#### copy-second-person
-**Rule**: Second person (Your profile, not My profile).
-
-#### copy-error-fixes
-**Rule**: Error messages should include how to fix.
+## Audit Categories
+
+| Category | Severity | Rules |
+|----------|----------|-------|
+| Accessibility (semantic HTML, ARIA) | CRITICAL | a11y-button-labels, a11y-form-labels, a11y-keyboard-handlers, a11y-heading-hierarchy, a11y-skip-link, a11y-live-regions |
+| Focus States | HIGH | focus-visible-ring, focus-never-outline-none, focus-visible-over-focus, focus-within-groups |
+| Forms | HIGH | form-autocomplete, form-correct-types, form-never-block-paste, form-inline-errors, form-focus-first-error |
+| Animation | MEDIUM | anim-reduced-motion, anim-transform-opacity-only, anim-no-transition-all, anim-interruptible |
+| Typography | MEDIUM | typo-ellipsis, typo-curly-quotes, typo-tabular-nums |
+| Content Handling | MEDIUM | content-overflow, content-empty-states, content-variable-length |
+| Images | MEDIUM | img-dimensions, img-lazy-loading, img-priority |
+| Performance | MEDIUM | perf-virtualize, perf-no-layout-reads, perf-preconnect, perf-font-display |
+| Navigation & State | MEDIUM | nav-url-reflects-state, nav-deep-linking, nav-destructive-confirm |
+| Touch & Interaction | MEDIUM | touch-manipulation, touch-overscroll, touch-disable-selection |
+| Dark Mode & Theming | MEDIUM | dark-color-scheme, dark-theme-color, dark-select-colors |
+| Localization | LOW | i18n-date-format, i18n-number-format, i18n-no-ip-language |
+| Hydration Safety | LOW | hydration-controlled-inputs, hydration-date-guard |
+| Content & Copy | LOW | copy-active-voice, copy-title-case, copy-specific-labels, copy-second-person, copy-error-fixes |
 
 ---
 
@@ -440,6 +108,7 @@ Recommendation: [APPROVE/CHANGES_REQUESTED/BLOCK]
 - **With agents**: Spawns ui-compliance-reviewer
 - **Pairs with**: shadcn-create skill for fixes
 - **Store findings**: Memory system for recurring issues
+- **Full rules**: `references/audit-rules.md`
 
 ---
 *Source: Vercel Web Interface Guidelines | 100+ rules | v1.0*

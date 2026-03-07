@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Interfaces: Capability Comparison</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           Midnight Executive
+           =========================================== */
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: rgba(30, 41, 59, 0.6);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #f59e0b;
+            --accent-glow: rgba(245, 158, 11, 0.15);
+            --teal: #00B69F;
+            --teal-glow: rgba(0, 182, 159, 0.15);
+            --purple: #a78bfa;
+            --purple-glow: rgba(167, 139, 250, 0.15);
+            --success: #22c55e;
+            --success-glow: rgba(34, 197, 94, 0.15);
+            --danger: #ef4444;
+            --border: rgba(148, 163, 184, 0.1);
+
+            --font-display: 'Libre Baskerville', serif;
+            --font-body: 'Source Sans 3', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --slide-padding: clamp(2rem, 5vw, 6rem);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.7s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 18px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--teal), var(--purple));
+            width: 0%;
+            z-index: 100;
+            transition: width 0.2s ease-out;
+        }
+
+        /* Navigation Dots */
+        .nav-dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out-expo);
+            opacity: 0.3;
+        }
+
+        .nav-dot:hover { opacity: 0.7; transform: scale(1.3); }
+        .nav-dot.active {
+            background: var(--teal);
+            opacity: 1;
+            box-shadow: 0 0 12px var(--teal-glow);
+        }
+
+        /* Slides */
+        .slide {
+            min-height: 100vh;
+            padding: var(--slide-padding);
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .reveal:nth-child(4) { transition-delay: 0.4s; }
+        .reveal:nth-child(5) { transition-delay: 0.5s; }
+        .reveal:nth-child(6) { transition-delay: 0.6s; }
+
+        /* Typography */
+        .label {
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 1rem;
+        }
+
+        .label-amber { color: var(--accent); }
+        .label-purple { color: var(--purple); }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+
+        h3 {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            max-width: 700px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        /* Decorative */
+        .accent-line {
+            width: 80px;
+            height: 2px;
+            background: var(--teal);
+            margin: 2rem 0;
+        }
+
+        .glow-bg {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .glow-teal { background: var(--teal-glow); }
+        .glow-amber { background: var(--accent-glow); }
+        .glow-purple { background: var(--purple-glow); }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .card-grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            align-items: start;
+        }
+
+        .three-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .two-col, .card-grid-3, .three-col { grid-template-columns: 1fr; }
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9375rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--teal);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td { color: var(--text-secondary); }
+        tr:last-child td { border-bottom: none; }
+
+        /* Capability Matrix Specific */
+        .matrix-table th:not(:first-child),
+        .matrix-table td:not(:first-child) {
+            text-align: center;
+        }
+
+        .check { color: var(--success); font-size: 1.25rem; }
+        .cross { color: var(--danger); font-size: 1.25rem; opacity: 0.6; }
+
+        /* Lists */
+        ul {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-secondary);
+        }
+
+        ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.55rem;
+            width: 6px;
+            height: 6px;
+            background: var(--teal);
+            border-radius: 50%;
+        }
+
+        /* Code */
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: var(--teal);
+        }
+
+        /* Icon boxes */
+        .icon-box {
+            width: 56px;
+            height: 56px;
+            background: var(--teal-glow);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            flex-shrink: 0;
+        }
+
+        .icon-box-amber { background: var(--accent-glow); }
+        .icon-box-purple { background: var(--purple-glow); }
+        .icon-box-success { background: var(--success-glow); }
+
+        /* Highlight box */
+        .highlight-box {
+            background: linear-gradient(135deg, var(--teal-glow) 0%, transparent 50%);
+            border: 1px solid rgba(0, 182, 159, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .highlight-box-amber {
+            background: linear-gradient(135deg, var(--accent-glow) 0%, transparent 50%);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .highlight-box-purple {
+            background: linear-gradient(135deg, var(--purple-glow) 0%, transparent 50%);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        /* Feature item */
+        .feature-item {
+            display: flex;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-item h4 {
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .feature-item p {
+            font-size: 0.9375rem;
+            margin: 0;
+        }
+
+        /* Interface cards */
+        .interface-card {
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .interface-card h3 {
+            margin-top: 1rem;
+        }
+
+        .interface-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Title slide */
+        .title-slide { text-align: center; }
+
+        .title-slide .glow-bg {
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .meta {
+            margin-top: 2rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* Keyboard hint */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease 2s forwards;
+        }
+
+        .keyboard-hint kbd {
+            background: var(--bg-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .nav-dots, .keyboard-hint { display: none; }
+            .slide { padding: 2rem 1.5rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal { transition: opacity 0.3s ease; transform: none; }
+            html { scroll-behavior: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar"></div>
+    <nav class="nav-dots" aria-label="Slide navigation"></nav>
+
+    <!-- =========================================
+         SLIDE 1: TITLE
+         ========================================= -->
+    <section class="slide title-slide" data-slide="0">
+        <div class="glow-bg glow-teal"></div>
+        <div class="slide-content">
+            <p class="label reveal">Capability Guide</p>
+            <h1 class="reveal">Claude Interfaces:<br>Capability Comparison</h1>
+            <p class="subtitle reveal">Understanding when to use Web, Desktop, or CLI — and why Claude Code unlocks the most powerful workflows</p>
+            <div class="accent-line reveal" style="margin: 2rem auto;"></div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 2: THREE INTERFACES
+         ========================================= -->
+    <section class="slide" data-slide="1">
+        <div class="glow-bg glow-purple" style="top: 10%; right: -20%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Overview</p>
+            <h2 class="reveal">Three Ways to Access Claude</h2>
+
+            <div class="three-col" style="margin-top: 2rem;">
+                <div class="card interface-card reveal">
+                    <div class="interface-icon">🌐</div>
+                    <h3>Claude.ai Web</h3>
+                    <p style="font-size: 0.9rem; text-align: left;">Browser-based interface. Quick questions, basic research. No installation required.</p>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                        <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">Best for</span>
+                        <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: var(--text-primary);">Quick questions</p>
+                    </div>
+                </div>
+                <div class="card interface-card reveal">
+                    <div class="interface-icon">🖥️</div>
+                    <h3>Claude Code Desktop</h3>
+                    <p style="font-size: 0.9rem; text-align: left;">Native app with GUI. Full capabilities in a familiar interface.</p>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                        <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">Best for</span>
+                        <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: var(--text-primary);">Full-featured work</p>
+                    </div>
+                </div>
+                <div class="card interface-card reveal" style="border-color: var(--teal);">
+                    <div class="interface-icon">⌨️</div>
+                    <h3 style="color: var(--teal);">Claude Code CLI</h3>
+                    <p style="font-size: 0.9rem; text-align: left;">Terminal-based. Maximum power and automation for advanced users.</p>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                        <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;">Best for</span>
+                        <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: var(--teal);">Power users</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 3: CAPABILITY MATRIX
+         ========================================= -->
+    <section class="slide" data-slide="2">
+        <div class="glow-bg glow-teal" style="bottom: -10%; left: -15%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Comparison</p>
+            <h2 class="reveal">Capability Matrix</h2>
+
+            <table class="reveal matrix-table" style="margin-top: 2rem;">
+                <thead>
+                    <tr>
+                        <th>Capability</th>
+                        <th>Claude.ai Web</th>
+                        <th>Claude Code Desktop</th>
+                        <th>Claude Code CLI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Skills</strong></td>
+                        <td><span class="check">✓</span> <span style="font-size: 0.8rem; color: var(--text-muted);">Projects only</span></td>
+                        <td><span class="check">✓</span> <span style="font-size: 0.8rem; color: var(--success);">Full</span></td>
+                        <td><span class="check">✓</span> <span style="font-size: 0.8rem; color: var(--success);">Full</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>MCPs</strong></td>
+                        <td><span class="check">✓</span> <span style="font-size: 0.8rem; color: var(--text-muted);">Basic</span></td>
+                        <td><span class="check">✓</span> <span style="font-size: 0.8rem; color: var(--success);">Full</span></td>
+                        <td><span class="check">✓</span> <span style="font-size: 0.8rem; color: var(--success);">Full</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Agents</strong></td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hooks</strong></td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bash/Shell</strong></td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>File Read/Write</strong></td>
+                        <td><span class="cross">✗</span> <span style="font-size: 0.8rem; color: var(--text-muted);">Upload only</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Grep/Glob Search</strong></td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 4: WHAT EACH CAPABILITY ENABLES
+         ========================================= -->
+    <section class="slide" data-slide="3">
+        <div class="glow-bg glow-amber" style="top: 20%; right: -15%;"></div>
+        <div class="slide-content">
+            <p class="label label-amber reveal">Deep Dive</p>
+            <h2 class="reveal">What Each Capability Enables</h2>
+
+            <div class="two-col" style="margin-top: 1.5rem;">
+                <div>
+                    <div class="feature-item reveal">
+                        <div class="icon-box">🧠</div>
+                        <div>
+                            <h4>Skills</h4>
+                            <p>Pre-built workflows and domain expertise. <strong>Web:</strong> Limited to Projects. <strong>Claude Code:</strong> 100+ skills with full automation.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item reveal">
+                        <div class="icon-box">🔌</div>
+                        <div>
+                            <h4>MCPs</h4>
+                            <p>Connect to external tools (Asana, Slack, Drive). <strong>Web:</strong> Basic menu. <strong>Claude Code:</strong> Full ecosystem.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item reveal">
+                        <div class="icon-box icon-box-purple">🤖</div>
+                        <div>
+                            <h4>Agents</h4>
+                            <p>Specialized sub-agents for complex tasks. <strong>Web:</strong> Not available. <strong>Claude Code:</strong> Spawn scouts, researchers, implementers.</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="feature-item reveal">
+                        <div class="icon-box icon-box-amber">⚡</div>
+                        <div>
+                            <h4>Hooks</h4>
+                            <p>Auto-triggers on events. <strong>Web:</strong> Not available. <strong>Claude Code:</strong> Enforce standards, inject context, quality gates.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item reveal">
+                        <div class="icon-box icon-box-success">📁</div>
+                        <div>
+                            <h4>File Read/Write</h4>
+                            <p>Create and edit files directly. <strong>Web:</strong> Upload only. <strong>Claude Code:</strong> Full filesystem operations.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item reveal">
+                        <div class="icon-box">🔍</div>
+                        <div>
+                            <h4>Grep/Glob Search</h4>
+                            <p>Search across files instantly. <strong>Web:</strong> Not available. <strong>Claude Code:</strong> Pattern matching across directories.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 5: WHY CLAUDE CODE IS MORE POWERFUL
+         ========================================= -->
+    <section class="slide" data-slide="4">
+        <div class="glow-bg glow-teal" style="bottom: 10%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content">
+            <p class="label reveal">The Difference</p>
+            <h2 class="reveal">Why Claude Code Is<br>More Powerful</h2>
+
+            <table class="reveal" style="margin-top: 2rem;">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>What It Enables</th>
+                        <th>Business Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong style="color: var(--purple);">Agents</strong></td>
+                        <td>Spawn sub-agents that work autonomously</td>
+                        <td>Complex tasks without manual handoff</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--accent);">Hooks</strong></td>
+                        <td>Auto-trigger actions on events</td>
+                        <td>Enforce guidelines, quality gates</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--teal);">Bash</strong></td>
+                        <td>Run any command — git, npm, scripts</td>
+                        <td>Actually <em>do</em> work, not just advise</td>
+                    </tr>
+                    <tr>
+                        <td><strong style="color: var(--success);">File Access</strong></td>
+                        <td>Direct access to local files</td>
+                        <td>Create deliverables, manage assets</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Grep/Glob</strong></td>
+                        <td>Search entire folders instantly</td>
+                        <td>Find patterns, audit content</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 6: WHEN TO USE EACH
+         ========================================= -->
+    <section class="slide" data-slide="5">
+        <div class="glow-bg glow-purple" style="top: 10%; right: -20%;"></div>
+        <div class="slide-content">
+            <p class="label label-purple reveal">Decision Guide</p>
+            <h2 class="reveal">When to Use Each Interface</h2>
+
+            <table class="reveal" style="margin-top: 2rem;">
+                <thead>
+                    <tr>
+                        <th>Use Case</th>
+                        <th>Best Interface</th>
+                        <th>Why</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Quick question</td>
+                        <td><strong>Claude.ai Web</strong></td>
+                        <td>Fastest, no setup</td>
+                    </tr>
+                    <tr>
+                        <td>Research with MCPs</td>
+                        <td><strong>Either</strong></td>
+                        <td>Both support MCPs</td>
+                    </tr>
+                    <tr>
+                        <td>Content creation (files)</td>
+                        <td><strong style="color: var(--teal);">Claude Code</strong></td>
+                        <td>Direct file output</td>
+                    </tr>
+                    <tr>
+                        <td>Multi-step workflows</td>
+                        <td><strong style="color: var(--teal);">Claude Code</strong></td>
+                        <td>Agents + hooks orchestrate</td>
+                    </tr>
+                    <tr>
+                        <td>Enforced brand compliance</td>
+                        <td><strong style="color: var(--teal);">Claude Code</strong></td>
+                        <td>Hooks auto-check every output</td>
+                    </tr>
+                    <tr>
+                        <td>Batch operations</td>
+                        <td><strong style="color: var(--teal);">Claude Code</strong></td>
+                        <td>Bash + loops</td>
+                    </tr>
+                    <tr>
+                        <td>Code development</td>
+                        <td><strong style="color: var(--teal);">Claude Code</strong></td>
+                        <td>Full toolchain access</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 7: KILLER FEATURES - HOOKS
+         ========================================= -->
+    <section class="slide" data-slide="6">
+        <div class="glow-bg glow-amber" style="top: 20%; left: -15%;"></div>
+        <div class="slide-content">
+            <p class="label label-amber reveal">Killer Feature #1</p>
+            <h2 class="reveal">Hooks = Automatic Guardrails</h2>
+            <p class="reveal">Hooks run automatically at key moments — without you asking.</p>
+
+            <div class="two-col" style="margin-top: 2rem;">
+                <div class="reveal">
+                    <div class="highlight-box-amber">
+                        <h3 style="color: var(--accent); margin-bottom: 1rem;">What Hooks Do</h3>
+                        <ul style="margin: 0;">
+                            <li>Every output checked against brand voice</li>
+                            <li>Auto-inject competitor context before research</li>
+                            <li>Block non-compliant content before finalized</li>
+                            <li>Log all actions for audit trails</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="reveal">
+                    <div class="card">
+                        <h3>Hook Types</h3>
+                        <table style="font-size: 0.85rem; margin: 0.5rem 0 0;">
+                            <tr><td><code>SessionStart</code></td><td>Load context on launch</td></tr>
+                            <tr><td><code>PreToolUse</code></td><td>Check before actions</td></tr>
+                            <tr><td><code>PostToolUse</code></td><td>Validate after actions</td></tr>
+                            <tr><td><code>Stop</code></td><td>Clean up on exit</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 8: KILLER FEATURES - AGENTS
+         ========================================= -->
+    <section class="slide" data-slide="7">
+        <div class="glow-bg glow-purple" style="bottom: 10%; right: -15%;"></div>
+        <div class="slide-content">
+            <p class="label label-purple reveal">Killer Feature #2</p>
+            <h2 class="reveal">Agents = Intelligent Delegation</h2>
+            <p class="reveal">Specialized assistants that Claude can spawn to work autonomously.</p>
+
+            <div class="card-grid reveal" style="margin-top: 2rem;">
+                <div class="card">
+                    <h3 style="color: var(--purple);">Research Agent</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">"Research competitors"</p>
+                    <p style="font-size: 0.85rem; margin: 0;">→ Spawns agent → Returns structured intel</p>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--purple);">Explorer Agent</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">"Analyze this codebase"</p>
+                    <p style="font-size: 0.85rem; margin: 0;">→ Spawns agent → Maps architecture</p>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--purple);">Implementer Agent</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">"Build this feature"</p>
+                    <p style="font-size: 0.85rem; margin: 0;">→ Spawns agent → Creates code</p>
+                </div>
+            </div>
+
+            <div class="highlight-box-purple reveal" style="margin-top: 2rem;">
+                <p style="margin: 0; color: var(--text-primary);"><strong>Key benefit:</strong> Main conversation stays clean while agents do deep work in the background.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 9: KILLER FEATURES - FILE ACCESS
+         ========================================= -->
+    <section class="slide" data-slide="8">
+        <div class="glow-bg glow-teal" style="top: 30%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content">
+            <p class="label reveal">Killer Feature #3</p>
+            <h2 class="reveal">File Access = Real Deliverables</h2>
+            <p class="reveal">Claude Code creates actual files, not just chat responses.</p>
+
+            <div class="two-col" style="margin-top: 2rem;">
+                <div class="reveal">
+                    <div class="highlight-box">
+                        <h3 style="color: var(--teal); margin-bottom: 1rem;">What You Get</h3>
+                        <ul style="margin: 0;">
+                            <li>Creates <code>.docx</code>, <code>.md</code>, <code>.csv</code>, <code>.xlsx</code> files</li>
+                            <li>Edits existing documents in place</li>
+                            <li>Organizes assets into folders</li>
+                            <li>No copy-paste from chat required</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="reveal">
+                    <div class="card">
+                        <h3>Web vs Claude Code</h3>
+                        <table style="font-size: 0.85rem; margin: 0.5rem 0 0;">
+                            <tr>
+                                <td><strong>Web</strong></td>
+                                <td>Copy text from chat → Paste into file → Format manually</td>
+                            </tr>
+                            <tr>
+                                <td><strong style="color: var(--teal);">Claude Code</strong></td>
+                                <td>File created directly → Already formatted → Ready to use</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 10: SUMMARY
+         ========================================= -->
+    <section class="slide" data-slide="9">
+        <div class="glow-bg glow-teal" style="top: 30%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content" style="text-align: center;">
+            <p class="label reveal">Summary</p>
+            <h2 class="reveal">Choosing Your Interface</h2>
+
+            <div class="three-col reveal" style="margin-top: 2rem;">
+                <div class="card" style="text-align: left;">
+                    <h3>Claude.ai Web</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem;"><strong>Best for:</strong> Quick questions, basic research</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;"><strong>Limitations:</strong> No file access, no agents, no hooks</p>
+                </div>
+                <div class="card" style="text-align: left;">
+                    <h3>Claude Code Desktop</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem;"><strong>Best for:</strong> Full-featured with GUI</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;"><strong>Limitations:</strong> Requires installation</p>
+                </div>
+                <div class="card" style="text-align: left; border-color: var(--teal);">
+                    <h3 style="color: var(--teal);">Claude Code CLI</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem;"><strong>Best for:</strong> Power users, automation</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;"><strong>Limitations:</strong> Terminal-based</p>
+                </div>
+            </div>
+
+            <div class="highlight-box reveal" style="margin-top: 3rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+                <p style="margin: 0; color: var(--text-primary); font-size: 1.125rem;">
+                    <strong>Bottom line:</strong> Claude Code (Desktop or CLI) unlocks the full potential of customized skills, agents, and hooks. For teams that need enforced standards, automated workflows, and real file output — <span style="color: var(--teal);">Claude Code is the clear choice</span>.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Keyboard Hint -->
+    <div class="keyboard-hint">
+        Press <kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> to navigate
+    </div>
+
+    <script>
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.progressBar = document.querySelector('.progress-bar');
+                this.navDots = document.querySelector('.nav-dots');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.init();
+            }
+
+            init() {
+                this.createNavDots();
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupScrollListener();
+                this.updateProgress();
+            }
+
+            createNavDots() {
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'nav-dot';
+                    dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    this.navDots.appendChild(dot);
+                });
+                this.updateNavDots();
+            }
+
+            updateNavDots() {
+                const dots = this.navDots.querySelectorAll('.nav-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentSlide);
+                });
+            }
+
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            this.currentSlide = parseInt(entry.target.dataset.slide);
+                            this.updateNavDots();
+                            this.updateProgress();
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        this.nextSlide();
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        this.prevSlide();
+                    }
+                });
+            }
+
+            setupScrollListener() {
+                window.addEventListener('scroll', () => this.updateProgress(), { passive: true });
+            }
+
+            updateProgress() {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                this.progressBar.style.width = `${(scrollTop / docHeight) * 100}%`;
+            }
+
+            goToSlide(index) {
+                if (index >= 0 && index < this.totalSlides) {
+                    this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.totalSlides - 1) this.goToSlide(this.currentSlide + 1);
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) this.goToSlide(this.currentSlide - 1);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => new SlidePresentation());
+    </script>
+</body>
+</html>

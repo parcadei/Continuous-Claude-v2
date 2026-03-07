@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Charts Demo — Midnight Executive + Chart.js</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        /* ===========================================
+           MIDNIGHT EXECUTIVE THEME (condensed)
+           =========================================== */
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: rgba(30, 41, 59, 0.6);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #f59e0b;
+            --teal: #00B69F;
+            --purple: #a78bfa;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --border: rgba(148, 163, 184, 0.1);
+
+            /* Shadcn-inspired chart colors */
+            --chart-1: #00B69F;
+            --chart-2: #a78bfa;
+            --chart-3: #f59e0b;
+            --chart-4: #22c55e;
+            --chart-5: #ef4444;
+
+            --font-display: 'Libre Baskerville', serif;
+            --font-body: 'Source Sans 3', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --slide-padding: clamp(2rem, 5vw, 6rem);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--teal), var(--purple));
+            width: 0%;
+            z-index: 100;
+        }
+
+        .nav-dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot:hover { opacity: 0.7; transform: scale(1.3); }
+        .nav-dot.active { background: var(--teal); opacity: 1; }
+
+        .slide {
+            min-height: 100vh;
+            padding: var(--slide-padding);
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slide-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+
+        .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 1rem;
+        }
+
+        h1, h2 { font-family: var(--font-display); font-weight: 700; margin-bottom: 1.5rem; }
+        h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.15; }
+        h2 { font-size: clamp(1.75rem, 3.5vw, 2.75rem); }
+        h3 { font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 0.75rem; }
+
+        p { color: var(--text-secondary); margin-bottom: 1rem; max-width: 700px; }
+
+        .title-slide { text-align: center; }
+
+        .glow-bg {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .glow-teal { background: rgba(0, 182, 159, 0.15); }
+        .glow-purple { background: rgba(167, 139, 250, 0.15); }
+
+        .accent-line {
+            width: 80px;
+            height: 2px;
+            background: var(--teal);
+            margin: 2rem auto;
+        }
+
+        .meta { font-size: 0.875rem; color: var(--text-muted); margin-top: 2rem; }
+
+        /* ===========================================
+           SHADCN-INSPIRED CHART CARDS
+           =========================================== */
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .chart-title {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .chart-description {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .chart-value {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .chart-trend {
+            font-size: 0.875rem;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .chart-trend.negative { color: var(--danger); }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-top: 1rem;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .chart-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Legend styling */
+        .chart-legend {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        /* ===========================================
+           INTERACTIVE TABS (Shadcn-style)
+           =========================================== */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: 8px;
+            width: fit-content;
+        }
+
+        .tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .tab:hover { color: var(--text-primary); }
+        .tab.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        /* ===========================================
+           STAT CARDS (Shadcn-style)
+           =========================================== */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .stat-card-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card-value {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-card-trend {
+            font-size: 0.8rem;
+            color: var(--success);
+            margin-top: 0.5rem;
+        }
+
+        .stat-card-trend.negative { color: var(--danger); }
+
+        /* ===========================================
+           PROGRESS BARS (Shadcn-style)
+           =========================================== */
+        .progress-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .progress-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+        }
+
+        .progress-label { color: var(--text-primary); }
+        .progress-value { color: var(--text-muted); }
+
+        .progress-bar-track {
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s var(--ease-out-expo);
+        }
+
+        /* ===========================================
+           KEYBOARD HINT
+           =========================================== */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease 2s forwards;
+        }
+
+        .keyboard-hint kbd {
+            background: var(--bg-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .nav-dots, .keyboard-hint { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar"></div>
+    <nav class="nav-dots"></nav>
+
+    <!-- =========================================
+         SLIDE 1: TITLE
+         ========================================= -->
+    <section class="slide title-slide" data-slide="0">
+        <div class="glow-bg glow-teal" style="top: -20%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content">
+            <p class="label reveal">Interactive Demo</p>
+            <h1 class="reveal">Charts & Graphs<br>in Presentations</h1>
+            <p class="reveal" style="max-width: 600px; margin: 0 auto;">Shadcn-inspired styling with Chart.js — zero build step, single HTML file</p>
+            <div class="accent-line reveal"></div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 2: AREA CHART
+         ========================================= -->
+    <section class="slide" data-slide="1">
+        <div class="glow-bg glow-purple" style="top: 10%; right: -20%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Revenue Analytics</p>
+            <h2 class="reveal">Monthly Performance</h2>
+
+            <div class="chart-card reveal" style="margin-top: 2rem;">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Total Revenue</div>
+                        <div class="chart-description">January - June 2026</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="chart-value">$1.2M</div>
+                        <div class="chart-trend">↑ 12.5% from last period</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="areaChart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: var(--chart-1);"></div>
+                        <span>Desktop</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: var(--chart-2);"></div>
+                        <span>Mobile</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 3: BAR CHART + STATS
+         ========================================= -->
+    <section class="slide" data-slide="2">
+        <div class="glow-bg glow-teal" style="bottom: -10%; left: -15%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Quarterly Metrics</p>
+            <h2 class="reveal">Q1 2026 Performance</h2>
+
+            <div class="stat-grid reveal">
+                <div class="stat-card">
+                    <div class="stat-card-label">Total Revenue</div>
+                    <div class="stat-card-value">$45.2K</div>
+                    <div class="stat-card-trend">↑ 20.1% from last month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Subscriptions</div>
+                    <div class="stat-card-value">+2,350</div>
+                    <div class="stat-card-trend">↑ 180.1% from last month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Active Users</div>
+                    <div class="stat-card-value">12.5K</div>
+                    <div class="stat-card-trend">↑ 19% from last month</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Churn Rate</div>
+                    <div class="stat-card-value">2.4%</div>
+                    <div class="stat-card-trend negative">↓ 0.3% from last month</div>
+                </div>
+            </div>
+
+            <div class="chart-card reveal" style="margin-top: 1.5rem;">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Monthly Active Users</div>
+                        <div class="chart-description">By platform</div>
+                    </div>
+                </div>
+                <div class="chart-container" style="height: 200px;">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 4: DONUT + PROGRESS
+         ========================================= -->
+    <section class="slide" data-slide="3">
+        <div class="glow-bg glow-purple" style="top: 20%; right: -15%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Market Analysis</p>
+            <h2 class="reveal">Traffic Sources & Goals</h2>
+
+            <div class="chart-grid reveal">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Traffic Breakdown</div>
+                            <div class="chart-description">By source</div>
+                        </div>
+                    </div>
+                    <div class="chart-container" style="height: 220px;">
+                        <canvas id="donutChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <div class="chart-title">Goal Progress</div>
+                            <div class="chart-description">Q1 targets</div>
+                        </div>
+                    </div>
+                    <div class="progress-list">
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span class="progress-label">Revenue Target</span>
+                                <span class="progress-value">78%</span>
+                            </div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill" style="width: 0%; background: var(--chart-1);" data-target="78"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span class="progress-label">User Acquisition</span>
+                                <span class="progress-value">92%</span>
+                            </div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill" style="width: 0%; background: var(--chart-2);" data-target="92"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span class="progress-label">NPS Score</span>
+                                <span class="progress-value">65%</span>
+                            </div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill" style="width: 0%; background: var(--chart-3);" data-target="65"></div>
+                            </div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span class="progress-label">Feature Adoption</span>
+                                <span class="progress-value">45%</span>
+                            </div>
+                            <div class="progress-bar-track">
+                                <div class="progress-bar-fill" style="width: 0%; background: var(--chart-4);" data-target="45"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 5: LINE CHART WITH TABS
+         ========================================= -->
+    <section class="slide" data-slide="4">
+        <div class="glow-bg glow-teal" style="bottom: 10%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content">
+            <p class="label reveal">Trend Analysis</p>
+            <h2 class="reveal">Growth Metrics Over Time</h2>
+
+            <div class="chart-card reveal" style="margin-top: 2rem;">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">User Growth</div>
+                        <div class="chart-description">Click tabs to switch metrics</div>
+                    </div>
+                    <div class="tabs">
+                        <button class="tab active" data-chart="users">Users</button>
+                        <button class="tab" data-chart="sessions">Sessions</button>
+                        <button class="tab" data-chart="pageviews">Pageviews</button>
+                    </div>
+                </div>
+                <div class="chart-container" style="height: 280px;">
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="keyboard-hint">
+        Press <kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> to navigate
+    </div>
+
+    <script>
+        /* ===========================================
+           CHART.JS CONFIGURATION
+           Shadcn-inspired dark theme
+           =========================================== */
+
+        // Global defaults
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = 'rgba(148, 163, 184, 0.1)';
+        Chart.defaults.font.family = "'Source Sans 3', sans-serif";
+
+        const chartColors = {
+            teal: '#00B69F',
+            purple: '#a78bfa',
+            amber: '#f59e0b',
+            success: '#22c55e',
+            danger: '#ef4444'
+        };
+
+        // Area Chart
+        const areaCtx = document.getElementById('areaChart');
+        if (areaCtx) {
+            new Chart(areaCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Desktop',
+                            data: [186, 305, 237, 373, 209, 314],
+                            borderColor: chartColors.teal,
+                            backgroundColor: 'rgba(0, 182, 159, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Mobile',
+                            data: [80, 140, 120, 190, 130, 180],
+                            borderColor: chartColors.purple,
+                            backgroundColor: 'rgba(167, 139, 250, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Bar Chart
+        const barCtx = document.getElementById('barChart');
+        if (barCtx) {
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Desktop',
+                            data: [4500, 5200, 4800, 6100, 5500, 6800],
+                            backgroundColor: chartColors.teal,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Mobile',
+                            data: [2100, 2800, 2400, 3200, 2900, 3600],
+                            backgroundColor: chartColors.purple,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Donut Chart
+        const donutCtx = document.getElementById('donutChart');
+        if (donutCtx) {
+            new Chart(donutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Direct', 'Organic', 'Referral', 'Social', 'Email'],
+                    datasets: [{
+                        data: [35, 28, 18, 12, 7],
+                        backgroundColor: [
+                            chartColors.teal,
+                            chartColors.purple,
+                            chartColors.amber,
+                            chartColors.success,
+                            chartColors.danger
+                        ],
+                        borderWidth: 0,
+                        spacing: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 16, usePointStyle: true, pointStyle: 'circle' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Line Chart with Tab Switching
+        const lineCtx = document.getElementById('lineChart');
+        let lineChart;
+        const chartData = {
+            users: [1200, 1900, 3000, 5000, 4200, 6800, 7500, 8200, 9100, 10200, 11500, 12500],
+            sessions: [2400, 3800, 6000, 10000, 8400, 13600, 15000, 16400, 18200, 20400, 23000, 25000],
+            pageviews: [7200, 11400, 18000, 30000, 25200, 40800, 45000, 49200, 54600, 61200, 69000, 75000]
+        };
+
+        if (lineCtx) {
+            lineChart = new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        data: chartData.users,
+                        borderColor: chartColors.teal,
+                        backgroundColor: 'rgba(0, 182, 159, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, beginAtZero: true }
+                    },
+                    animation: { duration: 750, easing: 'easeOutQuart' }
+                }
+            });
+
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    const metric = tab.dataset.chart;
+                    const colors = {
+                        users: chartColors.teal,
+                        sessions: chartColors.purple,
+                        pageviews: chartColors.amber
+                    };
+
+                    lineChart.data.datasets[0].data = chartData[metric];
+                    lineChart.data.datasets[0].borderColor = colors[metric];
+                    lineChart.data.datasets[0].backgroundColor = colors[metric].replace(')', ', 0.1)').replace('rgb', 'rgba');
+                    lineChart.update();
+                });
+            });
+        }
+
+        /* ===========================================
+           PROGRESS BAR ANIMATION
+           =========================================== */
+        function animateProgressBars() {
+            document.querySelectorAll('.progress-bar-fill').forEach(bar => {
+                const target = bar.dataset.target;
+                setTimeout(() => {
+                    bar.style.width = target + '%';
+                }, 300);
+            });
+        }
+
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.progressBar = document.querySelector('.progress-bar');
+                this.navDots = document.querySelector('.nav-dots');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.init();
+            }
+
+            init() {
+                this.createNavDots();
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupScrollListener();
+            }
+
+            createNavDots() {
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'nav-dot';
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    this.navDots.appendChild(dot);
+                });
+                this.updateNavDots();
+            }
+
+            updateNavDots() {
+                const dots = this.navDots.querySelectorAll('.nav-dot');
+                dots.forEach((dot, index) => dot.classList.toggle('active', index === this.currentSlide));
+            }
+
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            this.currentSlide = parseInt(entry.target.dataset.slide);
+                            this.updateNavDots();
+                            this.updateProgress();
+
+                            // Animate progress bars when slide 3 is visible
+                            if (this.currentSlide === 3) {
+                                animateProgressBars();
+                            }
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        this.nextSlide();
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        this.prevSlide();
+                    }
+                });
+            }
+
+            setupScrollListener() {
+                window.addEventListener('scroll', () => {
+                    const scrollTop = window.scrollY;
+                    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                    this.progressBar.style.width = `${(scrollTop / docHeight) * 100}%`;
+                }, { passive: true });
+            }
+
+            updateProgress() {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                this.progressBar.style.width = `${(scrollTop / docHeight) * 100}%`;
+            }
+
+            goToSlide(index) {
+                if (index >= 0 && index < this.totalSlides) {
+                    this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.totalSlides - 1) this.goToSlide(this.currentSlide + 1);
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) this.goToSlide(this.currentSlide - 1);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => new SlidePresentation());
+    </script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 ---
+name: validate-agent
 description: Validation agent that validates plan tech choices against current best practices
 ---
 

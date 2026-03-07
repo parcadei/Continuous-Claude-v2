@@ -1,3 +1,8 @@
+---
+name: system-overview
+description: Show users how Continuous Claude works - the opinionated setup with hooks, memory, and coordination.
+---
+
 # System Overview
 
 Show users how Continuous Claude works - the opinionated setup with hooks, memory, and coordination.

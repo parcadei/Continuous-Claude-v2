@@ -1,7 +1,8 @@
 ---
 name: onboard
 description: Analyze brownfield codebase and create initial continuity ledger
-user-invocable: true
+metadata:
+  user-invocable: true
 ---
 
 # Onboard - Project Discovery & Ledger Creation

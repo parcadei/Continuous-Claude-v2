@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-03-06T12:07:30.445199+00:00",
+  "updated_at": "2026-03-07T02:01:25.303957+00:00",
   "project": {
     "name": "continuous-claude",
     "description": "> Give Claude a notebook, memory, specialized assistants, and autonomous development capability — so every conversation builds on the last [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://claude.ai/code)",
@@ -129,10 +129,6 @@
       },
       ".claude\\hooks\\src\\shared/": {
         "purpose": "Shared code",
-        "key_files": null
-      },
-      ".claude\\hooks\\src\\src/": {
-        "purpose": "Source code",
         "key_files": null
       },
       ".claude\\plugins/": {
@@ -1687,10 +1683,26 @@
   "goals": {
     "source": "ROADMAP.md",
     "current": {
-      "title": "LinkMap Code Review, Refactor & Cleanup",
-      "description": "Overall assessment: Strong codebase (B+/A-). Clean architecture, solid state management, comprehensive features. Issues are mostly dead code, inconsistent error handling, and minor robustness gaps.; `chrome.windows.getCurrent()` resolves async, but `handleStateUpdate()` can fire before it resolves; Started: 2026-03-05"
+      "title": "Fix Sync-to-Repo Revert Loop + Re-apply Reverted Fixes",
+      "description": "This copies the fixed versions to `~/.claude/hooks/src/` and rebuilds; Revert loop fixed: Edit a `.ts` file in `continuous-claude/.claude/hooks/src/`, wait 15s, re-read the file — edit should persist; Started: 2026-03-07"
     },
     "completed": [
+      {
+        "title": "[fix](hooks) break sync-to-repo revert loop + re-apply 7 code fixes (2026-03-07) `0adbdeb`",
+        "completed": null
+      },
+      {
+        "title": "Fix: Eliminate Explore → Scout Redirect Round-Trip",
+        "completed": "2026-03-07"
+      },
+      {
+        "title": "LinkMap Code Review, Refactor & Cleanup",
+        "completed": "2026-03-07"
+      },
+      {
+        "title": "[fix](hooks) revive dead agent validation pipeline — Task→Agent rename (2026-03-06) `d8d7343`",
+        "completed": null
+      },
       {
         "title": "Dashboard Phase 1 — Fix HIGH Priority Bugs",
         "completed": "2026-03-05"
@@ -2034,5 +2046,5 @@
     "env_vars": ".env.example"
   },
   "_stale": true,
-  "_invalidated_at": "2026-03-07T00:48:59.238Z"
+  "_invalidated_at": "2026-03-07T20:26:51.767Z"
 }

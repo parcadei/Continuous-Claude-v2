@@ -1,0 +1,1209 @@
+{
+  "version": "1.0",
+  "started": "2026-03-07T13:47:56.712Z",
+  "snapshot_path": "~/.claude/skills/_snapshots/2026-03-07/",
+  "phases_completed": [
+    "phase-1-structural-validation",
+    "phase-2-format-migration",
+    "phase-3-duplicate-consolidation",
+    "phase-4-oversized-splitting",
+    "phase-4-audit-warn-fixes",
+    "phase-5-trigger-evaluation",
+    "phase-6-collision-testing"
+  ],
+  "skills": {
+    "agent-browser": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "split in phase 4"
+    },
+    "agent-context-isolation": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "agent-development": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "TODO false positive (TodoWrite tool ref / search example)"
+    },
+    "agentica-claude-proxy": {
+      "phase": "validated",
+      "structural": "fail",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "missing: scripts/agentica/claude_proxy.py, dependency_swarm.py"
+    },
+    "agentica-infrastructure": {
+      "phase": "validated",
+      "structural": "fail",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "missing: scripts/agentica_patterns/"
+    },
+    "agentica-prompts": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "agentica-sdk": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "split in phase 4"
+    },
+    "agentica-server": {
+      "phase": "validated",
+      "structural": "fail",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "missing: scripts/agentica/claude_proxy.py, PATTERNS.md"
+    },
+    "agentica-spawn": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "agentic-workflow": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "agent-orchestration": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "ast-grep-find": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "async-repl-protocol": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "azure-deployment": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "braintrust-analyze": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "braintrust-tracing": {
+      "phase": "evaluated",
+      "structural": "fail",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "missing: scripts/braintrust_analyze.py"
+    },
+    "browser-dev-cycle": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "split in phase 4"
+    },
+    "build": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "split in phase 4"
+    },
+    "claude-in-chrome": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "cli-reference": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "code-review": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "commit": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "completion-check": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "continuity_ledger": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "create_handoff": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "create-better-skills": {
+      "phase": "archived",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "Phase 3: consolidated duplicate"
+    },
+    "databases": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "date-logic-management": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "TODO false positive (TodoWrite tool ref / search example); split in phase 4"
+    },
+    "dead-code": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "debug": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "debug-hooks": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "describe_pr": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "discovery-interview": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "split in phase 4"
+    },
+    "environment-triage": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "excalidraw-mcp": {
+      "phase": "validated",
+      "structural": "fail",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "missing: scripts/*.cjs (healthcheck, clear-canvas, export/import)"
+    },
+    "explore": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "split in phase 4"
+    },
+    "find-skills": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "firecrawl-scrape": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "fix": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "split in phase 4"
+    },
+    "fourth-brand-guidelines": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "split in phase 4"
+    },
+    "fourth-presentation-builder": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "split in phase 4"
+    },
+    "fourth-presentation-suite": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "split in phase 4"
+    },
+    "frontend-slides": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "split in phase 4"
+    },
+    "full-test-suite": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "git-commits": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "github-search": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "help": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "hook-developer": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "split in phase 4"
+    },
+    "hooks": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "idearalph": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "implement_plan": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "TODO false positive (TodoWrite tool ref / search example)"
+    },
+    "implement_plan_micro": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "name fixed to kebab-case"
+    },
+    "implement_task": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "name fixed to kebab-case"
+    },
+    "init-project": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "knowledge-tree": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "maestro": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "mcp-guidance": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "meeting-brief-generator": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "memory": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "migrate": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "morph-apply": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "morph-search": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "mot": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "split in phase 4"
+    },
+    "nia-docs": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "notion-bridge": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "onboard": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "opc-architecture": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "pageindex-search": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "paper-design": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "parallel-agent-contracts": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "parallel-agents": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "perplexity-search": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "personas": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "plan-agent": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "plan-mode": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "premortem": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 92.3,
+      "eval_tier": "verified",
+      "notes": "TODO false positive (TodoWrite tool ref / search example); split in phase 4"
+    },
+    "qlty-check": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "qlty-during-development": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "ralph": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "split in phase 4"
+    },
+    "ralph-resume": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "react-perf": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "recall": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "recall-reasoning": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "refactor": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "reference-sdk": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "release": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "remember": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "repoprompt": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "TODO false positive (TodoWrite tool ref / search example)"
+    },
+    "repo-research-analyst": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "research": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "TODO false positive (TodoWrite tool ref / search example)"
+    },
+    "research-external": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "split in phase 4"
+    },
+    "resume_handoff": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "TODO false positive (TodoWrite tool ref / search example)"
+    },
+    "review": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "roadmap": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "router-first-architecture": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "search-hierarchy": {
+      "phase": "archived",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "Phase 3: consolidated duplicate"
+    },
+    "search-router": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "search-tools": {
+      "phase": "archived",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "Phase 3: consolidated duplicate"
+    },
+    "security": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "shadcn-create": {
+      "phase": "evaluated",
+      "structural": "fail",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "missing: references/patterns-*.md (4 files); split in phase 4"
+    },
+    "skill-creator": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "skill-developer": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "skill-development": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "skill-upgrader": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "sub-agents": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "system_overview": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "systematic-debugging": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "task-master-workflow": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "tdd": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "split in phase 4"
+    },
+    "tdd-migrate": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "TODO false positive (TodoWrite tool ref / search example)"
+    },
+    "tdd-migration-pipeline": {
+      "phase": "archived",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "Phase 3: consolidated duplicate"
+    },
+    "test": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "tldr-code": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "TODO false positive (TodoWrite tool ref / search example); split in phase 4"
+    },
+    "tldr-deep": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "tldr-overview": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "tldr-router": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "tldr-stats": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "tour": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "ui-audit": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "split in phase 4"
+    },
+    "ui-ux-pro-max": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "validate-agent": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "vercel-cli": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "vet-skill": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "weekly-report": {
+      "phase": "validated",
+      "structural": "pass",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": ""
+    },
+    "wiring": {
+      "phase": "validated",
+      "structural": "fail",
+      "trigger_accuracy": null,
+      "eval_tier": null,
+      "notes": "missing: scripts/orchestrate.py"
+    },
+    "workflow-router": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": ""
+    },
+    "math/abstract-algebra": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "math/category-theory": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "math/complex-analysis": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "math/functional-analysis": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "math/graph-number-theory": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "math/information-theory": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "math/linear-algebra": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "math/mathematical-logic": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "math/measure-theory": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "math/numerical-methods": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "math/odes-pdes": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "math/optimization": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "math/real-analysis": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "math/topology": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "frontend-design": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-health": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-setup": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-architect": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 90,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-ask": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 90,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-help": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 90,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-reseed": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-tutorial": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-recommend": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 87.5,
+      "eval_tier": "vetted",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-upgrade": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 90,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-add-domain": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 90,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-document": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-connect": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-verify": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-update": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-next": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-seed": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-retrospect": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-validate": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 90,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-learn": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 90,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-stats": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-graph": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-pipeline": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-remember": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 85.7,
+      "eval_tier": "vetted",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-refactor": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-ralph": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 100,
+      "eval_tier": "verified",
+      "notes": "added during phase 5 eval"
+    },
+    "arscontexta-tasks": {
+      "phase": "evaluated",
+      "structural": "pass",
+      "trigger_accuracy": 87.5,
+      "eval_tier": "vetted",
+      "notes": "added during phase 5 eval"
+    }
+  },
+  "collision_test": {
+    "date": "2026-03-07",
+    "beforeFixes": {
+      "collisionRate": 76.1,
+      "uniquePairs": 481
+    },
+    "afterFixes": {
+      "collisionRate": 39.5,
+      "uniquePairs": 278
+    },
+    "keywordsFixed": [
+      "code-review:pr",
+      "github-search:PR",
+      "find-skills:find/skill/agent",
+      "debug-agent:error/problem/issue",
+      "ast-grep-find:ast",
+      "morph-search:grep/search-for",
+      "systematic-debugging:fix"
+    ],
+    "triggerAccuracy": {
+      "before": 98.8,
+      "after": 99.1
+    }
+  }
+}

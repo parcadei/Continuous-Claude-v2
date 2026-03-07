@@ -219,9 +219,6 @@ premortem:
 **BLOCKING:** Present findings and require user decision.
 
 ```python
-# Build risk summary
-risk_summary = format_risks(tigers, elephants)
-
 AskUserQuestion(
     question=f"""Pre-Mortem identified {len(tigers)} tigers, {len(elephants)} elephants:
 
@@ -230,22 +227,10 @@ AskUserQuestion(
 How would you like to proceed?""",
     header="Risks",
     options=[
-        {
-            "label": "Accept risks and proceed",
-            "description": "Acknowledged but not blocking"
-        },
-        {
-            "label": "Add mitigations to plan (Recommended)",
-            "description": "Update plan with risk mitigations before proceeding"
-        },
-        {
-            "label": "Research mitigation options",
-            "description": "I don't know how to mitigate - help me find solutions"
-        },
-        {
-            "label": "Discuss specific risks",
-            "description": "Talk through particular concerns"
-        }
+        {"label": "Accept risks and proceed", "description": "Acknowledged but not blocking"},
+        {"label": "Add mitigations to plan (Recommended)", "description": "Update plan with risk mitigations before proceeding"},
+        {"label": "Research mitigation options", "description": "I don't know how to mitigate - help me find solutions"},
+        {"label": "Discuss specific risks", "description": "Talk through particular concerns"}
     ]
 )
 ```
@@ -253,79 +238,47 @@ How would you like to proceed?""",
 ### Step 4: Handle User Response
 
 #### If "Accept risks and proceed"
-```python
-# Log acceptance for audit trail
-print("Risks acknowledged. Proceeding with implementation.")
-# Continue to next workflow step
-```
+Log acceptance and continue to next workflow step.
 
 #### If "Add mitigations to plan"
-```python
-# User provides mitigation approach
-# Update plan file with mitigations section
-# Re-run quick premortem to verify mitigations address risks
-```
+Update plan file with mitigations section, then re-run quick premortem to verify mitigations address risks.
 
 #### If "Research mitigation options"
+
+Spawn parallel research for each HIGH severity tiger:
+
 ```python
-# Spawn parallel research for each HIGH severity tiger
 for tiger in high_severity_tigers:
     # Internal: How has codebase handled this before?
-    Task(
-        subagent_type="scout",
-        prompt=f"""
+    Task(subagent_type="scout", prompt=f"""
         Find how this codebase has previously handled: {tiger.category}
-
         Specifically looking for patterns related to: {tiger.risk}
-
-        Return:
-        - File:line references to similar solutions
-        - Patterns used
-        - Libraries/utilities available
-        """
-    )
+        Return: file:line references, patterns used, libraries available
+    """)
 
     # External: What are best practices?
-    Task(
-        subagent_type="oracle",
-        prompt=f"""
+    Task(subagent_type="oracle", prompt=f"""
         Research best practices for: {tiger.risk}
-
         Context: {tiger.category} in a {tech_stack} codebase
+        Return: recommended approaches (ranked), library options, common pitfalls
+    """)
 
-        Return:
-        - Recommended approaches (ranked)
-        - Library options
-        - Common pitfalls to avoid
-        """
-    )
-
-# Wait for research to complete
-# Synthesize options
-# Present via AskUserQuestion with 2-4 mitigation options
+# Synthesize, present 2-4 mitigation options via AskUserQuestion
 ```
 
 #### If "Discuss specific risks"
-```python
-# Ask which risk to discuss
-AskUserQuestion(
-    question="Which risk would you like to discuss?",
-    header="Risk",
-    options=[format_risk_option(r) for r in all_risks[:4]]
-)
-# Then have conversation about that specific risk
-```
+Ask which risk to discuss, then have conversation about that specific risk.
 
 ### Step 5: Update Plan (if mitigations added)
 
-If user added mitigations, append to the plan:
+Append to the plan file:
 
 ```markdown
 ## Risk Mitigations (Pre-Mortem)
 
 ### Tigers Addressed:
 1. **{risk}** (severity: {severity})
-   - Mitigation: {user_or_researched_mitigation}
+   - Mitigation: {mitigation}
    - Added to phase: {phase_number}
 
 ### Accepted Risks:
@@ -334,41 +287,16 @@ If user added mitigations, append to the plan:
 ### Pre-Mortem Run:
 - Date: {timestamp}
 - Mode: {quick|deep}
-- Tigers: {count}
-- Elephants: {count}
+- Tigers: {count} | Elephants: {count}
 ```
 
 ## Integration Points
 
-### In create_plan / plan-agent
-
-After plan structure is approved, before ExitPlanMode:
-
-```python
-# Run quick premortem
-/premortem quick
-
-# If HIGH risks found, block until addressed
-# If only MEDIUM/LOW, inform and proceed
-```
-
-### After plan approval, before implementation
-
-```python
-# Run deep premortem on full plan
-/premortem deep thoughts/shared/plans/YYYY-MM-DD-feature.md
-
-# Block until all HIGH tigers addressed
-```
-
-### In PR review workflows
-
-```python
-# Run quick premortem on diff scope
-/premortem quick
-
-# Inform of any risks found
-```
+| Context | Mode | Behavior |
+|---------|------|----------|
+| During plan creation | quick | Run after plan structure approved, before ExitPlanMode |
+| Before implementation | deep | Run on full plan file; block on HIGH risks |
+| PR review | quick | Run on diff scope; inform of risks found |
 
 ## Severity Thresholds
 
@@ -378,74 +306,9 @@ After plan structure is approved, before ExitPlanMode:
 | MEDIUM | No | Inform user, recommend addressing |
 | LOW | No | Note for awareness |
 
-## Example Session
-
-```
-User: /premortem deep thoughts/shared/plans/2026-01-08-api-rate-limiting.md
-
-Claude: Running deep pre-mortem on API rate limiting plan...
-
-[Reviews plan against deep checklist]
-
-Pre-mortem complete. Found 2 tigers, 1 elephant:
-
-**TIGERS:**
-1. [HIGH] No circuit breaker for external payment API
-   - Category: dependency
-   - If payment API is slow/down, requests will pile up
-
-2. [HIGH] No rollback strategy defined
-   - Category: integration
-   - If rate limiting breaks auth flow, no quick fix path
-
-**ELEPHANTS:**
-1. [MEDIUM] Team hasn't used Redis before
-   - We're introducing Redis for rate limit counters
-   - Learning curve could slow implementation
-
-**PAPER TIGERS:**
-1. Database migration size - Only adds one index, <1s migration
-
-[AskUserQuestion presented]
-
-User: Research mitigation options
-
-Claude: Researching mitigations...
-
-[Spawns scout + oracle in parallel]
-
-Found 3 options for circuit breaker:
-
-1. **Use existing retry util** (Recommended)
-   - Found at src/utils/retry.ts:45
-   - Already handles exponential backoff
-   - Just need to add circuit breaker state
-
-2. **Add resilience4j-lite**
-   - Popular library for this pattern
-   - More features but new dependency
-
-3. **Custom implementation**
-   - Full control but more code to maintain
-
-Which approach for the circuit breaker?
-
-User: Option 1 - use existing retry util
-
-Claude: Added to plan:
-
-## Risk Mitigations (Pre-Mortem)
-
-### Tigers Addressed:
-1. **No circuit breaker** (HIGH)
-   - Mitigation: Extend src/utils/retry.ts with circuit breaker state
-   - Added to Phase 1
-
-Shall I also address the rollback strategy tiger?
-```
-
 ## References
 
+- `references/example-session.md` — Annotated walkthrough of a deep premortem session
 - [Pre-Mortems by Shreyas Doshi](https://coda.io/@shreyas/pre-mortems)
 - [Gary Klein's Original Research](https://hbr.org/2007/09/performing-a-project-premortem)
-- [Project Pre-Mortem Guide - Mountain Goat Software](https://www.mountaingoatsoftware.com/blog/use-a-pre-mortem-to-identify-project-risks-before-they-occur)
+- [Mountain Goat Software Guide](https://www.mountaingoatsoftware.com/blog/use-a-pre-mortem-to-identify-project-risks-before-they-occur)

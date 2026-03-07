@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Midnight Executive Components — Interactive Library</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Chart.js (optional - for chart components) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        /* ===========================================
+           MIDNIGHT EXECUTIVE THEME - CORE VARIABLES
+           =========================================== */
+        :root {
+            /* Backgrounds */
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: rgba(30, 41, 59, 0.6);
+            --bg-hover: rgba(51, 65, 85, 0.5);
+
+            /* Text */
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            /* Accents */
+            --accent: #f59e0b;
+            --accent-glow: rgba(245, 158, 11, 0.15);
+            --teal: #00B69F;
+            --teal-glow: rgba(0, 182, 159, 0.15);
+            --purple: #a78bfa;
+            --purple-glow: rgba(167, 139, 250, 0.15);
+
+            /* Semantic */
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #eab308;
+            --info: #3b82f6;
+
+            /* Borders */
+            --border: rgba(148, 163, 184, 0.1);
+            --border-hover: rgba(148, 163, 184, 0.2);
+
+            /* Typography */
+            --font-display: 'Libre Baskerville', Georgia, serif;
+            --font-body: 'Source Sans 3', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+            /* Spacing */
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+
+            /* Animation */
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration: 0.2s;
+        }
+
+        /* ===========================================
+           BASE STYLES
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 16px;
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 { font-family: var(--font-display); font-weight: 700; }
+        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        h2 { font-size: 1.75rem; margin-bottom: 1rem; color: var(--teal); }
+        h3 { font-size: 1.25rem; margin-bottom: 0.75rem; }
+
+        p { color: var(--text-secondary); margin-bottom: 1rem; }
+
+        .section {
+            max-width: 900px;
+            margin: 0 auto 4rem;
+            padding-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section:last-child { border-bottom: none; }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .demo-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+        }
+
+        .label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            color: var(--teal);
+        }
+
+        /* ===========================================
+           1. TABS COMPONENT
+           =========================================== */
+        .tabs {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: var(--radius-md);
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all var(--duration) ease;
+        }
+
+        .tab-btn:hover { color: var(--text-primary); }
+
+        .tab-btn.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .tab-content {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        /* Tabs - Underline variant */
+        .tabs-underline {
+            display: flex;
+            gap: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0;
+            background: transparent;
+        }
+
+        .tabs-underline .tab-btn {
+            padding: 0.75rem 0;
+            border-radius: 0;
+            position: relative;
+        }
+
+        .tabs-underline .tab-btn.active {
+            background: transparent;
+            box-shadow: none;
+            color: var(--teal);
+        }
+
+        .tabs-underline .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--teal);
+        }
+
+        /* ===========================================
+           2. ACCORDION COMPONENT
+           =========================================== */
+        .accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .accordion-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .accordion-trigger {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            transition: background var(--duration) ease;
+        }
+
+        .accordion-trigger:hover {
+            background: var(--bg-hover);
+        }
+
+        .accordion-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: transform var(--duration) var(--ease-out);
+        }
+
+        .accordion-item[data-open="true"] .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            overflow: hidden;
+            transition: max-height 0.3s var(--ease-out);
+        }
+
+        .accordion-inner {
+            padding: 0 1.25rem 1rem;
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+        }
+
+        /* ===========================================
+           3. COLLAPSIBLE COMPONENT
+           =========================================== */
+        .collapsible {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .collapsible-trigger {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .collapsible-trigger:hover {
+            background: var(--bg-hover);
+        }
+
+        .collapsible-icon {
+            color: var(--teal);
+            transition: transform var(--duration) var(--ease-out);
+        }
+
+        .collapsible[data-open="true"] .collapsible-icon {
+            transform: rotate(90deg);
+        }
+
+        .collapsible-content {
+            overflow: hidden;
+            transition: max-height 0.3s var(--ease-out);
+        }
+
+        .collapsible-inner {
+            padding: 0 1rem 1rem 2.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* ===========================================
+           4. MODAL / DIALOG COMPONENT
+           =========================================== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow: hidden;
+            transform: scale(0.95) translateY(10px);
+            transition: transform 0.3s var(--ease-out);
+        }
+
+        .modal-overlay.open .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all var(--duration) ease;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* ===========================================
+           5. TOOLTIP COMPONENT
+           =========================================== */
+        .tooltip-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--duration) ease, visibility var(--duration) ease;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--bg-tertiary);
+        }
+
+        .tooltip-wrapper:hover .tooltip,
+        .tooltip.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Tooltip positions */
+        .tooltip-bottom {
+            bottom: auto;
+            top: calc(100% + 8px);
+        }
+
+        .tooltip-bottom::after {
+            top: auto;
+            bottom: 100%;
+            border-top-color: transparent;
+            border-bottom-color: var(--bg-tertiary);
+        }
+
+        /* ===========================================
+           6. CAROUSEL COMPONENT
+           =========================================== */
+        .carousel {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-lg);
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s var(--ease-out);
+        }
+
+        .carousel-slide {
+            flex: 0 0 100%;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .carousel-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--duration) ease;
+        }
+
+        .carousel-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .carousel-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: all var(--duration) ease;
+        }
+
+        .carousel-dot:hover { opacity: 0.6; }
+        .carousel-dot.active {
+            background: var(--teal);
+            opacity: 1;
+        }
+
+        /* ===========================================
+           7. TOGGLE / SWITCH COMPONENT
+           =========================================== */
+        .toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .toggle-track {
+            width: 44px;
+            height: 24px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            position: relative;
+            transition: background var(--duration) ease;
+        }
+
+        .toggle.active .toggle-track {
+            background: var(--teal);
+        }
+
+        .toggle-thumb {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: var(--text-primary);
+            border-radius: 50%;
+            transition: transform var(--duration) var(--ease-out);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle.active .toggle-thumb {
+            transform: translateX(20px);
+        }
+
+        .toggle-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===========================================
+           8. DROPDOWN COMPONENT
+           =========================================== */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-trigger {
+            padding: 0.625rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all var(--duration) ease;
+        }
+
+        .dropdown-trigger:hover {
+            border-color: var(--border-hover);
+        }
+
+        .dropdown-icon {
+            color: var(--text-muted);
+            transition: transform var(--duration) var(--ease-out);
+        }
+
+        .dropdown.open .dropdown-icon {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            min-width: 180px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.25rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all var(--duration) var(--ease-out);
+            z-index: 100;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .dropdown.open .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all var(--duration) ease;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .dropdown-item.active {
+            color: var(--teal);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.25rem 0;
+        }
+
+        /* ===========================================
+           9. BUTTONS (Supporting)
+           =========================================== */
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--duration) ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--teal);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background: #00a38e;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        .btn-ghost:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-hover);
+        }
+
+        /* ===========================================
+           10. CARDS (Enhanced)
+           =========================================== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-description {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* ===========================================
+           11. BADGE COMPONENT
+           =========================================== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .badge-teal { background: var(--teal-glow); color: var(--teal); }
+        .badge-amber { background: var(--accent-glow); color: var(--accent); }
+        .badge-purple { background: var(--purple-glow); color: var(--purple); }
+        .badge-success { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+        .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+        /* ===========================================
+           12. ALERT COMPONENT
+           =========================================== */
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .alert-icon {
+            flex-shrink: 0;
+            font-size: 1.25rem;
+        }
+
+        .alert-content { flex: 1; }
+
+        .alert-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-description {
+            font-size: 0.8125rem;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+
+        .alert-warning {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.2);
+            color: var(--warning);
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        /* ===========================================
+           13. PROGRESS COMPONENT
+           =========================================== */
+        .progress {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--teal);
+            border-radius: 4px;
+            transition: width 0.5s var(--ease-out);
+        }
+
+        .progress-amber .progress-bar { background: var(--accent); }
+        .progress-purple .progress-bar { background: var(--purple); }
+
+        /* ===========================================
+           14. SKELETON LOADER
+           =========================================== */
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: var(--radius-sm);
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-text {
+            height: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .skeleton-title {
+            height: 1.5rem;
+            width: 60%;
+            margin-bottom: 0.75rem;
+        }
+
+        .skeleton-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+        }
+
+        /* ===========================================
+           15. AVATAR COMPONENT
+           =========================================== */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--teal-glow);
+            color: var(--teal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .avatar-sm { width: 32px; height: 32px; font-size: 0.8rem; }
+        .avatar-lg { width: 56px; height: 56px; font-size: 1.25rem; }
+
+        .avatar-group {
+            display: flex;
+        }
+
+        .avatar-group .avatar {
+            border: 2px solid var(--bg-primary);
+            margin-left: -8px;
+        }
+
+        .avatar-group .avatar:first-child {
+            margin-left: 0;
+        }
+
+        /* ===========================================
+           16. INPUT COMPONENT
+           =========================================== */
+        .input {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            transition: all var(--duration) ease;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px var(--teal-glow);
+        }
+
+        .input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* ===========================================
+           17. SEPARATOR
+           =========================================== */
+        .separator {
+            height: 1px;
+            background: var(--border);
+            margin: 1rem 0;
+        }
+
+        .separator-vertical {
+            width: 1px;
+            height: auto;
+            align-self: stretch;
+            margin: 0 1rem;
+        }
+
+        /* ===========================================
+           UTILITY CLASSES
+           =========================================== */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-1 { gap: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-muted { color: var(--text-muted); }
+        .text-teal { color: var(--teal); }
+        .text-amber { color: var(--accent); }
+        .font-mono { font-family: var(--font-mono); }
+    </style>
+</head>
+<body>
+    <!-- ===========================================
+         HEADER
+         =========================================== -->
+    <header style="max-width: 900px; margin: 0 auto 3rem; text-align: center;">
+        <p class="label">Component Library</p>
+        <h1>Midnight Executive<br>Interactive Components</h1>
+        <p style="max-width: 600px; margin: 1rem auto;">Alpine.js + Shadcn-inspired styling. Copy any component into your presentations.</p>
+    </header>
+
+    <!-- ===========================================
+         1. TABS
+         =========================================== -->
+    <section class="section">
+        <h2>1. Tabs</h2>
+        <p>Switch between content views. Two variants: pill and underline.</p>
+
+        <div class="demo-grid">
+            <!-- Pill Tabs -->
+            <div class="demo-box" x-data="{ tab: 'overview' }">
+                <p class="label">Pill Style</p>
+                <div class="tabs">
+                    <button class="tab-btn" :class="{ active: tab === 'overview' }" @click="tab = 'overview'">Overview</button>
+                    <button class="tab-btn" :class="{ active: tab === 'analytics' }" @click="tab = 'analytics'">Analytics</button>
+                    <button class="tab-btn" :class="{ active: tab === 'reports' }" @click="tab = 'reports'">Reports</button>
+                </div>
+                <div class="tab-content">
+                    <div x-show="tab === 'overview'">
+                        <h3>Overview</h3>
+                        <p style="margin: 0;">High-level summary of your data and key metrics.</p>
+                    </div>
+                    <div x-show="tab === 'analytics'" x-cloak>
+                        <h3>Analytics</h3>
+                        <p style="margin: 0;">Detailed breakdowns and trend analysis.</p>
+                    </div>
+                    <div x-show="tab === 'reports'" x-cloak>
+                        <h3>Reports</h3>
+                        <p style="margin: 0;">Exportable reports and documentation.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Underline Tabs -->
+            <div class="demo-box" x-data="{ tab: 'q1' }">
+                <p class="label">Underline Style</p>
+                <div class="tabs tabs-underline">
+                    <button class="tab-btn" :class="{ active: tab === 'q1' }" @click="tab = 'q1'">Q1 2026</button>
+                    <button class="tab-btn" :class="{ active: tab === 'q2' }" @click="tab = 'q2'">Q2 2026</button>
+                    <button class="tab-btn" :class="{ active: tab === 'q3' }" @click="tab = 'q3'">Q3 2026</button>
+                </div>
+                <div class="tab-content" style="border: none; background: transparent; padding: 1rem 0;">
+                    <div x-show="tab === 'q1'">
+                        <p style="margin: 0;"><strong>$1.2M</strong> revenue • <strong>2,340</strong> new users</p>
+                    </div>
+                    <div x-show="tab === 'q2'" x-cloak>
+                        <p style="margin: 0;"><strong>$1.8M</strong> revenue • <strong>3,120</strong> new users</p>
+                    </div>
+                    <div x-show="tab === 'q3'" x-cloak>
+                        <p style="margin: 0;"><strong>$2.1M</strong> revenue • <strong>4,560</strong> new users</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         2. ACCORDION
+         =========================================== -->
+    <section class="section">
+        <h2>2. Accordion</h2>
+        <p>Expandable sections for detailed content. Great for FAQs or layered info.</p>
+
+        <div class="demo-box" style="max-width: 500px;" x-data="{ open: null }">
+            <div class="accordion">
+                <div class="accordion-item" :data-open="open === 1">
+                    <button class="accordion-trigger" @click="open = open === 1 ? null : 1">
+                        <span>What are the key benefits?</span>
+                        <span class="accordion-icon">▼</span>
+                    </button>
+                    <div class="accordion-content" x-show="open === 1" x-collapse x-cloak>
+                        <div class="accordion-inner">
+                            The platform offers 40% faster deployment, automated scaling, and built-in security compliance across all major cloud providers.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" :data-open="open === 2">
+                    <button class="accordion-trigger" @click="open = open === 2 ? null : 2">
+                        <span>How does pricing work?</span>
+                        <span class="accordion-icon">▼</span>
+                    </button>
+                    <div class="accordion-content" x-show="open === 2" x-collapse x-cloak>
+                        <div class="accordion-inner">
+                            We offer usage-based pricing with no minimum commitments. Start free and scale as you grow.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" :data-open="open === 3">
+                    <button class="accordion-trigger" @click="open = open === 3 ? null : 3">
+                        <span>What integrations are available?</span>
+                        <span class="accordion-icon">▼</span>
+                    </button>
+                    <div class="accordion-content" x-show="open === 3" x-collapse x-cloak>
+                        <div class="accordion-inner">
+                            Native integrations with GitHub, GitLab, Slack, Jira, and 50+ other tools. Plus a full REST API.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         3. COLLAPSIBLE
+         =========================================== -->
+    <section class="section">
+        <h2>3. Collapsible</h2>
+        <p>Simple show/hide for optional details. Lighter than accordion.</p>
+
+        <div class="demo-grid">
+            <div class="demo-box" x-data="{ open: false }">
+                <div class="collapsible" :data-open="open">
+                    <button class="collapsible-trigger" @click="open = !open">
+                        <span class="collapsible-icon">▶</span>
+                        <span>Show technical details</span>
+                    </button>
+                    <div class="collapsible-content" x-show="open" x-collapse x-cloak>
+                        <div class="collapsible-inner">
+                            <p style="margin: 0 0 0.5rem;"><code>API Version: 2.4.1</code></p>
+                            <p style="margin: 0 0 0.5rem;"><code>Response Time: 42ms avg</code></p>
+                            <p style="margin: 0;"><code>Uptime: 99.97%</code></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="demo-box" x-data="{ open: true }">
+                <div class="collapsible" :data-open="open">
+                    <button class="collapsible-trigger" @click="open = !open">
+                        <span class="collapsible-icon">▶</span>
+                        <span>View source breakdown</span>
+                    </button>
+                    <div class="collapsible-content" x-show="open" x-collapse>
+                        <div class="collapsible-inner">
+                            <div class="flex justify-between mb-2">
+                                <span>Direct</span>
+                                <span class="text-teal">42%</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span>Organic Search</span>
+                                <span class="text-teal">31%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Referral</span>
+                                <span class="text-teal">27%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         4. MODAL / DIALOG
+         =========================================== -->
+    <section class="section">
+        <h2>4. Modal / Dialog</h2>
+        <p>Pop up detailed information without leaving the slide.</p>
+
+        <div class="demo-box" x-data="{ open: false }">
+            <button class="btn btn-primary" @click="open = true">Open Modal</button>
+
+            <div class="modal-overlay" :class="{ open: open }" @click.self="open = false" @keydown.escape.window="open = false">
+                <div class="modal" @click.stop>
+                    <div class="modal-header">
+                        <h3 class="modal-title">Detailed Analysis</h3>
+                        <button class="modal-close" @click="open = false">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>This modal can contain detailed charts, tables, or additional context that would clutter the main slide.</p>
+                        <div class="alert alert-info mt-4">
+                            <span class="alert-icon">ℹ️</span>
+                            <div class="alert-content">
+                                <div class="alert-title">Pro tip</div>
+                                <p class="alert-description">Use modals for deep-dive data that only some audience members need.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-ghost" @click="open = false">Close</button>
+                        <button class="btn btn-primary">Download Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         5. TOOLTIP
+         =========================================== -->
+    <section class="section">
+        <h2>5. Tooltip</h2>
+        <p>Hover hints for additional context without cluttering the UI.</p>
+
+        <div class="demo-box flex gap-4">
+            <div class="tooltip-wrapper" x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
+                <button class="btn btn-outline">Hover me</button>
+                <div class="tooltip" :class="{ show: show }">This is a tooltip!</div>
+            </div>
+
+            <div class="tooltip-wrapper" x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
+                <span class="badge badge-teal" style="cursor: help;">ROI: 340%</span>
+                <div class="tooltip" :class="{ show: show }">Return on Investment over 12 months</div>
+            </div>
+
+            <div class="tooltip-wrapper" x-data="{ show: false }" @mouseenter="show = true" @mouseleave="show = false">
+                <span style="cursor: help; text-decoration: underline dotted; color: var(--text-secondary);">NPS Score</span>
+                <div class="tooltip tooltip-bottom" :class="{ show: show }">Net Promoter Score: Customer loyalty metric</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         6. CAROUSEL
+         =========================================== -->
+    <section class="section">
+        <h2>6. Carousel</h2>
+        <p>Cycle through multiple pieces of content in one space.</p>
+
+        <div class="demo-box" x-data="{ current: 0, total: 3 }">
+            <div class="carousel">
+                <div class="carousel-track" :style="{ transform: `translateX(-${current * 100}%)` }">
+                    <div class="carousel-slide">
+                        <span class="badge badge-teal mb-2">Case Study 1</span>
+                        <h3>Acme Corp</h3>
+                        <p style="margin: 0;">Reduced deployment time by 60% and saved $2.4M annually.</p>
+                    </div>
+                    <div class="carousel-slide">
+                        <span class="badge badge-purple mb-2">Case Study 2</span>
+                        <h3>TechStart Inc</h3>
+                        <p style="margin: 0;">Scaled from 10K to 1M users without infrastructure changes.</p>
+                    </div>
+                    <div class="carousel-slide">
+                        <span class="badge badge-amber mb-2">Case Study 3</span>
+                        <h3>Global Bank</h3>
+                        <p style="margin: 0;">Achieved SOC2 compliance in 2 weeks instead of 6 months.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-nav">
+                <button class="carousel-btn" @click="current = current > 0 ? current - 1 : total - 1">←</button>
+                <div class="carousel-dots">
+                    <template x-for="i in total">
+                        <button class="carousel-dot" :class="{ active: current === i - 1 }" @click="current = i - 1"></button>
+                    </template>
+                </div>
+                <button class="carousel-btn" @click="current = current < total - 1 ? current + 1 : 0">→</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         7. TOGGLE
+         =========================================== -->
+    <section class="section">
+        <h2>7. Toggle / Switch</h2>
+        <p>Binary on/off controls for showing different data views.</p>
+
+        <div class="demo-box" x-data="{ annual: true, darkMode: true, notifications: false }">
+            <div class="flex flex-col gap-4">
+                <div class="toggle" :class="{ active: annual }" @click="annual = !annual">
+                    <div class="toggle-track">
+                        <div class="toggle-thumb"></div>
+                    </div>
+                    <span class="toggle-label">
+                        Show <span x-text="annual ? 'Annual' : 'Monthly'"></span> pricing
+                    </span>
+                </div>
+
+                <div class="toggle" :class="{ active: darkMode }" @click="darkMode = !darkMode">
+                    <div class="toggle-track">
+                        <div class="toggle-thumb"></div>
+                    </div>
+                    <span class="toggle-label">Dark mode</span>
+                </div>
+
+                <div class="toggle" :class="{ active: notifications }" @click="notifications = !notifications">
+                    <div class="toggle-track">
+                        <div class="toggle-thumb"></div>
+                    </div>
+                    <span class="toggle-label">Enable notifications</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         8. DROPDOWN
+         =========================================== -->
+    <section class="section">
+        <h2>8. Dropdown</h2>
+        <p>Select between options or filter data views.</p>
+
+        <div class="demo-box flex gap-4">
+            <div class="dropdown" x-data="{ open: false, selected: 'Last 7 days' }" @click.outside="open = false">
+                <button class="dropdown-trigger" @click="open = !open">
+                    <span x-text="selected"></span>
+                    <span class="dropdown-icon">▼</span>
+                </button>
+                <div class="dropdown-menu" :class="{ open: open }">
+                    <button class="dropdown-item" :class="{ active: selected === 'Last 7 days' }" @click="selected = 'Last 7 days'; open = false">Last 7 days</button>
+                    <button class="dropdown-item" :class="{ active: selected === 'Last 30 days' }" @click="selected = 'Last 30 days'; open = false">Last 30 days</button>
+                    <button class="dropdown-item" :class="{ active: selected === 'Last 90 days' }" @click="selected = 'Last 90 days'; open = false">Last 90 days</button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" :class="{ active: selected === 'All time' }" @click="selected = 'All time'; open = false">All time</button>
+                </div>
+            </div>
+
+            <div class="dropdown" x-data="{ open: false, selected: 'Revenue' }" @click.outside="open = false">
+                <button class="dropdown-trigger" @click="open = !open">
+                    <span>Metric: <strong x-text="selected"></strong></span>
+                    <span class="dropdown-icon">▼</span>
+                </button>
+                <div class="dropdown-menu" :class="{ open: open }">
+                    <button class="dropdown-item" @click="selected = 'Revenue'; open = false">Revenue</button>
+                    <button class="dropdown-item" @click="selected = 'Users'; open = false">Users</button>
+                    <button class="dropdown-item" @click="selected = 'Conversions'; open = false">Conversions</button>
+                    <button class="dropdown-item" @click="selected = 'Churn'; open = false">Churn</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         9. SUPPORTING COMPONENTS
+         =========================================== -->
+    <section class="section">
+        <h2>9. Supporting Components</h2>
+        <p>Badges, alerts, progress bars, and other utility components.</p>
+
+        <div class="demo-grid">
+            <!-- Badges -->
+            <div class="demo-box">
+                <p class="label">Badges</p>
+                <div class="flex gap-2" style="flex-wrap: wrap;">
+                    <span class="badge">Default</span>
+                    <span class="badge badge-teal">Teal</span>
+                    <span class="badge badge-amber">Amber</span>
+                    <span class="badge badge-purple">Purple</span>
+                    <span class="badge badge-success">Success</span>
+                    <span class="badge badge-danger">Danger</span>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            <div class="demo-box">
+                <p class="label">Alerts</p>
+                <div class="flex flex-col gap-3">
+                    <div class="alert alert-info">
+                        <span class="alert-icon">ℹ️</span>
+                        <div class="alert-content">
+                            <div class="alert-title">Information</div>
+                            <p class="alert-description">This is an informational message.</p>
+                        </div>
+                    </div>
+                    <div class="alert alert-success">
+                        <span class="alert-icon">✓</span>
+                        <div class="alert-content">
+                            <div class="alert-title">Success</div>
+                            <p class="alert-description">Operation completed successfully.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="demo-box">
+                <p class="label">Progress Bars</p>
+                <div class="flex flex-col gap-3">
+                    <div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>Revenue Target</span>
+                            <span class="text-teal">78%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 78%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>User Growth</span>
+                            <span class="text-amber">45%</span>
+                        </div>
+                        <div class="progress progress-amber">
+                            <div class="progress-bar" style="width: 45%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Avatars -->
+            <div class="demo-box">
+                <p class="label">Avatars</p>
+                <div class="flex items-center gap-4">
+                    <div class="avatar avatar-sm">JD</div>
+                    <div class="avatar">AB</div>
+                    <div class="avatar avatar-lg">MK</div>
+                    <div class="avatar-group">
+                        <div class="avatar">A</div>
+                        <div class="avatar" style="background: var(--purple-glow); color: var(--purple);">B</div>
+                        <div class="avatar" style="background: var(--accent-glow); color: var(--accent);">C</div>
+                        <div class="avatar" style="background: var(--bg-tertiary); color: var(--text-muted);">+5</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skeleton -->
+            <div class="demo-box">
+                <p class="label">Skeleton Loaders</p>
+                <div class="flex gap-3">
+                    <div class="skeleton skeleton-avatar"></div>
+                    <div style="flex: 1;">
+                        <div class="skeleton skeleton-title"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text" style="width: 80%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="demo-box">
+                <p class="label">Button Variants</p>
+                <div class="flex gap-2" style="flex-wrap: wrap;">
+                    <button class="btn btn-primary">Primary</button>
+                    <button class="btn btn-secondary">Secondary</button>
+                    <button class="btn btn-outline">Outline</button>
+                    <button class="btn btn-ghost">Ghost</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         10. CARD VARIANTS
+         =========================================== -->
+    <section class="section">
+        <h2>10. Card Variants</h2>
+        <p>Enhanced cards with headers, footers, and interactive states.</p>
+
+        <div class="demo-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Monthly Revenue</h3>
+                    <p class="card-description">January - June 2026</p>
+                </div>
+                <div class="card-body">
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--teal);">$45,231.89</div>
+                    <p class="text-sm" style="color: var(--success); margin: 0.5rem 0 0;">↑ 20.1% from last month</p>
+                </div>
+            </div>
+
+            <div class="card" x-data="{ expanded: false }">
+                <div class="card-header flex justify-between items-center">
+                    <div>
+                        <h3 class="card-title">Active Users</h3>
+                        <p class="card-description">Real-time data</p>
+                    </div>
+                    <span class="badge badge-success">Live</span>
+                </div>
+                <div class="card-body">
+                    <div style="font-size: 2rem; font-weight: 700;">+2,350</div>
+                    <p class="text-sm text-muted" style="margin: 0.5rem 0 0;">+180.1% from last month</p>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-ghost btn-sm" style="padding: 0.5rem 0.75rem; font-size: 0.8rem;" @click="expanded = !expanded">
+                        <span x-text="expanded ? 'Hide' : 'Show'"></span> details
+                    </button>
+                    <div x-show="expanded" x-collapse x-cloak class="mt-2">
+                        <p class="text-sm text-muted" style="margin: 0;">Desktop: 1,420 • Mobile: 930</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===========================================
+         USAGE NOTES
+         =========================================== -->
+    <section class="section" style="border-bottom: none;">
+        <h2>Usage Notes</h2>
+
+        <div class="alert alert-info mb-4">
+            <span class="alert-icon">📋</span>
+            <div class="alert-content">
+                <div class="alert-title">How to use these components</div>
+                <p class="alert-description">Copy the HTML + Alpine.js attributes. Include the CSS variables and component styles in your presentation.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Required Dependencies</h3>
+            </div>
+            <div class="card-body">
+                <pre style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; overflow-x: auto;"><code>&lt;!-- Alpine.js (15kb) --&gt;
+&lt;script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"&gt;&lt;/script&gt;
+
+&lt;!-- Optional: Alpine Collapse plugin for smooth animations --&gt;
+&lt;script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"&gt;&lt;/script&gt;
+
+&lt;!-- Optional: Chart.js for charts --&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"&gt;&lt;/script&gt;</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Alpine.js Collapse Plugin -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        /* Hide elements with x-cloak until Alpine initializes */
+        [x-cloak] { display: none !important; }
+    </style>
+</body>
+</html>

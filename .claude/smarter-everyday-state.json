@@ -5,8 +5,8 @@
   "attempts": 2,
   "failures": [],
   "candidate_turn": null,
-  "last_edit_content": "#!/usr/bin/env node\n/**\n * Explore to Scout Rewrite Hook - PreToolUse (Agent)\n *\n * Silently rewrites subagent_type=\"Explore\" to \"scout\" using modifiedInput.\n * Eliminates the deny+retry round-trip that wasted tokens and latency.\n *\n * Per ~/.claude/rules/use-scout-not-explore.md:\n * - Explore uses Haiku - fast but inaccurate\n * - Scout uses Sonnet with detailed prompt - accurate results\n *\n * Uses the same modifiedInput pattern as ralph-template-inject.ts.\n */\n\ninterface HookInput {\n  tool?: st",
+  "last_edit_content": "#!/usr/bin/env node\n/**\n * Explore to Scout Rewrite Hook - PreToolUse (Agent)\n *\n * Silently rewrites subagent_type=\"Explore\" to \"scout\" using modifiedInput.\n * Eliminates the deny+retry round-trip that wasted tokens and latency.\n *\n * Per ~/.claude/rules/use-scout-not-explore.md:\n * - Explore uses Haiku - fast but inaccurate\n * - Scout uses Sonnet with detailed prompt - accurate results\n */\n\ninterface HookInput {\n  tool?: string;\n  tool_name?: string;\n  tool_input?: {\n    subagent_type?: string",
   "test_command": "cd C:/Users/david.hayes/continuous-claude/.claude/hooks && npm test 2>&1 | tail -10",
   "context": "Editing pre-compact-extract.ts",
-  "current_turn": 56
+  "current_turn": 92
 }

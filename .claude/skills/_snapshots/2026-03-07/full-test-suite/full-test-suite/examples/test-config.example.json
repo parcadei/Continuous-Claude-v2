@@ -1,0 +1,39 @@
+{
+  "baseUrl": "https://web-production-2c64.up.railway.app",
+  "cdpUrl": "http://localhost:9222",
+  "routes": [
+    { "path": "/", "name": "dashboard" },
+    { "path": "/meetings", "name": "meetings" },
+    { "path": "/actions", "name": "actions" },
+    { "path": "/decisions", "name": "decisions" },
+    { "path": "/proposals", "name": "proposals" },
+    { "path": "/agents", "name": "agents" },
+    { "path": "/connections", "name": "connections" },
+    { "path": "/workspaces", "name": "workspaces" },
+    { "path": "/settings", "name": "settings" }
+  ],
+  "depth": "standard",
+  "screenshotDir": "./test-screenshots",
+  "thresholds": {
+    "performance": {
+      "ttfb": 800,
+      "domInteractive": 3000,
+      "loadComplete": 10000
+    },
+    "design": {
+      "minContrastRatio": 4.5,
+      "minTouchTarget": 44,
+      "maxUniqueColors": 15
+    }
+  },
+  "unitTest": {
+    "command": "pnpm --filter @workbook/web test:run"
+  },
+  "apiTest": {
+    "endpoints": [
+      { "method": "GET", "path": "/api/health", "expect": 200 },
+      { "method": "GET", "path": "/api/meetings", "expect": [200, 401] },
+      { "method": "GET", "path": "/api/actions", "expect": [200, 401] }
+    ]
+  }
+}

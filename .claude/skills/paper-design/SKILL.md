@@ -1,8 +1,6 @@
 ---
 name: paper-design
 description: Visual UI design and iteration on Paper.design's HTML/CSS-native canvas via MCP. This skill should be used when users request visual mockups, UI design exploration, design system visualization, component prototyping, or visual-first workflows before code generation. Supports creating artboards, writing HTML to canvas, extracting JSX with Tailwind classes, taking screenshots, and iterating on designs visually. Triggers on requests like "design this in Paper", "show me a mockup", "create a visual design", "design system sticker sheet", or "verify this code visually".
-version: 1.1.0
-triggers:
   - paper
   - visual design
   - design in paper
@@ -12,6 +10,9 @@ triggers:
   - show me visually
   - design first
   - sticker sheet
+metadata:
+  version: 1.1.0
+  triggers: 
 ---
 
 # Paper.design MCP Integration

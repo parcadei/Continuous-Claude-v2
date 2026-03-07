@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q1 2026 Business Review — Interactive Presentation</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Alpine.js + Collapse Plugin -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        /* ===========================================
+           MIDNIGHT EXECUTIVE THEME
+           =========================================== */
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: rgba(30, 41, 59, 0.6);
+            --bg-hover: rgba(51, 65, 85, 0.5);
+
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --accent: #f59e0b;
+            --accent-glow: rgba(245, 158, 11, 0.15);
+            --teal: #00B69F;
+            --teal-glow: rgba(0, 182, 159, 0.15);
+            --purple: #a78bfa;
+            --purple-glow: rgba(167, 139, 250, 0.15);
+
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #eab308;
+            --info: #3b82f6;
+
+            --border: rgba(148, 163, 184, 0.1);
+            --border-hover: rgba(148, 163, 184, 0.2);
+
+            --font-display: 'Libre Baskerville', Georgia, serif;
+            --font-body: 'Source Sans 3', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration: 0.2s;
+
+            --slide-padding: clamp(2rem, 5vw, 5rem);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        [x-cloak] { display: none !important; }
+
+        html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 17px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Progress & Nav */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--teal), var(--purple));
+            width: 0%;
+            z-index: 100;
+            transition: width 0.2s ease-out;
+        }
+
+        .nav-dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot:hover { opacity: 0.7; transform: scale(1.3); }
+        .nav-dot.active { background: var(--teal); opacity: 1; }
+
+        /* Slides */
+        .slide {
+            min-height: 100vh;
+            padding: var(--slide-padding);
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+        }
+
+        .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .reveal:nth-child(4) { transition-delay: 0.4s; }
+
+        /* Typography */
+        .label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 1rem;
+        }
+
+        .label-amber { color: var(--accent); }
+        .label-purple { color: var(--purple); }
+
+        h1, h2, h3 { font-family: var(--font-display); font-weight: 700; }
+        h1 { font-size: clamp(2.25rem, 4.5vw, 3.5rem); line-height: 1.15; margin-bottom: 1.5rem; }
+        h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); margin-bottom: 1.25rem; }
+        h3 { font-size: 1.125rem; margin-bottom: 0.75rem; }
+
+        p { color: var(--text-secondary); margin-bottom: 1rem; max-width: 700px; }
+
+        .title-slide { text-align: center; }
+
+        .glow-bg {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .glow-teal { background: var(--teal-glow); }
+        .glow-amber { background: var(--accent-glow); }
+        .glow-purple { background: var(--purple-glow); }
+
+        .accent-line {
+            width: 80px;
+            height: 2px;
+            background: var(--teal);
+            margin: 2rem auto;
+        }
+
+        /* ===========================================
+           COMPONENTS
+           =========================================== */
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: var(--radius-md);
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all var(--duration) ease;
+        }
+
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .tab-content {
+            margin-top: 1.25rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-description {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .two-col, .card-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Stats */
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.25rem;
+        }
+
+        .stat-trend {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-trend.up { color: var(--success); }
+        .stat-trend.down { color: var(--danger); }
+
+        /* Accordion */
+        .accordion { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .accordion-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .accordion-trigger {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            transition: background var(--duration) ease;
+        }
+
+        .accordion-trigger:hover { background: var(--bg-hover); }
+
+        .accordion-icon {
+            color: var(--text-muted);
+            transition: transform var(--duration) var(--ease-out);
+            font-size: 0.75rem;
+        }
+
+        .accordion-item[data-open="true"] .accordion-icon { transform: rotate(180deg); }
+
+        .accordion-inner {
+            padding: 0 1rem 1rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow: hidden;
+            transform: scale(0.95) translateY(10px);
+            transition: transform 0.3s var(--ease-out);
+        }
+
+        .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title { font-family: var(--font-display); font-size: 1.125rem; }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+        }
+
+        .modal-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+        .modal-body { padding: 1.5rem; overflow-y: auto; max-height: 60vh; }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* Dropdown */
+        .dropdown { position: relative; display: inline-block; }
+
+        .dropdown-trigger {
+            padding: 0.5rem 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .dropdown-icon {
+            color: var(--text-muted);
+            transition: transform var(--duration) var(--ease-out);
+            font-size: 0.7rem;
+        }
+
+        .dropdown.open .dropdown-icon { transform: rotate(180deg); }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            min-width: 160px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.25rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all var(--duration) var(--ease-out);
+            z-index: 100;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .dropdown.open .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .dropdown-item.active { color: var(--teal); }
+
+        /* Carousel */
+        .carousel { position: relative; overflow: hidden; border-radius: var(--radius-lg); }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s var(--ease-out);
+        }
+
+        .carousel-slide {
+            flex: 0 0 100%;
+            padding: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .carousel-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .carousel-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+
+        .carousel-dots { display: flex; gap: 0.5rem; }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            opacity: 0.3;
+        }
+
+        .carousel-dot:hover { opacity: 0.6; }
+        .carousel-dot.active { background: var(--teal); opacity: 1; }
+
+        /* Toggle */
+        .toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .toggle-track {
+            width: 40px;
+            height: 22px;
+            background: var(--bg-tertiary);
+            border-radius: 11px;
+            position: relative;
+            transition: background var(--duration) ease;
+        }
+
+        .toggle.active .toggle-track { background: var(--teal); }
+
+        .toggle-thumb {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: var(--text-primary);
+            border-radius: 50%;
+            transition: transform var(--duration) var(--ease-out);
+        }
+
+        .toggle.active .toggle-thumb { transform: translateX(18px); }
+
+        .toggle-label { font-size: 0.85rem; color: var(--text-secondary); }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--duration) ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary { background: var(--teal); color: var(--bg-primary); }
+        .btn-primary:hover { background: #00a38e; }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
+        .btn-ghost { background: transparent; color: var(--text-secondary); }
+        .btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            border-radius: 9999px;
+        }
+
+        .badge-teal { background: var(--teal-glow); color: var(--teal); }
+        .badge-amber { background: var(--accent-glow); color: var(--accent); }
+        .badge-purple { background: var(--purple-glow); color: var(--purple); }
+        .badge-success { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+        .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+        /* Progress */
+        .progress {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s var(--ease-out);
+        }
+
+        /* Tooltip */
+        .tooltip-wrapper { position: relative; display: inline-block; }
+
+        .tooltip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 0.4rem 0.6rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--duration) ease;
+            z-index: 100;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: var(--bg-tertiary);
+        }
+
+        .tooltip-wrapper:hover .tooltip { opacity: 1; visibility: visible; }
+
+        /* Chart container */
+        .chart-container {
+            position: relative;
+            height: 200px;
+            margin-top: 1rem;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 0.625rem 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--teal);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td { color: var(--text-secondary); }
+        tr:last-child td { border-bottom: none; }
+
+        /* Utility */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 0.75rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .text-sm { font-size: 0.85rem; }
+        .text-muted { color: var(--text-muted); }
+
+        /* Keyboard hint */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease 2s forwards;
+        }
+
+        .keyboard-hint kbd {
+            background: var(--bg-secondary);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+        }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .nav-dots, .keyboard-hint { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar"></div>
+    <nav class="nav-dots"></nav>
+
+    <!-- =========================================
+         SLIDE 1: TITLE
+         ========================================= -->
+    <section class="slide title-slide" data-slide="0">
+        <div class="glow-bg glow-teal" style="top: -20%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content">
+            <p class="label reveal">Quarterly Business Review</p>
+            <h1 class="reveal">Q1 2026 Performance<br>& Strategic Outlook</h1>
+            <p class="reveal" style="max-width: 550px; margin: 0 auto;">Interactive presentation with expandable sections, live data views, and detailed breakdowns on demand.</p>
+            <div class="accent-line reveal"></div>
+            <p class="reveal text-muted text-sm">Click components to explore • Press Space or → to advance</p>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 2: EXECUTIVE SUMMARY WITH TABS
+         ========================================= -->
+    <section class="slide" data-slide="1" x-data="{ tab: 'highlights', period: 'Q1 2026' }">
+        <div class="glow-bg glow-amber" style="top: 10%; right: -20%;"></div>
+        <div class="slide-content">
+            <div class="flex justify-between items-center reveal">
+                <div>
+                    <p class="label label-amber">Executive Summary</p>
+                    <h2>Quarterly Performance</h2>
+                </div>
+                <div class="dropdown" :class="{ open: $store.dropdown1 }" @click.outside="$store.dropdown1 = false" x-init="$store.dropdown1 = false">
+                    <button class="dropdown-trigger" @click="$store.dropdown1 = !$store.dropdown1">
+                        <span x-text="period"></span>
+                        <span class="dropdown-icon">▼</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <button class="dropdown-item" :class="{ active: period === 'Q1 2026' }" @click="period = 'Q1 2026'; $store.dropdown1 = false">Q1 2026</button>
+                        <button class="dropdown-item" :class="{ active: period === 'Q4 2025' }" @click="period = 'Q4 2025'; $store.dropdown1 = false">Q4 2025</button>
+                        <button class="dropdown-item" :class="{ active: period === 'Q3 2025' }" @click="period = 'Q3 2025'; $store.dropdown1 = false">Q3 2025</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tabs reveal mt-3">
+                <button class="tab-btn" :class="{ active: tab === 'highlights' }" @click="tab = 'highlights'">Highlights</button>
+                <button class="tab-btn" :class="{ active: tab === 'revenue' }" @click="tab = 'revenue'">Revenue</button>
+                <button class="tab-btn" :class="{ active: tab === 'growth' }" @click="tab = 'growth'">Growth</button>
+                <button class="tab-btn" :class="{ active: tab === 'risks' }" @click="tab = 'risks'">Risks</button>
+            </div>
+
+            <div class="tab-content reveal">
+                <!-- Highlights Tab -->
+                <div x-show="tab === 'highlights'">
+                    <div class="card-grid">
+                        <div class="card">
+                            <div class="stat-value" style="color: var(--teal);">$12.4M</div>
+                            <div class="stat-label">Total Revenue</div>
+                            <div class="stat-trend up">↑ 23% vs Q4</div>
+                        </div>
+                        <div class="card">
+                            <div class="stat-value" style="color: var(--accent);">847</div>
+                            <div class="stat-label">New Customers</div>
+                            <div class="stat-trend up">↑ 31% vs Q4</div>
+                        </div>
+                        <div class="card">
+                            <div class="stat-value" style="color: var(--purple);">94.2%</div>
+                            <div class="stat-label">Retention Rate</div>
+                            <div class="stat-trend up">↑ 2.1pp vs Q4</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Revenue Tab -->
+                <div x-show="tab === 'revenue'" x-cloak>
+                    <div class="two-col">
+                        <div class="card">
+                            <div class="card-title">Revenue by Segment</div>
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Breakdown</div>
+                            <table class="mt-2">
+                                <tr><td>Enterprise</td><td style="text-align: right; color: var(--teal);">$7.2M</td></tr>
+                                <tr><td>Mid-Market</td><td style="text-align: right; color: var(--purple);">$3.8M</td></tr>
+                                <tr><td>SMB</td><td style="text-align: right; color: var(--accent);">$1.4M</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Growth Tab -->
+                <div x-show="tab === 'growth'" x-cloak>
+                    <div class="card">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="card-title">Growth Metrics</div>
+                            <span class="badge badge-success">On Track</span>
+                        </div>
+                        <div class="flex flex-col gap-3 mt-3">
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>ARR Target ($15M)</span>
+                                    <span style="color: var(--teal);">83%</span>
+                                </div>
+                                <div class="progress"><div class="progress-bar" style="width: 83%; background: var(--teal);"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>Customer Target (1,000)</span>
+                                    <span style="color: var(--purple);">71%</span>
+                                </div>
+                                <div class="progress"><div class="progress-bar" style="width: 71%; background: var(--purple);"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>NPS Target (70)</span>
+                                    <span style="color: var(--accent);">92%</span>
+                                </div>
+                                <div class="progress"><div class="progress-bar" style="width: 92%; background: var(--accent);"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risks Tab -->
+                <div x-show="tab === 'risks'" x-cloak>
+                    <div class="card" style="border-color: rgba(239, 68, 68, 0.3);">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span style="color: var(--danger);">⚠️</span>
+                            <div class="card-title" style="margin: 0;">Key Risks & Mitigations</div>
+                        </div>
+                        <table class="mt-2">
+                            <thead>
+                                <tr><th>Risk</th><th>Impact</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Talent Acquisition</td><td>High</td><td><span class="badge badge-amber">Monitoring</span></td></tr>
+                                <tr><td>Market Downturn</td><td>Medium</td><td><span class="badge badge-success">Mitigated</span></td></tr>
+                                <tr><td>Competitor Pricing</td><td>Medium</td><td><span class="badge badge-teal">Addressed</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 3: PRODUCT UPDATES WITH ACCORDION
+         ========================================= -->
+    <section class="slide" data-slide="2" x-data="{ open: 1, modal: false }">
+        <div class="glow-bg glow-purple" style="bottom: -10%; left: -15%;"></div>
+        <div class="slide-content">
+            <p class="label label-purple reveal">Product Updates</p>
+            <h2 class="reveal">Q1 Feature Releases</h2>
+            <p class="reveal">Click each feature to expand details. <button class="btn btn-ghost" @click="modal = true" style="text-decoration: underline;">View full roadmap →</button></p>
+
+            <div class="two-col reveal mt-4">
+                <div class="accordion">
+                    <div class="accordion-item" :data-open="open === 1">
+                        <button class="accordion-trigger" @click="open = open === 1 ? null : 1">
+                            <span class="flex items-center gap-2">
+                                <span class="badge badge-success">Shipped</span>
+                                AI-Powered Analytics
+                            </span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div x-show="open === 1" x-collapse>
+                            <div class="accordion-inner">
+                                <p style="margin: 0 0 0.5rem;">Natural language queries for instant insights. 3,200 customers enabled in first week.</p>
+                                <div class="flex gap-2">
+                                    <span class="badge badge-teal">+42% engagement</span>
+                                    <span class="badge badge-purple">NPS: 78</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" :data-open="open === 2">
+                        <button class="accordion-trigger" @click="open = open === 2 ? null : 2">
+                            <span class="flex items-center gap-2">
+                                <span class="badge badge-success">Shipped</span>
+                                Real-time Collaboration
+                            </span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div x-show="open === 2" x-collapse x-cloak>
+                            <div class="accordion-inner">
+                                <p style="margin: 0 0 0.5rem;">Multi-user editing with presence indicators. Reduces meeting time by 35%.</p>
+                                <div class="flex gap-2">
+                                    <span class="badge badge-teal">Enterprise favorite</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" :data-open="open === 3">
+                        <button class="accordion-trigger" @click="open = open === 3 ? null : 3">
+                            <span class="flex items-center gap-2">
+                                <span class="badge badge-amber">In Progress</span>
+                                API v3.0
+                            </span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div x-show="open === 3" x-collapse x-cloak>
+                            <div class="accordion-inner">
+                                <p style="margin: 0 0 0.5rem;">Complete API redesign with GraphQL support. Beta launch: April 15.</p>
+                                <div class="progress mt-2"><div class="progress-bar" style="width: 65%; background: var(--accent);"></div></div>
+                                <p class="text-sm text-muted mt-2" style="margin: 0;">65% complete</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Release Velocity</div>
+                    <div class="chart-container">
+                        <canvas id="velocityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roadmap Modal -->
+            <div class="modal-overlay" :class="{ open: modal }" @click.self="modal = false">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 class="modal-title">2026 Product Roadmap</h3>
+                        <button class="modal-close" @click="modal = false">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <table>
+                            <thead><tr><th>Quarter</th><th>Feature</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr><td>Q1</td><td>AI Analytics</td><td><span class="badge badge-success">Done</span></td></tr>
+                                <tr><td>Q1</td><td>Real-time Collab</td><td><span class="badge badge-success">Done</span></td></tr>
+                                <tr><td>Q2</td><td>API v3.0</td><td><span class="badge badge-amber">In Progress</span></td></tr>
+                                <tr><td>Q2</td><td>Mobile App v2</td><td><span class="badge badge-purple">Planned</span></td></tr>
+                                <tr><td>Q3</td><td>Enterprise SSO</td><td><span class="badge badge-purple">Planned</span></td></tr>
+                                <tr><td>Q4</td><td>Workflow Automation</td><td><span class="badge badge-purple">Planned</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-ghost" @click="modal = false">Close</button>
+                        <button class="btn btn-primary">Export PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 4: CUSTOMER SUCCESS WITH CAROUSEL
+         ========================================= -->
+    <section class="slide" data-slide="3" x-data="{ current: 0, total: 3 }">
+        <div class="glow-bg glow-teal" style="top: 20%; right: -15%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Customer Success</p>
+            <h2 class="reveal">Client Testimonials</h2>
+            <p class="reveal">Real results from our enterprise customers.</p>
+
+            <div class="reveal mt-4">
+                <div class="carousel">
+                    <div class="carousel-track" :style="{ transform: `translateX(-${current * 100}%)` }">
+                        <div class="carousel-slide">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="badge badge-teal">Enterprise</span>
+                                <div class="stat-value" style="font-size: 1.5rem; color: var(--teal);">340% ROI</div>
+                            </div>
+                            <h3 style="font-size: 1.25rem;">Acme Corporation</h3>
+                            <p style="font-style: italic; margin: 1rem 0;">"We reduced our deployment time from 2 weeks to 2 hours. The ROI was immediate and substantial."</p>
+                            <p class="text-sm text-muted" style="margin: 0;">— Sarah Chen, VP Engineering</p>
+                        </div>
+                        <div class="carousel-slide">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="badge badge-purple">Mid-Market</span>
+                                <div class="stat-value" style="font-size: 1.5rem; color: var(--purple);">$2.4M Saved</div>
+                            </div>
+                            <h3 style="font-size: 1.25rem;">TechStart Inc</h3>
+                            <p style="font-style: italic; margin: 1rem 0;">"Scaled from 10K to 1M users without adding infrastructure headcount. Game-changing efficiency."</p>
+                            <p class="text-sm text-muted" style="margin: 0;">— Marcus Johnson, CTO</p>
+                        </div>
+                        <div class="carousel-slide">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="badge badge-amber">Financial Services</span>
+                                <div class="stat-value" style="font-size: 1.5rem; color: var(--accent);">2 Weeks</div>
+                            </div>
+                            <h3 style="font-size: 1.25rem;">Global Bank</h3>
+                            <p style="font-style: italic; margin: 1rem 0;">"Achieved SOC2 compliance in 2 weeks instead of 6 months. Security team was impressed."</p>
+                            <p class="text-sm text-muted" style="margin: 0;">— David Park, CISO</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-nav">
+                    <button class="carousel-btn" @click="current = current > 0 ? current - 1 : total - 1">←</button>
+                    <div class="carousel-dots">
+                        <template x-for="i in total">
+                            <button class="carousel-dot" :class="{ active: current === i - 1 }" @click="current = i - 1"></button>
+                        </template>
+                    </div>
+                    <button class="carousel-btn" @click="current = current < total - 1 ? current + 1 : 0">→</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 5: STRATEGIC PRIORITIES WITH TOGGLES
+         ========================================= -->
+    <section class="slide" data-slide="4" x-data="{
+        showDetails: true,
+        view: 'visual',
+        priorities: [
+            { name: 'Product Innovation', progress: 78, color: 'var(--teal)', budget: '$4.2M', team: 42 },
+            { name: 'Market Expansion', progress: 45, color: 'var(--purple)', budget: '$2.8M', team: 18 },
+            { name: 'Customer Success', progress: 92, color: 'var(--success)', budget: '$1.5M', team: 24 },
+            { name: 'Operational Excellence', progress: 65, color: 'var(--accent)', budget: '$0.9M', team: 12 }
+        ]
+    }">
+        <div class="glow-bg glow-amber" style="bottom: 10%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content">
+            <div class="flex justify-between items-center reveal">
+                <div>
+                    <p class="label label-amber">Strategic Priorities</p>
+                    <h2>Q2 Focus Areas</h2>
+                </div>
+                <div class="flex gap-4 items-center">
+                    <div class="toggle" :class="{ active: showDetails }" @click="showDetails = !showDetails">
+                        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                        <span class="toggle-label">Show details</span>
+                    </div>
+                    <div class="tabs" style="padding: 0.15rem;">
+                        <button class="tab-btn" :class="{ active: view === 'visual' }" @click="view = 'visual'" style="padding: 0.35rem 0.75rem;">Visual</button>
+                        <button class="tab-btn" :class="{ active: view === 'table' }" @click="view = 'table'" style="padding: 0.35rem 0.75rem;">Table</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual View -->
+            <div x-show="view === 'visual'" class="reveal mt-4">
+                <div class="card-grid">
+                    <template x-for="(p, i) in priorities" :key="i">
+                        <div class="card">
+                            <div class="flex justify-between items-center">
+                                <div class="card-title" x-text="p.name"></div>
+                                <div class="tooltip-wrapper">
+                                    <span class="stat-value" style="font-size: 1.25rem;" :style="{ color: p.color }" x-text="p.progress + '%'"></span>
+                                    <div class="tooltip">Progress toward Q2 goal</div>
+                                </div>
+                            </div>
+                            <div class="progress mt-3">
+                                <div class="progress-bar" :style="{ width: p.progress + '%', background: p.color }"></div>
+                            </div>
+                            <div x-show="showDetails" x-collapse class="mt-3">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-muted">Budget:</span>
+                                    <span x-text="p.budget"></span>
+                                </div>
+                                <div class="flex justify-between text-sm mt-2">
+                                    <span class="text-muted">Team size:</span>
+                                    <span x-text="p.team + ' people'"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Table View -->
+            <div x-show="view === 'table'" x-cloak class="reveal mt-4">
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Priority</th>
+                                <th>Progress</th>
+                                <th x-show="showDetails">Budget</th>
+                                <th x-show="showDetails">Team</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="(p, i) in priorities" :key="i">
+                                <tr>
+                                    <td x-text="p.name" style="font-weight: 500; color: var(--text-primary);"></td>
+                                    <td>
+                                        <div class="flex items-center gap-2">
+                                            <div class="progress" style="width: 100px;">
+                                                <div class="progress-bar" :style="{ width: p.progress + '%', background: p.color }"></div>
+                                            </div>
+                                            <span x-text="p.progress + '%'" :style="{ color: p.color }"></span>
+                                        </div>
+                                    </td>
+                                    <td x-show="showDetails" x-text="p.budget"></td>
+                                    <td x-show="showDetails" x-text="p.team"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 6: NEXT STEPS
+         ========================================= -->
+    <section class="slide" data-slide="5">
+        <div class="glow-bg glow-teal" style="top: 30%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content" style="text-align: center;">
+            <p class="label reveal">Summary</p>
+            <h2 class="reveal">Key Takeaways & Next Steps</h2>
+
+            <div class="card reveal" style="max-width: 700px; margin: 2rem auto 0; text-align: left;">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-3">
+                        <span style="color: var(--teal); font-size: 1.25rem;">✓</span>
+                        <span><strong>Revenue up 23%</strong> — exceeding Q1 targets</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span style="color: var(--teal); font-size: 1.25rem;">✓</span>
+                        <span><strong>AI Analytics shipped</strong> — 3,200 customers enabled</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span style="color: var(--teal); font-size: 1.25rem;">✓</span>
+                        <span><strong>Retention at 94.2%</strong> — best quarter ever</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span style="color: var(--accent); font-size: 1.25rem;">→</span>
+                        <span><strong>Q2 Focus:</strong> API v3.0 launch, market expansion</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reveal mt-4">
+                <p class="text-muted">Questions? Discussion?</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="keyboard-hint">
+        Press <kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> to navigate • Click components to interact
+    </div>
+
+    <script>
+        // Chart.js setup
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = 'rgba(148, 163, 184, 0.1)';
+        Chart.defaults.font.family = "'Source Sans 3', sans-serif";
+
+        // Revenue Donut Chart
+        const revenueCtx = document.getElementById('revenueChart');
+        if (revenueCtx) {
+            new Chart(revenueCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Enterprise', 'Mid-Market', 'SMB'],
+                    datasets: [{
+                        data: [58, 31, 11],
+                        backgroundColor: ['#00B69F', '#a78bfa', '#f59e0b'],
+                        borderWidth: 0,
+                        spacing: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Velocity Bar Chart
+        const velocityCtx = document.getElementById('velocityChart');
+        if (velocityCtx) {
+            new Chart(velocityCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
+                    datasets: [{
+                        data: [12, 15, 8, 18, 22, 24],
+                        backgroundColor: '#a78bfa',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Slide navigation
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.progressBar = document.querySelector('.progress-bar');
+                this.navDots = document.querySelector('.nav-dots');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.init();
+            }
+
+            init() {
+                this.createNavDots();
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupScrollListener();
+            }
+
+            createNavDots() {
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'nav-dot';
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    this.navDots.appendChild(dot);
+                });
+                this.updateNavDots();
+            }
+
+            updateNavDots() {
+                const dots = this.navDots.querySelectorAll('.nav-dot');
+                dots.forEach((dot, index) => dot.classList.toggle('active', index === this.currentSlide));
+            }
+
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            this.currentSlide = parseInt(entry.target.dataset.slide);
+                            this.updateNavDots();
+                            this.updateProgress();
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        this.nextSlide();
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        this.prevSlide();
+                    }
+                });
+            }
+
+            setupScrollListener() {
+                window.addEventListener('scroll', () => {
+                    const scrollTop = window.scrollY;
+                    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                    this.progressBar.style.width = `${(scrollTop / docHeight) * 100}%`;
+                }, { passive: true });
+            }
+
+            updateProgress() {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                this.progressBar.style.width = `${(scrollTop / docHeight) * 100}%`;
+            }
+
+            goToSlide(index) {
+                if (index >= 0 && index < this.totalSlides) {
+                    this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.totalSlides - 1) this.goToSlide(this.currentSlide + 1);
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) this.goToSlide(this.currentSlide - 1);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => new SlidePresentation());
+    </script>
+</body>
+</html>

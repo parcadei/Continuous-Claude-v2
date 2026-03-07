@@ -1,3 +1,8 @@
+---
+name: mcp-guidance
+description: MCP tool usage patterns and best practices
+---
+
 # MCP & Plugin Guidance
 
 ## Activation

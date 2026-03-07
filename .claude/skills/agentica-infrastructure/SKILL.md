@@ -2,7 +2,8 @@
 name: agentica-infrastructure
 description: Reference guide for Agentica multi-agent infrastructure APIs
 allowed-tools: [Read]
-user-invocable: false
+metadata:
+  user-invocable: false
 ---
 
 # Agentica Infrastructure Reference

@@ -34,8 +34,8 @@ All Fourth brand values as CSS custom properties. Include these in every generat
     --fourth-cool-grey: #CFD1D1;
     --fourth-soft-white: #F5F5F5;
     --fourth-white: #FFFFFF;
-    --fourth-hot-red: #D9373B;
-    --fourth-purple: #9279B2;
+    --fourth-hot-red: #D81632;
+    --fourth-purple: #9678B6;
     --fourth-sunrise-orange: #FAA51A;
 
     /* Typography */
@@ -606,8 +606,8 @@ Complete HTML file structure for reference. When generating presentations, follo
             --fourth-cool-grey: #CFD1D1;
             --fourth-soft-white: #F5F5F5;
             --fourth-white: #FFFFFF;
-            --fourth-hot-red: #D9373B;
-            --fourth-purple: #9279B2;
+            --fourth-hot-red: #D81632;
+            --fourth-purple: #9678B6;
             --font-display: 'Poppins', sans-serif;
             --font-body: 'Poppins', sans-serif;
             --text-h1: clamp(2rem, 4vw, 3rem);

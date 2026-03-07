@@ -1,3 +1,8 @@
+---
+name: systematic-debugging
+description: Root cause analysis before fixes - NO fixes without investigation
+---
+
 # Systematic Debugging Skill
 
 ## Iron Law

@@ -1,0 +1,140 @@
+---
+description: Create or update continuity ledger for state preservation across clears
+---
+
+# Continuity Ledger
+
+> **Note:** This skill is now an alias for `/create_handoff`. Both output the same YAML format.
+
+Create a YAML handoff document for state preservation across `/clear`. This is the same as `/create_handoff`.
+
+## Process
+
+### 1. Filepath & Metadata
+
+**First, determine the session name from existing handoffs:**
+```bash
+ls -td thoughts/shared/handoffs/*/ 2>/dev/null | head -1 | xargs basename
+```
+
+This returns the most recently modified handoff folder name (e.g., `open-source-release`). Use this as the handoff folder name.
+
+If no handoffs exist, use `general` as the folder name.
+
+**Create your file under:** `thoughts/shared/handoffs/{session-name}/YYYY-MM-DD_HH-MM_description.yaml`, where:
+- `{session-name}` is from existing handoffs (e.g., `open-source-release`) or `general` if none exist
+- `YYYY-MM-DD` is today's date
+- `HH-MM` is the current time in 24-hour format (no seconds needed)
+- `description` is a brief kebab-case description
+
+**Examples:**
+- `thoughts/shared/handoffs/open-source-release/2026-01-08_16-30_memory-system-fix.yaml`
+- `thoughts/shared/handoffs/general/2026-01-08_16-30_bug-investigation.yaml`
+
+### 2. Write YAML handoff (~400 tokens)
+
+**CRITICAL: Use EXACTLY this YAML format. Do NOT deviate or use alternative field names.**
+
+The `goal:` and `now:` fields are shown in the statusline - they MUST be named exactly this.
+
+```yaml
+---
+session: {session-name from ledger}
+date: YYYY-MM-DD
+status: complete|partial|blocked
+outcome: SUCCEEDED|PARTIAL_PLUS|PARTIAL_MINUS|FAILED
+---
+
+goal: {What this session accomplished - shown in statusline}
+now: {What next session should do first - shown in statusline}
+test: {Command to verify this work, e.g., pytest tests/test_foo.py}
+
+done_this_session:
+  - task: {First completed task}
+    files: [{file1.py}, {file2.py}]
+  - task: {Second completed task}
+    files: [{file3.py}]
+
+blockers: [{any blocking issues}]
+
+questions: [{unresolved questions for next session}]
+
+decisions:
+  - {decision_name}: {rationale}
+
+findings:
+  - {key_finding}: {details}
+
+worked: [{approaches that worked}]
+failed: [{approaches that failed and why}]
+
+next:
+  - {First next step}
+  - {Second next step}
+
+files:
+  created: [{new files}]
+  modified: [{changed files}]
+```
+
+**Field guide:**
+- `goal:` + `now:` - REQUIRED, shown in statusline
+- `done_this_session:` - What was accomplished with file references
+- `decisions:` - Important choices and rationale
+- `findings:` - Key learnings
+- `worked:` / `failed:` - What to repeat vs avoid
+- `next:` - Action items for next session
+
+**DO NOT use alternative field names like `session_goal`, `objective`, `focus`, `current`, etc.**
+**The statusline parser looks for EXACTLY `goal:` and `now:` - nothing else works.**
+
+### 3. Mark Session Outcome (REQUIRED)
+
+**IMPORTANT:** Before responding to the user, you MUST ask about the session outcome.
+
+Use the AskUserQuestion tool with these exact options:
+
+```
+Question: "How did this session go?"
+Options:
+  - SUCCEEDED: Task completed successfully
+  - PARTIAL_PLUS: Mostly done, minor issues remain
+  - PARTIAL_MINUS: Some progress, major issues remain
+  - FAILED: Task abandoned or blocked
+```
+
+After the user responds, mark the outcome:
+```bash
+# Mark the most recent handoff (works with PostgreSQL or SQLite)
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "${CLAUDE_PROJECT_DIR:-.}")
+cd "$PROJECT_ROOT/opc" && uv run python scripts/core/artifact_mark.py --latest --outcome <USER_CHOICE>
+```
+
+### 4. Confirm completion
+
+After marking the outcome, respond to the user:
+
+```
+Handoff created! Outcome marked as [OUTCOME].
+
+Resume in a new session with:
+/resume_handoff path/to/handoff.yaml
+```
+
+## When to Use
+
+- Before running `/clear`
+- Context usage approaching 70%+
+- Multi-day implementations
+- Complex refactors you pick up/put down
+- Any session expected to hit 85%+ context
+
+## When NOT to Use
+
+- Quick tasks (< 30 min)
+- Simple bug fixes
+- Single-file changes
+
+## Why Clear Instead of Compact?
+
+Each compaction is lossy compression—after several compactions, you're working with degraded context. Clearing + loading the handoff gives you fresh context with full signal.

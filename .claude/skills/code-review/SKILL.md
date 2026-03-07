@@ -1,3 +1,8 @@
+---
+name: code-review
+description: Verification before completion claims
+---
+
 # Code Review Skill
 
 ## Iron Law

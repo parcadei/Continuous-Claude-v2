@@ -1,7 +1,9 @@
 ---
+name: maestro
 description: Versatile orchestrator for complex multi-step tasks - coordinates specialized agents
-user-invocable: true
-model: claude-opus-4-5-20251101
+metadata:
+  user-invocable: true
+  model: claude-opus-4-5-20251101
 ---
 
 # Maestro Orchestration Skill

@@ -1,7 +1,8 @@
 ---
 name: braintrust-tracing
 description: Braintrust tracing for Claude Code - hook architecture, sub-agent correlation, debugging
-user-invocable: false
+metadata:
+  user-invocable: false
 ---
 
 # Braintrust Tracing for Claude Code

@@ -1,7 +1,8 @@
 ---
 name: completion-check
 description: "Completion Check: Verify Infrastructure Is Wired"
-user-invocable: false
+metadata:
+  user-invocable: false
 ---
 
 # Completion Check: Verify Infrastructure Is Wired

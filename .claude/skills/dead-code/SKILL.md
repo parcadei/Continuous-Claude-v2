@@ -2,7 +2,8 @@
 name: dead-code
 description: Find unused functions and dead code in the codebase
 allowed-tools: [Bash]
-keywords: [dead code, unused, cleanup, refactor, unreachable]
+metadata:
+  keywords: [dead code, unused, cleanup, refactor, unreachable]
 ---
 
 # Dead Code Detection

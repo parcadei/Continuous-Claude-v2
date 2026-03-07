@@ -1,3 +1,8 @@
+---
+name: databases
+description: Query optimization and migration best practices
+---
+
 # Databases Skill
 
 ## Iron Law

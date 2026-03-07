@@ -1,7 +1,8 @@
 ---
 name: agentica-prompts
 description: Write reliable prompts for Agentica/REPL agents that avoid LLM instruction ambiguity
-user-invocable: false
+metadata:
+  user-invocable: false
 ---
 
 # Agentica Prompt Engineering

@@ -1,7 +1,8 @@
 ---
-name: implement_plan
+implement-plan
 description: Implement technical plans from thoughts/shared/plans with verification
-user-invocable: false
+metadata:
+  user-invocable: false
 ---
 
 # Implement Plan

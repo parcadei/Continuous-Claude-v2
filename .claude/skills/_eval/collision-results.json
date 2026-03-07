@@ -1,0 +1,2910 @@
+{
+  "timestamp": "2026-03-07T22:43:41.722Z",
+  "summary": {
+    "totalPrompts": 694,
+    "promptsWithCollisions": 274,
+    "collisionRate": 39.5,
+    "uniquePairs": 278
+  },
+  "pairs": {
+    "debug-agent | systematic-debugging": 19,
+    "github-search | scout": 16,
+    "code-review | describe_pr": 12,
+    "fix | systematic-debugging": 12,
+    "debug-agent | fix": 11,
+    "Skip | ast-grep-find": 9,
+    "Skip | phoenix": 9,
+    "ast-grep-find | phoenix": 9,
+    "debug | debug-agent": 8,
+    "phoenix | refactor": 8,
+    "code-review | review": 8,
+    "plan-agent | plan-mode": 7,
+    "Skip | systematic-debugging": 7,
+    "Skip | debug-agent": 7,
+    "morph-search | search-router": 7,
+    "plan-mode | workflow-router": 6,
+    "Skip | debug": 6,
+    "debug | systematic-debugging": 6,
+    "onboard | plan-agent": 6,
+    "onboard | pathfinder": 6,
+    "github-search | morph-search": 6,
+    "Skip | refactor": 6,
+    "ast-grep-find | refactor": 6,
+    "aegis | security": 6,
+    "plan-agent | workflow-router": 5,
+    "implement_plan | workflow-router": 5,
+    "explore | repoprompt": 5,
+    "explore | scout": 5,
+    "tldr-code | workflow-router": 5,
+    "debug | sleuth": 5,
+    "architect | plan-agent": 5,
+    "arbiter | test": 5,
+    "arscontexta-refactor | phoenix": 5,
+    "code-review | workflow-router": 4,
+    "build | plan-agent": 4,
+    "repoprompt | scout": 4,
+    "create_handoff | resume_handoff": 4,
+    "morph-search | scout": 4,
+    "discovery-interview | workflow-router": 4,
+    "frontend-design | plan-agent": 4,
+    "debug-hooks | systematic-debugging": 3,
+    "debug-agent | debug-hooks": 3,
+    "debug-hooks | hook-developer": 3,
+    "implement_plan | plan-mode": 3,
+    "Skip | commit": 3,
+    "Git | commit": 3,
+    "github-search | workflow-router": 3,
+    "systematic-debugging | workflow-router": 3,
+    "debug-agent | workflow-router": 3,
+    "Codebase | explore": 3,
+    "Codebase | repoprompt": 3,
+    "Codebase | scout": 3,
+    "ast-grep-find | workflow-router": 3,
+    "ast-grep-find | github-search": 3,
+    "ast-grep-find | scout": 3,
+    "morph-apply | spark": 3,
+    "oracle | perplexity-search": 3,
+    "github-search | mcp-guidance": 3,
+    "tdd | test": 3,
+    "github-search | search-router": 3,
+    "math/complex-analysis | morph-search": 3,
+    "discovery-interview | find-skills": 3,
+    "databases | workflow-router": 3,
+    "arscontexta-validate | databases": 3,
+    "Skip | arscontexta-refactor": 3,
+    "arscontexta-refactor | ast-grep-find": 3,
+    "maestro | ralph": 2,
+    "describe_pr | plan-mode": 2,
+    "describe_pr | plan-agent": 2,
+    "describe_pr | workflow-router": 2,
+    "Skip | debug-hooks": 2,
+    "debug | debug-hooks": 2,
+    "Skip | code-review": 2,
+    "code-review | github-search": 2,
+    "fix | workflow-router": 2,
+    "Feature | build": 2,
+    "Feature | workflow-router": 2,
+    "Feature | kraken": 2,
+    "build | workflow-router": 2,
+    "build | kraken": 2,
+    "kraken | workflow-router": 2,
+    "explore | tldr-code": 2,
+    "scout | tldr-code": 2,
+    "scout | workflow-router": 2,
+    "explore | pathfinder": 2,
+    "debug-agent | sleuth": 2,
+    "github-search | systematic-debugging": 2,
+    "firecrawl-scrape | workflow-router": 2,
+    "ast-grep-find | search-router": 2,
+    "ast-grep-find | morph-search": 2,
+    "ast-grep-find | spark": 2,
+    "morph-search | spark": 2,
+    "morph-apply | morph-search": 2,
+    "morph-apply | search-router": 2,
+    "mcp-guidance | perplexity-search": 2,
+    "perplexity-search | workflow-router": 2,
+    "github-search | perplexity-search": 2,
+    "perplexity-search | scout": 2,
+    "mcp-guidance | scout": 2,
+    "braintrust-analyze | pathfinder": 2,
+    "braintrust-analyze | workflow-router": 2,
+    "environment-triage | systematic-debugging": 2,
+    "scout | search-router": 2,
+    "math/mathematical-logic | workflow-router": 2,
+    "math/odes-pdes | workflow-router": 2,
+    "continuity_ledger | math/real-analysis": 2,
+    "review | workflow-router": 2,
+    "braintrust-analyze | braintrust-tracing": 2,
+    "debug-agent | premortem": 2,
+    "plan-agent | ui-ux-pro-max": 2,
+    "Skip | workflow-router": 2,
+    "arscontexta-health | workflow-router": 2,
+    "arscontexta-architect | plan-agent": 2,
+    "arscontexta-ask | knowledge-guide": 2,
+    "knowledge-guide | workflow-router": 2,
+    "arscontexta-reseed | arscontexta-seed": 2,
+    "arscontexta-tutorial | onboard": 2,
+    "arscontexta-tutorial | pathfinder": 2,
+    "arscontexta-connect | github-search": 2,
+    "arscontexta-learn | onboard": 2,
+    "arscontexta-learn | pathfinder": 2,
+    "arscontexta-refactor | refactor": 2,
+    "arscontexta-ralph | ralph": 2,
+    "vercel-cli | workflow-router": 2,
+    "math/real-analysis | vercel-cli": 2,
+    "code-review | fourth-presentation-suite": 2,
+    "find-skills | github-search": 2,
+    "plan-mode | ralph": 1,
+    "plan-agent | ralph": 1,
+    "code-review | ralph": 1,
+    "describe_pr | ralph": 1,
+    "idearalph | workflow-router": 1,
+    "code-review | plan-mode": 1,
+    "code-review | plan-agent": 1,
+    "debug-hooks | fix": 1,
+    "code-review | hook-developer": 1,
+    "describe_pr | hook-developer": 1,
+    "implement_plan | plan-agent": 1,
+    "Git | workflow-router": 1,
+    "commit | workflow-router": 1,
+    "Skip | describe_pr": 1,
+    "code-review | commit": 1,
+    "commit | describe_pr": 1,
+    "describe_pr | github-search": 1,
+    "Feature | plan-agent": 1,
+    "kraken | plan-agent": 1,
+    "build | onboard": 1,
+    "build | scout": 1,
+    "plan-agent | scout": 1,
+    "explore | workflow-router": 1,
+    "onboard | tldr-code": 1,
+    "pathfinder | tldr-code": 1,
+    "explore | onboard": 1,
+    "code-review | create_handoff": 1,
+    "create_handoff | describe_pr": 1,
+    "resume_handoff | workflow-router": 1,
+    "onboard | resume_handoff": 1,
+    "plan-agent | resume_handoff": 1,
+    "continuity_ledger | memory": 1,
+    "skill-developer | workflow-router": 1,
+    "skill-developer | vet-skill": 1,
+    "code-review | skill-developer": 1,
+    "describe_pr | skill-developer": 1,
+    "vet-skill | workflow-router": 1,
+    "nia-docs | oracle": 1,
+    "explore | nia-docs": 1,
+    "repoprompt | workflow-router": 1,
+    "pathfinder | repoprompt": 1,
+    "memory | onboard": 1,
+    "memory | pathfinder": 1,
+    "memory | validate-agent": 1,
+    "morph-search | workflow-router": 1,
+    "spark | workflow-router": 1,
+    "github-search | spark": 1,
+    "scout | spark": 1,
+    "github-search | oracle": 1,
+    "oracle | scout": 1,
+    "perplexity-search | test": 1,
+    "qlty-check | workflow-router": 1,
+    "onboard | workflow-router": 1,
+    "describe_pr | tdd": 1,
+    "describe_pr | test": 1,
+    "Skip | tdd": 1,
+    "ast-grep-find | tdd": 1,
+    "phoenix | tdd": 1,
+    "environment-triage | find-skills": 1,
+    "environment-triage | fix": 1,
+    "reference-sdk | workflow-router": 1,
+    "search-router | workflow-router": 1,
+    "math/abstract-algebra | morph-search": 1,
+    "databases | math/category-theory": 1,
+    "math/category-theory | workflow-router": 1,
+    "math/complex-analysis | workflow-router": 1,
+    "math/complex-analysis | search-router": 1,
+    "math/functional-analysis | workflow-router": 1,
+    "github-search | math/linear-algebra": 1,
+    "math/linear-algebra | scout": 1,
+    "math/numerical-methods | workflow-router": 1,
+    "math/numerical-methods | onboard": 1,
+    "math/numerical-methods | plan-agent": 1,
+    "math/optimization | workflow-router": 1,
+    "math/topology | workflow-router": 1,
+    "math/topology | morph-search": 1,
+    "math/topology | search-router": 1,
+    "code-review | math/topology": 1,
+    "plan-agent | refactor": 1,
+    "architect | refactor": 1,
+    "release | workflow-router": 1,
+    "code-review | release": 1,
+    "test | workflow-router": 1,
+    "Skip | braintrust-tracing": 1,
+    "braintrust-tracing | systematic-debugging": 1,
+    "braintrust-tracing | debug": 1,
+    "braintrust-tracing | debug-agent": 1,
+    "braintrust-tracing | plan-agent": 1,
+    "architect | braintrust-tracing": 1,
+    "premortem | workflow-router": 1,
+    "code-review | shadcn-create": 1,
+    "describe_pr | shadcn-create": 1,
+    "shadcn-create | workflow-router": 1,
+    "explore | shadcn-create": 1,
+    "frontend-design | workflow-router": 1,
+    "frontend-design | ui-ux-pro-max": 1,
+    "databases | describe_pr": 1,
+    "personas | workflow-router": 1,
+    "firecrawl-scrape | mcp-guidance": 1,
+    "arscontexta-health | mot": 1,
+    "arscontexta-setup | workflow-router": 1,
+    "arscontexta-setup | code-review": 1,
+    "arscontexta-setup | describe_pr": 1,
+    "architect | arscontexta-architect": 1,
+    "arscontexta-ask | ast-grep-find": 1,
+    "arscontexta-ask | github-search": 1,
+    "github-search | pathfinder": 1,
+    "github-search | knowledge-guide": 1,
+    "arscontexta-ask | workflow-router": 1,
+    "pathfinder | workflow-router": 1,
+    "arscontexta-ask | scout": 1,
+    "arscontexta-ask | pathfinder": 1,
+    "pathfinder | scout": 1,
+    "knowledge-guide | scout": 1,
+    "knowledge-guide | pathfinder": 1,
+    "find-skills | workflow-router": 1,
+    "arscontexta-reseed | workflow-router": 1,
+    "arscontexta-tutorial | workflow-router": 1,
+    "arscontexta-recommend | plan-agent": 1,
+    "architect | arscontexta-recommend": 1,
+    "architect | workflow-router": 1,
+    "arscontexta-upgrade | workflow-router": 1,
+    "arscontexta-add-domain | onboard": 1,
+    "arscontexta-add-domain | plan-agent": 1,
+    "arscontexta-document | workflow-router": 1,
+    "arscontexta-connect | scout": 1,
+    "arscontexta-verify | qlty-check": 1,
+    "arscontexta-update | workflow-router": 1,
+    "arscontexta-validate | workflow-router": 1,
+    "arscontexta-learn | perplexity-search": 1,
+    "arscontexta-learn | workflow-router": 1,
+    "arscontexta-stats | workflow-router": 1,
+    "arscontexta-pipeline | workflow-router": 1,
+    "arscontexta-remember | memory": 1,
+    "memory | workflow-router": 1,
+    "Skip | knowledge-guide": 1,
+    "arscontexta-refactor | code-review": 1,
+    "code-review | knowledge-guide": 1,
+    "ast-grep-find | code-review": 1,
+    "code-review | phoenix": 1,
+    "arscontexta-refactor | workflow-router": 1,
+    "phoenix | workflow-router": 1,
+    "arscontexta-refactor | knowledge-guide": 1,
+    "ast-grep-find | knowledge-guide": 1,
+    "knowledge-guide | phoenix": 1,
+    "ralph | workflow-router": 1,
+    "arscontexta-ralph | workflow-router": 1,
+    "fourth-presentation-suite | workflow-router": 1,
+    "describe_pr | fourth-presentation-suite": 1,
+    "fourth-presentation-suite | review": 1,
+    "find-skills | scout": 1
+  },
+  "expectedPairs": [
+    "debug-agent | systematic-debugging",
+    "github-search | scout",
+    "code-review | describe_pr",
+    "fix | systematic-debugging",
+    "debug-agent | fix",
+    "ast-grep-find | phoenix",
+    "debug | debug-agent",
+    "phoenix | refactor",
+    "code-review | review",
+    "plan-agent | plan-mode",
+    "morph-search | search-router",
+    "plan-mode | workflow-router",
+    "debug | systematic-debugging",
+    "onboard | plan-agent",
+    "onboard | pathfinder",
+    "github-search | morph-search",
+    "ast-grep-find | refactor",
+    "plan-agent | workflow-router",
+    "morph-search | scout",
+    "implement_plan | plan-mode",
+    "code-review | github-search",
+    "scout | search-router",
+    "implement_plan | plan-agent",
+    "commit | describe_pr"
+  ],
+  "unexpectedPairs": [
+    "Skip | ast-grep-find",
+    "Skip | phoenix",
+    "Skip | systematic-debugging",
+    "Skip | debug-agent",
+    "Skip | debug",
+    "Skip | refactor",
+    "aegis | security",
+    "implement_plan | workflow-router",
+    "explore | repoprompt",
+    "explore | scout",
+    "tldr-code | workflow-router",
+    "debug | sleuth",
+    "architect | plan-agent",
+    "arbiter | test",
+    "arscontexta-refactor | phoenix",
+    "code-review | workflow-router",
+    "build | plan-agent",
+    "repoprompt | scout",
+    "create_handoff | resume_handoff",
+    "discovery-interview | workflow-router",
+    "frontend-design | plan-agent",
+    "debug-hooks | systematic-debugging",
+    "debug-agent | debug-hooks",
+    "debug-hooks | hook-developer",
+    "Skip | commit",
+    "Git | commit",
+    "github-search | workflow-router",
+    "systematic-debugging | workflow-router",
+    "debug-agent | workflow-router",
+    "Codebase | explore",
+    "Codebase | repoprompt",
+    "Codebase | scout",
+    "ast-grep-find | workflow-router",
+    "ast-grep-find | github-search",
+    "ast-grep-find | scout",
+    "morph-apply | spark",
+    "oracle | perplexity-search",
+    "github-search | mcp-guidance",
+    "tdd | test",
+    "github-search | search-router",
+    "math/complex-analysis | morph-search",
+    "discovery-interview | find-skills",
+    "databases | workflow-router",
+    "arscontexta-validate | databases",
+    "Skip | arscontexta-refactor",
+    "arscontexta-refactor | ast-grep-find",
+    "maestro | ralph",
+    "describe_pr | plan-mode",
+    "describe_pr | plan-agent",
+    "describe_pr | workflow-router",
+    "Skip | debug-hooks",
+    "debug | debug-hooks",
+    "Skip | code-review",
+    "fix | workflow-router",
+    "Feature | build",
+    "Feature | workflow-router",
+    "Feature | kraken",
+    "build | workflow-router",
+    "build | kraken",
+    "kraken | workflow-router",
+    "explore | tldr-code",
+    "scout | tldr-code",
+    "scout | workflow-router",
+    "explore | pathfinder",
+    "debug-agent | sleuth",
+    "github-search | systematic-debugging",
+    "firecrawl-scrape | workflow-router",
+    "ast-grep-find | search-router",
+    "ast-grep-find | morph-search",
+    "ast-grep-find | spark",
+    "morph-search | spark",
+    "morph-apply | morph-search",
+    "morph-apply | search-router",
+    "mcp-guidance | perplexity-search",
+    "perplexity-search | workflow-router",
+    "github-search | perplexity-search",
+    "perplexity-search | scout",
+    "mcp-guidance | scout",
+    "braintrust-analyze | pathfinder",
+    "braintrust-analyze | workflow-router",
+    "environment-triage | systematic-debugging",
+    "math/mathematical-logic | workflow-router",
+    "math/odes-pdes | workflow-router",
+    "continuity_ledger | math/real-analysis",
+    "review | workflow-router",
+    "braintrust-analyze | braintrust-tracing",
+    "debug-agent | premortem",
+    "plan-agent | ui-ux-pro-max",
+    "Skip | workflow-router",
+    "arscontexta-health | workflow-router",
+    "arscontexta-architect | plan-agent",
+    "arscontexta-ask | knowledge-guide",
+    "knowledge-guide | workflow-router",
+    "arscontexta-reseed | arscontexta-seed",
+    "arscontexta-tutorial | onboard",
+    "arscontexta-tutorial | pathfinder",
+    "arscontexta-connect | github-search",
+    "arscontexta-learn | onboard",
+    "arscontexta-learn | pathfinder",
+    "arscontexta-refactor | refactor",
+    "arscontexta-ralph | ralph",
+    "vercel-cli | workflow-router",
+    "math/real-analysis | vercel-cli",
+    "code-review | fourth-presentation-suite",
+    "find-skills | github-search",
+    "plan-mode | ralph",
+    "plan-agent | ralph",
+    "code-review | ralph",
+    "describe_pr | ralph",
+    "idearalph | workflow-router",
+    "code-review | plan-mode",
+    "code-review | plan-agent",
+    "debug-hooks | fix",
+    "code-review | hook-developer",
+    "describe_pr | hook-developer",
+    "Git | workflow-router",
+    "commit | workflow-router",
+    "Skip | describe_pr",
+    "code-review | commit",
+    "describe_pr | github-search",
+    "Feature | plan-agent",
+    "kraken | plan-agent",
+    "build | onboard",
+    "build | scout",
+    "plan-agent | scout",
+    "explore | workflow-router",
+    "onboard | tldr-code",
+    "pathfinder | tldr-code",
+    "explore | onboard",
+    "code-review | create_handoff",
+    "create_handoff | describe_pr",
+    "resume_handoff | workflow-router",
+    "onboard | resume_handoff",
+    "plan-agent | resume_handoff",
+    "continuity_ledger | memory",
+    "skill-developer | workflow-router",
+    "skill-developer | vet-skill",
+    "code-review | skill-developer",
+    "describe_pr | skill-developer",
+    "vet-skill | workflow-router",
+    "nia-docs | oracle",
+    "explore | nia-docs",
+    "repoprompt | workflow-router",
+    "pathfinder | repoprompt",
+    "memory | onboard",
+    "memory | pathfinder",
+    "memory | validate-agent",
+    "morph-search | workflow-router",
+    "spark | workflow-router",
+    "github-search | spark",
+    "scout | spark",
+    "github-search | oracle",
+    "oracle | scout",
+    "perplexity-search | test",
+    "qlty-check | workflow-router",
+    "onboard | workflow-router",
+    "describe_pr | tdd",
+    "describe_pr | test",
+    "Skip | tdd",
+    "ast-grep-find | tdd",
+    "phoenix | tdd",
+    "environment-triage | find-skills",
+    "environment-triage | fix",
+    "reference-sdk | workflow-router",
+    "search-router | workflow-router",
+    "math/abstract-algebra | morph-search",
+    "databases | math/category-theory",
+    "math/category-theory | workflow-router",
+    "math/complex-analysis | workflow-router",
+    "math/complex-analysis | search-router",
+    "math/functional-analysis | workflow-router",
+    "github-search | math/linear-algebra",
+    "math/linear-algebra | scout",
+    "math/numerical-methods | workflow-router",
+    "math/numerical-methods | onboard",
+    "math/numerical-methods | plan-agent",
+    "math/optimization | workflow-router",
+    "math/topology | workflow-router",
+    "math/topology | morph-search",
+    "math/topology | search-router",
+    "code-review | math/topology",
+    "plan-agent | refactor",
+    "architect | refactor",
+    "release | workflow-router",
+    "code-review | release",
+    "test | workflow-router",
+    "Skip | braintrust-tracing",
+    "braintrust-tracing | systematic-debugging",
+    "braintrust-tracing | debug",
+    "braintrust-tracing | debug-agent",
+    "braintrust-tracing | plan-agent",
+    "architect | braintrust-tracing",
+    "premortem | workflow-router",
+    "code-review | shadcn-create",
+    "describe_pr | shadcn-create",
+    "shadcn-create | workflow-router",
+    "explore | shadcn-create",
+    "frontend-design | workflow-router",
+    "frontend-design | ui-ux-pro-max",
+    "databases | describe_pr",
+    "personas | workflow-router",
+    "firecrawl-scrape | mcp-guidance",
+    "arscontexta-health | mot",
+    "arscontexta-setup | workflow-router",
+    "arscontexta-setup | code-review",
+    "arscontexta-setup | describe_pr",
+    "architect | arscontexta-architect",
+    "arscontexta-ask | ast-grep-find",
+    "arscontexta-ask | github-search",
+    "github-search | pathfinder",
+    "github-search | knowledge-guide",
+    "arscontexta-ask | workflow-router",
+    "pathfinder | workflow-router",
+    "arscontexta-ask | scout",
+    "arscontexta-ask | pathfinder",
+    "pathfinder | scout",
+    "knowledge-guide | scout",
+    "knowledge-guide | pathfinder",
+    "find-skills | workflow-router",
+    "arscontexta-reseed | workflow-router",
+    "arscontexta-tutorial | workflow-router",
+    "arscontexta-recommend | plan-agent",
+    "architect | arscontexta-recommend",
+    "architect | workflow-router",
+    "arscontexta-upgrade | workflow-router",
+    "arscontexta-add-domain | onboard",
+    "arscontexta-add-domain | plan-agent",
+    "arscontexta-document | workflow-router",
+    "arscontexta-connect | scout",
+    "arscontexta-verify | qlty-check",
+    "arscontexta-update | workflow-router",
+    "arscontexta-validate | workflow-router",
+    "arscontexta-learn | perplexity-search",
+    "arscontexta-learn | workflow-router",
+    "arscontexta-stats | workflow-router",
+    "arscontexta-pipeline | workflow-router",
+    "arscontexta-remember | memory",
+    "memory | workflow-router",
+    "Skip | knowledge-guide",
+    "arscontexta-refactor | code-review",
+    "code-review | knowledge-guide",
+    "ast-grep-find | code-review",
+    "code-review | phoenix",
+    "arscontexta-refactor | workflow-router",
+    "phoenix | workflow-router",
+    "arscontexta-refactor | knowledge-guide",
+    "ast-grep-find | knowledge-guide",
+    "knowledge-guide | phoenix",
+    "ralph | workflow-router",
+    "arscontexta-ralph | workflow-router",
+    "fourth-presentation-suite | workflow-router",
+    "describe_pr | fourth-presentation-suite",
+    "fourth-presentation-suite | review",
+    "find-skills | scout"
+  ],
+  "details": [
+    {
+      "prompt": "Let's ralph plan for this project",
+      "expected": "ralph",
+      "matched": [
+        "ralph",
+        "plan-mode",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I want to ralph loop now",
+      "expected": "ralph",
+      "matched": [
+        "ralph",
+        "maestro"
+      ]
+    },
+    {
+      "prompt": "I want to development loop in this project",
+      "expected": "ralph",
+      "matched": [
+        "ralph",
+        "maestro"
+      ]
+    },
+    {
+      "prompt": "I want to create prd in this project",
+      "expected": "ralph",
+      "matched": [
+        "code-review",
+        "ralph",
+        "describe_pr"
+      ]
+    },
+    {
+      "prompt": "Can you help me validate idea?",
+      "expected": "idearalph",
+      "matched": [
+        "idearalph",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Let's create plan for this project",
+      "expected": "plan-mode",
+      "matched": [
+        "code-review",
+        "plan-mode",
+        "describe_pr",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I need to write plan",
+      "expected": "plan-mode",
+      "matched": [
+        "plan-mode",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I need to planning for the current project",
+      "expected": "plan-mode",
+      "matched": [
+        "plan-mode",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I want to make a plan now",
+      "expected": "plan-mode",
+      "matched": [
+        "plan-mode",
+        "workflow-router",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I want to enter plan mode in this project",
+      "expected": "plan-mode",
+      "matched": [
+        "plan-mode",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "I want to write plan in this project",
+      "expected": "plan-mode",
+      "matched": [
+        "plan-mode",
+        "describe_pr",
+        "workflow-router",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I want to EnterPlanMode in this project",
+      "expected": "plan-mode",
+      "matched": [
+        "plan-mode",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "I want to hook not working now",
+      "expected": "debug-hooks",
+      "matched": [
+        "systematic-debugging",
+        "debug-hooks",
+        "fix",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "Let's debug hook for this project",
+      "expected": "debug-hooks",
+      "matched": [
+        "Skip",
+        "systematic-debugging",
+        "debug-hooks",
+        "debug",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I want to SessionEnd not now",
+      "expected": "debug-hooks",
+      "matched": [
+        "debug-hooks",
+        "hook-developer"
+      ]
+    },
+    {
+      "prompt": "Please PostToolUse not",
+      "expected": "debug-hooks",
+      "matched": [
+        "debug-hooks",
+        "hook-developer"
+      ]
+    },
+    {
+      "prompt": "I want to debug hook in this project",
+      "expected": "debug-hooks",
+      "matched": [
+        "Skip",
+        "systematic-debugging",
+        "debug-hooks",
+        "debug",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I want to SessionEnd not in this project",
+      "expected": "debug-hooks",
+      "matched": [
+        "debug-hooks",
+        "hook-developer"
+      ]
+    },
+    {
+      "prompt": "I want to create hook in this project",
+      "expected": "hook-developer",
+      "matched": [
+        "code-review",
+        "hook-developer",
+        "describe_pr"
+      ]
+    },
+    {
+      "prompt": "I need to implement plan",
+      "expected": "implement_plan",
+      "matched": [
+        "implement_plan",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Can you help me execute plan?",
+      "expected": "implement_plan",
+      "matched": [
+        "implement_plan",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Let's follow plan for this project",
+      "expected": "implement_plan",
+      "matched": [
+        "implement_plan",
+        "plan-mode",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "Can you help me implement phase?",
+      "expected": "implement_plan",
+      "matched": [
+        "implement_plan",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "I want to implement plan in this project",
+      "expected": "implement_plan",
+      "matched": [
+        "implement_plan",
+        "plan-mode",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "I want to thoughts/shared/plans in this project",
+      "expected": "implement_plan",
+      "matched": [
+        "implement_plan",
+        "plan-mode",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "I need to commit for the current project",
+      "expected": "commit",
+      "matched": [
+        "Skip",
+        "commit"
+      ]
+    },
+    {
+      "prompt": "Can you help me save changes?",
+      "expected": "commit",
+      "matched": [
+        "Git",
+        "commit",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "I need to commit changes",
+      "expected": "commit",
+      "matched": [
+        "Git",
+        "commit"
+      ]
+    },
+    {
+      "prompt": "Please make commit",
+      "expected": "commit",
+      "matched": [
+        "Skip",
+        "commit"
+      ]
+    },
+    {
+      "prompt": "I want to commit changes in this project",
+      "expected": "commit",
+      "matched": [
+        "Git",
+        "commit"
+      ]
+    },
+    {
+      "prompt": "I want to create commit in this project",
+      "expected": "commit",
+      "matched": [
+        "Skip",
+        "code-review",
+        "describe_pr",
+        "commit"
+      ]
+    },
+    {
+      "prompt": "Can you help me pull request description?",
+      "expected": "describe_pr",
+      "matched": [
+        "code-review",
+        "describe_pr",
+        "github-search",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Let's create pr for this project",
+      "expected": "describe_pr",
+      "matched": [
+        "code-review",
+        "describe_pr"
+      ]
+    },
+    {
+      "prompt": "I want to create pr in this project",
+      "expected": "describe_pr",
+      "matched": [
+        "code-review",
+        "describe_pr"
+      ]
+    },
+    {
+      "prompt": "I need to fix the bug",
+      "expected": "fix",
+      "matched": [
+        "systematic-debugging",
+        "fix",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I need to broken for the current project",
+      "expected": "fix",
+      "matched": [
+        "systematic-debugging",
+        "fix",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I need to not working",
+      "expected": "fix",
+      "matched": [
+        "systematic-debugging",
+        "fix",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I want to fix bug in this project",
+      "expected": "fix",
+      "matched": [
+        "systematic-debugging",
+        "fix",
+        "workflow-router",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I want to broken in this project",
+      "expected": "fix",
+      "matched": [
+        "systematic-debugging",
+        "fix",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I want to this broken in this project",
+      "expected": "fix",
+      "matched": [
+        "systematic-debugging",
+        "fix",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I need to implement feature",
+      "expected": "build",
+      "matched": [
+        "Feature",
+        "build",
+        "workflow-router",
+        "kraken"
+      ]
+    },
+    {
+      "prompt": "Let's add feature for this project",
+      "expected": "build",
+      "matched": [
+        "build",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I want to build feature in this project",
+      "expected": "build",
+      "matched": [
+        "Feature",
+        "build",
+        "workflow-router",
+        "plan-agent",
+        "kraken"
+      ]
+    },
+    {
+      "prompt": "I want to new functionality in this project",
+      "expected": "build",
+      "matched": [
+        "build",
+        "onboard",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I want to greenfield brownfield in this project",
+      "expected": "build",
+      "matched": [
+        "build",
+        "scout",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "Please explore the codebase",
+      "expected": "explore",
+      "matched": [
+        "Codebase",
+        "explore",
+        "repoprompt",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "Please how does this work",
+      "expected": "explore",
+      "matched": [
+        "explore",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "I need to understand the code",
+      "expected": "explore",
+      "matched": [
+        "tldr-code",
+        "explore",
+        "workflow-router",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "I want to explore codebase in this project",
+      "expected": "explore",
+      "matched": [
+        "Codebase",
+        "explore",
+        "repoprompt",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "I want to understand code in this project",
+      "expected": "explore",
+      "matched": [
+        "tldr-code",
+        "explore",
+        "onboard",
+        "pathfinder"
+      ]
+    },
+    {
+      "prompt": "/debug",
+      "expected": "debug",
+      "matched": [
+        "Skip",
+        "systematic-debugging",
+        "debug",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "Please debug this",
+      "expected": "debug",
+      "matched": [
+        "Skip",
+        "systematic-debugging",
+        "debug",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I need to investigate for the current project",
+      "expected": "debug",
+      "matched": [
+        "debug",
+        "debug-agent",
+        "sleuth"
+      ]
+    },
+    {
+      "prompt": "I need to root cause",
+      "expected": "debug",
+      "matched": [
+        "debug",
+        "sleuth"
+      ]
+    },
+    {
+      "prompt": "I need to why is this happening",
+      "expected": "debug",
+      "matched": [
+        "debug",
+        "sleuth"
+      ]
+    },
+    {
+      "prompt": "I want to debug this in this project",
+      "expected": "debug",
+      "matched": [
+        "Skip",
+        "systematic-debugging",
+        "debug",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I want to investigate cause in this project",
+      "expected": "debug",
+      "matched": [
+        "debug",
+        "debug-agent",
+        "sleuth"
+      ]
+    },
+    {
+      "prompt": "I want to root cause in this project",
+      "expected": "debug",
+      "matched": [
+        "debug",
+        "sleuth"
+      ]
+    },
+    {
+      "prompt": "I want to create handoff in this project",
+      "expected": "create_handoff",
+      "matched": [
+        "create_handoff",
+        "code-review",
+        "describe_pr"
+      ]
+    },
+    {
+      "prompt": "I need to resume handoff",
+      "expected": "resume_handoff",
+      "matched": [
+        "create_handoff",
+        "resume_handoff"
+      ]
+    },
+    {
+      "prompt": "Let's continue handoff for this project",
+      "expected": "resume_handoff",
+      "matched": [
+        "create_handoff",
+        "resume_handoff"
+      ]
+    },
+    {
+      "prompt": "I want to pick up handoff now",
+      "expected": "resume_handoff",
+      "matched": [
+        "create_handoff",
+        "resume_handoff"
+      ]
+    },
+    {
+      "prompt": "Can you help me resume work?",
+      "expected": "resume_handoff",
+      "matched": [
+        "resume_handoff",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "I want to resume handoff in this project",
+      "expected": "resume_handoff",
+      "matched": [
+        "create_handoff",
+        "resume_handoff"
+      ]
+    },
+    {
+      "prompt": "I want to new session in this project",
+      "expected": "resume_handoff",
+      "matched": [
+        "resume_handoff",
+        "onboard",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I want to save state in this project",
+      "expected": "continuity_ledger",
+      "matched": [
+        "continuity_ledger",
+        "memory"
+      ]
+    },
+    {
+      "prompt": "Can you help me skill system?",
+      "expected": "skill-developer",
+      "matched": [
+        "skill-developer",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Please skill triggers",
+      "expected": "skill-developer",
+      "matched": [
+        "skill-developer",
+        "vet-skill"
+      ]
+    },
+    {
+      "prompt": "I want to create skill in this project",
+      "expected": "skill-developer",
+      "matched": [
+        "code-review",
+        "describe_pr",
+        "skill-developer"
+      ]
+    },
+    {
+      "prompt": "Can you help me vet this skill?",
+      "expected": "vet-skill",
+      "matched": [
+        "vet-skill",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "I need to search code",
+      "expected": "github-search",
+      "matched": [
+        "github-search",
+        "morph-search"
+      ]
+    },
+    {
+      "prompt": "Let's github issue for this project",
+      "expected": "github-search",
+      "matched": [
+        "systematic-debugging",
+        "github-search"
+      ]
+    },
+    {
+      "prompt": "I want to search github in this project",
+      "expected": "github-search",
+      "matched": [
+        "github-search",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "I want to github search in this project",
+      "expected": "github-search",
+      "matched": [
+        "github-search",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "I want to list issues in this project",
+      "expected": "github-search",
+      "matched": [
+        "systematic-debugging",
+        "github-search"
+      ]
+    },
+    {
+      "prompt": "Can you help me fetch url?",
+      "expected": "firecrawl-scrape",
+      "matched": [
+        "firecrawl-scrape",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Can you help me get page?",
+      "expected": "firecrawl-scrape",
+      "matched": [
+        "firecrawl-scrape",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "I need to documentation for the current project",
+      "expected": "nia-docs",
+      "matched": [
+        "nia-docs",
+        "oracle"
+      ]
+    },
+    {
+      "prompt": "I want to how library work in this project",
+      "expected": "nia-docs",
+      "matched": [
+        "explore",
+        "nia-docs"
+      ]
+    },
+    {
+      "prompt": "I need to ast-grep for the current project",
+      "expected": "ast-grep-find",
+      "matched": [
+        "ast-grep-find",
+        "search-router"
+      ]
+    },
+    {
+      "prompt": "Can you help me find pattern?",
+      "expected": "ast-grep-find",
+      "matched": [
+        "ast-grep-find",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "I need to refactor for the current project",
+      "expected": "ast-grep-find",
+      "matched": [
+        "Skip",
+        "ast-grep-find",
+        "phoenix"
+      ]
+    },
+    {
+      "prompt": "I want to find pattern in this project",
+      "expected": "ast-grep-find",
+      "matched": [
+        "github-search",
+        "ast-grep-find",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "I want to refactor all in this project",
+      "expected": "ast-grep-find",
+      "matched": [
+        "Skip",
+        "refactor",
+        "ast-grep-find",
+        "phoenix"
+      ]
+    },
+    {
+      "prompt": "I want to ast search in this project",
+      "expected": "ast-grep-find",
+      "matched": [
+        "github-search",
+        "ast-grep-find",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "Let's codebase structure for this project",
+      "expected": "repoprompt",
+      "matched": [
+        "explore",
+        "repoprompt"
+      ]
+    },
+    {
+      "prompt": "Can you help me file tree?",
+      "expected": "repoprompt",
+      "matched": [
+        "workflow-router",
+        "repoprompt"
+      ]
+    },
+    {
+      "prompt": "Let's code structure for this project",
+      "expected": "repoprompt",
+      "matched": [
+        "repoprompt",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "I want to explore codebase in this project",
+      "expected": "repoprompt",
+      "matched": [
+        "Codebase",
+        "explore",
+        "repoprompt",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "I want to what codebase structure in this project",
+      "expected": "repoprompt",
+      "matched": [
+        "explore",
+        "repoprompt",
+        "pathfinder"
+      ]
+    },
+    {
+      "prompt": "I want to recall learning in this project",
+      "expected": "memory",
+      "matched": [
+        "memory",
+        "onboard",
+        "pathfinder"
+      ]
+    },
+    {
+      "prompt": "I want to what tried before in this project",
+      "expected": "memory",
+      "matched": [
+        "memory",
+        "validate-agent"
+      ]
+    },
+    {
+      "prompt": "I need to warpgrep for the current project",
+      "expected": "morph-search",
+      "matched": [
+        "morph-search",
+        "search-router"
+      ]
+    },
+    {
+      "prompt": "I need to morph for the current project",
+      "expected": "morph-search",
+      "matched": [
+        "morph-search",
+        "search-router"
+      ]
+    },
+    {
+      "prompt": "Can you help me fast search?",
+      "expected": "morph-search",
+      "matched": [
+        "ast-grep-find",
+        "morph-search",
+        "workflow-router",
+        "spark"
+      ]
+    },
+    {
+      "prompt": "I want to search code now",
+      "expected": "morph-search",
+      "matched": [
+        "github-search",
+        "morph-search"
+      ]
+    },
+    {
+      "prompt": "I want to search code in this project",
+      "expected": "morph-search",
+      "matched": [
+        "github-search",
+        "morph-search",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "I want to fast search in this project",
+      "expected": "morph-search",
+      "matched": [
+        "github-search",
+        "ast-grep-find",
+        "morph-search",
+        "scout",
+        "spark"
+      ]
+    },
+    {
+      "prompt": "I want to warpgrep search in this project",
+      "expected": "morph-search",
+      "matched": [
+        "github-search",
+        "morph-search",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "Let's morph apply for this project",
+      "expected": "morph-apply",
+      "matched": [
+        "morph-search",
+        "morph-apply",
+        "search-router"
+      ]
+    },
+    {
+      "prompt": "Let's morph edit for this project",
+      "expected": "morph-apply",
+      "matched": [
+        "morph-search",
+        "morph-apply",
+        "search-router"
+      ]
+    },
+    {
+      "prompt": "I need to fast edit",
+      "expected": "morph-apply",
+      "matched": [
+        "morph-apply",
+        "spark"
+      ]
+    },
+    {
+      "prompt": "I want to fast edit in this project",
+      "expected": "morph-apply",
+      "matched": [
+        "morph-apply",
+        "spark"
+      ]
+    },
+    {
+      "prompt": "I want to edit file fast in this project",
+      "expected": "morph-apply",
+      "matched": [
+        "morph-apply",
+        "spark"
+      ]
+    },
+    {
+      "prompt": "I need to perplexity for the current project",
+      "expected": "perplexity-search",
+      "matched": [
+        "perplexity-search",
+        "mcp-guidance"
+      ]
+    },
+    {
+      "prompt": "I need to web search",
+      "expected": "perplexity-search",
+      "matched": [
+        "perplexity-search",
+        "oracle"
+      ]
+    },
+    {
+      "prompt": "Please search the web",
+      "expected": "perplexity-search",
+      "matched": [
+        "perplexity-search",
+        "oracle"
+      ]
+    },
+    {
+      "prompt": "Can you help me current information?",
+      "expected": "perplexity-search",
+      "matched": [
+        "perplexity-search",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "I want to search web in this project",
+      "expected": "perplexity-search",
+      "matched": [
+        "github-search",
+        "perplexity-search",
+        "scout",
+        "oracle"
+      ]
+    },
+    {
+      "prompt": "I want to what is latest in this project",
+      "expected": "perplexity-search",
+      "matched": [
+        "perplexity-search",
+        "test"
+      ]
+    },
+    {
+      "prompt": "I want to perplexity search in this project",
+      "expected": "perplexity-search",
+      "matched": [
+        "github-search",
+        "perplexity-search",
+        "mcp-guidance",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "Can you help me code quality?",
+      "expected": "qlty-check",
+      "matched": [
+        "qlty-check",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Let's analyze session for this project",
+      "expected": "braintrust-analyze",
+      "matched": [
+        "braintrust-analyze",
+        "pathfinder"
+      ]
+    },
+    {
+      "prompt": "Can you help me what agents?",
+      "expected": "braintrust-analyze",
+      "matched": [
+        "braintrust-analyze",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "I want to analyze session in this project",
+      "expected": "braintrust-analyze",
+      "matched": [
+        "braintrust-analyze",
+        "pathfinder"
+      ]
+    },
+    {
+      "prompt": "I want to what agents use in this project",
+      "expected": "braintrust-analyze",
+      "matched": [
+        "braintrust-analyze",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Can you help me new to this project?",
+      "expected": "onboard",
+      "matched": [
+        "onboard",
+        "workflow-router",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I want to new project in this project",
+      "expected": "onboard",
+      "matched": [
+        "onboard",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "Let's write tests first for this project",
+      "expected": "tdd",
+      "matched": [
+        "describe_pr",
+        "tdd",
+        "test"
+      ]
+    },
+    {
+      "prompt": "I want to red green refactor now",
+      "expected": "tdd",
+      "matched": [
+        "Skip",
+        "tdd",
+        "ast-grep-find",
+        "phoenix"
+      ]
+    },
+    {
+      "prompt": "I want to test driven in this project",
+      "expected": "tdd",
+      "matched": [
+        "tdd",
+        "test"
+      ]
+    },
+    {
+      "prompt": "I want to implement with test first in this project",
+      "expected": "tdd",
+      "matched": [
+        "tdd",
+        "test"
+      ]
+    },
+    {
+      "prompt": "Let's pip install for this project",
+      "expected": "environment-triage",
+      "matched": [
+        "environment-triage",
+        "find-skills"
+      ]
+    },
+    {
+      "prompt": "I need to import error",
+      "expected": "environment-triage",
+      "matched": [
+        "systematic-debugging",
+        "environment-triage"
+      ]
+    },
+    {
+      "prompt": "I want to import error in this project",
+      "expected": "environment-triage",
+      "matched": [
+        "systematic-debugging",
+        "fix",
+        "environment-triage"
+      ]
+    },
+    {
+      "prompt": "Can you help me how does SDK?",
+      "expected": "reference-sdk",
+      "matched": [
+        "workflow-router",
+        "reference-sdk"
+      ]
+    },
+    {
+      "prompt": "Let's which search tool for this project",
+      "expected": "search-router",
+      "matched": [
+        "github-search",
+        "search-router"
+      ]
+    },
+    {
+      "prompt": "Can you help me search tool?",
+      "expected": "search-router",
+      "matched": [
+        "workflow-router",
+        "search-router"
+      ]
+    },
+    {
+      "prompt": "Please ast-grep vs",
+      "expected": "search-router",
+      "matched": [
+        "ast-grep-find",
+        "search-router"
+      ]
+    },
+    {
+      "prompt": "I want to which search use in this project",
+      "expected": "search-router",
+      "matched": [
+        "github-search",
+        "search-router",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "I want to how search code in this project",
+      "expected": "search-router",
+      "matched": [
+        "github-search",
+        "morph-search",
+        "search-router",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "Can you help me call graph?",
+      "expected": "tldr-code",
+      "matched": [
+        "tldr-code",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Can you help me what calls?",
+      "expected": "tldr-code",
+      "matched": [
+        "tldr-code",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Can you help me calls what?",
+      "expected": "tldr-code",
+      "matched": [
+        "tldr-code",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Can you help me how complex?",
+      "expected": "tldr-code",
+      "matched": [
+        "tldr-code",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "I want to what calls this in this project",
+      "expected": "tldr-code",
+      "matched": [
+        "tldr-code",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "I want to prove group homomorphism in this project",
+      "expected": "math/abstract-algebra",
+      "matched": [
+        "morph-search",
+        "math/abstract-algebra"
+      ]
+    },
+    {
+      "prompt": "Please adjoint functor",
+      "expected": "math/category-theory",
+      "matched": [
+        "databases",
+        "math/category-theory"
+      ]
+    },
+    {
+      "prompt": "Can you help me limit colimit?",
+      "expected": "math/category-theory",
+      "matched": [
+        "workflow-router",
+        "math/category-theory"
+      ]
+    },
+    {
+      "prompt": "Can you help me residue theorem?",
+      "expected": "math/complex-analysis",
+      "matched": [
+        "workflow-router",
+        "math/complex-analysis"
+      ]
+    },
+    {
+      "prompt": "I need to holomorphic function",
+      "expected": "math/complex-analysis",
+      "matched": [
+        "morph-search",
+        "math/complex-analysis"
+      ]
+    },
+    {
+      "prompt": "I need to meromorphic for the current project",
+      "expected": "math/complex-analysis",
+      "matched": [
+        "morph-search",
+        "search-router",
+        "math/complex-analysis"
+      ]
+    },
+    {
+      "prompt": "I want to holomorphic function in this project",
+      "expected": "math/complex-analysis",
+      "matched": [
+        "morph-search",
+        "math/complex-analysis"
+      ]
+    },
+    {
+      "prompt": "Can you help me Hilbert space?",
+      "expected": "math/functional-analysis",
+      "matched": [
+        "workflow-router",
+        "math/functional-analysis"
+      ]
+    },
+    {
+      "prompt": "I want to find eigenvalue in this project",
+      "expected": "math/linear-algebra",
+      "matched": [
+        "github-search",
+        "math/linear-algebra",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "Can you help me propositional logic?",
+      "expected": "math/mathematical-logic",
+      "matched": [
+        "workflow-router",
+        "math/mathematical-logic"
+      ]
+    },
+    {
+      "prompt": "Can you help me first order logic?",
+      "expected": "math/mathematical-logic",
+      "matched": [
+        "workflow-router",
+        "math/mathematical-logic"
+      ]
+    },
+    {
+      "prompt": "Can you help me numerical integration?",
+      "expected": "math/numerical-methods",
+      "matched": [
+        "workflow-router",
+        "math/numerical-methods"
+      ]
+    },
+    {
+      "prompt": "I want to Newton method in this project",
+      "expected": "math/numerical-methods",
+      "matched": [
+        "onboard",
+        "math/numerical-methods",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "Can you help me initial value problem?",
+      "expected": "math/odes-pdes",
+      "matched": [
+        "workflow-router",
+        "math/odes-pdes"
+      ]
+    },
+    {
+      "prompt": "Can you help me boundary value problem?",
+      "expected": "math/odes-pdes",
+      "matched": [
+        "workflow-router",
+        "math/odes-pdes"
+      ]
+    },
+    {
+      "prompt": "Can you help me gradient descent?",
+      "expected": "math/optimization",
+      "matched": [
+        "workflow-router",
+        "math/optimization"
+      ]
+    },
+    {
+      "prompt": "I need to uniform continuity",
+      "expected": "math/real-analysis",
+      "matched": [
+        "continuity_ledger",
+        "math/real-analysis"
+      ]
+    },
+    {
+      "prompt": "I want to uniform continuity in this project",
+      "expected": "math/real-analysis",
+      "matched": [
+        "continuity_ledger",
+        "math/real-analysis"
+      ]
+    },
+    {
+      "prompt": "Can you help me connected space?",
+      "expected": "math/topology",
+      "matched": [
+        "workflow-router",
+        "math/topology"
+      ]
+    },
+    {
+      "prompt": "I need to homeomorphism for the current project",
+      "expected": "math/topology",
+      "matched": [
+        "morph-search",
+        "search-router",
+        "math/topology"
+      ]
+    },
+    {
+      "prompt": "I want to open set in this project",
+      "expected": "math/topology",
+      "matched": [
+        "code-review",
+        "math/topology"
+      ]
+    },
+    {
+      "prompt": "/refactor",
+      "expected": "refactor",
+      "matched": [
+        "Skip",
+        "refactor",
+        "ast-grep-find",
+        "phoenix"
+      ]
+    },
+    {
+      "prompt": "I want to refactor this now",
+      "expected": "refactor",
+      "matched": [
+        "Skip",
+        "refactor",
+        "ast-grep-find",
+        "phoenix"
+      ]
+    },
+    {
+      "prompt": "I need to clean up this code",
+      "expected": "refactor",
+      "matched": [
+        "refactor",
+        "phoenix"
+      ]
+    },
+    {
+      "prompt": "I want to improve architecture now",
+      "expected": "refactor",
+      "matched": [
+        "refactor",
+        "plan-agent",
+        "architect"
+      ]
+    },
+    {
+      "prompt": "I want to refactor this in this project",
+      "expected": "refactor",
+      "matched": [
+        "Skip",
+        "refactor",
+        "ast-grep-find",
+        "phoenix"
+      ]
+    },
+    {
+      "prompt": "I want to clean up code in this project",
+      "expected": "refactor",
+      "matched": [
+        "refactor",
+        "phoenix"
+      ]
+    },
+    {
+      "prompt": "Can you help me prepare release?",
+      "expected": "release",
+      "matched": [
+        "workflow-router",
+        "release"
+      ]
+    },
+    {
+      "prompt": "I want to ready deploy in this project",
+      "expected": "release",
+      "matched": [
+        "code-review",
+        "release"
+      ]
+    },
+    {
+      "prompt": "I want to review this code now",
+      "expected": "review",
+      "matched": [
+        "code-review",
+        "review"
+      ]
+    },
+    {
+      "prompt": "Can you help me review my pr?",
+      "expected": "review",
+      "matched": [
+        "code-review",
+        "workflow-router",
+        "review"
+      ]
+    },
+    {
+      "prompt": "Can you help me check before merge?",
+      "expected": "review",
+      "matched": [
+        "code-review",
+        "workflow-router",
+        "review"
+      ]
+    },
+    {
+      "prompt": "I want to review this in this project",
+      "expected": "review",
+      "matched": [
+        "code-review",
+        "review"
+      ]
+    },
+    {
+      "prompt": "I want to check before merge in this project",
+      "expected": "review",
+      "matched": [
+        "code-review",
+        "review"
+      ]
+    },
+    {
+      "prompt": "I want to security audit now",
+      "expected": "security",
+      "matched": [
+        "security",
+        "aegis"
+      ]
+    },
+    {
+      "prompt": "Please check vulnerabilities",
+      "expected": "security",
+      "matched": [
+        "security",
+        "aegis"
+      ]
+    },
+    {
+      "prompt": "I want to is this secure now",
+      "expected": "security",
+      "matched": [
+        "security",
+        "aegis"
+      ]
+    },
+    {
+      "prompt": "I want to security audit in this project",
+      "expected": "security",
+      "matched": [
+        "security",
+        "aegis"
+      ]
+    },
+    {
+      "prompt": "I want to check vulnerabilit in this project",
+      "expected": "security",
+      "matched": [
+        "security",
+        "aegis"
+      ]
+    },
+    {
+      "prompt": "I want to is this secure in this project",
+      "expected": "security",
+      "matched": [
+        "security",
+        "aegis"
+      ]
+    },
+    {
+      "prompt": "I need to run all tests",
+      "expected": "test",
+      "matched": [
+        "test",
+        "arbiter"
+      ]
+    },
+    {
+      "prompt": "Can you help me test the feature?",
+      "expected": "test",
+      "matched": [
+        "workflow-router",
+        "test"
+      ]
+    },
+    {
+      "prompt": "I want to verify everything works now",
+      "expected": "test",
+      "matched": [
+        "test",
+        "arbiter"
+      ]
+    },
+    {
+      "prompt": "Let's full test suite for this project",
+      "expected": "test",
+      "matched": [
+        "test",
+        "arbiter"
+      ]
+    },
+    {
+      "prompt": "I want to run all tests in this project",
+      "expected": "test",
+      "matched": [
+        "test",
+        "arbiter"
+      ]
+    },
+    {
+      "prompt": "I want to verify everything works in this project",
+      "expected": "test",
+      "matched": [
+        "test",
+        "arbiter"
+      ]
+    },
+    {
+      "prompt": "Let's braintrust tracing for this project",
+      "expected": "braintrust-tracing",
+      "matched": [
+        "braintrust-analyze",
+        "braintrust-tracing"
+      ]
+    },
+    {
+      "prompt": "I want to braintrust hook in this project",
+      "expected": "braintrust-tracing",
+      "matched": [
+        "braintrust-analyze",
+        "braintrust-tracing"
+      ]
+    },
+    {
+      "prompt": "I want to debug sub-agent in this project",
+      "expected": "braintrust-tracing",
+      "matched": [
+        "Skip",
+        "systematic-debugging",
+        "debug",
+        "braintrust-tracing",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I want to hook architecture in this project",
+      "expected": "braintrust-tracing",
+      "matched": [
+        "braintrust-tracing",
+        "plan-agent",
+        "architect"
+      ]
+    },
+    {
+      "prompt": "I need to what could go wrong",
+      "expected": "premortem",
+      "matched": [
+        "premortem",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "Can you help me failure modes?",
+      "expected": "premortem",
+      "matched": [
+        "workflow-router",
+        "premortem"
+      ]
+    },
+    {
+      "prompt": "I want to what could go wrong in this project",
+      "expected": "premortem",
+      "matched": [
+        "premortem",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "/discovery",
+      "expected": "discovery-interview",
+      "matched": [
+        "discovery-interview",
+        "find-skills"
+      ]
+    },
+    {
+      "prompt": "Let's discovery interview for this project",
+      "expected": "discovery-interview",
+      "matched": [
+        "discovery-interview",
+        "find-skills"
+      ]
+    },
+    {
+      "prompt": "Can you help me figure out what I want?",
+      "expected": "discovery-interview",
+      "matched": [
+        "workflow-router",
+        "discovery-interview"
+      ]
+    },
+    {
+      "prompt": "Please help me think through",
+      "expected": "discovery-interview",
+      "matched": [
+        "workflow-router",
+        "discovery-interview"
+      ]
+    },
+    {
+      "prompt": "Can you help me clarify requirements?",
+      "expected": "discovery-interview",
+      "matched": [
+        "workflow-router",
+        "discovery-interview"
+      ]
+    },
+    {
+      "prompt": "I want to discovery process in this project",
+      "expected": "discovery-interview",
+      "matched": [
+        "discovery-interview",
+        "find-skills"
+      ]
+    },
+    {
+      "prompt": "I want to help think through in this project",
+      "expected": "discovery-interview",
+      "matched": [
+        "workflow-router",
+        "discovery-interview"
+      ]
+    },
+    {
+      "prompt": "Let's shadcn create for this project",
+      "expected": "shadcn-create",
+      "matched": [
+        "code-review",
+        "describe_pr",
+        "shadcn-create"
+      ]
+    },
+    {
+      "prompt": "Can you help me configure shadcn?",
+      "expected": "shadcn-create",
+      "matched": [
+        "workflow-router",
+        "shadcn-create"
+      ]
+    },
+    {
+      "prompt": "I want to explore shadcn in this project",
+      "expected": "shadcn-create",
+      "matched": [
+        "explore",
+        "shadcn-create"
+      ]
+    },
+    {
+      "prompt": "I want to design page in this project",
+      "expected": "ui-ux-pro-max",
+      "matched": [
+        "ui-ux-pro-max",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "/frontend-design",
+      "expected": "frontend-design",
+      "matched": [
+        "frontend-design",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I want to bold design now",
+      "expected": "frontend-design",
+      "matched": [
+        "frontend-design",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "Can you help me distinctive ui?",
+      "expected": "frontend-design",
+      "matched": [
+        "workflow-router",
+        "frontend-design"
+      ]
+    },
+    {
+      "prompt": "I want to bold design in this project",
+      "expected": "frontend-design",
+      "matched": [
+        "frontend-design",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I want to design landing page in this project",
+      "expected": "frontend-design",
+      "matched": [
+        "ui-ux-pro-max",
+        "frontend-design",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I need to bug for the current project",
+      "expected": "systematic-debugging",
+      "matched": [
+        "systematic-debugging",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I need to debug for the current project",
+      "expected": "systematic-debugging",
+      "matched": [
+        "Skip",
+        "systematic-debugging",
+        "workflow-router",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I need to broken for the current project",
+      "expected": "systematic-debugging",
+      "matched": [
+        "systematic-debugging",
+        "fix",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I want to fix bug in this project",
+      "expected": "systematic-debugging",
+      "matched": [
+        "systematic-debugging",
+        "fix",
+        "workflow-router",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I want to broken in this project",
+      "expected": "systematic-debugging",
+      "matched": [
+        "systematic-debugging",
+        "fix",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I want to why broken in this project",
+      "expected": "systematic-debugging",
+      "matched": [
+        "systematic-debugging",
+        "fix",
+        "debug-agent"
+      ]
+    },
+    {
+      "prompt": "I want to write query in this project",
+      "expected": "databases",
+      "matched": [
+        "databases",
+        "describe_pr"
+      ]
+    },
+    {
+      "prompt": "I want to pull request now",
+      "expected": "code-review",
+      "matched": [
+        "code-review",
+        "github-search"
+      ]
+    },
+    {
+      "prompt": "Let's review code for this project",
+      "expected": "code-review",
+      "matched": [
+        "code-review",
+        "review"
+      ]
+    },
+    {
+      "prompt": "I want to review pr in this project",
+      "expected": "code-review",
+      "matched": [
+        "code-review",
+        "review"
+      ]
+    },
+    {
+      "prompt": "Can you help me pretend to be?",
+      "expected": "personas",
+      "matched": [
+        "workflow-router",
+        "personas"
+      ]
+    },
+    {
+      "prompt": "I need to github mcp",
+      "expected": "mcp-guidance",
+      "matched": [
+        "github-search",
+        "mcp-guidance"
+      ]
+    },
+    {
+      "prompt": "I need to firecrawl for the current project",
+      "expected": "mcp-guidance",
+      "matched": [
+        "firecrawl-scrape",
+        "mcp-guidance"
+      ]
+    },
+    {
+      "prompt": "I want to context7 search in this project",
+      "expected": "mcp-guidance",
+      "matched": [
+        "github-search",
+        "mcp-guidance",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "Can you help me vault health?",
+      "expected": "arscontexta-health",
+      "matched": [
+        "workflow-router",
+        "arscontexta-health"
+      ]
+    },
+    {
+      "prompt": "Let's knowledge system health for this project",
+      "expected": "arscontexta-health",
+      "matched": [
+        "mot",
+        "arscontexta-health"
+      ]
+    },
+    {
+      "prompt": "I want to what needs fixing vault in this project",
+      "expected": "arscontexta-health",
+      "matched": [
+        "workflow-router",
+        "arscontexta-health"
+      ]
+    },
+    {
+      "prompt": "Can you help me setup knowledge system?",
+      "expected": "arscontexta-setup",
+      "matched": [
+        "workflow-router",
+        "arscontexta-setup"
+      ]
+    },
+    {
+      "prompt": "Let's create vault for this project",
+      "expected": "arscontexta-setup",
+      "matched": [
+        "code-review",
+        "describe_pr",
+        "arscontexta-setup"
+      ]
+    },
+    {
+      "prompt": "/arscontexta:architect",
+      "expected": "arscontexta-architect",
+      "matched": [
+        "arscontexta-architect",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "I want to vault architecture now",
+      "expected": "arscontexta-architect",
+      "matched": [
+        "arscontexta-architect",
+        "plan-agent",
+        "architect"
+      ]
+    },
+    {
+      "prompt": "Please research knowledge methodology",
+      "expected": "arscontexta-ask",
+      "matched": [
+        "arscontexta-ask",
+        "knowledge-guide"
+      ]
+    },
+    {
+      "prompt": "Please zettelkasten research",
+      "expected": "arscontexta-ask",
+      "matched": [
+        "ast-grep-find",
+        "arscontexta-ask"
+      ]
+    },
+    {
+      "prompt": "I want to research knowledge methodology in this project",
+      "expected": "arscontexta-ask",
+      "matched": [
+        "github-search",
+        "workflow-router",
+        "arscontexta-ask",
+        "scout",
+        "pathfinder",
+        "knowledge-guide"
+      ]
+    },
+    {
+      "prompt": "Help me with query the bundled research knowledge",
+      "expected": "arscontexta-ask",
+      "matched": [
+        "databases",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Help me with contextual guidance and command discovery",
+      "expected": "arscontexta-help",
+      "matched": [
+        "workflow-router",
+        "find-skills"
+      ]
+    },
+    {
+      "prompt": "I need to reseed vault",
+      "expected": "arscontexta-reseed",
+      "matched": [
+        "arscontexta-seed",
+        "arscontexta-reseed"
+      ]
+    },
+    {
+      "prompt": "I want to reseed vault in this project",
+      "expected": "arscontexta-reseed",
+      "matched": [
+        "arscontexta-seed",
+        "arscontexta-reseed"
+      ]
+    },
+    {
+      "prompt": "Help me with re-derive knowledge system from first",
+      "expected": "arscontexta-reseed",
+      "matched": [
+        "workflow-router",
+        "arscontexta-reseed"
+      ]
+    },
+    {
+      "prompt": "Let's learn arscontexta for this project",
+      "expected": "arscontexta-tutorial",
+      "matched": [
+        "onboard",
+        "arscontexta-tutorial",
+        "pathfinder"
+      ]
+    },
+    {
+      "prompt": "I want to learn arscontexta in this project",
+      "expected": "arscontexta-tutorial",
+      "matched": [
+        "onboard",
+        "arscontexta-tutorial",
+        "pathfinder"
+      ]
+    },
+    {
+      "prompt": "Help me with interactive walkthrough for new arscontexta",
+      "expected": "arscontexta-tutorial",
+      "matched": [
+        "workflow-router",
+        "arscontexta-tutorial"
+      ]
+    },
+    {
+      "prompt": "I want to recommend knowledge architecture in this project",
+      "expected": "arscontexta-recommend",
+      "matched": [
+        "arscontexta-recommend",
+        "plan-agent",
+        "architect"
+      ]
+    },
+    {
+      "prompt": "Help me with get research-backed architecture advice for",
+      "expected": "arscontexta-recommend",
+      "matched": [
+        "workflow-router",
+        "plan-agent",
+        "architect"
+      ]
+    },
+    {
+      "prompt": "Can you help me update vault plugin?",
+      "expected": "arscontexta-upgrade",
+      "matched": [
+        "workflow-router",
+        "arscontexta-upgrade"
+      ]
+    },
+    {
+      "prompt": "I want to add new domain vault in this project",
+      "expected": "arscontexta-add-domain",
+      "matched": [
+        "onboard",
+        "arscontexta-add-domain",
+        "plan-agent"
+      ]
+    },
+    {
+      "prompt": "Can you help me document this deployment?",
+      "expected": "arscontexta-document",
+      "matched": [
+        "workflow-router",
+        "arscontexta-document"
+      ]
+    },
+    {
+      "prompt": "Let's find connections for this project",
+      "expected": "arscontexta-connect",
+      "matched": [
+        "github-search",
+        "arscontexta-connect"
+      ]
+    },
+    {
+      "prompt": "I want to find connections in this project",
+      "expected": "arscontexta-connect",
+      "matched": [
+        "github-search",
+        "arscontexta-connect",
+        "scout"
+      ]
+    },
+    {
+      "prompt": "Please check record quality",
+      "expected": "arscontexta-verify",
+      "matched": [
+        "qlty-check",
+        "arscontexta-verify"
+      ]
+    },
+    {
+      "prompt": "Can you help me refresh record?",
+      "expected": "arscontexta-update",
+      "matched": [
+        "workflow-router",
+        "arscontexta-update"
+      ]
+    },
+    {
+      "prompt": "Can you help me validate schema?",
+      "expected": "arscontexta-validate",
+      "matched": [
+        "databases",
+        "workflow-router",
+        "arscontexta-validate"
+      ]
+    },
+    {
+      "prompt": "I need to check schema compliance",
+      "expected": "arscontexta-validate",
+      "matched": [
+        "databases",
+        "arscontexta-validate"
+      ]
+    },
+    {
+      "prompt": "I want to validate schema in this project",
+      "expected": "arscontexta-validate",
+      "matched": [
+        "databases",
+        "arscontexta-validate"
+      ]
+    },
+    {
+      "prompt": "Help me with schema compliance validation for vault",
+      "expected": "arscontexta-validate",
+      "matched": [
+        "databases",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Can you help me research this topic?",
+      "expected": "arscontexta-learn",
+      "matched": [
+        "perplexity-search",
+        "workflow-router",
+        "arscontexta-learn"
+      ]
+    },
+    {
+      "prompt": "Let's learn about for this project",
+      "expected": "arscontexta-learn",
+      "matched": [
+        "onboard",
+        "arscontexta-learn",
+        "pathfinder"
+      ]
+    },
+    {
+      "prompt": "I want to learn about in this project",
+      "expected": "arscontexta-learn",
+      "matched": [
+        "onboard",
+        "arscontexta-learn",
+        "pathfinder"
+      ]
+    },
+    {
+      "prompt": "Help me with deep research with provenance tracking",
+      "expected": "arscontexta-learn",
+      "matched": [
+        "github-search",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "Can you help me record counts?",
+      "expected": "arscontexta-stats",
+      "matched": [
+        "workflow-router",
+        "arscontexta-stats"
+      ]
+    },
+    {
+      "prompt": "Help me with run the full processing pipeline:",
+      "expected": "arscontexta-pipeline",
+      "matched": [
+        "workflow-router",
+        "arscontexta-pipeline"
+      ]
+    },
+    {
+      "prompt": "/remember",
+      "expected": "arscontexta-remember",
+      "matched": [
+        "memory",
+        "arscontexta-remember"
+      ]
+    },
+    {
+      "prompt": "Help me with store a learning or insight",
+      "expected": "arscontexta-remember",
+      "matched": [
+        "memory",
+        "workflow-router"
+      ]
+    },
+    {
+      "prompt": "/refactor vault",
+      "expected": "arscontexta-refactor",
+      "matched": [
+        "Skip",
+        "refactor",
+        "arscontexta-refactor",
+        "ast-grep-find",
+        "phoenix"
+      ]
+    },
+    {
+      "prompt": "Let's reorganize records for this project",
+      "expected": "arscontexta-refactor",
+      "matched": [
+        "arscontexta-refactor",
+        "phoenix"
+      ]
+    },
+    {
+      "prompt": "Please restructure vault",
+      "expected": "arscontexta-refactor",
+      "matched": [
+        "arscontexta-refactor",
+        "phoenix"
+      ]
+    },
+    {
+      "prompt": "I want to refactor vault in this project",
+      "expected": "arscontexta-refactor",
+      "matched": [
+        "Skip",
+        "refactor",
+        "arscontexta-refactor",
+        "ast-grep-find",
+        "phoenix"
+      ]
+    },
+    {
+      "prompt": "Help me with refactor vault structure - merge,",
+      "expected": "arscontexta-refactor",
+      "matched": [
+        "Skip",
+        "code-review",
+        "workflow-router",
+        "arscontexta-refactor",
+        "knowledge-guide",
+        "ast-grep-find",
+        "phoenix"
+      ]
+    },
+    {
+      "prompt": "/ralph vault",
+      "expected": "arscontexta-ralph",
+      "matched": [
+        "ralph",
+        "arscontexta-ralph"
+      ]
+    },
+    {
+      "prompt": "Help me with ralph-mode autonomous vault processing (requires",
+      "expected": "arscontexta-ralph",
+      "matched": [
+        "ralph",
+        "workflow-router",
+        "arscontexta-ralph"
+      ]
+    },
+    {
+      "prompt": "Can you help me deploy to vercel?",
+      "expected": "vercel-cli",
+      "matched": [
+        "workflow-router",
+        "vercel-cli"
+      ]
+    },
+    {
+      "prompt": "Can you help me vercel deployment?",
+      "expected": "vercel-cli",
+      "matched": [
+        "workflow-router",
+        "vercel-cli"
+      ]
+    },
+    {
+      "prompt": "Please supabase setup",
+      "expected": "vercel-cli",
+      "matched": [
+        "vercel-cli",
+        "math/real-analysis"
+      ]
+    },
+    {
+      "prompt": "I want to supabase setup in this project",
+      "expected": "vercel-cli",
+      "matched": [
+        "vercel-cli",
+        "math/real-analysis"
+      ]
+    },
+    {
+      "prompt": "Can you help me qbr presentation?",
+      "expected": "fourth-presentation-suite",
+      "matched": [
+        "workflow-router",
+        "fourth-presentation-suite"
+      ]
+    },
+    {
+      "prompt": "I want to create ebr in this project",
+      "expected": "fourth-presentation-suite",
+      "matched": [
+        "code-review",
+        "describe_pr",
+        "fourth-presentation-suite"
+      ]
+    },
+    {
+      "prompt": "I want to executive review in this project",
+      "expected": "fourth-presentation-suite",
+      "matched": [
+        "code-review",
+        "review",
+        "fourth-presentation-suite"
+      ]
+    },
+    {
+      "prompt": "I need to find-skills for the current project",
+      "expected": "find-skills",
+      "matched": [
+        "github-search",
+        "find-skills"
+      ]
+    },
+    {
+      "prompt": "I want to find skills in this project",
+      "expected": "find-skills",
+      "matched": [
+        "github-search",
+        "find-skills",
+        "scout"
+      ]
+    }
+  ]
+}

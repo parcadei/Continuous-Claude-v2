@@ -1,7 +1,8 @@
 ---
 name: reference-sdk
 description: Check reference SDK implementations using btca ask
-user-invocable: false
+metadata:
+  user-invocable: false
 ---
 
 # Reference SDK Check

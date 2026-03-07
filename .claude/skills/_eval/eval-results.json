@@ -1,0 +1,1113 @@
+{
+  "timestamp": "2026-03-07T22:47:19.365Z",
+  "summary": {
+    "totalSkills": 97,
+    "totalCases": 1179,
+    "totalPass": 1168,
+    "totalFail": 11,
+    "overallAccuracy": 99.1,
+    "tiers": {
+      "verified": 94,
+      "vetted": 3,
+      "needs-optimization": 0
+    }
+  },
+  "results": {
+    "ralph": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "idearalph": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "plan-mode": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "mot": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "debug-hooks": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "hook-developer": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "implement_plan": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "critical",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "commit": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "describe_pr": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "fix": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "build": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "explore": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "debug": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "create_handoff": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "critical",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "resume_handoff": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "critical",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "continuity_ledger": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "critical",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "skill-developer": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "vet-skill": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "github-search": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "firecrawl-scrape": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 12,
+      "fail": 0,
+      "total": 12,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "nia-docs": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "ast-grep-find": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "repoprompt": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 12,
+      "fail": 0,
+      "total": 12,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "memory": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "morph-search": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "morph-apply": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "perplexity-search": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "qlty-check": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "braintrust-analyze": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "onboard": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "tdd": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "workflow-router": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "environment-triage": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "reference-sdk": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "search-router": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "tldr-code": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "critical",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/abstract-algebra": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/category-theory": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/complex-analysis": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/functional-analysis": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/graph-number-theory": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/information-theory": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/linear-algebra": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/mathematical-logic": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/measure-theory": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/numerical-methods": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/odes-pdes": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/optimization": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/real-analysis": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "math/topology": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "migrate": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "refactor": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "release": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "review": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "security": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "test": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "braintrust-tracing": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "cli-reference": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "premortem": {
+      "accuracy": 92.3,
+      "tier": "verified",
+      "pass": 12,
+      "fail": 1,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": [
+        {
+          "prompt": "I want to pre- mortem analysis in this project",
+          "expectedSkill": "premortem",
+          "shouldTrigger": true,
+          "pass": false,
+          "matchedSkills": [],
+          "matchedWorkflow": null
+        }
+      ]
+    },
+    "discovery-interview": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "shadcn-create": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "ui-ux-pro-max": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "frontend-design": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "systematic-debugging": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "critical",
+      "enforcement": "block",
+      "failures": []
+    },
+    "databases": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "critical",
+      "enforcement": "block",
+      "failures": []
+    },
+    "code-review": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "critical",
+      "enforcement": "block",
+      "failures": []
+    },
+    "personas": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "mcp-guidance": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-health": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-setup": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 10,
+      "fail": 0,
+      "total": 10,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-architect": {
+      "accuracy": 90,
+      "tier": "verified",
+      "pass": 9,
+      "fail": 1,
+      "total": 10,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": [
+        {
+          "prompt": "Help me with research-backed evolution advice for your",
+          "expectedSkill": "arscontexta-architect",
+          "shouldTrigger": true,
+          "pass": false,
+          "matchedSkills": [
+            "workflow-router"
+          ],
+          "matchedWorkflow": null
+        }
+      ]
+    },
+    "arscontexta-ask": {
+      "accuracy": 90,
+      "tier": "verified",
+      "pass": 9,
+      "fail": 1,
+      "total": 10,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": [
+        {
+          "prompt": "Help me with query the bundled research knowledge",
+          "expectedSkill": "arscontexta-ask",
+          "shouldTrigger": true,
+          "pass": false,
+          "matchedSkills": [
+            "databases",
+            "workflow-router"
+          ],
+          "matchedWorkflow": null
+        }
+      ]
+    },
+    "arscontexta-help": {
+      "accuracy": 90,
+      "tier": "verified",
+      "pass": 9,
+      "fail": 1,
+      "total": 10,
+      "priority": "low",
+      "enforcement": "suggest",
+      "failures": [
+        {
+          "prompt": "Help me with contextual guidance and command discovery",
+          "expectedSkill": "arscontexta-help",
+          "shouldTrigger": true,
+          "pass": false,
+          "matchedSkills": [
+            "workflow-router",
+            "find-skills"
+          ],
+          "matchedWorkflow": null
+        }
+      ]
+    },
+    "arscontexta-reseed": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 10,
+      "fail": 0,
+      "total": 10,
+      "priority": "low",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-tutorial": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 10,
+      "fail": 0,
+      "total": 10,
+      "priority": "low",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-recommend": {
+      "accuracy": 87.5,
+      "tier": "vetted",
+      "pass": 7,
+      "fail": 1,
+      "total": 8,
+      "priority": "low",
+      "enforcement": "suggest",
+      "failures": [
+        {
+          "prompt": "Help me with get research-backed architecture advice for",
+          "expectedSkill": "arscontexta-recommend",
+          "shouldTrigger": true,
+          "pass": false,
+          "matchedSkills": [
+            "workflow-router",
+            "plan-agent",
+            "architect"
+          ],
+          "matchedWorkflow": null
+        }
+      ]
+    },
+    "arscontexta-upgrade": {
+      "accuracy": 90,
+      "tier": "verified",
+      "pass": 9,
+      "fail": 1,
+      "total": 10,
+      "priority": "low",
+      "enforcement": "suggest",
+      "failures": [
+        {
+          "prompt": "Help me with apply plugin knowledge base updates",
+          "expectedSkill": "arscontexta-upgrade",
+          "shouldTrigger": true,
+          "pass": false,
+          "matchedSkills": [
+            "workflow-router"
+          ],
+          "matchedWorkflow": null
+        }
+      ]
+    },
+    "arscontexta-add-domain": {
+      "accuracy": 90,
+      "tier": "verified",
+      "pass": 9,
+      "fail": 1,
+      "total": 10,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": [
+        {
+          "prompt": "Help me with add a new knowledge domain",
+          "expectedSkill": "arscontexta-add-domain",
+          "shouldTrigger": true,
+          "pass": false,
+          "matchedSkills": [
+            "workflow-router"
+          ],
+          "matchedWorkflow": null
+        }
+      ]
+    },
+    "arscontexta-document": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 12,
+      "fail": 0,
+      "total": 12,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-connect": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 12,
+      "fail": 0,
+      "total": 12,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-verify": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 10,
+      "fail": 0,
+      "total": 10,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-update": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 10,
+      "fail": 0,
+      "total": 10,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-next": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 11,
+      "fail": 0,
+      "total": 11,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-seed": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 10,
+      "fail": 0,
+      "total": 10,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-retrospect": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 10,
+      "fail": 0,
+      "total": 10,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-validate": {
+      "accuracy": 90,
+      "tier": "verified",
+      "pass": 9,
+      "fail": 1,
+      "total": 10,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": [
+        {
+          "prompt": "Help me with schema compliance validation for vault",
+          "expectedSkill": "arscontexta-validate",
+          "shouldTrigger": true,
+          "pass": false,
+          "matchedSkills": [
+            "databases",
+            "workflow-router"
+          ],
+          "matchedWorkflow": null
+        }
+      ]
+    },
+    "arscontexta-learn": {
+      "accuracy": 90,
+      "tier": "verified",
+      "pass": 9,
+      "fail": 1,
+      "total": 10,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": [
+        {
+          "prompt": "Help me with deep research with provenance tracking",
+          "expectedSkill": "arscontexta-learn",
+          "shouldTrigger": true,
+          "pass": false,
+          "matchedSkills": [
+            "github-search",
+            "workflow-router"
+          ],
+          "matchedWorkflow": null
+        }
+      ]
+    },
+    "arscontexta-stats": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 10,
+      "fail": 0,
+      "total": 10,
+      "priority": "low",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-graph": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 10,
+      "fail": 0,
+      "total": 10,
+      "priority": "low",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-pipeline": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 10,
+      "fail": 0,
+      "total": 10,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-remember": {
+      "accuracy": 85.7,
+      "tier": "vetted",
+      "pass": 6,
+      "fail": 1,
+      "total": 7,
+      "priority": "low",
+      "enforcement": "suggest",
+      "failures": [
+        {
+          "prompt": "Help me with store a learning or insight",
+          "expectedSkill": "arscontexta-remember",
+          "shouldTrigger": true,
+          "pass": false,
+          "matchedSkills": [
+            "memory",
+            "workflow-router"
+          ],
+          "matchedWorkflow": null
+        }
+      ]
+    },
+    "arscontexta-refactor": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 10,
+      "fail": 0,
+      "total": 10,
+      "priority": "low",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-ralph": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 8,
+      "fail": 0,
+      "total": 8,
+      "priority": "low",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "arscontexta-tasks": {
+      "accuracy": 87.5,
+      "tier": "vetted",
+      "pass": 7,
+      "fail": 1,
+      "total": 8,
+      "priority": "low",
+      "enforcement": "suggest",
+      "failures": [
+        {
+          "prompt": "Help me with view and manage vault maintenance",
+          "expectedSkill": "arscontexta-tasks",
+          "shouldTrigger": true,
+          "pass": false,
+          "matchedSkills": [
+            "workflow-router"
+          ],
+          "matchedWorkflow": null
+        }
+      ]
+    },
+    "vercel-cli": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "fourth-presentation-suite": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 13,
+      "fail": 0,
+      "total": 13,
+      "priority": "medium",
+      "enforcement": "suggest",
+      "failures": []
+    },
+    "find-skills": {
+      "accuracy": 100,
+      "tier": "verified",
+      "pass": 12,
+      "fail": 0,
+      "total": 12,
+      "priority": "high",
+      "enforcement": "suggest",
+      "failures": []
+    }
+  }
+}

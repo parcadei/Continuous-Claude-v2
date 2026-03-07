@@ -1,4 +1,5 @@
 ---
+name: plan-agent
 description: Planning agent that creates implementation plans and handoffs from conversation context
 ---
 

@@ -2,7 +2,8 @@
 name: agentica-claude-proxy
 description: Guide for integrating Agentica SDK with Claude Code CLI proxy
 allowed-tools: [Read, Bash]
-user-invocable: false
+metadata:
+  user-invocable: false
 ---
 
 # Agentica-Claude Code Proxy Integration

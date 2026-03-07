@@ -1,8 +1,9 @@
 ---
 name: react-perf
 description: React/Next.js performance optimization - 45 rules from Vercel engineering
-user-invocable: true
 allowed-tools: [Read, Grep, Glob, Bash, Task]
+metadata:
+  user-invocable: true
 ---
 
 # React Performance Audit

@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI for Marketing: Skills, MCP & Claude Code — Fourth Marketing Team</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           Midnight Executive: Dark, premium, corporate
+           =========================================== */
+        :root {
+            /* Colors */
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: rgba(30, 41, 59, 0.6);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #f59e0b;
+            --accent-glow: rgba(245, 158, 11, 0.15);
+            --fourth-blue: #0C4A7D;
+            --fourth-teal: #00B69F;
+            --teal-glow: rgba(0, 182, 159, 0.15);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.15);
+            --success: #22c55e;
+            --success-glow: rgba(34, 197, 94, 0.15);
+            --border: rgba(148, 163, 184, 0.1);
+
+            /* Typography */
+            --font-display: 'Libre Baskerville', serif;
+            --font-body: 'Source Sans 3', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            /* Spacing */
+            --slide-padding: clamp(2rem, 5vw, 6rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.7s;
+        }
+
+        /* ===========================================
+           BASE STYLES
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 18px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--fourth-teal), var(--accent));
+            width: 0%;
+            z-index: 100;
+            transition: width 0.2s ease-out;
+        }
+
+        /* ===========================================
+           NAVIGATION DOTS
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out-expo);
+            opacity: 0.3;
+        }
+
+        .nav-dot:hover { opacity: 0.7; transform: scale(1.3); }
+        .nav-dot.active {
+            background: var(--fourth-teal);
+            opacity: 1;
+            box-shadow: 0 0 12px var(--teal-glow);
+        }
+
+        /* ===========================================
+           SLIDE CONTAINER
+           =========================================== */
+        .slide {
+            min-height: 100vh;
+            padding: var(--slide-padding);
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .reveal:nth-child(4) { transition-delay: 0.4s; }
+        .reveal:nth-child(5) { transition-delay: 0.5s; }
+        .reveal:nth-child(6) { transition-delay: 0.6s; }
+        .reveal:nth-child(7) { transition-delay: 0.7s; }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        .label {
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--fourth-teal);
+            margin-bottom: 1rem;
+        }
+
+        .label-amber { color: var(--accent); }
+        .label-danger { color: var(--danger); }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+
+        h3 {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            max-width: 700px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        /* ===========================================
+           DECORATIVE
+           =========================================== */
+        .accent-line {
+            width: 80px;
+            height: 2px;
+            background: var(--fourth-teal);
+            margin: 2rem 0;
+        }
+
+        .glow-bg {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .glow-teal { background: var(--teal-glow); }
+        .glow-amber { background: var(--accent-glow); }
+        .glow-red { background: var(--danger-glow); }
+
+        /* ===========================================
+           CARDS & GRIDS
+           =========================================== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .card-grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .two-col, .card-grid-2 { grid-template-columns: 1fr; }
+        }
+
+        /* ===========================================
+           TABLES
+           =========================================== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9375rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--fourth-teal);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td { color: var(--text-secondary); }
+
+        tr:last-child td { border-bottom: none; }
+
+        /* ===========================================
+           LISTS
+           =========================================== */
+        ul {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-secondary);
+        }
+
+        ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.55rem;
+            width: 6px;
+            height: 6px;
+            background: var(--fourth-teal);
+            border-radius: 50%;
+        }
+
+        /* ===========================================
+           CODE BLOCKS
+           =========================================== */
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: var(--fourth-teal);
+        }
+
+        pre {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        /* ===========================================
+           SPECIAL COMPONENTS
+           =========================================== */
+        .stat {
+            font-family: var(--font-display);
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--fourth-teal);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-danger { color: var(--danger); }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            background: var(--teal-glow);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .icon-box-amber { background: var(--accent-glow); }
+        .icon-box-red { background: var(--danger-glow); }
+
+        .highlight-box {
+            background: linear-gradient(135deg, var(--teal-glow) 0%, transparent 50%);
+            border: 1px solid rgba(0, 182, 159, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .highlight-box-amber {
+            background: linear-gradient(135deg, var(--accent-glow) 0%, transparent 50%);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .quote {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 1.125rem;
+            color: var(--text-primary);
+            border-left: 3px solid var(--fourth-teal);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Diagram */
+        .diagram {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        .diagram-box {
+            display: inline-block;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin: 0.25rem;
+        }
+
+        .diagram-arrow {
+            color: var(--fourth-teal);
+            font-size: 1.25rem;
+        }
+
+        /* ===========================================
+           AGENDA SLIDE
+           =========================================== */
+        .agenda-item {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .agenda-item:last-child { border-bottom: none; }
+
+        .agenda-num {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--fourth-teal);
+            width: 2rem;
+        }
+
+        .agenda-content h3 {
+            margin-bottom: 0.25rem;
+            font-size: 1.125rem;
+        }
+
+        .agenda-content p {
+            margin: 0;
+            font-size: 0.9375rem;
+        }
+
+        .agenda-time {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* ===========================================
+           TITLE SLIDE
+           =========================================== */
+        .title-slide { text-align: center; }
+
+        .title-slide .glow-bg {
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .meta {
+            margin-top: 2rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* ===========================================
+           KEYBOARD HINT
+           =========================================== */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease 2s forwards;
+        }
+
+        .keyboard-hint kbd {
+            background: var(--bg-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* ===========================================
+           RESPONSIVE
+           =========================================== */
+        @media (max-width: 768px) {
+            .nav-dots, .keyboard-hint { display: none; }
+            .slide { padding: 2rem 1.5rem; }
+            .card-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal { transition: opacity 0.3s ease; transform: none; }
+            html { scroll-behavior: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar"></div>
+    <nav class="nav-dots" aria-label="Slide navigation"></nav>
+
+    <!-- =========================================
+         SLIDE 1: TITLE
+         ========================================= -->
+    <section class="slide title-slide" data-slide="0">
+        <div class="glow-bg glow-teal"></div>
+        <div class="slide-content">
+            <p class="label reveal">Fourth Marketing Team</p>
+            <h1 class="reveal">AI for Marketing:<br>Skills, MCP & Claude Code</h1>
+            <p class="subtitle reveal">How intelligent workflows transform campaign execution and research</p>
+            <div class="accent-line reveal" style="margin: 2rem auto;"></div>
+            <p class="meta reveal">Dave Hayes • January 29, 2026 • 45-60 minutes</p>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 2: AGENDA
+         ========================================= -->
+    <section class="slide" data-slide="1">
+        <div class="glow-bg glow-teal" style="top: 10%; right: -20%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Overview</p>
+            <h2 class="reveal">Today's Agenda</h2>
+
+            <div class="reveal" style="margin-top: 2rem;">
+                <div class="agenda-item">
+                    <div class="agenda-num">1</div>
+                    <div class="agenda-content">
+                        <h3>AI Strategy Context</h3>
+                        <p>Why vendor diversification matters now</p>
+                    </div>
+                    <div class="agenda-time">5 min</div>
+                </div>
+                <div class="agenda-item">
+                    <div class="agenda-num">2</div>
+                    <div class="agenda-content">
+                        <h3>Skills + MCP: The Foundation</h3>
+                        <p>How expertise and execution work together</p>
+                    </div>
+                    <div class="agenda-time">10 min</div>
+                </div>
+                <div class="agenda-item">
+                    <div class="agenda-num">3</div>
+                    <div class="agenda-content">
+                        <h3>Live Demo: Asana Marketing Workflows</h3>
+                        <p>Campaign creation with brand compliance</p>
+                    </div>
+                    <div class="agenda-time">20 min</div>
+                </div>
+                <div class="agenda-item">
+                    <div class="agenda-num">4</div>
+                    <div class="agenda-content">
+                        <h3>Claude Code: The Power User Path</h3>
+                        <p>Advanced capabilities for marketing research</p>
+                    </div>
+                    <div class="agenda-time">15 min</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 3: AI STRATEGY CONTEXT
+         ========================================= -->
+    <section class="slide" data-slide="2">
+        <div class="glow-bg glow-red" style="bottom: -20%; left: -10%;"></div>
+        <div class="slide-content">
+            <p class="label label-danger reveal">Strategic Context</p>
+            <h2 class="reveal">Why Vendor Diversification<br>Matters Now</h2>
+            <p class="reveal">OpenAI faces mounting challenges that create uncertainty for enterprise deployments.</p>
+
+            <div class="card-grid reveal" style="margin-top: 1.5rem;">
+                <div class="card">
+                    <div class="stat stat-danger">~$8B</div>
+                    <div class="stat-label">2025 Projected Loss</div>
+                    <p style="margin-top: 0.75rem; font-size: 0.875rem;">Analysts warn of insolvency risk by mid-2027 without major changes.</p>
+                </div>
+                <div class="card">
+                    <div class="stat stat-danger">3+</div>
+                    <div class="stat-label">Major Lawsuits</div>
+                    <p style="margin-top: 0.75rem; font-size: 0.875rem;">Musk fraud case, NYT copyright, antitrust probes all advancing.</p>
+                </div>
+                <div class="card">
+                    <div class="stat" style="color: var(--success);">✓</div>
+                    <div class="stat-label">Alternative Ready</div>
+                    <p style="margin-top: 0.75rem; font-size: 0.875rem;">Anthropic's Claude offers cleaner slate, steadier feature pacing.</p>
+                </div>
+            </div>
+
+            <div class="highlight-box-amber reveal" style="margin-top: 1.5rem;">
+                <p style="margin: 0; color: var(--text-primary); font-size: 1rem;"><strong>Recommendation:</strong> Diversify AI vendor bets. Avoid single-vendor lock-in. Today's session shows what's possible with Claude.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 4: SKILLS + MCP INTRO
+         ========================================= -->
+    <section class="slide" data-slide="3">
+        <div class="glow-bg glow-teal" style="top: 20%; right: -15%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Part 1</p>
+            <h2 class="reveal">Skills + MCP:<br>The Foundation</h2>
+
+            <div class="quote reveal">
+                "Skills provide expertise. MCP provides execution.<br>Together, they create intelligent workflows."
+            </div>
+
+            <div class="two-col" style="margin-top: 2rem;">
+                <div class="card reveal">
+                    <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                        <div class="icon-box">🤲</div>
+                        <div>
+                            <h3 style="color: var(--fourth-teal);">MCP</h3>
+                            <p style="margin: 0; font-size: 0.9375rem;">Model Context Protocol — connects Claude to external tools (Asana, Slack, Drive)</p>
+                            <p style="margin: 0.5rem 0 0; color: var(--text-muted); font-size: 0.875rem;"><strong>The hands</strong> — ability to DO things</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card reveal">
+                    <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                        <div class="icon-box icon-box-amber">🧠</div>
+                        <div>
+                            <h3 style="color: var(--accent);">Skills</h3>
+                            <p style="margin: 0; font-size: 0.9375rem;">Markdown files that teach Claude HOW to do things correctly</p>
+                            <p style="margin: 0.5rem 0 0; color: var(--text-muted); font-size: 0.875rem;"><strong>The expertise</strong> — knowing WHAT to do</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quote reveal" style="margin-top: 2rem; font-size: 1rem;">
+                "MCP is like access to a hardware store's aisles. Skills are the helpful employee who walks you through the repair process."
+                <span style="display: block; font-size: 0.875rem; margin-top: 0.5rem; font-style: normal; color: var(--text-muted);">— Anthropic official guidance</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 5: WHAT ARE SKILLS
+         ========================================= -->
+    <section class="slide" data-slide="4">
+        <div class="glow-bg glow-amber" style="bottom: 10%; left: -15%;"></div>
+        <div class="slide-content">
+            <p class="label label-amber reveal">Skills Deep Dive</p>
+            <h2 class="reveal">What Makes a Good Skill?</h2>
+            <p class="reveal">Skills are markdown files Claude reads BEFORE doing work — like having specialists review everything in real-time.</p>
+
+            <div class="two-col" style="margin-top: 1.5rem;">
+                <div>
+                    <table class="reveal">
+                        <thead>
+                            <tr><th>Element</th><th>Purpose</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Trigger Conditions</td><td>When to activate</td></tr>
+                            <tr><td>Domain Knowledge</td><td>Expertise to apply</td></tr>
+                            <tr><td>Templates</td><td>Consistent outputs</td></tr>
+                            <tr><td>Quality Gates</td><td>Validation checkpoints</td></tr>
+                            <tr><td>Integration Points</td><td>Connections to other skills</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="reveal">
+                    <pre style="font-size: 0.75rem;">my-skill/
+├── SKILL.md          ← Instructions
+└── reference.md      ← Data, templates
+
+---
+name: fourth-brand-guidelines
+description: Validate messaging,
+             check iQ capitalization...
+---
+
+# When to Activate
+- Creating customer content
+- Reviewing marketing copy
+
+# Quality Gates
+- [ ] iQ capitalization correct
+- [ ] Proof points verified</pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 6: THE ORCHESTRATION PATTERN
+         ========================================= -->
+    <section class="slide" data-slide="5">
+        <div class="glow-bg glow-teal" style="top: 30%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content">
+            <p class="label reveal">How It Works</p>
+            <h2 class="reveal">The Orchestration Pattern</h2>
+
+            <div class="diagram reveal" style="margin-top: 2rem; text-align: left; padding: 2rem;">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div class="diagram-box" style="background: var(--bg-secondary);">
+                        <strong>USER REQUEST</strong><br>
+                        <span style="color: var(--text-muted);">"Create Q2 campaign for iQ launch"</span>
+                    </div>
+                </div>
+                <div style="text-align: center; color: var(--fourth-teal); font-size: 1.5rem;">↓</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                    <div class="diagram-box" style="border-color: var(--accent);">
+                        <span style="color: var(--accent);">SKILL:</span> Campaign Planner<br>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">Structure • Personas • Timeline</span>
+                    </div>
+                    <div class="diagram-box" style="border-color: var(--accent);">
+                        <span style="color: var(--accent);">SKILL:</span> Brand Guidelines<br>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">Validate iQ • Check tone • Proof points</span>
+                    </div>
+                </div>
+                <div style="text-align: center; color: var(--fourth-teal); font-size: 1.5rem;">↓</div>
+                <div style="text-align: center; margin: 1rem 0;">
+                    <div class="diagram-box" style="border-color: var(--fourth-teal);">
+                        <span style="color: var(--fourth-teal);">MCP:</span> Asana<br>
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">Create tasks • Set dependencies • Assign dates</span>
+                    </div>
+                </div>
+                <div style="text-align: center; color: var(--fourth-teal); font-size: 1.5rem;">↓</div>
+                <div style="text-align: center;">
+                    <div class="diagram-box" style="background: var(--teal-glow); border-color: var(--fourth-teal);">
+                        <strong style="color: var(--fourth-teal);">ASANA WORKSPACE</strong><br>
+                        <span style="color: var(--text-muted);">Tasks created, ready for team</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 7: WHEN TO USE EACH
+         ========================================= -->
+    <section class="slide" data-slide="6">
+        <div class="glow-bg glow-amber" style="top: 10%; right: -20%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Decision Guide</p>
+            <h2 class="reveal">When to Use Each</h2>
+
+            <table class="reveal" style="margin-top: 2rem;">
+                <thead>
+                    <tr><th>Scenario</th><th>Solution</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Need to access external data (files, APIs)</td><td><strong style="color: var(--fourth-teal);">MCP</strong></td></tr>
+                    <tr><td>Need consistent process/methodology</td><td><strong style="color: var(--accent);">Skill</strong></td></tr>
+                    <tr><td>Need to execute actions in external tools</td><td><strong style="color: var(--fourth-teal);">MCP</strong></td></tr>
+                    <tr><td>Need brand compliance or quality gates</td><td><strong style="color: var(--accent);">Skill</strong></td></tr>
+                    <tr><td>Need both access AND expertise</td><td><strong style="color: var(--success);">Both</strong> <span style="color: var(--text-muted);">(skill orchestrates MCP)</span></td></tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box reveal" style="margin-top: 2rem;">
+                <h3 style="color: var(--fourth-teal); margin-bottom: 0.5rem;">Key Insight</h3>
+                <p style="margin: 0; color: var(--text-primary);">
+                    <strong>Without Skills:</strong> Claude can create tasks, but inconsistently<br>
+                    <strong>Without MCP:</strong> Claude knows the process, but can't execute<br>
+                    <strong>Together:</strong> Claude follows your exact process AND executes it
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 8: LIVE DEMO INTRO
+         ========================================= -->
+    <section class="slide" data-slide="7">
+        <div class="glow-bg glow-teal" style="bottom: -10%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content" style="text-align: center;">
+            <p class="label reveal">Part 2</p>
+            <h2 class="reveal">Live Demo:<br>Asana Marketing Workflows</h2>
+            <p class="subtitle reveal" style="margin: 0 auto;">Watch Claude create a campaign with brand compliance in real-time</p>
+
+            <div class="two-col reveal" style="margin-top: 3rem; text-align: left;">
+                <div class="card">
+                    <h3 style="color: var(--accent);">Skills Loaded</h3>
+                    <ul style="margin-top: 0.75rem;">
+                        <li><code>fourth-marketing-campaigns</code></li>
+                        <li><code>fourth-content-calendar</code></li>
+                        <li><code>asana-marketing-orchestrator</code></li>
+                        <li><code>fourth-brand-guidelines</code> <span style="color: var(--text-muted); font-size: 0.8rem;">(673 lines)</span></li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 style="color: var(--fourth-teal);">Asana Projects</h3>
+                    <ul style="margin-top: 0.75rem;">
+                        <li>Q1 2026 Marketing Campaigns</li>
+                        <li>Content Calendar - Q1 2026</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 9: DEMO FLOW
+         ========================================= -->
+    <section class="slide" data-slide="8">
+        <div class="glow-bg glow-amber" style="top: 20%; right: -15%;"></div>
+        <div class="slide-content">
+            <p class="label label-amber reveal">Demo Flow</p>
+            <h2 class="reveal">What You'll See</h2>
+
+            <div class="card-grid card-grid-2" style="margin-top: 1.5rem;">
+                <div class="card reveal">
+                    <h3>Campaign Creation</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem;">Prompt: "Create a marketing campaign for Summer Restaurant Recovery targeting restaurant GMs struggling with staffing..."</p>
+                    <ul style="font-size: 0.875rem;">
+                        <li>Claude consults campaign planning skill</li>
+                        <li>Checks brand guidelines for messaging</li>
+                        <li>Incorporates verified proof points</li>
+                        <li>Creates tasks via Asana MCP</li>
+                    </ul>
+                </div>
+                <div class="card reveal">
+                    <h3>Content Calendar</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem;">Prompt: "Add three content pieces supporting the campaign — blog, webinar, case study..."</p>
+                    <ul style="font-size: 0.875rem;">
+                        <li>Pulls content brief templates</li>
+                        <li>Auto-tags to campaign theme</li>
+                        <li>Brand voice validation in background</li>
+                    </ul>
+                </div>
+                <div class="card reveal">
+                    <h3>Error Catching</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem;">Prompt: "Create a task called 'Get Fourth IQ trending'"</p>
+                    <ul style="font-size: 0.875rem;">
+                        <li>Should catch "IQ" → "iQ" error</li>
+                        <li>Demonstrates guardrails in action</li>
+                    </ul>
+                </div>
+                <div class="card reveal">
+                    <h3>Human in the Loop</h3>
+                    <p style="font-size: 0.9rem; margin-bottom: 1rem;">Key message:</p>
+                    <p style="font-size: 0.875rem; font-style: italic; color: var(--text-primary);">"We're improving quality and consistency, not removing judgment. AI makes fewer errors, but never zero."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 10: CLAUDE CODE INTRO
+         ========================================= -->
+    <section class="slide" data-slide="9">
+        <div class="glow-bg glow-teal" style="bottom: -10%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content" style="text-align: center;">
+            <p class="label reveal">Part 3</p>
+            <h2 class="reveal">Claude Code:<br>The Power User Path</h2>
+            <p class="subtitle reveal" style="margin: 0 auto;">Full power: bash, agents, hooks, memory</p>
+
+            <div class="accent-line reveal" style="margin: 2rem auto;"></div>
+
+            <table class="reveal" style="margin-top: 1.5rem;">
+                <thead>
+                    <tr><th>Level</th><th>Interface</th><th>Capabilities</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>1</strong></td><td>Claude.ai</td><td>Skills + MCP — what we just demoed</td></tr>
+                    <tr><td><strong>2</strong></td><td>Cowork</td><td>Skills + MCP + scheduled automation (coming soon)</td></tr>
+                    <tr><td><strong>3</strong></td><td style="color: var(--fourth-teal);"><strong>Claude Code</strong></td><td>Full power: bash, agents, hooks, memory</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 11: CLAUDE CODE CAPABILITIES
+         ========================================= -->
+    <section class="slide" data-slide="10">
+        <div class="glow-bg glow-amber" style="top: 10%; left: -15%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Claude Code</p>
+            <h2 class="reveal">Marketing-Specific Capabilities</h2>
+
+            <div class="two-col" style="margin-top: 1.5rem;">
+                <div>
+                    <div class="card reveal" style="margin-bottom: 1rem;">
+                        <h3 style="color: var(--fourth-teal);">What Claude Code Adds</h3>
+                        <table style="font-size: 0.85rem; margin: 0;">
+                            <tr><td><strong>Bash</strong></td><td>Execute terminal commands</td></tr>
+                            <tr><td><strong>Read/Write</strong></td><td>Full file system access</td></tr>
+                            <tr><td><strong>Agents</strong></td><td>Spawn specialized sub-agents</td></tr>
+                            <tr><td><strong>Memory</strong></td><td>Persistent knowledge across sessions</td></tr>
+                        </table>
+                    </div>
+                    <div class="card reveal">
+                        <h3 style="color: var(--accent);">Marketing Researcher Agent</h3>
+                        <pre style="font-size: 0.7rem; margin: 0.75rem 0 0;">{
+  "name": "marketing_researcher",
+  "model": "sonnet",
+  "tools": ["WebSearch", "WebFetch",
+            "Read", "Write"]
+}</pre>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="reveal" style="margin-bottom: 1rem;">Quick Commands</h3>
+                    <pre class="reveal" style="font-size: 0.75rem;"># Competitive Research
+"Research 7shifts' latest marketing"
+"Competitive intel on Deputy"
+
+# Campaign Planning
+"Create brief for Fourth iQ launch"
+
+# Content
+"Outline article about AI in hospitality"
+
+# Case Studies
+"Create case study for [customer]"
+
+# ROI
+"Calculate ROI for 50-location chain"
+
+# Brand
+"Check this against brand voice"</pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 12: MEMORY SYSTEM
+         ========================================= -->
+    <section class="slide" data-slide="11">
+        <div class="glow-bg glow-teal" style="bottom: 10%; right: -15%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Continuous Claude</p>
+            <h2 class="reveal">Memory System:<br>Session Continuity</h2>
+
+            <div class="two-col" style="margin-top: 1.5rem;">
+                <div>
+                    <h3 class="reveal">What It Remembers</h3>
+                    <table class="reveal" style="font-size: 0.9rem;">
+                        <tr><td><strong>Decisions</strong></td><td>"We chose approach X because..."</td></tr>
+                        <tr><td><strong>Patterns</strong></td><td>"This customer type responds to..."</td></tr>
+                        <tr><td><strong>Solutions</strong></td><td>"Fixed that error by..."</td></tr>
+                        <tr><td><strong>Preferences</strong></td><td>"Team prefers tone Y for emails..."</td></tr>
+                    </table>
+
+                    <div class="highlight-box reveal" style="margin-top: 1.5rem;">
+                        <p style="margin: 0; font-size: 0.9rem; color: var(--text-primary);">
+                            <strong>End of day:</strong> "Save my progress"<br>
+                            <strong>Next day:</strong> "Resume where I left off"<br><br>
+                            Claude picks up with full context from previous session.
+                        </p>
+                    </div>
+                </div>
+                <div class="reveal">
+                    <h3>Environment</h3>
+                    <pre style="font-size: 0.7rem;">Terminal session with:
+├── 117 general skills
+├── 8 Fourth marketing skills
+├── Marketing researcher agent
+├── Memory system (Postgres)
+└── Knowledge tree + Roadmap</pre>
+
+                    <h3 style="margin-top: 1.5rem;">Model Selection</h3>
+                    <table style="font-size: 0.85rem;">
+                        <tr><td><strong>Haiku</strong> $</td><td>Simple formatting, bulk ops</td></tr>
+                        <tr><td><strong>Sonnet</strong> $$</td><td>Most tasks (default)</td></tr>
+                        <tr><td><strong>Opus</strong> $$$</td><td>Complex analysis, critical decisions</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 13: POWER USER PATH
+         ========================================= -->
+    <section class="slide" data-slide="12">
+        <div class="glow-bg glow-amber" style="top: 30%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content">
+            <p class="label label-amber reveal">Growth Path</p>
+            <h2 class="reveal">The Power User Journey</h2>
+
+            <table class="reveal" style="margin-top: 2rem;">
+                <thead>
+                    <tr><th>Stage</th><th>What to Learn</th><th>Investment</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>Use existing skills — natural language prompts</td><td><strong style="color: var(--success);">Immediate</strong></td></tr>
+                    <tr><td>2</td><td>Customize prompts — effective patterns</td><td>1-2 hours</td></tr>
+                    <tr><td>3</td><td>Build simple skills — markdown format</td><td>Half day</td></tr>
+                    <tr><td>4</td><td>Try Claude Code — terminal basics</td><td>2-3 hours</td></tr>
+                    <tr><td>5</td><td>Build agents — JSON format</td><td>1 day</td></tr>
+                    <tr><td>6</td><td>Advanced workflows — hooks, memory, automation</td><td>Ongoing</td></tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box reveal" style="margin-top: 2rem;">
+                <h3 style="color: var(--fourth-teal); margin-bottom: 0.5rem;">Next Steps</h3>
+                <ol style="color: var(--text-primary); margin: 0; padding-left: 1.25rem; font-size: 0.9375rem;">
+                    <li>Identify a workflow that needs consistency</li>
+                    <li>Document the expertise — what does "doing it right" look like?</li>
+                    <li>Draft a skill — start with the template</li>
+                    <li>Test and iterate — refine based on real use</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 14: FOURTH QUICK REFERENCE
+         ========================================= -->
+    <section class="slide" data-slide="13">
+        <div class="glow-bg glow-teal" style="top: 10%; right: -20%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Reference</p>
+            <h2 class="reveal">Fourth Marketing Quick Reference</h2>
+
+            <div class="two-col" style="margin-top: 1.5rem;">
+                <div>
+                    <h3 class="reveal">Proof Points Library</h3>
+                    <table class="reveal" style="font-size: 0.8rem;">
+                        <thead><tr><th>Metric</th><th>Customer</th></tr></thead>
+                        <tbody>
+                            <tr><td>15% sales increase</td><td>Thai Leisure Group</td></tr>
+                            <tr><td>22% over-scheduling reduction</td><td>Thai Leisure Group</td></tr>
+                            <tr><td>25% forecast accuracy</td><td>PizzaExpress</td></tr>
+                            <tr><td>75% scheduling time cut</td><td>Buffalo Wild Wings</td></tr>
+                            <tr><td>600 hours saved weekly</td><td>Chili's</td></tr>
+                            <tr><td>6 hrs → 1 hr scheduling</td><td>Blaze Pizza</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <h3 class="reveal">iQ Branding Rules</h3>
+                    <table class="reveal" style="font-size: 0.85rem;">
+                        <thead><tr><th style="color: var(--success);">✓ Correct</th><th style="color: var(--danger);">✗ Incorrect</th></tr></thead>
+                        <tbody>
+                            <tr><td>Fourth iQ</td><td>Fourth IQ</td></tr>
+                            <tr><td>Powered by iQ</td><td>uses iQ</td></tr>
+                            <tr><td>iQ insights</td><td>IQ insights</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h3 class="reveal" style="margin-top: 1.5rem;">Primary Colors</h3>
+                    <div class="reveal" style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                        <div style="text-align: center;">
+                            <div style="width: 50px; height: 50px; background: #0C4A7D; border-radius: 8px;"></div>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">Deep Blue</span>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="width: 50px; height: 50px; background: #00B69F; border-radius: 8px;"></div>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">Teal</span>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="width: 50px; height: 50px; background: #002747; border-radius: 8px;"></div>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">Navy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 15: KEY TAKEAWAYS
+         ========================================= -->
+    <section class="slide" data-slide="14">
+        <div class="glow-bg glow-teal" style="top: 30%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content" style="text-align: center;">
+            <p class="label reveal">Summary</p>
+            <h2 class="reveal">Key Takeaways</h2>
+
+            <div class="card-grid reveal" style="margin-top: 2rem; max-width: 900px; margin-left: auto; margin-right: auto;">
+                <div class="card" style="text-align: left;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">1</div>
+                    <h3>Diversify AI Vendors</h3>
+                    <p style="font-size: 0.9rem; margin: 0;">OpenAI risk is real. Claude offers a mature, capable alternative.</p>
+                </div>
+                <div class="card" style="text-align: left;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">2</div>
+                    <h3>Skills Encode Expertise</h3>
+                    <p style="font-size: 0.9rem; margin: 0;">Brand compliance, campaign structure, quality gates — all captured in text files.</p>
+                </div>
+                <div class="card" style="text-align: left;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">3</div>
+                    <h3>MCP Enables Execution</h3>
+                    <p style="font-size: 0.9rem; margin: 0;">Connect Claude to Asana, Slack, Drive — universal adapter for AI.</p>
+                </div>
+                <div class="card" style="text-align: left;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">4</div>
+                    <h3>Human Stays in the Loop</h3>
+                    <p style="font-size: 0.9rem; margin: 0;">AI improves consistency, doesn't remove judgment. Always review.</p>
+                </div>
+            </div>
+
+            <div class="accent-line reveal" style="margin: 3rem auto;"></div>
+            <p class="meta reveal">Questions? Let's discuss.</p>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 16: Q&A
+         ========================================= -->
+    <section class="slide title-slide" data-slide="15">
+        <div class="glow-bg glow-teal"></div>
+        <div class="slide-content">
+            <p class="label reveal">Q&A</p>
+            <h1 class="reveal">Questions &<br>Discussion</h1>
+            <div class="accent-line reveal" style="margin: 2rem auto;"></div>
+            <p class="meta reveal">
+                Dave Hayes • dave.hayes@fourth.com<br>
+                Skills + MCP docs: claude.com/blog/skills-explained<br>
+                MCP Protocol: modelcontextprotocol.io
+            </p>
+        </div>
+    </section>
+
+    <!-- Keyboard Hint -->
+    <div class="keyboard-hint">
+        Press <kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> to navigate
+    </div>
+
+    <script>
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.progressBar = document.querySelector('.progress-bar');
+                this.navDots = document.querySelector('.nav-dots');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.init();
+            }
+
+            init() {
+                this.createNavDots();
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupScrollListener();
+                this.updateProgress();
+            }
+
+            createNavDots() {
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'nav-dot';
+                    dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    this.navDots.appendChild(dot);
+                });
+                this.updateNavDots();
+            }
+
+            updateNavDots() {
+                const dots = this.navDots.querySelectorAll('.nav-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentSlide);
+                });
+            }
+
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            this.currentSlide = parseInt(entry.target.dataset.slide);
+                            this.updateNavDots();
+                            this.updateProgress();
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        this.nextSlide();
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        this.prevSlide();
+                    }
+                });
+            }
+
+            setupScrollListener() {
+                window.addEventListener('scroll', () => this.updateProgress(), { passive: true });
+            }
+
+            updateProgress() {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                this.progressBar.style.width = `${(scrollTop / docHeight) * 100}%`;
+            }
+
+            goToSlide(index) {
+                if (index >= 0 && index < this.totalSlides) {
+                    this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.totalSlides - 1) this.goToSlide(this.currentSlide + 1);
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) this.goToSlide(this.currentSlide - 1);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => new SlidePresentation());
+    </script>
+</body>
+</html>

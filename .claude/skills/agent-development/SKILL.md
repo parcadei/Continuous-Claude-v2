@@ -1,3 +1,8 @@
+---
+name: agent-development
+description: Agents MUST have valid YAML frontmatter starting at byte 0 (no leading newline).
+---
+
 # Agent Development Skill
 
 ## Activation

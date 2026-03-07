@@ -1,7 +1,8 @@
 ---
 name: git-commits
 description: Git Commit Rules
-user-invocable: false
+metadata:
+  user-invocable: false
 ---
 
 # Git Commit Rules

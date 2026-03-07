@@ -1,3 +1,8 @@
+---
+name: recall
+description: Query the memory system for relevant learnings from past sessions.
+---
+
 # Recall - Semantic Memory Retrieval
 
 Query the memory system for relevant learnings from past sessions.

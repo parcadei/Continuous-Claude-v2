@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{PRESENTATION_TITLE}}</title>
+
+    <!-- ===========================================
+         FOURTH EXECUTIVE THEME
+         Brand-aligned dark premium with Fourth identity
+
+         USAGE: Copy this file, replace {{PLACEHOLDERS}}
+         - {{PRESENTATION_TITLE}} - Browser tab title
+         - {{LABEL}} - Section label (uppercase)
+         - {{HEADING}} - Main heading
+         - {{SUBTITLE}} - Subheading text
+
+         LOGO DATA URIS (for use in generated presentations):
+         - White logo (dark/gradient bg): FOURTH_LOGO_WHITE
+         - Standard logo (light bg):      FOURTH_LOGO_STANDARD
+         - iQ icon (decorative):          FOURTH_IQ_ICON
+         =========================================== -->
+
+    <!-- Fonts: Poppins (Fourth brand) + JetBrains Mono (code/data) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           THEME: FOURTH EXECUTIVE v2
+           Premium dark aesthetic with Fourth brand DNA
+           "Fourth Midnight" palette — near-black with blue undertone
+
+           To customize colors, edit the :root variables below.
+           All components reference these variables.
+           =========================================== */
+        :root {
+            /* -------- CORE COLORS ("Fourth Midnight" — premium depth) -------- */
+            --bg-primary: #0A1929;           /* Fourth Midnight - near-black, blue DNA (L=10%) */
+            --bg-secondary: #0F2A3F;         /* Dark card surface (L=15%) */
+            --bg-tertiary: #153650;          /* Hover states, active elements (L=20%) */
+            --bg-card: rgba(15, 42, 63, 0.55); /* Denser glass on darker body */
+            --bg-midnight: #051526;          /* Deepest dark (L=7%) */
+
+            /* -------- TEXT COLORS -------- */
+            --text-primary: #FFFFFF;         /* White - main text on dark */
+            --text-secondary: #CFD1D1;       /* Cool Grey - body text */
+            --text-muted: #8DA8C4;           /* Blue-tinted muted */
+
+            /* -------- ACCENT COLORS (Fourth Brand) -------- */
+            --accent: #6FB4E3;               /* Sky Blue - PRIMARY accent (default for labels, bullets, th) */
+            --accent-glow: rgba(111, 180, 227, 0.15);
+            --teal: #00B69F;                 /* Teal Green - SECONDARY accent (accent lines, nav dots) */
+            --teal-glow: rgba(0, 182, 159, 0.15);
+            --sunrise: #FAA51A;              /* Sunrise Orange - warm accent (brand tertiary) */
+            --sunrise-glow: rgba(250, 165, 26, 0.10);
+            --purple: #9678B6;               /* Fourth Purple - corrected from brand-essentials */
+            --purple-glow: rgba(150, 120, 182, 0.15);
+
+            /* -------- SEMANTIC COLORS -------- */
+            --success: #00B69F;              /* Teal doubles as success */
+            --success-glow: rgba(0, 182, 159, 0.15);
+            --danger: #D81632;               /* Fourth Hot Red - corrected from brand-essentials */
+            --danger-glow: rgba(216, 22, 50, 0.15);
+            --warning: #FAA51A;              /* Sunrise Orange doubles as warning */
+
+            /* -------- BORDERS -------- */
+            --border: rgba(111, 180, 227, 0.1);
+            --border-accent: rgba(111, 180, 227, 0.2);
+
+            /* -------- TYPOGRAPHY (Fourth Brand: Poppins) -------- */
+            --font-display: 'Poppins', sans-serif;
+            --font-body: 'Poppins', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+            /* -------- SPACING -------- */
+            --slide-padding: clamp(2rem, 5vw, 6rem);
+            --content-max-width: 1100px;
+
+            /* -------- ANIMATION -------- */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+            --duration-fast: 0.3s;
+            --duration-normal: 0.7s;
+            --duration-slow: 1s;
+
+            /* -------- FOURTH BRAND TOKENS -------- */
+            --fourth-deep-blue: #0C4A7D;
+            --fourth-teal: #00B69F;
+            --fourth-sky-blue: #6FB4E3;
+            --fourth-midnight: #002747;
+            --fourth-sunrise: #FAA51A;
+            --fourth-dark-gray: #373E42;
+            --fourth-cool-grey: #CFD1D1;
+            --fourth-soft-white: #F5F5F5;
+            --fourth-white: #FFFFFF;
+            --fourth-hot-red: #D81632;
+            --fourth-purple: #9678B6;
+            --fourth-vignette: linear-gradient(25deg, #00B69F 0%, #6FB4E3 40%, #0C4A7D 100%);
+        }
+
+        /* ===========================================
+           BASE RESET
+           =========================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+            font-size: 18px;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--teal));
+            width: 0%;
+            z-index: 100;
+            transition: width 0.2s ease-out;
+        }
+
+        /* ===========================================
+           NAVIGATION DOTS
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            transition: all var(--duration-fast) var(--ease-out-expo);
+            opacity: 0.3;
+        }
+
+        .nav-dot:hover {
+            opacity: 0.7;
+            transform: scale(1.3);
+        }
+
+        .nav-dot.active {
+            background: var(--teal);
+            opacity: 1;
+            box-shadow: 0 0 12px var(--teal-glow);
+        }
+
+        /* ===========================================
+           SLIDE CONTAINER
+           =========================================== */
+        .slide {
+            min-height: 100vh;
+            padding: var(--slide-padding);
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-content {
+            max-width: var(--content-max-width);
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .title-slide {
+            text-align: center;
+        }
+
+        /* ===========================================
+           FOURTH BRAND BACKGROUNDS (v2 — diversified glows)
+           =========================================== */
+
+        /* Title — deepest dark with faint warm sunrise glow */
+        .bg-title {
+            background: linear-gradient(160deg, #051526 0%, #0A1929 40%, #0F2A3F 100%);
+        }
+
+        /* Closing — same depth, reversed */
+        .bg-closing {
+            background: linear-gradient(160deg, #0F2A3F 0%, #0A1929 50%, #051526 100%);
+        }
+
+        /* Content — teal radial glow (cool, tech) */
+        .bg-dark-radial {
+            background: radial-gradient(ellipse at 50% 50%, rgba(0, 182, 159, 0.08) 0%, #0A1929 70%);
+        }
+
+        /* Top-left — warm sunrise glow */
+        .bg-dark-tl {
+            background: radial-gradient(ellipse at 15% 15%, rgba(250, 165, 26, 0.06) 0%, #0A1929 60%);
+        }
+
+        /* Bottom-right — purple glow */
+        .bg-dark-br {
+            background: radial-gradient(ellipse at 85% 85%, rgba(150, 120, 182, 0.07) 0%, #0A1929 60%);
+        }
+
+        /* Linear sweep from deepest dark through midnight */
+        .bg-dark-sweep {
+            background: linear-gradient(135deg, #051526 0%, #0A1929 50%, #153650 100%);
+        }
+
+        /* Section break — Deep Blue accent (mid-tone, contrast with dark slides) */
+        .bg-section-break {
+            background: radial-gradient(ellipse at 50% 50%, rgba(12, 74, 125, 0.25) 0%, #0A1929 65%);
+        }
+
+        /* ===========================================
+           FOURTH LOGO STYLES
+           =========================================== */
+
+        /* Watermark logo (bottom-right, subtle) */
+        .fourth-logo-watermark {
+            position: absolute;
+            bottom: 2rem;
+            right: 2.5rem;
+            width: 80px;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Oversized background logo — dramatic, nearly transparent */
+        .fourth-logo-backdrop {
+            position: absolute;
+            width: 600px;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+            filter: brightness(1.5);
+        }
+
+        .fourth-logo-backdrop-right {
+            right: -120px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .fourth-logo-backdrop-left {
+            left: -120px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .fourth-logo-backdrop-large {
+            width: 800px;
+            opacity: 0.025;
+        }
+
+        /* Title/closing logo (centered, prominent) */
+        .fourth-logo-hero {
+            width: 120px;
+            margin: 0 auto 2rem;
+            display: block;
+        }
+
+        /* Closing logo (larger) */
+        .fourth-logo-closing {
+            width: 180px;
+            margin: 0 auto 1.5rem;
+            display: block;
+        }
+
+        /* iQ icon (decorative, section breaks) */
+        .fourth-iq-mark {
+            width: 32px;
+            opacity: 0.6;
+        }
+
+        /* ===========================================
+           REVEAL ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition:
+                opacity var(--duration-normal) var(--ease-out-expo),
+                transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .reveal:nth-child(4) { transition-delay: 0.4s; }
+        .reveal:nth-child(5) { transition-delay: 0.5s; }
+        .reveal:nth-child(6) { transition-delay: 0.6s; }
+        .reveal:nth-child(7) { transition-delay: 0.7s; }
+
+        /* ===========================================
+           TYPOGRAPHY (Poppins-based, Fourth brand)
+           =========================================== */
+        .label {
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .label-teal { color: var(--teal); }
+        .label-purple { color: var(--purple); }
+        .label-sunrise { color: var(--sunrise); }
+        .label-danger { color: var(--danger); }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 600;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+
+        h3 {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        h4 {
+            font-family: var(--font-body);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            max-width: 700px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        .meta {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* ===========================================
+           DECORATIVE ELEMENTS
+           =========================================== */
+        .accent-line {
+            width: 80px;
+            height: 2px;
+            background: var(--teal);
+            margin: 2rem 0;
+        }
+
+        .accent-line-sky { background: var(--accent); }
+        .accent-line-center { margin: 2rem auto; }
+
+        .glow-bg {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .glow-teal { background: rgba(0, 182, 159, 0.12); }
+        .glow-sky { background: rgba(111, 180, 227, 0.12); }
+        .glow-sunrise { background: rgba(250, 165, 26, 0.10); }
+        .glow-purple { background: rgba(150, 120, 182, 0.12); }
+        .glow-red { background: var(--danger-glow); }
+
+        /* ===========================================
+           CARDS
+           =========================================== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-accent {
+            border-color: rgba(111, 180, 227, 0.25);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+        /* ===========================================
+           LAYOUT HELPERS
+           =========================================== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            align-items: start;
+        }
+
+        .three-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        /* ===========================================
+           TABLES
+           =========================================== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9375rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .matrix-table th:not(:first-child),
+        .matrix-table td:not(:first-child) {
+            text-align: center;
+        }
+
+        /* ===========================================
+           LISTS
+           =========================================== */
+        ul {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-secondary);
+        }
+
+        ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.55rem;
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        /* ===========================================
+           CODE
+           =========================================== */
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: var(--accent);
+        }
+
+        pre {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        /* ===========================================
+           SPECIAL COMPONENTS
+           =========================================== */
+        .stat {
+            font-family: var(--font-display);
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-teal { color: var(--teal); }
+        .stat-sunrise { color: var(--sunrise); }
+        .stat-danger { color: var(--danger); }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            background: var(--accent-glow);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .icon-box-teal { background: var(--teal-glow); }
+        .icon-box-sunrise { background: var(--sunrise-glow); }
+        .icon-box-purple { background: var(--purple-glow); }
+        .icon-box-success { background: var(--success-glow); }
+        .icon-box-danger { background: var(--danger-glow); }
+
+        .highlight-box {
+            background: linear-gradient(135deg, var(--accent-glow) 0%, transparent 50%);
+            border: 1px solid rgba(111, 180, 227, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .highlight-box-teal {
+            background: linear-gradient(135deg, var(--teal-glow) 0%, transparent 50%);
+            border-color: rgba(0, 182, 159, 0.2);
+        }
+
+        .highlight-box-sunrise {
+            background: linear-gradient(135deg, var(--sunrise-glow) 0%, transparent 50%);
+            border-color: rgba(250, 165, 26, 0.15);
+        }
+
+        .highlight-box-purple {
+            background: linear-gradient(135deg, var(--purple-glow) 0%, transparent 50%);
+            border-color: rgba(150, 120, 182, 0.2);
+        }
+
+        .quote {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-size: 1.125rem;
+            color: var(--text-primary);
+            border-left: 3px solid var(--accent);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-item h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .feature-item p {
+            font-size: 0.9375rem;
+            margin: 0;
+        }
+
+        .check { color: var(--success); font-size: 1.25rem; }
+        .cross { color: var(--danger); font-size: 1.25rem; opacity: 0.6; }
+
+        /* ===========================================
+           KEYBOARD HINT
+           =========================================== */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease 2s forwards;
+        }
+
+        .keyboard-hint kbd {
+            background: var(--bg-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* ===========================================
+           RESPONSIVE
+           =========================================== */
+        @media (max-width: 900px) {
+            .two-col,
+            .three-col,
+            .card-grid-2,
+            .card-grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-dots,
+            .keyboard-hint {
+                display: none;
+            }
+
+            .slide {
+                padding: 2rem 1.5rem;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            html {
+                font-size: 16px;
+            }
+
+            .fourth-logo-watermark {
+                width: 50px;
+                bottom: 1rem;
+                right: 1.5rem;
+            }
+        }
+
+        /* ===========================================
+           REDUCED MOTION
+           =========================================== */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                transition: opacity 0.3s ease;
+                transform: none;
+            }
+
+            html {
+                scroll-behavior: auto;
+            }
+
+            .keyboard-hint {
+                animation: none;
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar"></div>
+
+    <!-- Navigation Dots (auto-generated by JS) -->
+    <nav class="nav-dots" aria-label="Slide navigation"></nav>
+
+    <!-- =========================================
+         EXAMPLE SLIDES
+         Copy and modify these patterns
+         ========================================= -->
+
+    <!-- PATTERN: Title Slide (Dark gradient + Logo) -->
+    <section class="slide title-slide bg-title" data-slide="0">
+        <img src="{{FOURTH_LOGO_WHITE}}" class="fourth-logo-hero reveal" alt="Fourth">
+        <div class="slide-content">
+            <p class="label reveal">{{LABEL}}</p>
+            <h1 class="reveal">{{HEADING}}</h1>
+            <p class="subtitle reveal">{{SUBTITLE}}</p>
+            <div class="accent-line reveal" style="margin: 2rem auto;"></div>
+            <p class="meta reveal">Author &bull; Date</p>
+        </div>
+    </section>
+
+    <!-- PATTERN: Content Slide with Cards (teal glow) -->
+    <section class="slide bg-dark-radial" data-slide="1">
+        <img src="{{FOURTH_LOGO_WHITE}}" class="fourth-logo-watermark" alt="">
+        <div class="glow-bg glow-teal" style="top: 10%; right: -20%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Section Label</p>
+            <h2 class="reveal">Slide Heading</h2>
+            <p class="reveal">Introductory paragraph text goes here.</p>
+
+            <div class="card-grid reveal">
+                <div class="card">
+                    <div class="stat">42%</div>
+                    <div class="stat-label">Metric Label</div>
+                    <p style="margin-top: 0.75rem; font-size: 0.9rem;">Description text.</p>
+                </div>
+                <div class="card">
+                    <div class="stat stat-teal">$1.2M</div>
+                    <div class="stat-label">Another Metric</div>
+                    <p style="margin-top: 0.75rem; font-size: 0.9rem;">Description text.</p>
+                </div>
+                <div class="card">
+                    <h3>Card Title</h3>
+                    <p style="font-size: 0.9rem;">Card content goes here.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PATTERN: Two-Column Slide (sunrise warm glow) -->
+    <section class="slide bg-dark-tl" data-slide="2">
+        <img src="{{FOURTH_LOGO_WHITE}}" class="fourth-logo-watermark" alt="">
+        <div class="glow-bg glow-sunrise" style="bottom: 10%; left: -15%;"></div>
+        <div class="slide-content">
+            <p class="label label-purple reveal">Section Label</p>
+            <h2 class="reveal">Two Column Layout</h2>
+
+            <div class="two-col" style="margin-top: 2rem;">
+                <div>
+                    <div class="feature-item reveal">
+                        <div class="icon-box">&#127919;</div>
+                        <div>
+                            <h4>Feature Title</h4>
+                            <p>Feature description text goes here.</p>
+                        </div>
+                    </div>
+                    <div class="feature-item reveal">
+                        <div class="icon-box icon-box-teal">&#9889;</div>
+                        <div>
+                            <h4>Another Feature</h4>
+                            <p>More description text.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="reveal">
+                    <div class="highlight-box">
+                        <h3 style="color: var(--accent);">Highlight Box</h3>
+                        <p style="margin: 0; color: var(--text-primary);">Important information goes here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PATTERN: Section Break (Deep Blue accent + iQ mark) -->
+    <section class="slide bg-section-break" data-slide="3" style="text-align: center;">
+        <div class="slide-content">
+            <img src="{{FOURTH_IQ_ICON}}" class="fourth-iq-mark reveal" alt="iQ" style="margin: 0 auto 1.5rem; display: block;">
+            <p class="label reveal" style="font-size: 0.65rem; letter-spacing: 0.3em;">Section 02</p>
+            <h1 class="reveal" style="font-size: clamp(2rem, 4.5vw, 3.5rem);">Section Title</h1>
+            <div class="accent-line accent-line-center reveal"></div>
+        </div>
+    </section>
+
+    <!-- PATTERN: Table Slide (purple glow) -->
+    <section class="slide bg-dark-br" data-slide="4">
+        <img src="{{FOURTH_LOGO_WHITE}}" class="fourth-logo-watermark" alt="">
+        <div class="glow-bg glow-purple" style="top: 30%; right: -20%;"></div>
+        <div class="slide-content">
+            <p class="label reveal">Data</p>
+            <h2 class="reveal">Comparison Table</h2>
+
+            <table class="reveal matrix-table" style="margin-top: 2rem;">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Option A</th>
+                        <th>Option B</th>
+                        <th>Option C</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Capability 1</strong></td>
+                        <td><span class="check">&#10003;</span></td>
+                        <td><span class="check">&#10003;</span></td>
+                        <td><span class="cross">&#10007;</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Capability 2</strong></td>
+                        <td><span class="cross">&#10007;</span></td>
+                        <td><span class="check">&#10003;</span></td>
+                        <td><span class="check">&#10003;</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- PATTERN: Closing Slide (Dark gradient + Full Logo + Powered by iQ) -->
+    <section class="slide title-slide bg-closing" data-slide="5">
+        <div class="slide-content">
+            <img src="{{FOURTH_LOGO_WHITE}}" class="fourth-logo-closing reveal" alt="Fourth">
+            <h2 class="reveal" style="margin-bottom: 0.75rem;">Thank You</h2>
+            <p class="subtitle reveal" style="margin: 0 auto;">Powered by iQ</p>
+            <div class="accent-line accent-line-center reveal"></div>
+            <p class="meta reveal">Contact Information</p>
+        </div>
+    </section>
+
+    <!-- Keyboard Hint -->
+    <div class="keyboard-hint">
+        Press <kbd>&larr;</kbd> <kbd>&rarr;</kbd> or <kbd>Space</kbd> to navigate
+    </div>
+
+    <!-- ===========================================
+         PRESENTATION CONTROLLER
+         Handles navigation, animations, progress bar
+         =========================================== -->
+    <script>
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.progressBar = document.querySelector('.progress-bar');
+                this.navDots = document.querySelector('.nav-dots');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.init();
+            }
+
+            init() {
+                this.createNavDots();
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupScrollListener();
+                this.updateProgress();
+            }
+
+            createNavDots() {
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'nav-dot';
+                    dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    this.navDots.appendChild(dot);
+                });
+                this.updateNavDots();
+            }
+
+            updateNavDots() {
+                const dots = this.navDots.querySelectorAll('.nav-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentSlide);
+                });
+            }
+
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            this.currentSlide = parseInt(entry.target.dataset.slide);
+                            this.updateNavDots();
+                            this.updateProgress();
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        this.nextSlide();
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        this.prevSlide();
+                    }
+                });
+            }
+
+            setupScrollListener() {
+                window.addEventListener('scroll', () => this.updateProgress(), { passive: true });
+            }
+
+            updateProgress() {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+                this.progressBar.style.width = `${progress}%`;
+            }
+
+            goToSlide(index) {
+                if (index >= 0 && index < this.totalSlides) {
+                    this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.totalSlides - 1) {
+                    this.goToSlide(this.currentSlide + 1);
+                }
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) {
+                    this.goToSlide(this.currentSlide - 1);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => new SlidePresentation());
+    </script>
+</body>
+</html>

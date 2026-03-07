@@ -1,4 +1,5 @@
 ---
+name: repo-research-analyst
 description: Analyze repository structure, patterns, conventions, and documentation for understanding a new codebase
 ---
 

@@ -1,9 +1,10 @@
 ---
 name: init-project
 description: Initialize Continuous Claude for a new project - knowledge tree, ROADMAP, and daemon
-user-invocable: true
-triggers: ["/init-project", "new project", "setup project", "initialize project"]
 allowed-tools: [Bash, Read, Write, Task]
+metadata:
+  user-invocable: true
+  triggers: ["/init-project", "new project", "setup project", "initialize project"]
 ---
 
 # Init Project - Continuous Claude Setup

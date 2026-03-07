@@ -1,9 +1,10 @@
 ---
 name: help
 description: Interactive workspace discovery - learn what tools, workflows, agents, and hooks are available
-triggers: ["help", "what can you do", "show capabilities", "how do I"]
 allowed-tools: [AskUserQuestion, Bash, Read, Glob, Grep]
-priority: high
+metadata:
+  triggers: ["help", "what can you do", "show capabilities", "how do I"]
+  priority: high
 ---
 
 # /help - Workspace Discovery

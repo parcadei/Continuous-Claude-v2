@@ -1,7 +1,8 @@
 ---
 name: hooks
 description: Hook Development Rules
-user-invocable: false
+metadata:
+  user-invocable: false
 ---
 
 # Hook Development Rules

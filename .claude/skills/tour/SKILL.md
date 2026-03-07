@@ -1,3 +1,8 @@
+---
+name: tour
+description: Friendly onboarding when users ask about capabilities.
+---
+
 # Tour: What Can I Do?
 
 Friendly onboarding when users ask about capabilities.

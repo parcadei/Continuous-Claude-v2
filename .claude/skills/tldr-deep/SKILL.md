@@ -1,3 +1,8 @@
+---
+name: tldr-deep
+description: Full 5-layer analysis of a specific function. Use when debugging or deeply understanding code.
+---
+
 # TLDR Deep Analysis
 
 Full 5-layer analysis of a specific function. Use when debugging or deeply understanding code.

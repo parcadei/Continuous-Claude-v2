@@ -1,7 +1,8 @@
 ---
 name: wiring
 description: Wiring Verification
-user-invocable: false
+metadata:
+  user-invocable: false
 ---
 
 # Wiring Verification

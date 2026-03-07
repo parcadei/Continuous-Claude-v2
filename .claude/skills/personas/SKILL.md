@@ -1,3 +1,8 @@
+---
+name: personas
+description: Specialized personas for different contexts
+---
+
 # Personas Skill
 
 ## Activation

@@ -1,7 +1,8 @@
 ---
 name: agent-context-isolation
 description: Agent Context Isolation
-user-invocable: false
+metadata:
+  user-invocable: false
 ---
 
 # Agent Context Isolation

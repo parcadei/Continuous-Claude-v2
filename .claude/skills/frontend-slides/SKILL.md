@@ -12,58 +12,30 @@ Create zero-dependency, animation-rich HTML presentations that run entirely in t
 1. **Zero Dependencies** — Single HTML files with inline CSS/JS. No npm, no build tools.
 2. **Show, Don't Tell** — People don't know what they want until they see it. Generate visual previews, not abstract choices.
 3. **Distinctive Design** — Avoid generic "AI slop" aesthetics. Every presentation should feel custom-crafted.
-4. **Production Quality** — Code should be well-commented, accessible, and performant.
+4. **Production Quality** — Well-commented, accessible, performant code.
 
 ---
 
 ## Phase 0: Detect Mode
 
-First, determine what the user wants:
-
-**Mode A: New Presentation**
-- User wants to create slides from scratch
-- Proceed to Phase 1 (Content Discovery)
-
-**Mode B: PPT Conversion**
-- User has a PowerPoint file (.ppt, .pptx) to convert
-- Proceed to Phase 4 (PPT Extraction)
-
-**Mode C: Existing Presentation Enhancement**
-- User has an HTML presentation and wants to improve it
-- Read the existing file, understand the structure, then enhance
+**Mode A: New Presentation** — User wants slides from scratch → Phase 1
+**Mode B: PPT Conversion** — User has a .ppt/.pptx file → Phase 4
+**Mode C: Enhancement** — User has HTML presentation to improve → read + enhance
 
 ---
 
 ## Phase 1: Content Discovery (New Presentations)
 
-Before designing, understand the content. Ask via AskUserQuestion:
+Ask via AskUserQuestion:
 
-### Step 1.1: Presentation Context
+**Q1: Purpose** — "What is this presentation for?"
+- Pitch deck / Teaching/Tutorial / Conference talk / Internal presentation
 
-**Question 1: Purpose**
-- Header: "Purpose"
-- Question: "What is this presentation for?"
-- Options:
-  - "Pitch deck" — Selling an idea, product, or company to investors/clients
-  - "Teaching/Tutorial" — Explaining concepts, how-to guides, educational content
-  - "Conference talk" — Speaking at an event, tech talk, keynote
-  - "Internal presentation" — Team updates, strategy meetings, company updates
+**Q2: Length** — "Approximately how many slides?"
+- Short (5-10) / Medium (10-20) / Long (20+)
 
-**Question 2: Slide Count**
-- Header: "Length"
-- Question: "Approximately how many slides?"
-- Options:
-  - "Short (5-10)" — Quick pitch, lightning talk
-  - "Medium (10-20)" — Standard presentation
-  - "Long (20+)" — Deep dive, comprehensive talk
-
-**Question 3: Content**
-- Header: "Content"
-- Question: "Do you have the content ready, or do you need help structuring it?"
-- Options:
-  - "I have all content ready" — Just need to design the presentation
-  - "I have rough notes" — Need help organizing into slides
-  - "I have a topic only" — Need help creating the full outline
+**Q3: Content** — "Do you have the content ready, or do you need help structuring it?"
+- All content ready / Rough notes (needs organizing) / Topic only (needs full outline)
 
 If user has content, ask them to share it (text, bullet points, images, etc.).
 
@@ -73,30 +45,28 @@ If user has content, ask them to share it (text, bullet points, images, etc.).
 
 **CRITICAL: This is the "show, don't tell" phase.**
 
-Most people can't articulate design preferences in words. Instead of asking "do you want minimalist or bold?", we generate mini-previews and let them react.
+Most people can't articulate design preferences in words. Generate mini-previews and let them react.
 
 ### Step 2.1: Mood Selection
 
-**Question 1: Feeling**
-- Header: "Vibe"
-- Question: "What feeling should the audience have when viewing your slides?"
-- Options:
-  - "Impressed/Confident" — Professional, trustworthy, this team knows what they're doing
-  - "Excited/Energized" — Innovative, bold, this is the future
-  - "Calm/Focused" — Clear, thoughtful, easy to follow
-  - "Inspired/Moved" — Emotional, storytelling, memorable
-- multiSelect: true (can choose up to 2)
+**Q: Vibe** — "What feeling should the audience have?"
+- "Impressed/Confident" / "Excited/Energized" / "Calm/Focused" / "Inspired/Moved"
+- multiSelect: true (up to 2)
 
 ### Step 2.2: Generate Style Previews
 
-Based on their mood selection, generate **3 distinct style previews** as mini HTML files in a temporary directory. Each preview should be a single title slide showing:
+Generate **3 distinct style previews** in `.claude-design/slide-previews/`:
 
-- Typography (font choices, heading/body hierarchy)
-- Color palette (background, accent, text colors)
-- Animation style (how elements enter)
-- Overall aesthetic feel
+```
+.claude-design/slide-previews/
+├── style-a.html   # First style option
+├── style-b.html   # Second style option
+└── style-c.html   # Third style option
+```
 
-**Preview Styles to Consider (pick 3 based on mood):**
+Each preview: single title slide, self-contained, animated, ~50-100 lines.
+
+**Mood → Style Options:**
 
 | Mood | Style Options |
 |------|---------------|
@@ -105,37 +75,22 @@ Based on their mood selection, generate **3 distinct style previews** as mini HT
 | Calm/Focused | "Paper & Ink", "Soft Muted", "Swiss Minimal" |
 | Inspired/Moved | "Cinematic Dark", "Warm Editorial", "Atmospheric" |
 
-**IMPORTANT: Never use these generic patterns:**
+**NEVER use:**
 - Purple gradients on white backgrounds
 - Inter, Roboto, or system fonts
 - Standard blue primary colors
 - Predictable hero layouts
 
-**Instead, use distinctive choices:**
+**Instead use:**
 - Unique font pairings (Clash Display, Satoshi, Cormorant Garamond, DM Sans, etc.)
 - Cohesive color themes with personality
 - Atmospheric backgrounds (gradients, subtle patterns, depth)
 - Signature animation moments
 
+For effect → feeling mappings and animation CSS snippets, see `references/animation-patterns.md`.
+
 ### Step 2.3: Present Previews
 
-Create the previews in: `.claude-design/slide-previews/`
-
-```
-.claude-design/slide-previews/
-├── style-a.html   # First style option
-├── style-b.html   # Second style option
-├── style-c.html   # Third style option
-└── assets/        # Any shared assets
-```
-
-Each preview file should be:
-- Self-contained (inline CSS/JS)
-- A single "title slide" showing the aesthetic
-- Animated to demonstrate motion style
-- ~50-100 lines, not a full presentation
-
-Present to user:
 ```
 I've created 3 style previews for you to compare:
 
@@ -148,762 +103,198 @@ Open each file to see them in action:
 - .claude-design/slide-previews/style-b.html
 - .claude-design/slide-previews/style-c.html
 
-Take a look and tell me:
-1. Which style resonates most?
-2. What do you like about it?
-3. Anything you'd change?
+Which style resonates most? What do you like? Anything to change?
 ```
 
-Then use AskUserQuestion:
-
-**Question: Pick Your Style**
-- Header: "Style"
-- Question: "Which style preview do you prefer?"
-- Options:
-  - "Style A: [Name]" — [Brief description]
-  - "Style B: [Name]" — [Brief description]
-  - "Style C: [Name]" — [Brief description]
-  - "Mix elements" — Combine aspects from different styles
-
-If "Mix elements", ask for specifics.
+**Q: Style** — "Which style preview do you prefer?"
+- Style A / Style B / Style C / "Mix elements" (ask for specifics)
 
 ### Step 2.4: Interactivity Level
 
-After style selection, determine if interactive components are needed:
+**Q: Interactivity** — "Do you need interactive elements?"
+- "Static slides only" / "Light interactivity" / "Data-rich dashboard style"
 
-**Question: Interactivity**
-- Header: "Interactivity"
-- Question: "Do you need interactive elements in your presentation?"
-- Options:
-  - "Static slides only" — Traditional linear presentation
-  - "Light interactivity" — Tabs to switch views, expandable sections
-  - "Data-rich dashboard style" — Charts, filters, multiple data views, modals
-- multiSelect: false
+**If Light or Data-rich:** Include Alpine.js CDN, use `components/midnight-components.html`.
 
-**If Light or Data-rich:**
-- Include Alpine.js CDN
-- Use components from `components/midnight-components.html`
-- Combine with Chart.js for data visualization
+**Interactivity triggers:**
 
-**Interactivity triggers based on content:**
-- Multiple ways to view same data → **Tabs**
-- Detailed info that clutters the slide → **Accordion/Collapsible**
-- Full tables or roadmaps → **Modal**
-- Multiple testimonials/case studies → **Carousel**
-- Time period or metric selection → **Dropdown**
-- Optional detailed view → **Toggle**
+| Need | Component |
+|------|-----------|
+| Multiple ways to view same data | Tabs |
+| Details that clutter the slide | Accordion/Collapsible |
+| Full tables or roadmaps | Modal |
+| Multiple testimonials/case studies | Carousel |
+| Time period or metric selection | Dropdown |
+| Optional detailed view | Toggle |
 
 ---
 
 ## Phase 3: Generate Presentation
 
-Now generate the full presentation based on:
-- Content from Phase 1
-- Style from Phase 2
+### HTML Architecture
+
+Follow the full boilerplate in `references/html-template.md`. Key structure:
+
+- **`:root` CSS vars** — colors, fonts, spacing, easing (easy single-point customization)
+- **`.slide`** — each `<section>` is one slide, `min-height: 100vh`, `scroll-snap-align: start`
+- **`.reveal`** — fade+slide-up entrance, triggered by `.visible` class via Intersection Observer
+- **`SlidePresentation` class** — keyboard nav, touch/swipe, progress bar, nav dots
+
+For animation CSS patterns (entrance, backgrounds, 3D tilt), see `references/animation-patterns.md`.
 
 ### File Structure
 
-For single presentations:
 ```
-presentation.html    # Self-contained presentation
-assets/              # Images, if any
-```
-
-For projects with multiple presentations:
-```
-[presentation-name].html
-[presentation-name]-assets/
+presentation.html          # Self-contained
+assets/                    # Images, if any
 ```
 
-### HTML Architecture
+### Required JS Features
 
-Follow this structure for all presentations:
+1. `SlidePresentation` class — keyboard (arrows, space), touch, mouse wheel, progress bar, nav dots
+2. `IntersectionObserver` — adds `.visible` when slide enters viewport
+3. Optional: custom cursor, particle canvas, parallax, 3D tilt, magnetic buttons, counters
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presentation Title</title>
+### Code Quality
 
-    <!-- Fonts (use Fontshare or Google Fonts) -->
-    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=...">
-
-    <style>
-        /* ===========================================
-           CSS CUSTOM PROPERTIES (THEME)
-           Easy to modify: change these to change the whole look
-           =========================================== */
-        :root {
-            /* Colors */
-            --bg-primary: #0a0f1c;
-            --bg-secondary: #111827;
-            --text-primary: #ffffff;
-            --text-secondary: #9ca3af;
-            --accent: #00ffcc;
-            --accent-glow: rgba(0, 255, 204, 0.3);
-
-            /* Typography */
-            --font-display: 'Clash Display', sans-serif;
-            --font-body: 'Satoshi', sans-serif;
-
-            /* Spacing */
-            --slide-padding: clamp(2rem, 5vw, 4rem);
-
-            /* Animation */
-            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-            --duration-normal: 0.6s;
-        }
-
-        /* ===========================================
-           BASE STYLES
-           =========================================== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-            scroll-snap-type: y mandatory;
-        }
-
-        body {
-            font-family: var(--font-body);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            overflow-x: hidden;
-        }
-
-        /* ===========================================
-           SLIDE CONTAINER
-           Each section is one slide
-           =========================================== */
-        .slide {
-            min-height: 100vh;
-            padding: var(--slide-padding);
-            scroll-snap-align: start;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* ===========================================
-           ANIMATIONS
-           Trigger via .visible class (added by JS on scroll)
-           =========================================== */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity var(--duration-normal) var(--ease-out-expo),
-                        transform var(--duration-normal) var(--ease-out-expo);
-        }
-
-        .slide.visible .reveal {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Stagger children */
-        .reveal:nth-child(1) { transition-delay: 0.1s; }
-        .reveal:nth-child(2) { transition-delay: 0.2s; }
-        .reveal:nth-child(3) { transition-delay: 0.3s; }
-        .reveal:nth-child(4) { transition-delay: 0.4s; }
-
-        /* ... more styles ... */
-    </style>
-</head>
-<body>
-    <!-- Progress bar (optional) -->
-    <div class="progress-bar"></div>
-
-    <!-- Navigation dots (optional) -->
-    <nav class="nav-dots">
-        <!-- Generated by JS -->
-    </nav>
-
-    <!-- Slides -->
-    <section class="slide title-slide">
-        <h1 class="reveal">Presentation Title</h1>
-        <p class="reveal">Subtitle or author</p>
-    </section>
-
-    <section class="slide">
-        <h2 class="reveal">Slide Title</h2>
-        <p class="reveal">Content...</p>
-    </section>
-
-    <!-- More slides... -->
-
-    <script>
-        /* ===========================================
-           SLIDE PRESENTATION CONTROLLER
-           Handles navigation, animations, and interactions
-           =========================================== */
-
-        class SlidePresentation {
-            constructor() {
-                // ... initialization
-            }
-
-            // ... methods
-        }
-
-        // Initialize
-        new SlidePresentation();
-    </script>
-</body>
-</html>
-```
-
-### Required JavaScript Features
-
-Every presentation should include:
-
-1. **SlidePresentation Class** — Main controller
-   - Keyboard navigation (arrows, space)
-   - Touch/swipe support
-   - Mouse wheel navigation
-   - Progress bar updates
-   - Navigation dots
-
-2. **Intersection Observer** — For scroll-triggered animations
-   - Add `.visible` class when slides enter viewport
-   - Trigger CSS animations efficiently
-
-3. **Optional Enhancements** (based on style):
-   - Custom cursor with trail
-   - Particle system background (canvas)
-   - Parallax effects
-   - 3D tilt on hover
-   - Magnetic buttons
-   - Counter animations
-
-### Code Quality Requirements
-
-**Comments:**
-Every section should have clear comments explaining:
-- What it does
-- Why it exists
-- How to modify it
-
-```javascript
-/* ===========================================
-   CUSTOM CURSOR
-   Creates a stylized cursor that follows mouse with a trail effect.
-   - Uses lerp (linear interpolation) for smooth movement
-   - Grows larger when hovering over interactive elements
-   =========================================== */
-class CustomCursor {
-    constructor() {
-        // ...
-    }
-}
-```
-
-**Accessibility:**
-- Semantic HTML (`<section>`, `<nav>`, `<main>`)
-- Keyboard navigation works
-- ARIA labels where needed
-- Reduced motion support
-
-```css
-@media (prefers-reduced-motion: reduce) {
-    .reveal {
-        transition: opacity 0.3s ease;
-        transform: none;
-    }
-}
-```
-
-**Responsive:**
-- Mobile-friendly (single column, adjusted spacing)
-- Disable heavy effects on mobile
-- Touch-friendly interactions
-
-```css
-@media (max-width: 768px) {
-    .nav-dots,
-    .keyboard-hint {
-        display: none;
-    }
-}
-```
+- Comments: every section explains what, why, and how to modify
+- Accessibility: semantic HTML, keyboard nav, ARIA labels, reduced motion support
+- Responsive: mobile-friendly, disable heavy effects at 768px, touch-friendly
 
 ---
 
 ## Phase 4: PPT Conversion
 
-When converting PowerPoint files:
-
 ### Step 4.1: Extract Content
 
-Use Python with `python-pptx` to extract:
+Use `references/pptx-extractor.py` (requires `python-pptx`):
 
-```python
-from pptx import Presentation
-from pptx.util import Inches, Pt
-import json
-import os
-import base64
-
-def extract_pptx(file_path, output_dir):
-    """
-    Extract all content from a PowerPoint file.
-    Returns a JSON structure with slides, text, and images.
-    """
-    prs = Presentation(file_path)
-    slides_data = []
-
-    # Create assets directory
-    assets_dir = os.path.join(output_dir, 'assets')
-    os.makedirs(assets_dir, exist_ok=True)
-
-    for slide_num, slide in enumerate(prs.slides):
-        slide_data = {
-            'number': slide_num + 1,
-            'title': '',
-            'content': [],
-            'images': [],
-            'notes': ''
-        }
-
-        for shape in slide.shapes:
-            # Extract title
-            if shape.has_text_frame:
-                if shape == slide.shapes.title:
-                    slide_data['title'] = shape.text
-                else:
-                    slide_data['content'].append({
-                        'type': 'text',
-                        'content': shape.text
-                    })
-
-            # Extract images
-            if shape.shape_type == 13:  # Picture
-                image = shape.image
-                image_bytes = image.blob
-                image_ext = image.ext
-                image_name = f"slide{slide_num + 1}_img{len(slide_data['images']) + 1}.{image_ext}"
-                image_path = os.path.join(assets_dir, image_name)
-
-                with open(image_path, 'wb') as f:
-                    f.write(image_bytes)
-
-                slide_data['images'].append({
-                    'path': f"assets/{image_name}",
-                    'width': shape.width,
-                    'height': shape.height
-                })
-
-        # Extract notes
-        if slide.has_notes_slide:
-            notes_frame = slide.notes_slide.notes_text_frame
-            slide_data['notes'] = notes_frame.text
-
-        slides_data.append(slide_data)
-
-    return slides_data
+```bash
+pip install python-pptx
+python references/pptx-extractor.py slides.pptx output/
 ```
+
+Produces `output/slides.json` + `output/assets/` with all images.
 
 ### Step 4.2: Confirm Content Structure
 
-Present the extracted content to the user:
-
+Present extracted content summary to user:
 ```
 I've extracted the following from your PowerPoint:
 
-**Slide 1: [Title]**
-- [Content summary]
-- Images: [count]
-
-**Slide 2: [Title]**
-- [Content summary]
-- Images: [count]
-
+**Slide 1: [Title]** — [content summary], [N] image(s)
+**Slide 2: [Title]** — [content summary], [N] image(s)
 ...
-
-All images have been saved to the assets folder.
 
 Does this look correct? Should I proceed with style selection?
 ```
 
 ### Step 4.3: Style Selection
 
-Proceed to Phase 2 (Style Discovery) with the extracted content in mind.
+Proceed to Phase 2 (Style Discovery) with extracted content in mind.
 
 ### Step 4.4: Generate HTML
 
-Convert the extracted content into the chosen style, preserving:
-- All text content
-- All images (referenced from assets folder)
-- Slide order
-- Any speaker notes (as HTML comments or separate file)
+Convert extracted content into chosen style, preserving all text, images (referenced from assets/), slide order, and speaker notes (as HTML comments or separate file).
 
 ---
 
 ## Phase 5: Delivery
 
-### Final Output
+1. **Clean up** — Delete `.claude-design/slide-previews/` if it exists
+2. **Open** — `open [filename].html` to launch in browser
+3. **Provide summary:**
 
-When the presentation is complete:
-
-1. **Clean up temporary files**
-   - Delete `.claude-design/slide-previews/` if it exists
-
-2. **Open the presentation**
-   - Use `open [filename].html` to launch in browser
-
-3. **Provide summary**
 ```
 Your presentation is ready!
 
-📁 File: [filename].html
-🎨 Style: [Style Name]
-📊 Slides: [count]
+File: [filename].html
+Style: [Style Name]
+Slides: [count]
 
-**Navigation:**
-- Arrow keys (← →) or Space to navigate
-- Scroll/swipe also works
-- Click the dots on the right to jump to a slide
+Navigation: Arrow keys or Space, scroll/swipe, or click the dots on the right.
 
-**To customize:**
-- Colors: Look for `:root` CSS variables at the top
-- Fonts: Change the Fontshare/Google Fonts link
-- Animations: Modify `.reveal` class timings
+To customize: :root CSS variables (colors), Fontshare/Google Fonts link (fonts), .reveal class timings (animations).
 
 Would you like me to make any adjustments?
 ```
 
 ---
 
-## Style Reference: Effect → Feeling Mapping
-
-Use this guide to match animations to intended feelings:
-
-### Dramatic / Cinematic
-- Slow fade-ins (1-1.5s)
-- Large scale transitions (0.9 → 1)
-- Dark backgrounds with spotlight effects
-- Parallax scrolling
-- Full-bleed images
-
-### Techy / Futuristic
-- Neon glow effects (box-shadow with accent color)
-- Particle systems (canvas background)
-- Grid patterns
-- Monospace fonts for accents
-- Glitch or scramble text effects
-- Cyan, magenta, electric blue palette
-
-### Playful / Friendly
-- Bouncy easing (spring physics)
-- Rounded corners (large radius)
-- Pastel or bright colors
-- Floating/bobbing animations
-- Hand-drawn or illustrated elements
-
-### Professional / Corporate
-- Subtle, fast animations (200-300ms)
-- Clean sans-serif fonts
-- Navy, slate, or charcoal backgrounds
-- Precise spacing and alignment
-- Minimal decorative elements
-- Data visualization focus
-
-### Calm / Minimal
-- Very slow, subtle motion
-- High whitespace
-- Muted color palette
-- Serif typography
-- Generous padding
-- Content-focused, no distractions
-
-### Editorial / Magazine
-- Strong typography hierarchy
-- Pull quotes and callouts
-- Image-text interplay
-- Grid-breaking layouts
-- Serif headlines, sans-serif body
-- Black and white with one accent
-
----
-
-## Animation Patterns Reference
-
-### Entrance Animations
-
-```css
-/* Fade + Slide Up (most common) */
-.reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s var(--ease-out-expo),
-                transform 0.6s var(--ease-out-expo);
-}
-
-.visible .reveal {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Scale In */
-.reveal-scale {
-    opacity: 0;
-    transform: scale(0.9);
-    transition: opacity 0.6s, transform 0.6s var(--ease-out-expo);
-}
-
-/* Slide from Left */
-.reveal-left {
-    opacity: 0;
-    transform: translateX(-50px);
-    transition: opacity 0.6s, transform 0.6s var(--ease-out-expo);
-}
-
-/* Blur In */
-.reveal-blur {
-    opacity: 0;
-    filter: blur(10px);
-    transition: opacity 0.8s, filter 0.8s var(--ease-out-expo);
-}
-```
-
-### Background Effects
-
-```css
-/* Gradient Mesh */
-.gradient-bg {
-    background:
-        radial-gradient(ellipse at 20% 80%, rgba(120, 0, 255, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(0, 255, 200, 0.2) 0%, transparent 50%),
-        var(--bg-primary);
-}
-
-/* Noise Texture */
-.noise-bg {
-    background-image: url("data:image/svg+xml,..."); /* Inline SVG noise */
-}
-
-/* Grid Pattern */
-.grid-bg {
-    background-image:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
-}
-```
-
-### Interactive Effects
-
-```javascript
-/* 3D Tilt on Hover */
-class TiltEffect {
-    constructor(element) {
-        this.element = element;
-        this.element.style.transformStyle = 'preserve-3d';
-        this.element.style.perspective = '1000px';
-        this.bindEvents();
-    }
-
-    bindEvents() {
-        this.element.addEventListener('mousemove', (e) => {
-            const rect = this.element.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width - 0.5;
-            const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-            this.element.style.transform = `
-                rotateY(${x * 10}deg)
-                rotateX(${-y * 10}deg)
-            `;
-        });
-
-        this.element.addEventListener('mouseleave', () => {
-            this.element.style.transform = 'rotateY(0) rotateX(0)';
-        });
-    }
-}
-```
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-**Fonts not loading:**
-- Check Fontshare/Google Fonts URL
-- Ensure font names match in CSS
-
-**Animations not triggering:**
-- Verify Intersection Observer is running
-- Check that `.visible` class is being added
-
-**Scroll snap not working:**
-- Ensure `scroll-snap-type` on html/body
-- Each slide needs `scroll-snap-align: start`
-
-**Mobile issues:**
-- Disable heavy effects at 768px breakpoint
-- Test touch events
-- Reduce particle count or disable canvas
-
-**Performance issues:**
-- Use `will-change` sparingly
-- Prefer `transform` and `opacity` animations
-- Throttle scroll/mousemove handlers
-
----
-
 ## Themes & Component Library
-
-This skill includes pre-built themes and interactive components for rapid development.
 
 ### Available Themes
 
 | Theme | File | Use Case |
 |-------|------|----------|
-| **Midnight Executive** | `themes/midnight-executive.html` | Corporate, executive briefings, data-heavy presentations |
+| Midnight Executive | `themes/midnight-executive.html` | Corporate, executive briefings, data-heavy |
 
-**To use a theme:**
-1. Copy the theme file as your starting point
-2. Replace placeholder content with your slides
-3. All CSS variables, animations, and JS are included
+Copy the theme file as your starting point, replace placeholder content.
 
 ### Interactive Components (Alpine.js)
 
-For presentations that need **interactive elements** beyond static slides, use the component library.
+**File:** `components/midnight-components.html` | **Docs:** `components/README.md`
 
-**File:** `components/midnight-components.html`
-**Documentation:** `components/README.md`
+| Component | Use Case |
+|-----------|----------|
+| Tabs | Switch between data views |
+| Accordion | Expandable detail sections |
+| Collapsible | Show/hide optional info |
+| Modal | Pop-up detailed content |
+| Carousel | Cycle through testimonials/cases |
+| Dropdown | Select time period or metric |
+| Toggle | On/off data filtering |
+| Tooltip | Hover hints |
 
-**Available Components:**
-
-| Component | Use Case | Example |
-|-----------|----------|---------|
-| **Tabs** | Switch between data views | Revenue by quarter, segment breakdowns |
-| **Accordion** | Expandable detail sections | FAQ, feature lists with descriptions |
-| **Collapsible** | Show/hide optional info | Technical details, methodology |
-| **Modal** | Pop-up detailed content | Full roadmaps, data tables, deep-dives |
-| **Carousel** | Cycle through items | Testimonials, case studies, team bios |
-| **Dropdown** | Select between options | Time period selector, metric chooser |
-| **Toggle** | On/off switches | Show/hide detailed view, data filtering |
-| **Tooltip** | Hover hints | Explain acronyms, add context |
-
-**Supporting Components:** Badges, Alerts, Progress bars, Avatars, Skeleton loaders, Buttons, Cards
-
-### When to Add Interactivity
-
-**Use static slides when:**
-- Linear storytelling (beginning → middle → end)
-- Audience follows along passively
-- No need to explore data differently
-- Simpler is better
-
-**Add interactive components when:**
-- Multiple data views needed (tabs, dropdowns)
-- Details that only some audiences need (accordions, modals)
-- Hiding complexity until requested (collapsibles)
-- Cycling through similar content (carousels)
-- User-controlled exploration
+Supporting: Badges, Alerts, Progress bars, Avatars, Skeleton loaders, Buttons, Cards.
 
 ### Charts (Chart.js)
 
-For data visualization, include Chart.js via CDN:
-
 ```html
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 ```
-
-**Available Chart Types:**
 
 | Type | Best For |
 |------|----------|
-| **Area/Line** | Trends over time, growth metrics |
-| **Bar** | Comparisons, category breakdowns |
-| **Donut/Pie** | Proportions, market share |
-| **Horizontal Bar** | Rankings, progress toward goals |
+| Area/Line | Trends over time |
+| Bar | Comparisons, category breakdowns |
+| Donut/Pie | Proportions, market share |
+| Horizontal Bar | Rankings, progress toward goals |
 
-**When to use charts:**
-- Quantitative data that tells a story
-- Trends, comparisons, or proportions
-- Anywhere a table would be harder to read
+Combine: Tabs + Charts (switch metrics), Dropdown + Charts (change time period), Toggle + Charts (show/hide comparison).
 
-**Combine charts + components:**
-- **Tabs + Charts** — Switch between different metrics
-- **Dropdown + Charts** — Change time period dynamically
-- **Toggle + Charts** — Show/hide comparison data
+---
 
-### Required CDN Includes
+## References
 
-For interactive presentations, add to `<head>`:
+| File | Contents |
+|------|----------|
+| `references/html-template.md` | Full HTML boilerplate, JS class, CDN includes, code quality rules |
+| `references/animation-patterns.md` | Effect→feeling mapping, entrance CSS, background CSS, 3D tilt JS, troubleshooting |
+| `references/pptx-extractor.py` | Python script for PPTX content extraction |
+| `STYLE_PRESETS.md` | Detailed style preset catalog |
+| `themes/midnight-executive.html` | Full theme template |
+| `components/midnight-components.html` | Interactive component demo |
 
-```html
-<!-- Alpine.js (15kb) - Required for interactive components -->
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+---
 
-<!-- Alpine Collapse - For smooth expand/collapse animations -->
-<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+## Example Session Flows
 
-<!-- Chart.js - For data visualization -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-```
+**New Presentation:**
+1. User: "I want to create a pitch deck for my AI startup"
+2. Ask: purpose, length, content → user shares bullet points
+3. Ask: vibe (Impressed + Excited) → generate 3 style previews
+4. User picks Style B (Neon Cyber), asks for darker background
+5. Generate full presentation → open in browser → iterate on tweaks → deliver
 
-Also add:
-```css
-[x-cloak] { display: none !important; }
-```
-
-### File Structure
-
-```
-skills/frontend-slides/
-├── SKILL.md                 # This file
-├── STYLE_PRESETS.md         # Style reference guide
-├── themes/
-│   ├── README.md            # Theme usage guide
-│   └── midnight-executive.html  # Full theme template
-└── components/
-    ├── README.md            # Component copy-paste reference
-    └── midnight-components.html  # Interactive component demo
-```
+**PPT Conversion:**
+1. User: "Convert my slides.pptx to a web presentation"
+2. Extract content + images → confirm with user
+3. Style selection → generate HTML with preserved assets → deliver
 
 ---
 
 ## Related Skills
 
-- **frontend-design** — For more complex interactive pages beyond slides
-- **ui-ux-pro-max** — For advanced UI patterns and design systems
-- **shadcn-create** — For React-based Shadcn component theming
-
----
-
-## Example Session Flow
-
-1. User: "I want to create a pitch deck for my AI startup"
-2. Skill asks about purpose, length, content
-3. User shares their bullet points and key messages
-4. Skill asks about desired feeling (Impressed + Excited)
-5. Skill generates 3 style previews
-6. User picks Style B (Neon Cyber), asks for darker background
-7. Skill generates full presentation with all slides
-8. Skill opens the presentation in browser
-9. User requests tweaks to specific slides
-10. Final presentation delivered
-
----
-
-## Conversion Session Flow
-
-1. User: "Convert my slides.pptx to a web presentation"
-2. Skill extracts content and images from PPT
-3. Skill confirms extracted content with user
-4. Skill asks about desired feeling/style
-5. Skill generates style previews
-6. User picks a style
-7. Skill generates HTML presentation with preserved assets
-8. Final presentation delivered
+- **frontend-design** — Complex interactive pages beyond slides
+- **shadcn-create** — React-based Shadcn component theming

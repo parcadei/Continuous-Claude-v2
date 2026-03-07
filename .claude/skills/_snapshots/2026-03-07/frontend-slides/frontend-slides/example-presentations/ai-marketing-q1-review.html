@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Marketing — Q1 2026 Performance Review</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Alpine.js + Collapse -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: rgba(30, 41, 59, 0.6);
+            --bg-hover: rgba(51, 65, 85, 0.5);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #f59e0b;
+            --accent-glow: rgba(245, 158, 11, 0.15);
+            --teal: #00B69F;
+            --teal-glow: rgba(0, 182, 159, 0.15);
+            --purple: #a78bfa;
+            --purple-glow: rgba(167, 139, 250, 0.15);
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #eab308;
+            --border: rgba(148, 163, 184, 0.1);
+            --font-display: 'Libre Baskerville', Georgia, serif;
+            --font-body: 'Source Sans 3', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration: 0.2s;
+            --slide-padding: clamp(2rem, 5vw, 5rem);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        [x-cloak] { display: none !important; }
+        html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 17px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--teal), var(--accent));
+            width: 0%;
+            z-index: 100;
+            transition: width 0.2s ease-out;
+        }
+
+        .nav-dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot:hover { opacity: 0.7; transform: scale(1.3); }
+        .nav-dot.active { background: var(--teal); opacity: 1; }
+
+        .slide {
+            min-height: 100vh;
+            padding: var(--slide-padding);
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-content { max-width: 1100px; margin: 0 auto; width: 100%; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+        }
+
+        .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .reveal:nth-child(4) { transition-delay: 0.4s; }
+
+        .label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 1rem;
+        }
+
+        .label-amber { color: var(--accent); }
+        .label-purple { color: var(--purple); }
+        .label-danger { color: var(--danger); }
+
+        h1, h2, h3 { font-family: var(--font-display); font-weight: 700; }
+        h1 { font-size: clamp(2.25rem, 4.5vw, 3.5rem); line-height: 1.15; margin-bottom: 1.5rem; }
+        h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); margin-bottom: 1.25rem; }
+        h3 { font-size: 1.125rem; margin-bottom: 0.75rem; }
+
+        p { color: var(--text-secondary); margin-bottom: 1rem; max-width: 700px; }
+
+        .title-slide { text-align: center; }
+
+        .glow-bg {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .glow-teal { background: var(--teal-glow); }
+        .glow-amber { background: var(--accent-glow); }
+        .glow-purple { background: var(--purple-glow); }
+
+        .accent-line { width: 80px; height: 2px; background: var(--teal); margin: 2rem auto; }
+
+        /* Components */
+        .tabs {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-secondary);
+            padding: 0.25rem;
+            border-radius: var(--radius-md);
+            width: fit-content;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all var(--duration) ease;
+        }
+
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .tab-content { margin-top: 1.25rem; }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-title { font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .card-description { font-size: 0.8rem; color: var(--text-muted); margin: 0; }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .three-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+        }
+
+        @media (max-width: 900px) {
+            .two-col, .three-col, .card-grid { grid-template-columns: 1fr; }
+        }
+
+        .stat-value { font-family: var(--font-display); font-size: 2rem; font-weight: 700; line-height: 1; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.25rem; }
+        .stat-trend { font-size: 0.8rem; margin-top: 0.5rem; }
+        .stat-trend.up { color: var(--success); }
+        .stat-trend.down { color: var(--danger); }
+
+        .accordion { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .accordion-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .accordion-trigger {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            transition: background var(--duration) ease;
+        }
+
+        .accordion-trigger:hover { background: var(--bg-hover); }
+        .accordion-icon { color: var(--text-muted); transition: transform var(--duration) var(--ease-out); font-size: 0.75rem; }
+        .accordion-item[data-open="true"] .accordion-icon { transform: rotate(180deg); }
+        .accordion-inner { padding: 0 1rem 1rem; color: var(--text-secondary); font-size: 0.875rem; }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow: hidden;
+            transform: scale(0.95) translateY(10px);
+            transition: transform 0.3s var(--ease-out);
+        }
+
+        .modal-overlay.open .modal { transform: scale(1) translateY(0); }
+        .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-family: var(--font-display); font-size: 1.125rem; }
+        .modal-close { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-sm); }
+        .modal-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .modal-body { padding: 1.5rem; overflow-y: auto; max-height: 60vh; }
+        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+        .dropdown { position: relative; display: inline-block; }
+
+        .dropdown-trigger {
+            padding: 0.5rem 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .dropdown-icon { color: var(--text-muted); transition: transform var(--duration) var(--ease-out); font-size: 0.7rem; }
+        .dropdown.open .dropdown-icon { transform: rotate(180deg); }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            min-width: 160px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 0.25rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all var(--duration) var(--ease-out);
+            z-index: 100;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .dropdown.open .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .dropdown-item.active { color: var(--teal); }
+
+        .carousel { position: relative; overflow: hidden; border-radius: var(--radius-lg); }
+        .carousel-track { display: flex; transition: transform 0.5s var(--ease-out); }
+        .carousel-slide { flex: 0 0 100%; padding: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+        .carousel-nav { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 1rem; }
+
+        .carousel-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .carousel-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .carousel-dots { display: flex; gap: 0.5rem; }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            border: none;
+            cursor: pointer;
+            opacity: 0.3;
+        }
+
+        .carousel-dot:hover { opacity: 0.6; }
+        .carousel-dot.active { background: var(--teal); opacity: 1; }
+
+        .toggle { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
+
+        .toggle-track {
+            width: 40px;
+            height: 22px;
+            background: var(--bg-tertiary);
+            border-radius: 11px;
+            position: relative;
+            transition: background var(--duration) ease;
+        }
+
+        .toggle.active .toggle-track { background: var(--teal); }
+
+        .toggle-thumb {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: var(--text-primary);
+            border-radius: 50%;
+            transition: transform var(--duration) var(--ease-out);
+        }
+
+        .toggle.active .toggle-thumb { transform: translateX(18px); }
+        .toggle-label { font-size: 0.85rem; color: var(--text-secondary); }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--duration) ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary { background: var(--teal); color: var(--bg-primary); }
+        .btn-primary:hover { background: #00a38e; }
+        .btn-ghost { background: transparent; color: var(--text-secondary); }
+        .btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            border-radius: 9999px;
+        }
+
+        .badge-teal { background: var(--teal-glow); color: var(--teal); }
+        .badge-amber { background: var(--accent-glow); color: var(--accent); }
+        .badge-purple { background: var(--purple-glow); color: var(--purple); }
+        .badge-success { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+        .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+        .progress { height: 6px; background: var(--bg-tertiary); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 3px; transition: width 1s var(--ease-out); }
+
+        .chart-container { position: relative; height: 200px; margin-top: 1rem; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { padding: 0.625rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { font-weight: 600; color: var(--teal); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        td { color: var(--text-secondary); }
+        tr:last-child td { border-bottom: none; }
+
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 0.75rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .text-sm { font-size: 0.85rem; }
+        .text-muted { color: var(--text-muted); }
+
+        .keyboard-hint {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease 2s forwards;
+        }
+
+        .keyboard-hint kbd { background: var(--bg-secondary); padding: 0.2rem 0.4rem; border-radius: 4px; font-family: var(--font-mono); }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .nav-dots, .keyboard-hint { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar"></div>
+    <nav class="nav-dots"></nav>
+
+    <!-- =========================================
+         SLIDE 1: TITLE
+         ========================================= -->
+    <section class="slide title-slide" data-slide="0">
+        <div class="glow-bg glow-teal" style="top: -20%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content">
+            <p class="label reveal">Internal Review</p>
+            <h1 class="reveal">AI-Powered Marketing<br>Q1 2026 Performance</h1>
+            <p class="reveal" style="max-width: 550px; margin: 0 auto;">How our AI tools transformed campaign performance, content creation, and team productivity this quarter.</p>
+            <div class="accent-line reveal"></div>
+            <p class="reveal text-muted text-sm">Marketing Operations Team • January 29, 2026</p>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 2: EXECUTIVE SUMMARY (TABS)
+         ========================================= -->
+    <section class="slide" data-slide="1" x-data="{ tab: 'overview' }">
+        <div class="glow-bg glow-amber" style="top: 10%; right: -20%;"></div>
+        <div class="slide-content">
+            <p class="label label-amber reveal">Executive Summary</p>
+            <h2 class="reveal">Quarter at a Glance</h2>
+
+            <div class="tabs reveal mt-3">
+                <button class="tab-btn" :class="{ active: tab === 'overview' }" @click="tab = 'overview'">Overview</button>
+                <button class="tab-btn" :class="{ active: tab === 'wins' }" @click="tab = 'wins'">Key Wins</button>
+                <button class="tab-btn" :class="{ active: tab === 'metrics' }" @click="tab = 'metrics'">Metrics</button>
+                <button class="tab-btn" :class="{ active: tab === 'challenges' }" @click="tab = 'challenges'">Challenges</button>
+            </div>
+
+            <div class="tab-content reveal">
+                <div x-show="tab === 'overview'">
+                    <div class="card-grid">
+                        <div class="card">
+                            <div class="stat-value" style="color: var(--teal);">$847K</div>
+                            <div class="stat-label">Revenue Influenced</div>
+                            <div class="stat-trend up">↑ 156% vs Q4 2025</div>
+                        </div>
+                        <div class="card">
+                            <div class="stat-value" style="color: var(--accent);">12,400</div>
+                            <div class="stat-label">AI-Generated Assets</div>
+                            <div class="stat-trend up">↑ 340% vs Q4 2025</div>
+                        </div>
+                        <div class="card">
+                            <div class="stat-value" style="color: var(--purple);">68%</div>
+                            <div class="stat-label">Time Saved</div>
+                            <div class="stat-trend up">↑ 23pp vs Q4 2025</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="tab === 'wins'" x-cloak>
+                    <div class="card">
+                        <div class="flex flex-col gap-3">
+                            <div class="flex items-center gap-3">
+                                <span style="color: var(--success); font-size: 1.25rem;">✓</span>
+                                <span><strong>AI Content Engine</strong> — Launched personalization at scale, 4.2x engagement lift</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span style="color: var(--success); font-size: 1.25rem;">✓</span>
+                                <span><strong>Predictive Lead Scoring</strong> — 89% accuracy, sales team adoption at 94%</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span style="color: var(--success); font-size: 1.25rem;">✓</span>
+                                <span><strong>Automated A/B Testing</strong> — 127 experiments run, 34% avg improvement</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span style="color: var(--success); font-size: 1.25rem;">✓</span>
+                                <span><strong>Brand Voice AI</strong> — 98.7% consistency score across all channels</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="tab === 'metrics'" x-cloak>
+                    <div class="two-col">
+                        <div class="card">
+                            <div class="card-title">Performance vs Target</div>
+                            <div class="flex flex-col gap-3 mt-3">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2">
+                                        <span>MQL Generation</span>
+                                        <span style="color: var(--success);">112%</span>
+                                    </div>
+                                    <div class="progress"><div class="progress-fill" style="width: 100%; background: var(--success);"></div></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2">
+                                        <span>Content Output</span>
+                                        <span style="color: var(--success);">148%</span>
+                                    </div>
+                                    <div class="progress"><div class="progress-fill" style="width: 100%; background: var(--success);"></div></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-2">
+                                        <span>Cost per Lead</span>
+                                        <span style="color: var(--teal);">92%</span>
+                                    </div>
+                                    <div class="progress"><div class="progress-fill" style="width: 92%; background: var(--teal);"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">AI Tool ROI</div>
+                            <table class="mt-2">
+                                <tr><td>Claude Content</td><td style="text-align: right; color: var(--success);">+412%</td></tr>
+                                <tr><td>Jasper Ads</td><td style="text-align: right; color: var(--success);">+287%</td></tr>
+                                <tr><td>HubSpot AI</td><td style="text-align: right; color: var(--success);">+196%</td></tr>
+                                <tr><td>Midjourney</td><td style="text-align: right; color: var(--teal);">+124%</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="tab === 'challenges'" x-cloak>
+                    <div class="card" style="border-color: rgba(239, 68, 68, 0.3);">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span style="color: var(--danger);">⚠️</span>
+                            <div class="card-title" style="margin: 0;">Areas for Improvement</div>
+                        </div>
+                        <table class="mt-2">
+                            <thead><tr><th>Challenge</th><th>Impact</th><th>Action</th></tr></thead>
+                            <tbody>
+                                <tr><td>AI hallucinations in long-form</td><td>Medium</td><td><span class="badge badge-amber">In Progress</span></td></tr>
+                                <tr><td>Integration with legacy CRM</td><td>High</td><td><span class="badge badge-teal">Q2 Priority</span></td></tr>
+                                <tr><td>Team training gaps</td><td>Medium</td><td><span class="badge badge-success">Resolved</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 3: CAMPAIGN PERFORMANCE (CHARTS + DROPDOWN)
+         ========================================= -->
+    <section class="slide" data-slide="2" x-data="{ period: 'Q1 2026', showBreakdown: true }">
+        <div class="glow-bg glow-teal" style="bottom: -10%; left: -15%;"></div>
+        <div class="slide-content">
+            <div class="flex justify-between items-center reveal">
+                <div>
+                    <p class="label">Campaign Performance</p>
+                    <h2>AI-Driven Campaigns</h2>
+                </div>
+                <div class="flex gap-3 items-center">
+                    <div class="toggle" :class="{ active: showBreakdown }" @click="showBreakdown = !showBreakdown">
+                        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                        <span class="toggle-label">Channel breakdown</span>
+                    </div>
+                    <div class="dropdown" :class="{ open: $store.dd1 }" @click.outside="$store.dd1 = false" x-init="$store.dd1 = false">
+                        <button class="dropdown-trigger" @click="$store.dd1 = !$store.dd1">
+                            <span x-text="period"></span>
+                            <span class="dropdown-icon">▼</span>
+                        </button>
+                        <div class="dropdown-menu">
+                            <button class="dropdown-item" :class="{ active: period === 'Q1 2026' }" @click="period = 'Q1 2026'; $store.dd1 = false">Q1 2026</button>
+                            <button class="dropdown-item" :class="{ active: period === 'Q4 2025' }" @click="period = 'Q4 2025'; $store.dd1 = false">Q4 2025</button>
+                            <button class="dropdown-item" :class="{ active: period === 'Full Year' }" @click="period = 'Full Year'; $store.dd1 = false">Full Year</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="two-col reveal mt-4">
+                <div class="card">
+                    <div class="card-title">Conversion Rates by Campaign Type</div>
+                    <div class="chart-container" style="height: 220px;">
+                        <canvas id="campaignChart"></canvas>
+                    </div>
+                </div>
+                <div class="card" x-show="showBreakdown">
+                    <div class="card-title">Channel Performance</div>
+                    <div class="chart-container" style="height: 220px;">
+                        <canvas id="channelChart"></canvas>
+                    </div>
+                </div>
+                <div class="card" x-show="!showBreakdown" x-cloak>
+                    <div class="card-title">Top Performing Campaigns</div>
+                    <table class="mt-2">
+                        <thead><tr><th>Campaign</th><th>Leads</th><th>Conv.</th></tr></thead>
+                        <tbody>
+                            <tr><td>AI Product Launch</td><td>2,847</td><td style="color: var(--success);">8.4%</td></tr>
+                            <tr><td>Personalized Nurture</td><td>1,923</td><td style="color: var(--success);">7.2%</td></tr>
+                            <tr><td>ABM Enterprise</td><td>847</td><td style="color: var(--teal);">12.1%</td></tr>
+                            <tr><td>Retargeting AI</td><td>3,412</td><td style="color: var(--teal);">5.8%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 4: AI TOOL ADOPTION (ACCORDION)
+         ========================================= -->
+    <section class="slide" data-slide="3" x-data="{ open: 1, modal: false }">
+        <div class="glow-bg glow-purple" style="top: 20%; right: -15%;"></div>
+        <div class="slide-content">
+            <p class="label label-purple reveal">Tool Adoption</p>
+            <h2 class="reveal">AI Marketing Stack</h2>
+            <p class="reveal">Click each tool to see usage stats and ROI. <button class="btn btn-ghost" @click="modal = true" style="text-decoration: underline;">View full stack →</button></p>
+
+            <div class="two-col reveal mt-4">
+                <div class="accordion">
+                    <div class="accordion-item" :data-open="open === 1">
+                        <button class="accordion-trigger" @click="open = open === 1 ? null : 1">
+                            <span class="flex items-center gap-2">
+                                <span class="badge badge-success">94% Adoption</span>
+                                Claude for Content
+                            </span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div x-show="open === 1" x-collapse>
+                            <div class="accordion-inner">
+                                <p style="margin: 0 0 0.5rem;">Primary tool for blog posts, emails, and social copy. 8,400 pieces generated this quarter.</p>
+                                <div class="flex gap-2">
+                                    <span class="badge badge-teal">Avg 4.2 quality score</span>
+                                    <span class="badge badge-purple">67% time saved</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" :data-open="open === 2">
+                        <button class="accordion-trigger" @click="open = open === 2 ? null : 2">
+                            <span class="flex items-center gap-2">
+                                <span class="badge badge-success">87% Adoption</span>
+                                Jasper for Ads
+                            </span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div x-show="open === 2" x-collapse x-cloak>
+                            <div class="accordion-inner">
+                                <p style="margin: 0 0 0.5rem;">Ad copy generation for Google, Meta, and LinkedIn. 2,100 ad variants created.</p>
+                                <div class="flex gap-2">
+                                    <span class="badge badge-teal">+34% CTR improvement</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" :data-open="open === 3">
+                        <button class="accordion-trigger" @click="open = open === 3 ? null : 3">
+                            <span class="flex items-center gap-2">
+                                <span class="badge badge-amber">72% Adoption</span>
+                                Midjourney for Visuals
+                            </span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div x-show="open === 3" x-collapse x-cloak>
+                            <div class="accordion-inner">
+                                <p style="margin: 0 0 0.5rem;">Custom imagery for campaigns, social, and presentations. 1,900 images generated.</p>
+                                <div class="flex gap-2">
+                                    <span class="badge badge-amber">$42K saved vs stock</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" :data-open="open === 4">
+                        <button class="accordion-trigger" @click="open = open === 4 ? null : 4">
+                            <span class="flex items-center gap-2">
+                                <span class="badge badge-purple">68% Adoption</span>
+                                HubSpot AI Features
+                            </span>
+                            <span class="accordion-icon">▼</span>
+                        </button>
+                        <div x-show="open === 4" x-collapse x-cloak>
+                            <div class="accordion-inner">
+                                <p style="margin: 0 0 0.5rem;">Lead scoring, email optimization, and predictive analytics. Still ramping adoption.</p>
+                                <div class="flex gap-2">
+                                    <span class="badge badge-purple">Q2 training planned</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Tool Usage Trend</div>
+                    <div class="chart-container" style="height: 240px;">
+                        <canvas id="adoptionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Stack Modal -->
+            <div class="modal-overlay" :class="{ open: modal }" @click.self="modal = false">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Complete AI Marketing Stack</h3>
+                        <button class="modal-close" @click="modal = false">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <table>
+                            <thead><tr><th>Category</th><th>Tool</th><th>Monthly Cost</th><th>ROI</th></tr></thead>
+                            <tbody>
+                                <tr><td>Content</td><td>Claude Pro</td><td>$2,400</td><td style="color: var(--success);">+412%</td></tr>
+                                <tr><td>Content</td><td>Jasper Business</td><td>$1,200</td><td style="color: var(--success);">+287%</td></tr>
+                                <tr><td>Visual</td><td>Midjourney</td><td>$960</td><td style="color: var(--teal);">+124%</td></tr>
+                                <tr><td>Analytics</td><td>HubSpot AI</td><td>$3,200</td><td style="color: var(--success);">+196%</td></tr>
+                                <tr><td>Research</td><td>Perplexity Pro</td><td>$400</td><td style="color: var(--teal);">+89%</td></tr>
+                                <tr><td>Video</td><td>Synthesia</td><td>$600</td><td style="color: var(--amber);">+67%</td></tr>
+                            </tbody>
+                        </table>
+                        <p class="mt-3 text-sm text-muted">Total monthly spend: $8,760 | Combined ROI: +247%</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-ghost" @click="modal = false">Close</button>
+                        <button class="btn btn-primary">Export Report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 5: CONTENT EXAMPLES (CAROUSEL)
+         ========================================= -->
+    <section class="slide" data-slide="4" x-data="{ current: 0, total: 4 }">
+        <div class="glow-bg glow-amber" style="bottom: 10%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content">
+            <p class="label label-amber reveal">Content Showcase</p>
+            <h2 class="reveal">AI-Generated Campaign Examples</h2>
+            <p class="reveal">Real content created by our AI tools this quarter.</p>
+
+            <div class="reveal mt-4">
+                <div class="carousel">
+                    <div class="carousel-track" :style="{ transform: `translateX(-${current * 100}%)` }">
+                        <div class="carousel-slide">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="badge badge-teal">Email Campaign</span>
+                                <div style="color: var(--success); font-weight: 600;">42% Open Rate</div>
+                            </div>
+                            <h3 style="font-size: 1.1rem;">Product Launch Sequence</h3>
+                            <p style="font-style: italic; margin: 1rem 0; font-size: 0.9rem;">"Unlock the future of [Industry]. Our AI-powered platform just got smarter — and we think you'll love what's new..."</p>
+                            <div class="flex gap-2">
+                                <span class="badge badge-purple">5-email sequence</span>
+                                <span class="badge badge-amber">8.2% CTR</span>
+                            </div>
+                        </div>
+                        <div class="carousel-slide">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="badge badge-purple">Blog Post</span>
+                                <div style="color: var(--success); font-weight: 600;">12K Views</div>
+                            </div>
+                            <h3 style="font-size: 1.1rem;">"The CMO's Guide to AI in 2026"</h3>
+                            <p style="font-style: italic; margin: 1rem 0; font-size: 0.9rem;">Comprehensive thought leadership piece ranking #3 for "AI marketing strategy" — generated and refined in 4 hours.</p>
+                            <div class="flex gap-2">
+                                <span class="badge badge-teal">2,400 words</span>
+                                <span class="badge badge-amber">14 backlinks</span>
+                            </div>
+                        </div>
+                        <div class="carousel-slide">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="badge badge-amber">LinkedIn Ads</span>
+                                <div style="color: var(--success); font-weight: 600;">$18 CPL</div>
+                            </div>
+                            <h3 style="font-size: 1.1rem;">ABM Enterprise Campaign</h3>
+                            <p style="font-style: italic; margin: 1rem 0; font-size: 0.9rem;">47 personalized ad variants targeting Fortune 500 accounts. Each variant tailored to company pain points via AI research.</p>
+                            <div class="flex gap-2">
+                                <span class="badge badge-purple">2.4% CTR</span>
+                                <span class="badge badge-success">127 MQLs</span>
+                            </div>
+                        </div>
+                        <div class="carousel-slide">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="badge badge-success">Video Script</span>
+                                <div style="color: var(--success); font-weight: 600;">89% Completion</div>
+                            </div>
+                            <h3 style="font-size: 1.1rem;">Product Demo Video</h3>
+                            <p style="font-style: italic; margin: 1rem 0; font-size: 0.9rem;">3-minute explainer script with AI-generated voiceover. Used in sales outreach with 3.2x response rate improvement.</p>
+                            <div class="flex gap-2">
+                                <span class="badge badge-teal">Synthesia avatar</span>
+                                <span class="badge badge-amber">24hr turnaround</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-nav">
+                    <button class="carousel-btn" @click="current = current > 0 ? current - 1 : total - 1">←</button>
+                    <div class="carousel-dots">
+                        <template x-for="i in total">
+                            <button class="carousel-dot" :class="{ active: current === i - 1 }" @click="current = i - 1"></button>
+                        </template>
+                    </div>
+                    <button class="carousel-btn" @click="current = current < total - 1 ? current + 1 : 0">→</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 6: TEAM PRODUCTIVITY
+         ========================================= -->
+    <section class="slide" data-slide="5" x-data="{ view: 'time', showComparison: false }">
+        <div class="glow-bg glow-teal" style="top: 15%; left: -15%;"></div>
+        <div class="slide-content">
+            <div class="flex justify-between items-center reveal">
+                <div>
+                    <p class="label">Team Impact</p>
+                    <h2>Productivity Gains</h2>
+                </div>
+                <div class="flex gap-3 items-center">
+                    <div class="toggle" :class="{ active: showComparison }" @click="showComparison = !showComparison">
+                        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                        <span class="toggle-label">vs. Q4 comparison</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tabs reveal mt-3">
+                <button class="tab-btn" :class="{ active: view === 'time' }" @click="view = 'time'">Time Saved</button>
+                <button class="tab-btn" :class="{ active: view === 'output' }" @click="view = 'output'">Output Volume</button>
+                <button class="tab-btn" :class="{ active: view === 'quality' }" @click="view = 'quality'">Quality Scores</button>
+            </div>
+
+            <div class="tab-content reveal">
+                <div x-show="view === 'time'">
+                    <div class="three-col">
+                        <div class="card" style="text-align: center;">
+                            <div class="stat-value" style="color: var(--teal); font-size: 2.5rem;">68%</div>
+                            <div class="stat-label">Time Saved on Content</div>
+                            <p class="text-sm text-muted mt-2" style="margin: 0;" x-show="showComparison">vs 45% in Q4</p>
+                        </div>
+                        <div class="card" style="text-align: center;">
+                            <div class="stat-value" style="color: var(--accent); font-size: 2.5rem;">4.2hrs</div>
+                            <div class="stat-label">Avg. Saved per Person/Day</div>
+                            <p class="text-sm text-muted mt-2" style="margin: 0;" x-show="showComparison">vs 2.8hrs in Q4</p>
+                        </div>
+                        <div class="card" style="text-align: center;">
+                            <div class="stat-value" style="color: var(--purple); font-size: 2.5rem;">$127K</div>
+                            <div class="stat-label">Labor Cost Avoided</div>
+                            <p class="text-sm text-muted mt-2" style="margin: 0;" x-show="showComparison">vs $68K in Q4</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="view === 'output'" x-cloak>
+                    <div class="two-col">
+                        <div class="card">
+                            <div class="card-title">Content Pieces by Type</div>
+                            <div class="chart-container" style="height: 220px;">
+                                <canvas id="outputChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">Monthly Output</div>
+                            <table class="mt-2">
+                                <thead><tr><th>Type</th><th>Q1</th><th x-show="showComparison">Q4</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Blog Posts</td><td>47</td><td x-show="showComparison" style="color: var(--text-muted);">18</td></tr>
+                                    <tr><td>Emails</td><td>312</td><td x-show="showComparison" style="color: var(--text-muted);">124</td></tr>
+                                    <tr><td>Social Posts</td><td>847</td><td x-show="showComparison" style="color: var(--text-muted);">342</td></tr>
+                                    <tr><td>Ad Variants</td><td>2,100</td><td x-show="showComparison" style="color: var(--text-muted);">780</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="view === 'quality'" x-cloak>
+                    <div class="card">
+                        <div class="card-title">Quality Metrics (1-5 Scale)</div>
+                        <div class="flex flex-col gap-3 mt-3">
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>Brand Voice Consistency</span>
+                                    <span style="color: var(--success);">4.8</span>
+                                </div>
+                                <div class="progress"><div class="progress-fill" style="width: 96%; background: var(--success);"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>Factual Accuracy</span>
+                                    <span style="color: var(--teal);">4.2</span>
+                                </div>
+                                <div class="progress"><div class="progress-fill" style="width: 84%; background: var(--teal);"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>Engagement Quality</span>
+                                    <span style="color: var(--success);">4.5</span>
+                                </div>
+                                <div class="progress"><div class="progress-fill" style="width: 90%; background: var(--success);"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-2">
+                                    <span>SEO Optimization</span>
+                                    <span style="color: var(--purple);">4.1</span>
+                                </div>
+                                <div class="progress"><div class="progress-fill" style="width: 82%; background: var(--purple);"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 7: Q2 ROADMAP
+         ========================================= -->
+    <section class="slide" data-slide="6" x-data="{ open: null }">
+        <div class="glow-bg glow-purple" style="bottom: -10%; right: -20%;"></div>
+        <div class="slide-content">
+            <p class="label label-purple reveal">Looking Ahead</p>
+            <h2 class="reveal">Q2 2026 Priorities</h2>
+            <p class="reveal">Click each initiative to see scope and success criteria.</p>
+
+            <div class="card-grid reveal mt-4">
+                <div class="card" @click="open = open === 1 ? null : 1" style="cursor: pointer;">
+                    <div class="flex justify-between items-center">
+                        <span class="badge badge-teal">Priority 1</span>
+                        <span class="text-muted text-sm" x-text="open === 1 ? '−' : '+'"></span>
+                    </div>
+                    <h3 class="mt-2">Agentic Workflow Automation</h3>
+                    <p class="text-sm text-muted" style="margin: 0.5rem 0 0;">Deploy autonomous AI agents for campaign management</p>
+                    <div x-show="open === 1" x-collapse x-cloak class="mt-3" style="border-top: 1px solid var(--border); padding-top: 0.75rem;">
+                        <p class="text-sm" style="margin: 0 0 0.5rem;"><strong>Scope:</strong> Email sequences, social scheduling, A/B test selection</p>
+                        <p class="text-sm" style="margin: 0;"><strong>Success:</strong> 50% reduction in manual campaign setup</p>
+                    </div>
+                </div>
+
+                <div class="card" @click="open = open === 2 ? null : 2" style="cursor: pointer;">
+                    <div class="flex justify-between items-center">
+                        <span class="badge badge-amber">Priority 2</span>
+                        <span class="text-muted text-sm" x-text="open === 2 ? '−' : '+'"></span>
+                    </div>
+                    <h3 class="mt-2">Predictive Analytics 2.0</h3>
+                    <p class="text-sm text-muted" style="margin: 0.5rem 0 0;">Upgrade lead scoring with behavioral AI models</p>
+                    <div x-show="open === 2" x-collapse x-cloak class="mt-3" style="border-top: 1px solid var(--border); padding-top: 0.75rem;">
+                        <p class="text-sm" style="margin: 0 0 0.5rem;"><strong>Scope:</strong> Intent signals, firmographic enrichment, timing prediction</p>
+                        <p class="text-sm" style="margin: 0;"><strong>Success:</strong> 95% lead score accuracy</p>
+                    </div>
+                </div>
+
+                <div class="card" @click="open = open === 3 ? null : 3" style="cursor: pointer;">
+                    <div class="flex justify-between items-center">
+                        <span class="badge badge-purple">Priority 3</span>
+                        <span class="text-muted text-sm" x-text="open === 3 ? '−' : '+'"></span>
+                    </div>
+                    <h3 class="mt-2">Video Content at Scale</h3>
+                    <p class="text-sm text-muted" style="margin: 0.5rem 0 0;">Expand AI video production for sales and marketing</p>
+                    <div x-show="open === 3" x-collapse x-cloak class="mt-3" style="border-top: 1px solid var(--border); padding-top: 0.75rem;">
+                        <p class="text-sm" style="margin: 0 0 0.5rem;"><strong>Scope:</strong> Product demos, customer testimonials, training content</p>
+                        <p class="text-sm" style="margin: 0;"><strong>Success:</strong> 20 videos/month capacity</p>
+                    </div>
+                </div>
+
+                <div class="card" @click="open = open === 4 ? null : 4" style="cursor: pointer;">
+                    <div class="flex justify-between items-center">
+                        <span class="badge badge-success">Priority 4</span>
+                        <span class="text-muted text-sm" x-text="open === 4 ? '−' : '+'"></span>
+                    </div>
+                    <h3 class="mt-2">CRM Integration Complete</h3>
+                    <p class="text-sm text-muted" style="margin: 0.5rem 0 0;">Finish legacy system migration and AI enablement</p>
+                    <div x-show="open === 4" x-collapse x-cloak class="mt-3" style="border-top: 1px solid var(--border); padding-top: 0.75rem;">
+                        <p class="text-sm" style="margin: 0 0 0.5rem;"><strong>Scope:</strong> Salesforce sync, historical data migration, AI training</p>
+                        <p class="text-sm" style="margin: 0;"><strong>Success:</strong> 100% data availability for AI tools</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================
+         SLIDE 8: KEY TAKEAWAYS
+         ========================================= -->
+    <section class="slide" data-slide="7">
+        <div class="glow-bg glow-teal" style="top: 30%; left: 50%; transform: translateX(-50%);"></div>
+        <div class="slide-content" style="text-align: center;">
+            <p class="label reveal">Summary</p>
+            <h2 class="reveal">Key Takeaways</h2>
+
+            <div class="card reveal" style="max-width: 700px; margin: 2rem auto 0; text-align: left;">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-3">
+                        <span style="color: var(--teal); font-size: 1.25rem;">✓</span>
+                        <span><strong>AI tools delivered 247% combined ROI</strong> — investment paying off significantly</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span style="color: var(--teal); font-size: 1.25rem;">✓</span>
+                        <span><strong>68% time savings</strong> — team now focused on strategy, not execution</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span style="color: var(--teal); font-size: 1.25rem;">✓</span>
+                        <span><strong>Content output up 340%</strong> — quality maintained at 4.4/5 average</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span style="color: var(--accent); font-size: 1.25rem;">→</span>
+                        <span><strong>Q2 Focus:</strong> Agentic automation, predictive analytics, video scale</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reveal mt-4">
+                <p class="text-muted">Questions? Let's discuss.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="keyboard-hint">
+        Press <kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> to navigate • Click components to interact
+    </div>
+
+    <script>
+        // Chart.js configuration
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = 'rgba(148, 163, 184, 0.1)';
+        Chart.defaults.font.family = "'Source Sans 3', sans-serif";
+
+        // Campaign Chart
+        const campaignCtx = document.getElementById('campaignChart');
+        if (campaignCtx) {
+            new Chart(campaignCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Email', 'Social', 'Paid Ads', 'Content', 'ABM'],
+                    datasets: [{
+                        label: 'AI-Assisted',
+                        data: [8.4, 4.2, 6.1, 5.8, 12.1],
+                        backgroundColor: '#00B69F',
+                        borderRadius: 4
+                    }, {
+                        label: 'Traditional',
+                        data: [3.2, 1.8, 2.4, 2.1, 4.3],
+                        backgroundColor: '#334155',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true } } },
+                    scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, beginAtZero: true } }
+                }
+            });
+        }
+
+        // Channel Chart
+        const channelCtx = document.getElementById('channelChart');
+        if (channelCtx) {
+            new Chart(channelCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Email', 'LinkedIn', 'Google Ads', 'Meta', 'Organic'],
+                    datasets: [{ data: [32, 24, 22, 14, 8], backgroundColor: ['#00B69F', '#a78bfa', '#f59e0b', '#3b82f6', '#64748b'], borderWidth: 0, spacing: 2 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, pointStyle: 'circle' } } }
+                }
+            });
+        }
+
+        // Adoption Trend Chart
+        const adoptionCtx = document.getElementById('adoptionChart');
+        if (adoptionCtx) {
+            new Chart(adoptionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
+                    datasets: [
+                        { label: 'Claude', data: [45, 58, 72, 84, 91, 94], borderColor: '#00B69F', backgroundColor: 'rgba(0, 182, 159, 0.1)', fill: true, tension: 0.4 },
+                        { label: 'Jasper', data: [38, 52, 65, 74, 82, 87], borderColor: '#a78bfa', backgroundColor: 'rgba(167, 139, 250, 0.1)', fill: true, tension: 0.4 },
+                        { label: 'Midjourney', data: [22, 35, 48, 58, 67, 72], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true, tension: 0.4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true } } },
+                    scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, beginAtZero: true, max: 100 } }
+                }
+            });
+        }
+
+        // Output Chart
+        const outputCtx = document.getElementById('outputChart');
+        if (outputCtx) {
+            new Chart(outputCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Blog', 'Email', 'Social', 'Ads'],
+                    datasets: [{
+                        data: [47, 312, 847, 2100],
+                        backgroundColor: ['#00B69F', '#a78bfa', '#f59e0b', '#3b82f6'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: { x: { grid: { color: 'rgba(148, 163, 184, 0.1)' }, beginAtZero: true }, y: { grid: { display: false } } }
+                }
+            });
+        }
+
+        // Slide navigation
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.progressBar = document.querySelector('.progress-bar');
+                this.navDots = document.querySelector('.nav-dots');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.init();
+            }
+
+            init() {
+                this.createNavDots();
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupScrollListener();
+            }
+
+            createNavDots() {
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'nav-dot';
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    this.navDots.appendChild(dot);
+                });
+                this.updateNavDots();
+            }
+
+            updateNavDots() {
+                const dots = this.navDots.querySelectorAll('.nav-dot');
+                dots.forEach((dot, index) => dot.classList.toggle('active', index === this.currentSlide));
+            }
+
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            this.currentSlide = parseInt(entry.target.dataset.slide);
+                            this.updateNavDots();
+                            this.updateProgress();
+                        }
+                    });
+                }, { threshold: 0.5 });
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); this.nextSlide(); }
+                    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); this.prevSlide(); }
+                });
+            }
+
+            setupScrollListener() {
+                window.addEventListener('scroll', () => {
+                    const scrollTop = window.scrollY;
+                    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                    this.progressBar.style.width = `${(scrollTop / docHeight) * 100}%`;
+                }, { passive: true });
+            }
+
+            updateProgress() {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                this.progressBar.style.width = `${(scrollTop / docHeight) * 100}%`;
+            }
+
+            goToSlide(index) { if (index >= 0 && index < this.totalSlides) this.slides[index].scrollIntoView({ behavior: 'smooth' }); }
+            nextSlide() { if (this.currentSlide < this.totalSlides - 1) this.goToSlide(this.currentSlide + 1); }
+            prevSlide() { if (this.currentSlide > 0) this.goToSlide(this.currentSlide - 1); }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => new SlidePresentation());
+    </script>
+</body>
+</html>

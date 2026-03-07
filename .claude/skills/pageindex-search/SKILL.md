@@ -1,3 +1,8 @@
+---
+name: pageindex-search
+description: Tree-based RAG for large markdown documents using LLM reasoning.
+---
+
 # PageIndex Search Skill
 
 Tree-based RAG for large markdown documents using LLM reasoning.

@@ -1,8 +1,9 @@
 ---
 name: research-external
 description: External research workflow for docs, web, APIs - NOT codebase exploration
-model: sonnet
 allowed-tools: [Bash, Read, Write, Task]
+metadata:
+  model: sonnet
 ---
 
 # External Research Workflow
@@ -19,7 +20,7 @@ Research external sources (documentation, web, APIs) for libraries, best practic
 
 ## Question Flow (No Arguments)
 
-If the user types just `/research-external` with no or partial arguments, guide them through this question flow. Use AskUserQuestion for each phase.
+If the user types just `/research-external` with no or partial arguments, guide them through this question flow.
 
 ### Phase 1: Research Type
 
@@ -37,78 +38,29 @@ options:
     description: "Which tool/library/approach is best"
 ```
 
-**Mapping:**
-- "How to use library" → library focus
-- "Best practices" → best-practices focus
-- "General topic" → general focus
-- "Compare options" → best-practices with comparison framing
+**Mapping:** library / best-practices / general / best-practices with comparison framing
 
 ### Phase 2: Specific Topic
 
-```yaml
-question: "What specifically do you want to research?"
-header: "Topic"
-options: []  # Free text input
-```
-
-Examples of good answers:
+Free text input. Examples:
 - "How to use Prisma ORM with TypeScript"
 - "Best practices for error handling in Python"
 - "React vs Vue vs Svelte for dashboards"
 
 ### Phase 3: Library Details (if library focus)
 
-If user selected library focus:
-
-```yaml
-question: "Which package registry?"
-header: "Registry"
-options:
-  - label: "npm (JavaScript/TypeScript)"
-    description: "Node.js packages"
-  - label: "PyPI (Python)"
-    description: "Python packages"
-  - label: "crates.io (Rust)"
-    description: "Rust crates"
-  - label: "Go modules"
-    description: "Go packages"
-```
-
-Then ask for specific library name if not already provided.
+Ask for registry (npm / PyPI / crates.io / Go modules) and specific library name if not provided.
 
 ### Phase 4: Depth
 
-```yaml
-question: "How thorough should the research be?"
-header: "Depth"
-options:
-  - label: "Quick answer"
-    description: "Just the essentials"
-  - label: "Thorough research"
-    description: "Multiple sources, examples, edge cases"
-```
-
-**Mapping:**
-- "Quick answer" → --depth shallow
-- "Thorough" → --depth thorough
+- "Quick answer" → `--depth shallow`
+- "Thorough research" → `--depth thorough`
 
 ### Phase 5: Output
 
-```yaml
-question: "What should I produce?"
-header: "Output"
-options:
-  - label: "Summary in chat"
-    description: "Tell me what you found"
-  - label: "Research document"
-    description: "Write to thoughts/shared/research/"
-  - label: "Handoff for implementation"
-    description: "Prepare context for coding"
-```
-
-**Mapping:**
-- "Research document" → --output doc
-- "Handoff" → --output handoff
+- "Summary in chat" → default chat response
+- "Research document" → `--output doc` → `thoughts/shared/research/`
+- "Handoff for implementation" → `--output handoff`
 
 ### Summary Before Execution
 
@@ -124,7 +76,7 @@ Based on your answers, I'll research:
 Proceed? [Yes / Adjust settings]
 ```
 
-## Focus Modes (First Argument)
+## Focus Modes
 
 | Focus | Primary Tool | Purpose |
 |-------|--------------|---------|
@@ -146,7 +98,6 @@ Proceed? [Yes / Adjust settings]
 
 ### Step 1: Parse Arguments
 
-Extract from user input:
 ```
 FOCUS=$1           # library | best-practices | general
 TOPIC="..."        # from --topic
@@ -160,47 +111,39 @@ REGISTRY="npm"     # from --registry (default: npm)
 
 #### Focus: `library`
 
-Primary tool: **nia-docs** - Find API documentation, usage patterns, code examples.
+Primary tool: **nia-docs** — API documentation, usage patterns, code examples.
 
 ```bash
 # Semantic search in package
 (cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/nia_docs.py \
-  --package "$LIBRARY" \
-  --registry "$REGISTRY" \
-  --query "$TOPIC" \
-  --limit 10)
+  --package "$LIBRARY" --registry "$REGISTRY" --query "$TOPIC" --limit 10)
 
-# If thorough depth, also grep for specific patterns
+# Thorough: also grep for specific patterns
 (cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/nia_docs.py \
-  --package "$LIBRARY" \
-  --grep "$TOPIC")
+  --package "$LIBRARY" --grep "$TOPIC")
 
 # Supplement with official docs if URL known
 (cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/firecrawl_scrape.py \
-  --url "https://docs.example.com/api/$TOPIC" \
-  --format markdown)
+  --url "https://docs.example.com/api/$TOPIC" --format markdown)
 ```
 
-**Thorough depth additions:**
-- Multiple semantic queries with variations
-- Grep for specific function/class names
-- Scrape official documentation pages
+Thorough depth: multiple semantic queries with variations, grep for function/class names, scrape official docs pages.
 
 #### Focus: `best-practices`
 
-Primary tool: **perplexity-search** - Find recommended approaches, patterns, anti-patterns.
+Primary tool: **perplexity-search** — recommended approaches, patterns, anti-patterns.
 
 ```bash
 # AI-synthesized research (sonar-pro)
 (cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
   --research "$TOPIC best practices 2024 2025")
 
-# If comparing alternatives
+# Comparing alternatives
 (cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
   --reason "$TOPIC vs alternatives - which to choose?")
 ```
 
-**Thorough depth additions:**
+Thorough depth additions:
 ```bash
 # Chain-of-thought for complex decisions
 (cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
@@ -212,151 +155,46 @@ Primary tool: **perplexity-search** - Find recommended approaches, patterns, ant
 
 # Recent developments
 (cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
-  --search "$TOPIC latest developments" \
-  --recency month --max-results 5)
+  --search "$TOPIC latest developments" --recency month --max-results 5)
 ```
 
 #### Focus: `general`
 
-Use ALL available MCP tools - comprehensive multi-source research.
+Use ALL available MCP tools — comprehensive multi-source research.
 
-**Step 2a: Library documentation (nia-docs)**
 ```bash
+# 2a: Library documentation (nia-docs)
 (cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/nia_docs.py \
   --search "$TOPIC")
-```
 
-**Step 2b: Web research (perplexity)**
-```bash
+# 2b: Web research (perplexity)
 (cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
   --research "$TOPIC")
-```
 
-**Step 2c: Specific documentation (firecrawl)**
-```bash
-# Scrape relevant documentation pages found in perplexity results
+# 2c: Specific documentation pages found in step 2b (firecrawl)
 (cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/firecrawl_scrape.py \
-  --url "$FOUND_DOC_URL" \
-  --format markdown)
+  --url "$FOUND_DOC_URL" --format markdown)
 ```
 
-**Thorough depth additions:**
-- Run all three tools with expanded queries
-- Cross-reference findings between sources
-- Follow links from initial results for deeper context
+Thorough depth: run all three with expanded queries, cross-reference findings, follow links for deeper context.
 
 ### Step 3: Synthesize Findings
 
 Combine results from all sources:
 
-1. **Key Concepts** - Core ideas and terminology
-2. **Code Examples** - Working examples from documentation
-3. **Best Practices** - Recommended approaches
-4. **Pitfalls** - Common mistakes to avoid
-5. **Alternatives** - Other options considered
-6. **Sources** - URLs for all citations
+1. **Key Concepts** — Core ideas and terminology
+2. **Code Examples** — Working examples from documentation
+3. **Best Practices** — Recommended approaches
+4. **Pitfalls** — Common mistakes to avoid
+5. **Alternatives** — Other options considered
+6. **Sources** — URLs for all citations
 
 ### Step 4: Write Output
 
-#### Output: `doc` (default)
+See `references/output-templates.md` for full doc and handoff templates.
 
-Write to: `thoughts/shared/research/YYYY-MM-DD-{topic-slug}.md`
-
-```markdown
----
-date: {ISO timestamp}
-type: external-research
-topic: "{topic}"
-focus: {focus}
-sources: [nia, perplexity, firecrawl]
-status: complete
----
-
-# Research: {Topic}
-
-## Summary
-{2-3 sentence summary of findings}
-
-## Key Findings
-
-### Library Documentation
-{From nia-docs - API references, usage patterns}
-
-### Best Practices (2024-2025)
-{From perplexity - recommended approaches}
-
-### Code Examples
-```{language}
-// Working examples found
-```
-
-## Recommendations
-- {Recommendation 1}
-- {Recommendation 2}
-
-## Pitfalls to Avoid
-- {Pitfall 1}
-- {Pitfall 2}
-
-## Alternatives Considered
-| Option | Pros | Cons |
-|--------|------|------|
-| {Option 1} | ... | ... |
-
-## Sources
-- [{Source 1}]({url1})
-- [{Source 2}]({url2})
-```
-
-#### Output: `handoff`
-
-Write to: `thoughts/shared/handoffs/{session}/research-{topic-slug}.yaml`
-
-```yaml
----
-type: research-handoff
-ts: {ISO timestamp}
-topic: "{topic}"
-focus: {focus}
-status: complete
----
-
-goal: Research {topic} for implementation planning
-sources_used: [nia, perplexity, firecrawl]
-
-findings:
-  key_concepts:
-    - {concept1}
-    - {concept2}
-
-  code_examples:
-    - pattern: "{pattern name}"
-      code: |
-        // example code
-
-  best_practices:
-    - {practice1}
-    - {practice2}
-
-  pitfalls:
-    - {pitfall1}
-
-recommendations:
-  - {rec1}
-  - {rec2}
-
-sources:
-  - title: "{Source 1}"
-    url: "{url1}"
-    type: {documentation|article|reference}
-
-for_plan_agent: |
-  Based on research, the recommended approach is:
-  1. {Step 1}
-  2. {Step 2}
-  Key libraries: {lib1}, {lib2}
-  Avoid: {pitfall1}
-```
+**Doc path:** `thoughts/shared/research/YYYY-MM-DD-{topic-slug}.md`
+**Handoff path:** `thoughts/shared/handoffs/{session}/research-{topic-slug}.yaml`
 
 ### Step 5: Return Summary
 
@@ -373,55 +211,30 @@ Key findings:
 - {Finding 3}
 
 Sources: {N} sources cited
-
-{If handoff output:}
-Ready for plan-agent to continue.
 ```
 
 ## Error Handling
 
 If an MCP tool fails (API key missing, rate limited, etc.):
 
-1. **Log the failure** in output:
-   ```yaml
-   tool_status:
-     nia: success
-     perplexity: failed (rate limited)
-     firecrawl: skipped
-   ```
+1. Log the failure in output under `tool_status:`
+2. Continue with other sources — partial results are valuable
+3. Set status: `complete` / `partial` / `failed`
+4. Note gaps in findings under `## Gaps`
 
-2. **Continue with other sources** - partial results are valuable
+## Quick Examples
 
-3. **Set status appropriately:**
-   - `complete` - All requested tools succeeded
-   - `partial` - Some tools failed, findings still useful
-   - `failed` - No useful results obtained
-
-4. **Note gaps** in findings:
-   ```markdown
-   ## Gaps
-   - Perplexity unavailable - best practices section limited to nia results
-   ```
-
-## Examples
-
-### Library Research (Shallow)
-```
+```bash
+# Library lookup (shallow)
 /research-external library --topic "dependency injection" --library fastapi --registry py_pi
-```
 
-### Best Practices (Thorough)
-```
+# Best practices (thorough)
 /research-external best-practices --topic "error handling in Python async" --depth thorough
-```
 
-### General Research for Handoff
-```
+# General research for handoff
 /research-external general --topic "OAuth2 PKCE flow implementation" --depth thorough --output handoff
-```
 
-### Quick Library Lookup
-```
+# Quick React hook lookup
 /research-external library --topic "useEffect cleanup" --library react
 ```
 
@@ -442,7 +255,8 @@ If an MCP tool fails (API key missing, rate limited, etc.):
 
 ## Notes
 
-- **NOT for codebase exploration** - Use `research-codebase` or `scout` for that
-- **Always cite sources** - Include URLs for all findings
-- **2024-2025 timeframe** - Focus on current best practices
-- **Graceful degradation** - Partial results better than no results
+- **NOT for codebase exploration** — Use `research-codebase` or `scout` for that
+- **Always cite sources** — Include URLs for all findings
+- **2024-2025 timeframe** — Focus on current best practices
+- **Graceful degradation** — Partial results better than no results
+- Full output templates: `references/output-templates.md`

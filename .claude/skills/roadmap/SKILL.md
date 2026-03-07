@@ -1,3 +1,8 @@
+---
+name: roadmap
+description: ROADMAP management - view, update, and track project goals and progress
+---
+
 # /roadmap - ROADMAP Management
 
 <roadmap-command>

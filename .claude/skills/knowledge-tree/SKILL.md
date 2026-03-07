@@ -1,8 +1,9 @@
 ---
 name: knowledge-tree
 description: Query and update project knowledge tree for navigation
-triggers: ["/knowledge-tree", "project structure", "where to add", "project goals"]
 allowed-tools: [Bash, Read]
+metadata:
+  triggers: ["/knowledge-tree", "project structure", "where to add", "project goals"]
 ---
 
 # Knowledge Tree

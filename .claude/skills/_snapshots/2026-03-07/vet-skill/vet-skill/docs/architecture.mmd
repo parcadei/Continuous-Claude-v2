@@ -1,0 +1,60 @@
+graph TD
+    User["User: npx skills add org/repo@skill"]
+
+    subgraph InstallFlow["Install Flow"]
+        SIR["skill-install-registrar hook"]
+        TP["trusted-publishers.json"]
+        TrustCheck{"Trusted publisher?"}
+        ET_FAST["extract_triggers.py"]
+        REG_FAST["register_skill.py"]
+        RECOMMEND["Recommend /vet-skill for full evaluation"]
+    end
+
+    subgraph VetFlow["Vet Skill Flow"]
+        VET["/vet-skill orchestrator"]
+        QV["quick_validate.py"]
+        ET_VET["extract_triggers.py"]
+        EVAL["run_eval.py (10 parallel Claude processes, majority vote)"]
+        ANALYZE["Analyze results"]
+        REG_VET["register_skill.py"]
+    end
+
+    subgraph StalenessFlow["Staleness Detection"]
+        SSINIT["session-start-init-check.ts"]
+        STALE_CHECK{"30-day age OR hash mismatch?"}
+        WARN["Warn user: skill may be stale"]
+        OK["No action needed"]
+    end
+
+    subgraph DataStores["Data Stores"]
+        RULES["skill-rules.json (central routing)"]
+        LOCK[".skill-lock.json (install metadata)"]
+        TRUSTED["trusted-publishers.json (trusted orgs)"]
+    end
+
+    User --> SIR
+    SIR --> TP
+    TP --> TrustCheck
+    TrustCheck -- Yes --> ET_FAST
+    ET_FAST --> REG_FAST
+    REG_FAST --> RULES
+    REG_FAST --> LOCK
+    TrustCheck -- No --> RECOMMEND
+    RECOMMEND --> VET
+
+    VET --> QV
+    QV --> ET_VET
+    ET_VET --> EVAL
+    EVAL --> ANALYZE
+    ANALYZE --> REG_VET
+    REG_VET --> RULES
+    REG_VET --> LOCK
+
+    SSINIT --> RULES
+    SSINIT --> LOCK
+    LOCK --> STALE_CHECK
+    RULES --> STALE_CHECK
+    STALE_CHECK -- Yes --> WARN
+    STALE_CHECK -- No --> OK
+
+    SIR -.reads.-> TRUSTED
