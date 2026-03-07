@@ -169,24 +169,6 @@ Triggered when Claude Code sends a notification.
 - Supports Python, TypeScript, Go, Rust
 - Injects errors into context for iterative fixing
 
-### Subagent Coordination
-
-**subagent-start** (SubagentStart)
-- Pattern-aware router for multi-agent patterns
-- Injects pattern-specific context (swarm, jury, pipeline, hierarchical, etc.)
-- Registers agent in PostgreSQL coordination database
-- Provides role-based instructions (coordinator, worker, juror, mapper, reducer)
-
-**subagent-stop** (SubagentStop)
-- Handles pattern-specific completion tracking
-- Marks agent as completed in coordination database
-- Triggers aggregation for patterns like map-reduce, jury voting
-
-**subagent-learning** (SubagentStop)
-- Extracts learnings from subagent transcripts
-- Stores in semantic memory for future recall
-- Fire-and-forget background process
-
 ## Hook Registration
 
 Hooks are registered in `.claude/settings.json`:

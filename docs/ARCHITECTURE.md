@@ -4,7 +4,7 @@
 
 Continuous Claude v3 is an **agentic AI development environment** built on top of Claude Code. It transforms a single AI assistant into a coordinated system of specialized agents, with automatic context management, semantic memory, and token-efficient code analysis. Think of it as "VS Code + GitHub Copilot, but the AI can delegate to specialist AIs, remember past sessions, and understand code at the AST level."
 
-The system has four main layers: **Skills** (what users can trigger), **Hooks** (automatic behaviors), **Agents** (specialized sub-assistants), and **Infrastructure** (persistence and analysis tools).
+The system has five pillars: **Memory** (persistent learnings), **Hooks** (automatic behaviors), **Agents** (specialized sub-assistants), **PageIndex** (document intelligence), and **Workflows** (multi-step orchestration).
 
 ---
 
@@ -32,15 +32,15 @@ The system has four main layers: **Skills** (what users can trigger), **Hooks** 
 |  | - Indexing  |    | - Braintrust  |    | - TLDR inject|    | - Handoff idx  |   |
 |  +-------------+    +---------------+    +--------------+    +----------------+   |
 |                                                                                    |
-|  +-------------+    +---------------+    +--------------+    +----------------+   |
-|  | SubagentSt  |    | SubagentStop  |    | Stop         |    | SessionEnd     |   |
-|  | - Register  |    | - Continuity  |    | - Coordinator|    | - Cleanup      |   |
-|  +-------------+    +---------------+    +--------------+    +----------------+   |
+|  +-------------+    +----------------+                                            |
+|  | SessionEnd  |    | PreCompact     |                                            |
+|  | - Cleanup   |    | - State save   |                                            |
+|  +-------------+    +----------------+                                            |
 +-----------------------------------------------------------------------------------+
                                         |
                                         v
 +-----------------------------------------------------------------------------------+
-|                              AGENT LAYER (41 agents)                               |
+|                              AGENT LAYER (31 agents)                               |
 |                                                                                    |
 |  ORCHESTRATORS          IMPLEMENTERS         EXPLORERS          REVIEWERS         |
 |  +----------+           +----------+         +----------+       +----------+      |
@@ -155,13 +155,11 @@ Hooks fire automatically at specific lifecycle points. Users don't invoke them d
 | `smart-search-router` | Grep | Routes to AST-grep/LEANN/Grep based on query type |
 | `tldr-context-inject` | Task | Adds code context to subagent prompts |
 | `file-claims` | Edit | Tracks which session owns which files |
-| `pre-edit-context` | Edit | Injects context before edits |
 
 ### PostToolUse Hooks
 
 | Hook | Triggers On | What It Does |
 |------|-------------|--------------|
-| `pattern-orchestrator` | Task | Manages multi-agent patterns (pipeline, jury, debate) |
 | `typescript-preflight` | Edit, Write | Runs TypeScript compiler check |
 | `handoff-index` | Write | Indexes handoff documents for search |
 | `compiler-in-the-loop` | Write | Validates code changes compile |
@@ -174,16 +172,13 @@ Hooks fire automatically at specific lifecycle points. Users don't invoke them d
 | `session-register` | SessionStart | Registers session in coordination layer |
 | `session-start-continuity` | Resume/Compact | Restores continuity ledger |
 | `skill-activation-prompt` | UserPromptSubmit | Suggests relevant skills |
-| `subagent-start` | SubagentStart | Registers subagent spawn |
-| `subagent-stop-continuity` | SubagentStop | Saves subagent state |
-| `stop-coordinator` | Stop | Handles graceful shutdown |
 | `session-end-cleanup` | SessionEnd | Cleanup and final state save |
 
 ---
 
 ## 3. Agent Layer
 
-41 specialized agents, each with a defined role, model preference, and tool access.
+31 specialized agents, each with a defined role, model preference, and tool access.
 
 ### Orchestration Agents
 
@@ -197,8 +192,7 @@ Hooks fire automatically at specific lifecycle points. Users don't invoke them d
 | Agent | Model | Purpose |
 |-------|-------|---------|
 | **architect** | opus | Feature design, interface planning, integration design |
-| **phoenix** | opus | Refactoring plans, tech debt analysis |
-| **pioneer** | opus | Migration planning, framework upgrades |
+| **phoenix** | opus | Refactoring plans, tech debt analysis, migration planning |
 
 ### Exploration Agents
 
@@ -228,7 +222,7 @@ Hooks fire automatically at specific lifecycle points. Users don't invoke them d
 |-------|-------|---------|
 | **arbiter** | opus | Unit/integration testing |
 | **atlas** | opus | E2E testing |
-| **validator** | sonnet | Plan validation against precedent |
+| **validate-agent** | sonnet | Plan validation against precedent |
 
 ### Review Agents
 
@@ -236,7 +230,6 @@ Hooks fire automatically at specific lifecycle points. Users don't invoke them d
 |-------|-------|---------|
 | **critic** | sonnet | Code review |
 | **judge** | sonnet | Refactor review |
-| **warden** | sonnet | Security review |
 | **surveyor** | sonnet | Migration completeness |
 
 ### Specialized Agents
@@ -349,7 +342,7 @@ Location: `/tmp/claude-symbol-index/`
 | `symbols.json` | Function/class definitions with location |
 | `callers.json` | Who calls each function |
 
-Built by `build_symbol_index.py` on SessionStart.
+Built by `opc/scripts/tldr/build_symbol_index.py` on SessionStart.
 
 ---
 
@@ -357,33 +350,29 @@ Built by `build_symbol_index.py` on SessionStart.
 
 ### Entry Points (User-Callable)
 
-| Script | Purpose |
-|--------|---------|
-| `recall_learnings.py` | Semantic search of archival memory |
-| `store_learning.py` | Store a new learning |
-| `observe_agents.py` | Query running agent state |
-| `braintrust_analyze.py` | Analyze session logs |
-| `artifact_query.py` | Search artifact index |
+| Script | Path | Purpose |
+|--------|------|---------|
+| `recall_learnings.py` | `opc/scripts/core/recall_learnings.py` | Semantic search of archival memory |
+| `store_learning.py` | `opc/scripts/core/store_learning.py` | Store a new learning |
+| `observe_agents.py` | `opc/scripts/observe_agents.py` | Query running agent state |
+| `braintrust_analyze.py` | `opc/scripts/braintrust_analyze.py` | Analyze session logs |
+| `artifact_query.py` | `opc/scripts/core/artifact_query.py` | Search artifact index |
 
 ### Background Services
 
-| Script | Purpose |
-|--------|---------|
-| `build_symbol_index.py` | Builds symbol index on session start |
-| `index_incremental.py` | Incremental artifact indexing |
+| Script | Path | Purpose |
+|--------|------|---------|
+| `build_symbol_index.py` | `opc/scripts/tldr/build_symbol_index.py` | Builds symbol index on session start |
+| `index_incremental.py` | `opc/scripts/tldr/index_incremental.py` | Incremental artifact indexing |
 
 ### Computation Backends
 
-| Script | Purpose |
-|--------|---------|
-| `sympy_compute.py` | Symbolic math |
-| `z3_solve.py` | Constraint solving |
-| `pint_compute.py` | Unit conversions |
-| `math_router.py` | Routes math queries to backends |
-
-### Hook Launcher
-
-`hook_launcher.py` - Central dispatcher that compiles and runs TypeScript hooks via the `tsc-cache/` directory.
+| Script | Path | Purpose |
+|--------|------|---------|
+| `sympy_compute.py` | `opc/scripts/cc_math/sympy_compute.py` | Symbolic math |
+| `z3_solve.py` | `opc/scripts/cc_math/z3_solve.py` | Constraint solving |
+| `pint_compute.py` | `opc/scripts/cc_math/pint_compute.py` | Unit conversions |
+| `math_router.py` | `opc/scripts/cc_math/math_router.py` | Routes math queries to backends |
 
 ---
 
@@ -416,7 +405,7 @@ User: "debug the authentication bug"
          |
          v
 +-------------------+
-| PostToolUse:Task  |  pattern-orchestrator checks completion
+| PostToolUse:Task  |  completion recorded
 +-------------------+
          |
          v
@@ -492,7 +481,6 @@ Claude calls Grep("validateToken")
 |------|---------|
 | `.claude/hooks/src/smart-search-router.ts` | Routes searches to best tool |
 | `.claude/hooks/src/tldr-context-inject.ts` | Adds TLDR context to agents |
-| `.claude/hooks/src/pattern-orchestrator.ts` | Multi-agent pattern management |
 | `.claude/hooks/src/session-start-continuity.ts` | Restores session state |
 | `.claude/hooks/src/handoff-index.ts` | Indexes handoff documents |
 
@@ -709,11 +697,6 @@ Output: list[MemoryRecord]
 | `braintrust_analyze.py` | `format_duration` | Never called, no tests |
 | `secrets_filter.py` | `mask_secret` | Never called, not exported |
 
-**Functions kept (have tests, cross-platform support):**
-| File | Function | Reason |
-|------|----------|--------|
-| `hook_launcher.py` | `expand_path` | Cross-platform path handling, tested |
-
 #### Archive Directory (490+ functions)
 
 The `archive/` directory contains deprecated subsystems:
@@ -759,9 +742,8 @@ Location: `.claude/hooks/src/`
 |----------|-------|---------|
 | Session | 4 | Start/end lifecycle |
 | Tool Interception | 8 | Enhance tool behavior |
-| Subagent | 4 | Agent coordination |
-| Patterns | 2 | Multi-agent orchestration |
 | Validation | 3 | Code quality gates |
+| Patterns | 2 | Multi-agent orchestration |
 
 **Key Hook Functions:**
 
@@ -769,9 +751,7 @@ Location: `.claude/hooks/src/`
 |------|---------------|
 | `skill-activation-prompt.ts` | `runPatternInference`, `generateAgenticaOutput` |
 | `tldr-context-inject.ts` | `detectIntent`, `getTldrContext`, `extractEntryPoints` |
-| `subagent-stop-continuity.ts` | `parseStructuredHandoff`, `createYamlHandoff` |
 | `compiler-in-the-loop.ts` | `runLeanCompiler`, `getGoedelSuggestions`, `queryLoogle` |
-| `pattern-orchestrator.ts` | `handlePipeline`, `handleJury`, `handleDebate`, `handleGenCritic` |
 
 ---
 
@@ -780,9 +760,9 @@ Location: `.claude/hooks/src/`
 | Metric | Count | Notes |
 |--------|-------|-------|
 | Python functions | 2,328 | Across all `opc/scripts/` |
-| TypeScript hooks | 34 | Active in `.claude/hooks/src/` |
-| Skills | 123 | In `.claude/skills/` |
-| Agents | 41 | Defined in system prompt |
+| TypeScript hooks | 92 source files, 23 registered | Active in `.claude/hooks/src/` |
+| Skills | 129 directories | In `.claude/skills/` |
+| Agents | 31 | Defined in `.claude/agents/` |
 | Tests | 265+ | TLDR-code alone |
 | Entry layer functions | 1,057 | Called from outside |
 | Leaf functions | 729 | Utility/helper code |

@@ -1,10 +1,29 @@
 # Project Roadmap
 
 ## Current Focus
-
-_No current goal. Next planned item will be promoted on next planning session._
+**Add Mixed Background Design Elements to CCv3 Light Landing Page**
+- Target: Hero section (3W-0); Target: Problem (46-0) / Solution (4E-0) area
+- Started: 2026-03-07
 
 ## Completed
+- [x] Fix Sync-to-Repo Revert Loop + Re-apply Reverted Fixes (2026-03-07)
+- [x] [fix](hooks) break sync-to-repo revert loop + re-apply 7 code fixes (2026-03-07) `0adbdeb`
+- [x] Fix: Eliminate Explore → Scout Redirect Round-Trip (2026-03-07)
+- [x] LinkMap Code Review, Refactor & Cleanup (2026-03-07)
+- [x] [fix](hooks) revive dead agent validation pipeline — Task→Agent rename (2026-03-06) `d8d7343`
+- [x] Dashboard Phase 1 — Fix HIGH Priority Bugs (2026-03-05)
+- [x] Skills.sh Vetting Pipeline — Code Review Remediation + Testing (2026-03-05)
+- [x] Dashboard Final Review via Browser Automation (2026-03-05)
+- [x] [feat](dashboard) add System Health Report and Sessions sidebar panels (2026-03-03) `4ec578e`
+- [x] [fix](dashboard) activity feed always empty — seed on load, broadcast events, fix reactivity (2026-03-03) `8d503e1`
+- [x] [fix](dashboard) handoffs scan both directories, Ralph status online when idle (2026-03-03) `bcd323e`
+- [x] [fix](dashboard) HandoffsDetail crash on uppercase status values from API (2026-03-02) `35fd59c`
+- [x] [feat](dashboard) session dashboard UX overhaul — WebSocket, panels, DRY cleanup (2026-03-02) `97d7950`
+- [x] PPTX Design Revolution — From Corporate Template to Agency-Quality (2026-03-01)
+- [x] [feat] add paper-design skill v1.1.0 for visual UI design via MCP (2026-03-01) `241f8ff`
+- [x] Fourth Presentation Suite — Premium Visual Upgrade (v4) (2026-02-28)
+- [x] Fourth Presentation Suite — Visual Polish Upgrade (2026-02-28)
+- [x] [feat] add forge-landing Next.js project (frontend-design skill v1.2.0 test) (2026-02-22) `68b035b`
 - [x] [fix](hooks) V5 final repair — eliminate Python bridge, fix Windows daemon tests (2026-02-21) `2067653`
 - [x] [feat](hooks) implement skill-router functions + LOW severity fixes (2026-02-21) `e97222c`
 - [x] [docs] update README counts and add Mermaid architecture diagrams (2026-02-21) `cd1fcdc`
@@ -78,22 +97,52 @@ _No current goal. Next planned item will be promoted on next planning session._
 - [x] Memory unit tests in opc/tests/ (2026-02)
 
 ## Planned
+_No planned items yet._
 
 ## Recent Planning Sessions
-### 2026-02-14: Platform Quality Upgrade — Implementation Plan
-**Summary:** Comprehensive testing against the live Railway deployment (https://web-production-2c64.up.railway.app) graded the platform **B- (74/100)**. Route stability (100) and performance (100) are excellent, but **accessibility (55/100)** and **design quality (55/100)** drag the score. Three routes — `/`, `/...
+### 2026-03-07: Add Mixed Background Design Elements to CCv3 Light Landing Page
+**Key Decisions:**
+- Target: Hero section (3W-0)
+- Target: Problem (46-0) / Solution (4E-0) area
+- Target: Stats row (4N-0)
+- Applied via update_styles background property or wrapper div
+- Target: Feature cards area (57-0 through 6A-0)
 
+**Implementation:**
+- Target: Hero section (3W-0)
+- Technique: Two large soft radial gradient circles floating behind the headline
+- Orb 1: ~500px, radial-gradient teal rgba(13,148,136,0.08), top-right area
+- Orb 2: ~400px, radial-gradient warm peach rgba(251,191,146,0.07), bottom-left area
+- Absolute positioned divs, pointer-events: none
+
+### 2026-03-05: LinkMap Code Review, Refactor & Cleanup
+**Key Decisions:**
+- Overall assessment: Strong codebase (B+/A-). Clean architecture, solid state management, comprehensive features. Issues are mostly dead code, inconsistent error handling, and minor robustness gaps.
+- `chrome.windows.getCurrent()` resolves async, but `handleStateUpdate()` can fire before it resolves
+- Fix:: Await the window query before requesting state, or gate first render on both being ready:
+- Fix:: Generate labels from render order, not sorted order
+- Fix:: Add `if (!name || !name.trim()) return;` guards
+
+### 2026-03-01: PPTX Design Revolution — From Corporate Template to Agency-Quality
+**Key Decisions:**
+- The fundamental issue: Every slide uses the same 2-3 visual primitives (glass card, dark gradient, teal accent) with no variation in composition, scale drama, or information design. The result is monotonous and flat — the visual equivalent of a monotone speaker.
+- Fix: Introduce 4-5 DISTINCT container styles. Glass cards should be ONE option, not the default for everything.
+- Fix: Create "hero metric" compositions where the number dominates 60%+ of the visual space.
+- Fix: Build shape-based visualizations that don't depend on python-pptx chart objects.
+- Fix: Introduce 3-4 distinct layout archetypes that rotate through the deck.
+
+### 2026-02-28: Fourth Presentation Suite — Premium Visual Upgrade (v4)
+**Key Decisions:**
+- Gap: The current PPTX looks good but not *agency-quality*. Missing: gradient area charts, pill badges, thin divider lines, teal checkmarks, left-accent cards, and a new roadmap slide type.
+- Goal: Implement premium design primitives and new slide types so the PPTX output matches the reference images — ready to present in boardrooms.
+- Find/create `<c:spPr>` under the `<c:ser>` element
+- Build: `<c:symbol val="circle"/>`, `<c:size val="8"/>`, `<c:spPr>` with fill + line
+- Create `XL_CHART_TYPE.AREA` chart via existing `_add_category_chart`
+
+### 2026-02-14: Platform Quality Upgrade — Implementation Plan
 **Key Decisions:**
 - Goal: Raise overall score from 74 → 85-90 (B+/A-) by fixing WCAG blockers, improving design quality, and cleaning up polish items.
 - Branch: `platform-updates` (off `master`)
 - Source reports: `workbook-platform-audit.md` (prioritized fixes), `workbook-test-report.md` (raw graded data)
 - Fixes: Skip link (5 routes), focus indicators (16-24 elements/route), touch targets (90%+ elements)
 - Risk: MEDIUM — button/input size cascades everywhere. Visual verify all routes.
-
-**Files:** workbook-platform-audit.md, workbook-test-report.md, apps/web/app/layout.tsx, apps/web/app/(dashboard)/layout.tsx, apps/web/app/globals.css, apps/web/components/ui/button.tsx, apps/web/components/ui/input.tsx, apps/web/components/ui/nexus-card.tsx
-
-### 2026-02-02: ROADMAP.md Creation
-**Key Decisions:**
-- Created roadmap file for hook integration
-- Enables post-plan-roadmap hook to track planning decisions
-- Knowledge tree can now reference goals.source

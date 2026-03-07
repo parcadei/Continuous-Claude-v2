@@ -10,7 +10,6 @@ sequenceDiagram
     participant Pre as PreToolUse
     participant Post as PostToolUse
     participant C as PreCompact
-    participant Sub as SubagentStop
     participant E as SessionEnd
 
     Note over S: Session begins
@@ -22,7 +21,8 @@ sequenceDiagram
 
     Note over U,P: User types a prompt
     U->>P: Submit prompt
-    P->>P: skill-activation-prompt (suggest skills)
+    P->>P: skill-activation-prompt (keyword + intent match)
+    P->>P: skill-router.ts (graph: prereqs + co-activation)
     P->>P: memory-awareness (recall learnings)
     P->>P: ralph-progress-inject (show progress)
     P->>P: ralph-retry-reminder (retry context)
@@ -46,9 +46,6 @@ sequenceDiagram
     Note over C: Context window filling up
     C->>C: pre-compact-continuity (save state)
     C->>C: pre-compact-extract (extract learnings)
-
-    Note over Sub: Agent finishes
-    Sub->>Sub: subagent-stop-continuity (save results)
 
     Note over E: Session ends
     E->>E: session-end-cleanup (cleanup)
@@ -80,4 +77,4 @@ These hooks can return `deny` to prevent a tool from executing:
 | tldr-read-enforcer | File read when TLDR summary available |
 | smart-search-router | Grep when AST search is better |
 
-Last verified: 2026-02-20
+Last verified: 2026-03-03
