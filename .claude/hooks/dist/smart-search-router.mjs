@@ -601,28 +601,7 @@ async function main() {
       queries_routed: 1,
       literal_queries: 1
     });
-    const reason2 = `\u{1F50D} Use TLDR search for code exploration (95% token savings):
-
-**Option 1 - TLDR Skill:**
-/tldr-search ${pattern}
-
-**Option 2 - Direct CLI:**
-\`\`\`bash
-tldr search "${pattern}" .
-\`\`\`
-
-**Option 3 - Read specific file (TLDR auto-enriches):**
-Read the file containing "${pattern}" - the tldr-read-enforcer will return structured context.
-
-TLDR finds location + provides call graph + docstrings in one call.`;
-    const output2 = {
-      hookSpecificOutput: {
-        hookEventName: "PreToolUse",
-        permissionDecision: "deny",
-        permissionDecisionReason: reason2
-      }
-    };
-    console.log(JSON.stringify(output2));
+    console.log("{}");
     return;
   }
   if (queryType === "structural") {

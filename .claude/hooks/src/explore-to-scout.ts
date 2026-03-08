@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Explore to Scout Rewrite Hook - PreToolUse (Agent)
+ * Explore to Scout Hook - PreToolUse (Agent)
  *
- * Silently rewrites subagent_type="Explore" to "scout" using modifiedInput.
- * Eliminates the deny+retry round-trip that wasted tokens and latency.
+ * Blocks subagent_type="Explore" with permissionDecision: "deny".
+ * Claude Code does NOT support modifiedInput — only deny/allow/continue.
  *
  * Per ~/.claude/rules/use-scout-not-explore.md:
  * - Explore uses Haiku - fast but inaccurate
@@ -15,16 +15,7 @@ interface HookInput {
   tool_name?: string;
   tool_input?: {
     subagent_type?: string;
-    prompt?: string;
     [key: string]: unknown;
-  };
-}
-
-interface HookOutput {
-  hookSpecificOutput?: {
-    hookEventName: string;
-    modifiedInput?: Record<string, unknown>;
-    additionalContext?: string;
   };
 }
 
@@ -55,12 +46,18 @@ async function main(): Promise<void> {
     return;
   }
 
-  // Silently rewrite Explore -> scout (no deny/retry needed)
-  const output: HookOutput = {
+  // Block Explore — Claude Code only supports permissionDecision, not modifiedInput
+  const output = {
     hookSpecificOutput: {
       hookEventName: 'PreToolUse',
-      modifiedInput: { subagent_type: 'scout' },
-      additionalContext: 'Explore -> scout: upgraded for accuracy (Sonnet vs Haiku)',
+      permissionDecision: 'deny' as const,
+      permissionDecisionReason: `BLOCKED: subagent_type='Explore' is not allowed.
+
+Per ~/.claude/rules/use-scout-not-explore.md:
+- Explore uses Haiku -- fast but inaccurate
+- Scout uses Sonnet with a detailed prompt -- accurate results
+
+REMOVE subagent_type="Explore" and use subagent_type="scout" instead.`,
     },
   };
 

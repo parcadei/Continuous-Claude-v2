@@ -292,13 +292,13 @@ var ALLOWED_PATTERNS = [
   /.*_test\.py$/,
   /.*\.test\.(ts|js)$/,
   /.*\.spec\.(ts|js)$/,
-  // Allow hooks/skills (we edit these)
-  /\.claude\/hooks\//,
-  /\.claude\/skills\//,
+  // Allow hooks/skills (we edit these) - cross-platform path separators
+  /\.claude[/\\]hooks[/\\]/,
+  /\.claude[/\\]skills[/\\]/,
   /init-db\.sql$/,
-  /migrations\//
+  /migrations[/\\]/
 ];
-var ALLOWED_DIRS = ["/tmp/", "node_modules/", ".venv/", "__pycache__/"];
+var ALLOWED_DIRS = ["/tmp/", "node_modules/", ".venv/", "__pycache__/", "\\tmp\\"];
 function isCodeFile(filePath) {
   return CODE_EXTENSIONS.has(extname(filePath));
 }

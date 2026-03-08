@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-03-07T02:01:25.303957+00:00",
+  "updated_at": "2026-03-08T11:19:47.839639+00:00",
   "project": {
     "name": "continuous-claude",
     "description": "> Give Claude a notebook, memory, specialized assistants, and autonomous development capability — so every conversation builds on the last [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://claude.ai/code)",
@@ -263,11 +263,27 @@
           "README.md"
         ]
       },
+      ".claude\\skills\\_eval/": {
+        "purpose": "JavaScript modules",
+        "key_files": null
+      },
       ".claude\\skills\\_sandbox/": {
         "purpose": "Project directory",
         "key_files": null
       },
+      ".claude\\skills\\_snapshots/": {
+        "purpose": "Project directory",
+        "key_files": null
+      },
+      ".claude\\skills\\_snapshots\\2026-03-07/": {
+        "purpose": "Project directory",
+        "key_files": null
+      },
       ".claude\\skills\\agent-browser/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\agent-browser\\references/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -307,6 +323,10 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\agentica-sdk\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\agentica-server/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -333,6 +353,10 @@
       },
       ".claude\\skills\\archive\\compound-learnings/": {
         "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\archive\\create-better-skills/": {
+        "purpose": "Project directory",
         "key_files": null
       },
       ".claude\\skills\\archive\\dangerous-mode/": {
@@ -457,6 +481,10 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\archive\\tdd-migration-pipeline/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\ast-grep-find/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -543,6 +571,10 @@
           "README.md"
         ]
       },
+      ".claude\\skills\\date-logic-management\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\dead-code/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -560,6 +592,10 @@
         "key_files": null
       },
       ".claude\\skills\\discovery-interview/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\discovery-interview\\references/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -583,6 +619,10 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\explore\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\find-skills/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -595,12 +635,16 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\fix\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\fourth-brand-guidelines/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
       ".claude\\skills\\fourth-brand-guidelines\\references/": {
-        "purpose": "Project directory",
+        "purpose": "Markdown documentation",
         "key_files": null
       },
       ".claude\\skills\\fourth-presentation-builder/": {
@@ -647,6 +691,10 @@
         "purpose": "Project directory",
         "key_files": null
       },
+      ".claude\\skills\\frontend-slides\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\frontend-slides\\templates/": {
         "purpose": "Project directory",
         "key_files": null
@@ -682,6 +730,10 @@
         "key_files": null
       },
       ".claude\\skills\\hook-developer/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\hook-developer\\references/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -753,6 +805,10 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\mot\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\nia-docs/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -813,6 +869,10 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\premortem\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\qlty-check/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -822,6 +882,10 @@
         "key_files": null
       },
       ".claude\\skills\\ralph/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\ralph\\references/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -870,6 +934,10 @@
         "key_files": null
       },
       ".claude\\skills\\research-external/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\research-external\\references/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -973,6 +1041,10 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\tdd\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\tdd-migrate/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -986,6 +1058,10 @@
         "key_files": null
       },
       ".claude\\skills\\tldr-code/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\tldr-code\\references/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -1010,6 +1086,10 @@
         "key_files": null
       },
       ".claude\\skills\\ui-audit/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\ui-audit\\references/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -1673,7 +1753,7 @@
       "add_skill": [
         ".claude\\plugins\\braintrust-tracing\\skills/",
         ".claude\\skills/",
-        ".claude\\skills\\create-better-skills/"
+        ".claude\\skills\\archive\\create-better-skills/"
       ]
     },
     "entry_points": {
@@ -1683,10 +1763,14 @@
   "goals": {
     "source": "ROADMAP.md",
     "current": {
-      "title": "Fix Sync-to-Repo Revert Loop + Re-apply Reverted Fixes",
-      "description": "This copies the fixed versions to `~/.claude/hooks/src/` and rebuilds; Revert loop fixed: Edit a `.ts` file in `continuous-claude/.claude/hooks/src/`, wait 15s, re-read the file — edit should persist; Started: 2026-03-07"
+      "title": "Add Mixed Background Design Elements to CCv3 Light Landing Page",
+      "description": "Target: Hero section (3W-0); Target: Problem (46-0) / Solution (4E-0) area; Started: 2026-03-07"
     },
     "completed": [
+      {
+        "title": "Fix Sync-to-Repo Revert Loop + Re-apply Reverted Fixes",
+        "completed": "2026-03-07"
+      },
       {
         "title": "[fix](hooks) break sync-to-repo revert loop + re-apply 7 code fixes (2026-03-07) `0adbdeb`",
         "completed": null
@@ -2044,7 +2128,5 @@
   },
   "critical_info": {
     "env_vars": ".env.example"
-  },
-  "_stale": true,
-  "_invalidated_at": "2026-03-07T20:26:51.767Z"
+  }
 }

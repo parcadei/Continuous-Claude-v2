@@ -89,6 +89,18 @@ See `references/icon-catalog.md` for CDN setup, usage pattern, sizing, and the f
 
 ---
 
+## 1C. Element Anchor IDs (`data-fc-id`) [REQUIRED]
+
+Every meaningful content element in the HTML output MUST have a `data-fc-id` attribute. These IDs enable the Fourth Connect commenting system to anchor review pins to specific elements.
+
+**Convention:** `data-fc-id="slide{N}-{section}-{element}"`
+
+Apply to: headings, content containers, stat cards, tables, paragraphs, figures, expandable sections. Skip purely decorative elements.
+
+Full specification and examples: `@references/fourth-html-template.md` → "Element Anchor IDs" section.
+
+---
+
 ## 2. Content Transformation Step
 
 Between receiving raw content and generating slides, MUST classify and transform:

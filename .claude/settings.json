@@ -1,5 +1,4 @@
 {
-  "autoCompact": false,
   "env": {
     "CONTINUOUS_CLAUDE_COORDINATION": "true",
     "ENABLE_TOOL_SEARCH": "auto:5",
@@ -59,6 +58,11 @@
           {
             "type": "command",
             "command": "node C:/Users/david.hayes/.claude/hooks/dist/pre-tool-knowledge.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node C:/Users/david.hayes/.claude/hooks/dist/tldr-context-inject.mjs",
             "timeout": 5000
           }
         ]
@@ -236,6 +240,11 @@
             "type": "command",
             "command": "node C:/Users/david.hayes/.claude/hooks/dist/roadmap-reconcile.mjs",
             "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "node C:/Users/david.hayes/.claude/hooks/dist/session-start-tldr-cache.mjs",
+            "timeout": 15000
           }
         ]
       }
@@ -449,6 +458,8 @@
     "trace-claude-code@braintrust-claude-plugin": true
   },
   "alwaysThinkingEnabled": true,
+  "skipDangerousModePermissionPrompt": true,
+  "autoCompact": false,
   "allowedTools": [],
   "warningLevel": "medium",
   "mcpServers": {
@@ -468,18 +479,12 @@
         "mcp-server-fetch"
       ]
     },
-    "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/",
-      "headers": {
-        "Authorization": "Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}"
-      },
-      "disabled": true
-    },
     "firecrawl": {
       "type": "stdio",
-      "command": "npx",
+      "command": "cmd",
       "args": [
+        "/c",
+        "npx",
         "-y",
         "firecrawl-mcp"
       ],
@@ -490,8 +495,10 @@
     },
     "morph": {
       "type": "stdio",
-      "command": "npx",
+      "command": "cmd",
       "args": [
+        "/c",
+        "npx",
         "-y",
         "@morphllm/morphmcp"
       ],
@@ -502,8 +509,10 @@
     },
     "perplexity": {
       "type": "stdio",
-      "command": "npx",
+      "command": "cmd",
       "args": [
+        "/c",
+        "npx",
         "-y",
         "@perplexity-ai/mcp-server"
       ],
@@ -528,8 +537,10 @@
     },
     "ast-grep": {
       "type": "stdio",
-      "command": "npx",
+      "command": "cmd",
       "args": [
+        "/c",
+        "npx",
         "-y",
         "@anthropic/mcp-ast-grep"
       ],
@@ -547,7 +558,7 @@
       "args": [
         "C:/Users/david.hayes/.claude/servers/qlty/server.py"
       ],
-      "disabled": false
+      "disabled": true
     },
     "pageindex": {
       "type": "stdio",
@@ -560,5 +571,5 @@
       ]
     }
   },
-  "skipDangerousModePermissionPrompt": true
+  "effortLevel": "high"
 }

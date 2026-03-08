@@ -515,18 +515,32 @@ async function main() {
                   hasPlanFiles(planDirDirect) ? planDirDirect :
                   hasPlanFiles(userPlanDir) ? userPlanDir : planDirNested;
 
+  // When using the global ~/.claude/plans/ directory, apply a staleness guard
+  // to prevent cross-project contamination. Only plan files modified within
+  // the last 2 minutes are considered (i.e., the plan just written by THIS
+  // ExitPlanMode call). Project-local plans are always trusted.
+  const isGlobalPlanDir = planDir === userPlanDir;
+  const STALENESS_THRESHOLD_MS = 120_000; // 2 minutes
+
   let planContent = '';
+  let latestPlanPath: string | undefined;
   if (fs.existsSync(planDir)) {
+    const now = Date.now();
     const planFiles = fs.readdirSync(planDir)
-      .filter(f => f.endsWith('.md'))
-      .sort((a, b) => {
-        const statA = fs.statSync(path.join(planDir, a));
-        const statB = fs.statSync(path.join(planDir, b));
-        return statB.mtime.getTime() - statA.mtime.getTime();
-      });
+      .filter(f => f.endsWith('.md') && !f.startsWith('_'))
+      .map(f => ({
+        name: f,
+        mtime: fs.statSync(path.join(planDir, f)).mtime.getTime(),
+      }))
+      .filter(f => {
+        if (isGlobalPlanDir) return (now - f.mtime) < STALENESS_THRESHOLD_MS;
+        return true;
+      })
+      .sort((a, b) => b.mtime - a.mtime);
 
     if (planFiles.length > 0) {
-      planContent = fs.readFileSync(path.join(planDir, planFiles[0]), 'utf-8');
+      planContent = fs.readFileSync(path.join(planDir, planFiles[0].name), 'utf-8');
+      latestPlanPath = path.join(planDir, planFiles[0].name);
     }
   }
 
@@ -546,21 +560,6 @@ async function main() {
       planned: [],
       sessions: []
     };
-  }
-
-  // Get path of latest plan file for title fallback (reuse planFiles from above)
-  let latestPlanPath: string | undefined;
-  if (fs.existsSync(planDir)) {
-    const latestPlanFiles = fs.readdirSync(planDir)
-      .filter(f => f.endsWith('.md'))
-      .sort((a, b) => {
-        const statA = fs.statSync(path.join(planDir, a));
-        const statB = fs.statSync(path.join(planDir, b));
-        return statB.mtime.getTime() - statA.mtime.getTime();
-      });
-    if (latestPlanFiles.length > 0) {
-      latestPlanPath = path.join(planDir, latestPlanFiles[0]);
-    }
   }
 
   const planInfo = extractPlanInfo(planContent, latestPlanPath);

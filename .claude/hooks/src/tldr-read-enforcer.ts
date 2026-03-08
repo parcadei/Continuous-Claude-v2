@@ -86,12 +86,12 @@ const ALLOWED_PATTERNS = [
   /requirements\.txt$/, /package\.json$/, /tsconfig\.json$/, /pyproject\.toml$/,
   // Allow test files (need full context for implementation)
   /test_.*\.py$/, /.*_test\.py$/, /.*\.test\.(ts|js)$/, /.*\.spec\.(ts|js)$/,
-  // Allow hooks/skills (we edit these)
-  /\.claude\/hooks\//, /\.claude\/skills\//,
-  /init-db\.sql$/, /migrations\//,
+  // Allow hooks/skills (we edit these) - cross-platform path separators
+  /\.claude[/\\]hooks[/\\]/, /\.claude[/\\]skills[/\\]/,
+  /init-db\.sql$/, /migrations[/\\]/,
 ];
 
-const ALLOWED_DIRS = ['/tmp/', 'node_modules/', '.venv/', '__pycache__/'];
+const ALLOWED_DIRS = ['/tmp/', 'node_modules/', '.venv/', '__pycache__/', '\\tmp\\'];
 
 function isCodeFile(filePath: string): boolean {
   return CODE_EXTENSIONS.has(extname(filePath));

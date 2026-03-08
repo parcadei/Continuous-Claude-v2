@@ -113,6 +113,36 @@ Include in the `<head>` of every generated file:
 </html>
 ```
 
+### Element Anchor IDs (`data-fc-id`) [REQUIRED]
+
+Every meaningful content element MUST have a `data-fc-id` attribute. These stable identifiers allow the Fourth Connect commenting system to anchor pins to specific elements — surviving layout changes, section expand/collapse, and content reflows.
+
+**Convention:** `data-fc-id="slide{N}-{section}-{element}"`
+
+```html
+<section class="slide content-slide" id="slide-3" data-slide-index="2">
+  <h2 data-fc-id="slide3-revenue-header">Revenue Overview</h2>
+  <div class="stat-row" data-fc-id="slide3-revenue-stats">
+    <div class="stat-card" data-fc-id="slide3-stat-logins">
+      <div class="stat-value">346K</div>
+      <div class="stat-label">TOTAL LOGINS</div>
+    </div>
+    <div class="stat-card" data-fc-id="slide3-stat-engagement">
+      <div class="stat-value">89%</div>
+      <div class="stat-label">ENGAGEMENT</div>
+    </div>
+  </div>
+  <p data-fc-id="slide3-revenue-insight">Revenue grew 23% quarter-over-quarter.</p>
+</section>
+```
+
+**Rules:**
+1. Apply to: headings (H1-H6), content containers (DIV, SECTION), stat cards, tables, paragraphs, list items, figures, blockquotes
+2. IDs must be unique within the document, readable, and semantic
+3. Skip purely decorative elements (background shapes, logos, progress bars)
+4. Expandable/collapsible sections: apply to BOTH the toggle AND the content container
+5. Tables: apply to the `<table>` element and optionally to key rows/cells
+
 ### Core Slide CSS
 
 ```css

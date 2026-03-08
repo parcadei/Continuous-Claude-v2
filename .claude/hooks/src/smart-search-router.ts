@@ -473,35 +473,14 @@ async function main() {
   // Track hook activity (P8) - get project dir early for tracking
   const projectDir = process.env.CLAUDE_PROJECT_DIR || '.';
 
-  // LITERAL: Suggest TLDR search (finds + enriches in one call)
+  // LITERAL: Pass through to Grep (native tool handles literal patterns best)
   if (queryType === 'literal') {
     trackHookActivitySync('smart-search-router', projectDir, true, {
       queries_routed: 1, literal_queries: 1,
     });
 
-    const reason = `🔍 Use TLDR search for code exploration (95% token savings):
-
-**Option 1 - TLDR Skill:**
-/tldr-search ${pattern}
-
-**Option 2 - Direct CLI:**
-\`\`\`bash
-tldr search "${pattern}" .
-\`\`\`
-
-**Option 3 - Read specific file (TLDR auto-enriches):**
-Read the file containing "${pattern}" - the tldr-read-enforcer will return structured context.
-
-TLDR finds location + provides call graph + docstrings in one call.`;
-
-    const output: HookOutput = {
-      hookSpecificOutput: {
-        hookEventName: 'PreToolUse',
-        permissionDecision: 'deny',
-        permissionDecisionReason: reason
-      }
-    };
-    console.log(JSON.stringify(output));
+    // Allow Grep to handle literal patterns natively — no redirect
+    console.log('{}');
     return;
   }
 
