@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-03-09T03:10:32.400958+00:00",
+  "updated_at": "2026-03-09T19:33:08.731007+00:00",
   "project": {
     "name": "continuous-claude",
     "description": "> Give Claude a notebook, memory, specialized assistants, and autonomous development capability — so every conversation builds on the last [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://claude.ai/code)",
@@ -1879,10 +1879,14 @@
   "goals": {
     "source": "ROADMAP.md",
     "current": {
-      "title": "Deep Review: Zombie Process Cleanup + ROADMAP Fix — Hardening Pass",
-      "description": "Zero cross-project contamination in any of 12 project ROADMAPs checked; Problem: `findstr \":${port}\"` is substring — matches `:30020` when looking for `:3002`.; Started: 2026-03-09"
+      "title": "Memory Curation Plan: Remove Slop, Keep Signal",
+      "description": "`metadata->>'learning_type'` (text extraction); `metadata->>'context'` (text extraction); Started: 2026-03-09"
     },
     "completed": [
+      {
+        "title": "Deep Review: Zombie Process Cleanup + ROADMAP Fix — Hardening Pass",
+        "completed": "2026-03-09"
+      },
       {
         "title": "Add Mixed Background Design Elements to CCv3 Light Landing Page",
         "completed": "2026-03-09"
