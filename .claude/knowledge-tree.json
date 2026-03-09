@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-03-09T00:41:33.664325+00:00",
+  "updated_at": "2026-03-09T03:10:32.400958+00:00",
   "project": {
     "name": "continuous-claude",
     "description": "> Give Claude a notebook, memory, specialized assistants, and autonomous development capability — so every conversation builds on the last [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://claude.ai/code)",
@@ -11,7 +11,7 @@
     "root": "C:\\Users\\david.hayes\\continuous-claude",
     "directories": {
       ".claude/": {
-        "purpose": "Markdown documentation",
+        "purpose": "JSON data/config",
         "key_files": null
       },
       ".claude\\agents/": {
@@ -627,6 +627,10 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\extract-v2/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\find-skills/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -733,11 +737,27 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\hook-audit/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\hook-audit\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\hook-developer/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
       ".claude\\skills\\hook-developer\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\hook-scaffold/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\hook-scaffold\\references/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -790,6 +810,14 @@
         "key_files": null
       },
       ".claude\\skills\\memory/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\memory-curate/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\memory-curate\\references/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -869,11 +897,23 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\post-ship-audit/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\post-ship-audit\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\premortem/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
       ".claude\\skills\\premortem\\references/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\project-registry/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -977,6 +1017,10 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\session-score/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\shadcn-create/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -1021,7 +1065,19 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      ".claude\\skills\\stale-scan/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       ".claude\\skills\\sub-agents/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\sync-drift/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\sync-drift\\references/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -1138,6 +1194,14 @@
         "key_files": null
       },
       ".claude\\skills\\weekly-report/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\win-preflight/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\win-preflight\\references/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -1370,6 +1434,10 @@
       },
       "opc\\scripts\\core/": {
         "purpose": "Core functionality",
+        "key_files": null
+      },
+      "opc\\scripts\\core\\.tldr/": {
+        "purpose": "Project directory",
         "key_files": null
       },
       "opc\\scripts\\core\\db/": {
@@ -1622,6 +1690,10 @@
         "purpose": "Project directory",
         "key_files": null
       },
+      "tasks/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       "test-screenshots/": {
         "purpose": "Project directory",
         "key_files": null
@@ -1632,6 +1704,14 @@
       },
       "test-screenshots\\routes/": {
         "purpose": "Route handlers",
+        "key_files": null
+      },
+      "tests/": {
+        "purpose": "Test files",
+        "key_files": null
+      },
+      "tests\\unit/": {
+        "purpose": "Project directory",
         "key_files": null
       },
       "thoughts/": {
@@ -1654,6 +1734,18 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      "thoughts\\shared\\handoffs\\kraken-hook-health-monitor/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      "thoughts\\shared\\handoffs\\kraken-memory-curate/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      "thoughts\\shared\\handoffs\\kraken-memory-quality-scorer/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       "thoughts\\shared\\handoffs\\kraken-onboarding-wizard/": {
         "purpose": "Markdown documentation",
         "key_files": null
@@ -1662,7 +1754,19 @@
         "purpose": "Markdown documentation",
         "key_files": null
       },
+      "thoughts\\shared\\handoffs\\kraken-post-ship-audit/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
       "thoughts\\shared\\handoffs\\kraken-presence-tracking/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      "thoughts\\shared\\handoffs\\kraken-stale-scan-skill/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      "thoughts\\shared\\handoffs\\kraken-sync-enhancement/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -2140,7 +2244,12 @@
         "completed": "2026-02"
       }
     ],
-    "planned": []
+    "planned": [
+      {
+        "title": "PRD: Continuous Claude Platform Optimization [prd-platform-optimization.md]",
+        "priority": "medium"
+      }
+    ]
   },
   "critical_info": {
     "env_vars": ".env.example"

@@ -115,6 +115,80 @@ def has_error_pattern(text: str) -> bool:
     return any(p.search(text) for p in COMPILED_ERROR_PATTERNS)
 
 
+# --- Quality scoring (Python port of memory-quality-scorer.ts) ---
+
+SIGNAL_KEYWORDS = re.compile(
+    r"(error|exception|failure|bug|crash).*(fix|fixed|solved|solution|resolved|workaround)"
+    r"|(fix|fixed|solved|solution|resolved|workaround).*(error|exception|failure|bug|crash)",
+    re.IGNORECASE,
+)
+DECISION_KEYWORDS = re.compile(
+    r"(chose|decided|picked|selected|went with|prefer|trade-?off)", re.IGNORECASE
+)
+TECH_TERMS = re.compile(
+    r"(async|await|import|export|class\s|function\s|def\s|hook|middleware|"
+    r"endpoint|schema|migration|component|module|pipeline|mutex|semaphore|"
+    r"docker|kubernetes|postgres|redis)",
+    re.IGNORECASE,
+)
+SPECIFIC_REFS = re.compile(r"[\w/\\]+\.\w{1,5}(?::\d+)?|`[^`]{3,}`|https?://\S+")
+NOISE_REPETITION = re.compile(
+    r"(extraction|checkpoint|heartbeat|periodic|session\s+\d+|"
+    r"phase\s+\d+\s+complete|running|processing)",
+    re.IGNORECASE,
+)
+NOISE_SHORT = 30    # chars
+NOISE_GENERIC = re.compile(
+    r"^(ok|done|yes|no|sure|thanks|got it|understood)[\.\!\s]*$", re.IGNORECASE
+)
+
+
+def score_extraction(content: str, context: str = "") -> dict:
+    """Score an extraction candidate. Returns dict with score, classification, reasons."""
+    score = 5  # base
+    reasons: list[str] = []
+
+    # --- positive signals ---
+    if SIGNAL_KEYWORDS.search(content):
+        score += 2
+        reasons.append("+2 error-fix pair")
+    if DECISION_KEYWORDS.search(content):
+        score += 1
+        reasons.append("+1 decision language")
+    if TECH_TERMS.search(content):
+        score += 1
+        reasons.append("+1 technical terms")
+    refs = SPECIFIC_REFS.findall(content)
+    if len(refs) >= 2:
+        score += 1
+        reasons.append("+1 specific references")
+
+    # --- negative signals ---
+    if len(content.strip()) < NOISE_SHORT:
+        score -= 3
+        reasons.append("-3 too short")
+    if NOISE_GENERIC.match(content.strip()):
+        score -= 4
+        reasons.append("-4 generic response")
+    rep_count = len(NOISE_REPETITION.findall(content))
+    if rep_count >= 3:
+        score -= 3
+        reasons.append(f"-3 repetitive ({rep_count} noise markers)")
+    elif rep_count >= 1:
+        score -= 1
+        reasons.append(f"-1 noise marker ({rep_count})")
+
+    score = max(0, min(10, score))
+    if score >= 5:
+        classification = "SIGNAL"
+    elif score >= 3:
+        classification = "BORDERLINE"
+    else:
+        classification = "NOISE"
+
+    return {"score": score, "classification": classification, "reasons": reasons}
+
+
 class ExtractionState(TypedDict, total=False):
     session_id: str
     last_extracted_line: int
@@ -433,6 +507,31 @@ async def extract_incremental(
 
             new_hashes.append(h)
             tool_errors_to_store.append(error_info)
+
+    # Quality gate: filter NOISE before storing
+    quality_filtered: list[str] = []
+    quality_skipped = 0
+    for thinking in learnings_to_store:
+        qr = score_extraction(thinking)
+        if qr["classification"] == "NOISE":
+            quality_skipped += 1
+            print(f"  [QUALITY] NOISE (score={qr['score']}): {thinking[:60]}...", file=sys.stderr)
+            continue
+        quality_filtered.append(thinking)
+
+    quality_filtered_errors: list[dict] = []
+    for error_info in tool_errors_to_store:
+        ctx = error_info.get("error_context", "")
+        qr = score_extraction(ctx)
+        if qr["classification"] == "NOISE":
+            quality_skipped += 1
+            print(f"  [QUALITY] NOISE error (score={qr['score']}): {ctx[:60]}...", file=sys.stderr)
+            continue
+        quality_filtered_errors.append(error_info)
+
+    learnings_to_store = quality_filtered
+    tool_errors_to_store = quality_filtered_errors
+    result["learnings_skipped"] += quality_skipped
 
     # Store thinking learnings
     for thinking in learnings_to_store:

@@ -143,7 +143,7 @@
   - [x] 8.4 Minimum threshold: only pass entries scoring above threshold to `store_learning.py`
   - [x] 8.5 Add confidence field: high (explicit insight), medium (contextual pattern), low (ambient extraction)
   - [x] 8.6 Write tests for quality scorer: test signal entries pass, noise entries blocked
-  - [ ] 8.7 Integrate into extraction pipeline: scorer runs before storage, below-threshold entries logged but not stored
+  - [x] 8.7 Integrate into extraction pipeline: scorer runs before storage, below-threshold entries logged but not stored
   - [x] 8.8 Build and verify
 
 - [x] 9.0 Memory Usage Guidelines Doc (CLAUDE.md — new rule)
@@ -219,7 +219,7 @@
   - [x] 16.3 If unregistered: add registration to settings.json
   - [x] 16.4 If code broken: diagnose and fix — ensure it logs agent type, duration, outcome to `skill-telemetry.jsonl`
   - [x] 16.5 Add timestamp and session ID to each telemetry entry
-  - [ ] 16.6 Verify: spawn a test agent, confirm telemetry entry appears in log
+  - [x] 16.6 Verify: spawn a test agent, confirm telemetry entry appears in log
 
 - [x] 17.0 Cross-Project Sync Status (Plugin/Skill)
   - [x] 17.1 Create sync status check that reads project registry and checks sync state per project
