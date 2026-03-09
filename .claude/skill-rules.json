@@ -1,0 +1,87 @@
+{
+  "sync-drift": {
+    "keywords": [
+      "sync drift",
+      "out of sync",
+      "check sync",
+      "drift check"
+    ],
+    "priority": 90
+  },
+  "hook-audit": {
+    "keywords": [
+      "hook audit",
+      "unregistered hooks",
+      "wire hooks",
+      "check hooks"
+    ],
+    "priority": 90
+  },
+  "hook-scaffold": {
+    "keywords": [
+      "new hook",
+      "scaffold hook",
+      "create hook",
+      "hook scaffold"
+    ],
+    "priority": 90
+  },
+  "memory-curate": {
+    "keywords": [
+      "curate memory",
+      "clean memory",
+      "memory audit",
+      "memory curate"
+    ],
+    "priority": 90
+  },
+  "post-ship-audit": {
+    "keywords": [
+      "post-ship",
+      "verify ship",
+      "post-ship audit"
+    ],
+    "priority": 85
+  },
+  "project-registry": {
+    "keywords": [
+      "project registry",
+      "what port",
+      "project info",
+      "which project"
+    ],
+    "priority": 85
+  },
+  "stale-scan": {
+    "keywords": [
+      "stale scan",
+      "stale references",
+      "dead references"
+    ],
+    "priority": 85
+  },
+  "win-preflight": {
+    "keywords": [
+      "windows check",
+      "win preflight",
+      "platform check"
+    ],
+    "priority": 85
+  },
+  "session-score": {
+    "keywords": [
+      "session score",
+      "how productive",
+      "session quality"
+    ],
+    "priority": 80
+  },
+  "extract-v2": {
+    "keywords": [
+      "extract learnings",
+      "smart extract",
+      "extract v2"
+    ],
+    "priority": 80
+  }
+}

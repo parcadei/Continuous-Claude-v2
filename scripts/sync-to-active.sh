@@ -60,7 +60,7 @@ copy_dir() {
         $skip_file && continue
 
         if $DRY_RUN; then
-            echo "Would copy: $dir/$rel"
+            echo "[DRY RUN] Would copy: $src_file -> $dst_file"
         else
             mkdir -p "$(dirname "$dst_file")"
             cp "$src_file" "$dst_file"
@@ -80,7 +80,7 @@ for pattern in "hooks/*.sh" "hooks/*.py" "hooks/*.mjs" "hooks/*.ps1" "hooks/pack
         dst_file="$ACTIVE_CLAUDE/$rel"
 
         if $DRY_RUN; then
-            echo "Would copy: $rel"
+            echo "[DRY RUN] Would copy: $src_file -> $dst_file"
         else
             mkdir -p "$(dirname "$dst_file")"
             cp "$src_file" "$dst_file"
@@ -88,6 +88,43 @@ for pattern in "hooks/*.sh" "hooks/*.py" "hooks/*.mjs" "hooks/*.ps1" "hooks/pack
         fi
     done
 done
+
+# Sync hooks/dist/*.mjs (built hook bundles)
+DIST_SRC="$REPO_CLAUDE/hooks/dist"
+DIST_DST="$ACTIVE_CLAUDE/hooks/dist"
+if [[ -d "$DIST_SRC" ]]; then
+    $DRY_RUN || mkdir -p "$DIST_DST"
+    for src_file in "$DIST_SRC"/*.mjs; do
+        [[ ! -f "$src_file" ]] && continue
+        local_name=$(basename "$src_file")
+        dst_file="$DIST_DST/$local_name"
+        if $DRY_RUN; then
+            echo "[DRY RUN] Would copy: $src_file -> $dst_file"
+        else
+            cp "$src_file" "$dst_file"
+            $VERBOSE && echo "Copied: hooks/dist/$local_name" || true
+        fi
+    done
+fi
+
+# Sync scripts/ralph/*.py (only if target directory already exists)
+RALPH_SRC="$REPO_CLAUDE/scripts/ralph"
+RALPH_DST="$ACTIVE_CLAUDE/scripts/ralph"
+if [[ -d "$RALPH_SRC" && -d "$RALPH_DST" ]]; then
+    for src_file in "$RALPH_SRC"/*.py; do
+        [[ ! -f "$src_file" ]] && continue
+        local_name=$(basename "$src_file")
+        dst_file="$RALPH_DST/$local_name"
+        if $DRY_RUN; then
+            echo "[DRY RUN] Would copy: $src_file -> $dst_file"
+        else
+            cp "$src_file" "$dst_file"
+            $VERBOSE && echo "Copied: scripts/ralph/$local_name" || true
+        fi
+    done
+elif [[ -d "$RALPH_SRC" && ! -d "$RALPH_DST" ]]; then
+    $VERBOSE && echo "Skipped: scripts/ralph/ (target directory does not exist)" || true
+fi
 
 if ! $DRY_RUN && ! $SKIP_BUILD; then
     if [[ -f "$ACTIVE_CLAUDE/hooks/package.json" ]]; then
@@ -127,4 +164,47 @@ elif ! $DRY_RUN; then
     $VERBOSE && echo "Note: jq not installed, skipping mcpServers merge" || true
 fi
 
-$VERBOSE && echo "Sync complete: continuous-claude → ~/.claude" || true
+# Verification: compare file counts between source and target
+if ! $DRY_RUN; then
+    VERIFY_FAIL=0
+    echo "Verification:"
+
+    verify_dir() {
+        local label="$1" src_dir="$2" dst_dir="$3" pattern="$4"
+        if [[ ! -d "$src_dir" ]]; then
+            return 0
+        fi
+        if [[ ! -d "$dst_dir" ]]; then
+            echo "  $label: SKIPPED (target dir absent)"
+            return 0
+        fi
+        local src_count dst_count
+        if [[ -n "$pattern" ]]; then
+            src_count=$(find "$src_dir" -maxdepth 1 -name "$pattern" -type f 2>/dev/null | wc -l)
+            dst_count=$(find "$dst_dir" -maxdepth 1 -name "$pattern" -type f 2>/dev/null | wc -l)
+        else
+            src_count=$(find "$src_dir" -type f ! -name "*.pid" ! -name "*.lock" ! -path "*/.tldr/*" ! -path "*/node_modules/*" ! -path "*/cache/*" ! -path "*/dist/*" 2>/dev/null | wc -l)
+            dst_count=$(find "$dst_dir" -type f ! -name "*.pid" ! -name "*.lock" ! -path "*/.tldr/*" ! -path "*/node_modules/*" ! -path "*/cache/*" ! -path "*/dist/*" 2>/dev/null | wc -l)
+        fi
+        src_count=$(echo "$src_count" | tr -d ' ')
+        dst_count=$(echo "$dst_count" | tr -d ' ')
+        if [[ "$src_count" -eq "$dst_count" ]]; then
+            echo "  $label: OK ($src_count files)"
+        else
+            echo "  $label: MISMATCH (source=$src_count, target=$dst_count)"
+            VERIFY_FAIL=1
+        fi
+    }
+
+    for dir in $SYNC_DIRS; do
+        verify_dir "$dir" "$REPO_CLAUDE/$dir" "$ACTIVE_CLAUDE/$dir"
+    done
+    verify_dir "hooks/dist (*.mjs)" "$REPO_CLAUDE/hooks/dist" "$ACTIVE_CLAUDE/hooks/dist" "*.mjs"
+    verify_dir "scripts/ralph (*.py)" "$REPO_CLAUDE/scripts/ralph" "$ACTIVE_CLAUDE/scripts/ralph" "*.py"
+
+    if [[ "$VERIFY_FAIL" -eq 1 ]]; then
+        echo "  WARNING: Some directories have file count mismatches"
+    fi
+fi
+
+$VERBOSE && echo "Sync complete: continuous-claude -> ~/.claude" || true

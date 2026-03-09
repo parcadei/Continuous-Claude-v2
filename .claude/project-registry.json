@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "projects": [
+    {
+      "name": "continuous-claude",
+      "path": "C:/Users/david.hayes/continuous-claude",
+      "stack": ["TypeScript", "Node.js", "PostgreSQL", "esbuild"],
+      "description": "Claude Code infrastructure -- hooks, skills, agents, memory",
+      "port": null,
+      "url": null,
+      "devCommand": null,
+      "status": "active"
+    },
+    {
+      "name": "NorthStar Transformation",
+      "path": "C:/Users/david.hayes/Projects/northstar-transformation",
+      "stack": ["Next.js", "TypeScript", "Tailwind", "Drizzle", "Neon"],
+      "description": "AI transformation platform for enterprise",
+      "port": 3002,
+      "url": "https://northstar.localhost/",
+      "devCommand": "npm run dev",
+      "status": "active"
+    },
+    {
+      "name": "Fourth Connect",
+      "path": "C:/Users/david.hayes/Projects/fourth-connect",
+      "stack": ["Next.js", "TypeScript", "Tailwind"],
+      "description": "Fourth brand platform",
+      "port": 3000,
+      "url": "https://fourth-connect.localhost/",
+      "devCommand": "npm run dev",
+      "status": "active"
+    },
+    {
+      "name": "agent-factory",
+      "path": "C:/Users/david.hayes/Projects/agent-factory",
+      "stack": ["Next.js", "AI SDK v6", "OpenRouter", "Docker"],
+      "description": "Vercel AI SDK agent builder",
+      "port": 3001,
+      "url": null,
+      "devCommand": "npm run dev",
+      "status": "active"
+    },
+    {
+      "name": "LinkMap",
+      "path": "C:/Users/david.hayes/Projects/linkmap",
+      "stack": ["React", "TypeScript"],
+      "description": "Link management tool",
+      "port": null,
+      "url": null,
+      "devCommand": null,
+      "status": "inactive"
+    }
+  ]
+}

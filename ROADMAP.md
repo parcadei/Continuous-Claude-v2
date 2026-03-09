@@ -1,11 +1,12 @@
 # Project Roadmap
 
 ## Current Focus
-**Add Mixed Background Design Elements to CCv3 Light Landing Page**
-- Target: Hero section (3W-0); Target: Problem (46-0) / Solution (4E-0) area
-- Started: 2026-03-07
+**Deep Review: Zombie Process Cleanup + ROADMAP Fix — Hardening Pass**
+- Zero cross-project contamination in any of 12 project ROADMAPs checked; Problem: `findstr ":${port}"` is substring — matches `:30020` when looking for `:3002`.
+- Started: 2026-03-09
 
 ## Completed
+- [x] Add Mixed Background Design Elements to CCv3 Light Landing Page (2026-03-09)
 - [x] Fix Sync-to-Repo Revert Loop + Re-apply Reverted Fixes (2026-03-07)
 - [x] [fix](hooks) break sync-to-repo revert loop + re-apply 7 code fixes (2026-03-07) `0adbdeb`
 - [x] Fix: Eliminate Explore → Scout Redirect Round-Trip (2026-03-07)
@@ -97,9 +98,22 @@
 - [x] Memory unit tests in opc/tests/ (2026-02)
 
 ## Planned
+- [ ] PRD: Continuous Claude Platform Optimization [prd-platform-optimization.md] (normal)
 _No planned items yet._
 
 ## Recent Planning Sessions
+### 2026-03-09: Deep Review: Zombie Process Cleanup + ROADMAP Fix — Hardening Pass
+**Summary:** Deep review of the implementation completed earlier this session. Two independent scouts audited every file and found **2 HIGH**, **2 MEDIUM**, and several LOW issues that need fixing to ensure reliability across all projects.
+
+**Key Decisions:**
+- Zero cross-project contamination in any of 12 project ROADMAPs checked
+- Problem: `findstr ":${port}"` is substring — matches `:30020` when looking for `:3002`.
+- Fix: Replace the netstat parsing with a post-filter that validates the exact port:
+- Problem: `kill -TERM -${pid}` sends to process group, which only works if process is group leader. `npx` is typically NOT a group leader.
+- Fix: Replace the Unix branch with positive-PID kill + child process cleanup:
+
+**Files:** path.join, package.json, npx.cmd, post-plan-roadmap.ts, dev-cleanup.mjs, C:/Users/david.hayes/Projects/NorthStar Transformation/scripts/dev-cleanup.mjs, dev-start.mjs, C:/Users/david.hayes/Projects/NorthStar Transformation/scripts/dev-start.mjs
+
 ### 2026-03-07: Add Mixed Background Design Elements to CCv3 Light Landing Page
 **Key Decisions:**
 - Target: Hero section (3W-0)
@@ -107,8 +121,6 @@ _No planned items yet._
 - Target: Stats row (4N-0)
 - Applied via update_styles background property or wrapper div
 - Target: Feature cards area (57-0 through 6A-0)
-
-**Implementation:**
 - Target: Hero section (3W-0)
 - Technique: Two large soft radial gradient circles floating behind the headline
 - Orb 1: ~500px, radial-gradient teal rgba(13,148,136,0.08), top-right area
@@ -138,11 +150,3 @@ _No planned items yet._
 - Find/create `<c:spPr>` under the `<c:ser>` element
 - Build: `<c:symbol val="circle"/>`, `<c:size val="8"/>`, `<c:spPr>` with fill + line
 - Create `XL_CHART_TYPE.AREA` chart via existing `_add_category_chart`
-
-### 2026-02-14: Platform Quality Upgrade — Implementation Plan
-**Key Decisions:**
-- Goal: Raise overall score from 74 → 85-90 (B+/A-) by fixing WCAG blockers, improving design quality, and cleaning up polish items.
-- Branch: `platform-updates` (off `master`)
-- Source reports: `workbook-platform-audit.md` (prioritized fixes), `workbook-test-report.md` (raw graded data)
-- Fixes: Skip link (5 routes), focus indicators (16-24 elements/route), touch targets (90%+ elements)
-- Risk: MEDIUM — button/input size cascades everywhere. Visual verify all routes.
