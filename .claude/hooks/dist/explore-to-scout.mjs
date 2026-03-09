@@ -25,8 +25,14 @@ async function main() {
   const output = {
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
-      modifiedInput: { subagent_type: "scout" },
-      additionalContext: "Explore -> scout: upgraded for accuracy (Sonnet vs Haiku)"
+      permissionDecision: "deny",
+      permissionDecisionReason: `BLOCKED: subagent_type='Explore' is not allowed.
+
+Per ~/.claude/rules/use-scout-not-explore.md:
+- Explore uses Haiku -- fast but inaccurate
+- Scout uses Sonnet with a detailed prompt -- accurate results
+
+REMOVE subagent_type="Explore" and use subagent_type="scout" instead.`
     }
   };
   console.log(JSON.stringify(output));

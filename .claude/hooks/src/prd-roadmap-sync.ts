@@ -153,26 +153,33 @@ function extractTaskProgress(content: string, filePath: string): TaskProgress {
 }
 
 function findRoadmapPath(startDir: string): string | null {
-  // Check CLAUDE_PROJECT_DIR first (highest priority)
   const projectDir = process.env.CLAUDE_PROJECT_DIR;
   if (projectDir) {
+    // Hard boundary: never walk outside the project
     const roadmap = path.join(projectDir, 'ROADMAP.md');
     if (fs.existsSync(roadmap)) return roadmap;
     const claudeRoadmap = path.join(projectDir, '.claude', 'ROADMAP.md');
     if (fs.existsSync(claudeRoadmap)) return claudeRoadmap;
+    // Return project-root path even if it doesn't exist yet (caller creates on write)
+    return roadmap;
   }
 
-  // Recursive upward search from startDir
+  // Fallback: walk up from startDir but stop at project root indicators
   let current = path.resolve(startDir);
   const root = path.parse(current).root;
 
   while (current !== root) {
-    // Check both ROADMAP.md and .claude/ROADMAP.md at each level
     const candidate = path.join(current, 'ROADMAP.md');
     if (fs.existsSync(candidate)) return candidate;
 
     const claudeCandidate = path.join(current, '.claude', 'ROADMAP.md');
     if (fs.existsSync(claudeCandidate)) return claudeCandidate;
+
+    // Stop at project root — never escape above .git or package.json
+    if (fs.existsSync(path.join(current, '.git')) ||
+        fs.existsSync(path.join(current, 'package.json'))) {
+      return candidate;
+    }
 
     current = path.dirname(current);
   }

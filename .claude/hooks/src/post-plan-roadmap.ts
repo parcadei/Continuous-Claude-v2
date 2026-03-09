@@ -517,10 +517,10 @@ async function main() {
 
   // When using the global ~/.claude/plans/ directory, apply a staleness guard
   // to prevent cross-project contamination. Only plan files modified within
-  // the last 2 minutes are considered (i.e., the plan just written by THIS
+  // the last 10 minutes are considered (i.e., the plan just written by THIS
   // ExitPlanMode call). Project-local plans are always trusted.
   const isGlobalPlanDir = planDir === userPlanDir;
-  const STALENESS_THRESHOLD_MS = 120_000; // 2 minutes
+  const STALENESS_THRESHOLD_MS = 600_000; // 10 minutes
 
   let planContent = '';
   let latestPlanPath: string | undefined;
@@ -597,7 +597,7 @@ async function main() {
     sections.sessions.unshift(newSession);
   }
 
-  sections.sessions = sections.sessions.slice(0, 10);
+  sections.sessions = sections.sessions.slice(0, 5);
 
   const newContent = generateRoadmap(sections);
   fs.mkdirSync(path.dirname(roadmapPath), { recursive: true });

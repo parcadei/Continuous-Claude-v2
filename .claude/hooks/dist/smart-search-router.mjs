@@ -1,26 +1,39 @@
 // src/smart-search-router.ts
-import { existsSync as existsSync3, mkdirSync as mkdirSync2, writeFileSync as writeFileSync3 } from "fs";
+import { existsSync as existsSync3, mkdirSync as mkdirSync3, writeFileSync as writeFileSync3 } from "fs";
 import { execSync as execSync2 } from "child_process";
 import { join as join3 } from "path";
 
 // src/daemon-client.ts
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, unlinkSync, mkdirSync } from "fs";
 import { execSync, spawnSync } from "child_process";
 import { join, resolve } from "path";
 import { tmpdir } from "os";
 import * as crypto from "crypto";
+function getTldrTmpDir() {
+  if (process.platform === "win32") {
+    const dir = "C:/tmp";
+    if (!existsSync(dir)) {
+      try {
+        mkdirSync(dir, { recursive: true });
+      } catch {
+      }
+    }
+    return dir;
+  }
+  return tmpdir();
+}
 function resolveProjectDir(projectDir) {
   return resolve(projectDir);
 }
 function getLockPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
-  return `${tmpdir()}/tldr-${hash}.lock`;
+  return `${getTldrTmpDir()}/tldr-${hash}.lock`;
 }
 function getPidPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
-  return `${tmpdir()}/tldr-${hash}.pid`;
+  return `${getTldrTmpDir()}/tldr-${hash}.pid`;
 }
 function isDaemonProcessRunning(projectDir) {
   const pidPath = getPidPath(projectDir);
@@ -68,7 +81,7 @@ function getConnectionInfo(projectDir) {
     const port = 49152 + parseInt(hash, 16) % 1e4;
     return { type: "tcp", host: "127.0.0.1", port };
   } else {
-    return { type: "unix", path: `${tmpdir()}/tldr-${hash}.sock` };
+    return { type: "unix", path: `${getTldrTmpDir()}/tldr-${hash}.sock` };
   }
 }
 function getStatusFile(projectDir) {
@@ -249,7 +262,7 @@ function trackHookActivitySync(hookName, projectDir, success = true, metrics = {
 }
 
 // src/shared/session-activity.ts
-import { existsSync as existsSync2, mkdirSync, readFileSync as readFileSync2, writeFileSync as writeFileSync2 } from "fs";
+import { existsSync as existsSync2, mkdirSync as mkdirSync2, readFileSync as readFileSync2, writeFileSync as writeFileSync2 } from "fs";
 import { join as join2 } from "path";
 function getHomeDir() {
   return process.env.HOME || process.env.USERPROFILE || "/tmp";
@@ -257,7 +270,7 @@ function getHomeDir() {
 function getActivityPath(sessionId) {
   const dir = join2(getHomeDir(), ".claude", "cache", "session-activity");
   try {
-    mkdirSync(dir, { recursive: true });
+    mkdirSync2(dir, { recursive: true });
   } catch {
   }
   return join2(dir, `${sessionId}.json`);
@@ -313,7 +326,7 @@ var CONTEXT_DIR = "/tmp/claude-search-context";
 function storeSearchContext(sessionId, context) {
   try {
     if (!existsSync3(CONTEXT_DIR)) {
-      mkdirSync2(CONTEXT_DIR, { recursive: true });
+      mkdirSync3(CONTEXT_DIR, { recursive: true });
     }
     writeFileSync3(
       `${CONTEXT_DIR}/${sessionId}.json`,

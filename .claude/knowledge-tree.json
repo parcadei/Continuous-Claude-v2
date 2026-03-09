@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-03-08T11:19:47.839639+00:00",
+  "updated_at": "2026-03-09T00:41:33.664325+00:00",
   "project": {
     "name": "continuous-claude",
     "description": "> Give Claude a notebook, memory, specialized assistants, and autonomous development capability — so every conversation builds on the last [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://claude.ai/code)",
@@ -31,7 +31,7 @@
         "key_files": null
       },
       ".claude\\cache/": {
-        "purpose": "Project directory",
+        "purpose": "JavaScript modules",
         "key_files": null
       },
       ".claude\\cache\\agents/": {
@@ -110,6 +110,10 @@
           "package.json",
           "README.md"
         ]
+      },
+      ".claude\\hooks\\.tldr/": {
+        "purpose": "Project directory",
+        "key_files": null
       },
       ".claude\\hooks\\archive/": {
         "purpose": "Project directory",
@@ -1179,6 +1183,14 @@
         "purpose": "Project directory",
         "key_files": null
       },
+      ".tldr\\cache/": {
+        "purpose": "Project directory",
+        "key_files": null
+      },
+      ".tldr\\cache\\semantic/": {
+        "purpose": "Project directory",
+        "key_files": null
+      },
       "ai-report-card/": {
         "purpose": "Markdown documentation",
         "key_files": [
@@ -1763,10 +1775,14 @@
   "goals": {
     "source": "ROADMAP.md",
     "current": {
-      "title": "Add Mixed Background Design Elements to CCv3 Light Landing Page",
-      "description": "Target: Hero section (3W-0); Target: Problem (46-0) / Solution (4E-0) area; Started: 2026-03-07"
+      "title": "Deep Review: Zombie Process Cleanup + ROADMAP Fix — Hardening Pass",
+      "description": "Zero cross-project contamination in any of 12 project ROADMAPs checked; Problem: `findstr \":${port}\"` is substring — matches `:30020` when looking for `:3002`.; Started: 2026-03-09"
     },
     "completed": [
+      {
+        "title": "Add Mixed Background Design Elements to CCv3 Light Landing Page",
+        "completed": "2026-03-09"
+      },
       {
         "title": "Fix Sync-to-Repo Revert Loop + Re-apply Reverted Fixes",
         "completed": "2026-03-07"

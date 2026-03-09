@@ -43,10 +43,20 @@ function createExtractorLock(pid) {
   }
 }
 async function main() {
-  const input = JSON.parse(await readStdin());
+  let input;
+  try {
+    input = JSON.parse(await readStdin());
+  } catch {
+    console.log(JSON.stringify({ continue: true }));
+    return;
+  }
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
   try {
     const ledgerDir = path.join(projectDir, "thoughts", "ledgers");
+    if (!fs.existsSync(ledgerDir)) {
+      console.log(JSON.stringify({ continue: true }));
+      return;
+    }
     const ledgerFiles = fs.readdirSync(ledgerDir).filter((f) => f.startsWith("CONTINUITY_CLAUDE-") && f.endsWith(".md"));
     if (ledgerFiles.length > 0) {
       const mostRecent = ledgerFiles.sort((a, b) => {

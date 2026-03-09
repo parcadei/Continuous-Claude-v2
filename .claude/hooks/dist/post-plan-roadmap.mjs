@@ -405,15 +405,22 @@ async function main() {
     }
   };
   const planDir = hasPlanFiles(planDirNested) ? planDirNested : hasPlanFiles(planDirDirect) ? planDirDirect : hasPlanFiles(userPlanDir) ? userPlanDir : planDirNested;
+  const isGlobalPlanDir = planDir === userPlanDir;
+  const STALENESS_THRESHOLD_MS = 6e5;
   let planContent = "";
+  let latestPlanPath;
   if (fs.existsSync(planDir)) {
-    const planFiles = fs.readdirSync(planDir).filter((f) => f.endsWith(".md")).sort((a, b) => {
-      const statA = fs.statSync(path.join(planDir, a));
-      const statB = fs.statSync(path.join(planDir, b));
-      return statB.mtime.getTime() - statA.mtime.getTime();
-    });
+    const now = Date.now();
+    const planFiles = fs.readdirSync(planDir).filter((f) => f.endsWith(".md") && !f.startsWith("_")).map((f) => ({
+      name: f,
+      mtime: fs.statSync(path.join(planDir, f)).mtime.getTime()
+    })).filter((f) => {
+      if (isGlobalPlanDir) return now - f.mtime < STALENESS_THRESHOLD_MS;
+      return true;
+    }).sort((a, b) => b.mtime - a.mtime);
     if (planFiles.length > 0) {
-      planContent = fs.readFileSync(path.join(planDir, planFiles[0]), "utf-8");
+      planContent = fs.readFileSync(path.join(planDir, planFiles[0].name), "utf-8");
+      latestPlanPath = path.join(planDir, planFiles[0].name);
     }
   }
   const toolOutput = data.tool_output || data.tool_result || "";
@@ -431,17 +438,6 @@ async function main() {
       planned: [],
       sessions: []
     };
-  }
-  let latestPlanPath;
-  if (fs.existsSync(planDir)) {
-    const latestPlanFiles = fs.readdirSync(planDir).filter((f) => f.endsWith(".md")).sort((a, b) => {
-      const statA = fs.statSync(path.join(planDir, a));
-      const statB = fs.statSync(path.join(planDir, b));
-      return statB.mtime.getTime() - statA.mtime.getTime();
-    });
-    if (latestPlanFiles.length > 0) {
-      latestPlanPath = path.join(planDir, latestPlanFiles[0]);
-    }
   }
   const planInfo = extractPlanInfo(planContent, latestPlanPath);
   const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
@@ -473,7 +469,7 @@ async function main() {
   } else {
     sections.sessions.unshift(newSession);
   }
-  sections.sessions = sections.sessions.slice(0, 10);
+  sections.sessions = sections.sessions.slice(0, 5);
   const newContent = generateRoadmap(sections);
   fs.mkdirSync(path.dirname(roadmapPath), { recursive: true });
   fs.writeFileSync(roadmapPath, newContent, "utf-8");

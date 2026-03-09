@@ -168,6 +168,22 @@ function writeStateWithLock(filePath, content) {
   }
 }
 
+// src/shared/session-isolation.ts
+import { tmpdir, hostname } from "os";
+import { join as join3 } from "path";
+function getSessionId2() {
+  if (process.env.CLAUDE_SESSION_ID) {
+    return process.env.CLAUDE_SESSION_ID;
+  }
+  const host = hostname().replace(/[^a-zA-Z0-9]/g, "").substring(0, 8);
+  return `${host}-${process.pid}`;
+}
+function getSessionStatePath(baseName, sessionId) {
+  const sid = sessionId || getSessionId2();
+  const safeSid = sid.replace(/[^a-zA-Z0-9-_]/g, "_").substring(0, 32);
+  return join3(tmpdir(), `claude-${baseName}-${safeSid}.json`);
+}
+
 // src/smarter-everyday.ts
 var TEST_COMMANDS = [
   /\b(npm|yarn|pnpm)\s+(run\s+)?test/i,
@@ -204,8 +220,8 @@ var FAILURE_PATTERNS = [
   /Tests:\s+\d+\s+failed/i
 ];
 var VICTORY_TURN_THRESHOLD = 3;
-function getStateFilePath(projectDir) {
-  return path.join(projectDir, ".claude", "smarter-everyday-state.json");
+function getStateFilePath(_projectDir) {
+  return getSessionStatePath("smarter-everyday");
 }
 function loadState(stateFile, sessionId) {
   const defaultState = {

@@ -86,6 +86,7 @@ function findRoadmapPath(startDir) {
     if (fs.existsSync(roadmap)) return roadmap;
     const claudeRoadmap = path.join(projectDir, ".claude", "ROADMAP.md");
     if (fs.existsSync(claudeRoadmap)) return claudeRoadmap;
+    return roadmap;
   }
   let current = path.resolve(startDir);
   const root = path.parse(current).root;
@@ -94,6 +95,9 @@ function findRoadmapPath(startDir) {
     if (fs.existsSync(candidate)) return candidate;
     const claudeCandidate = path.join(current, ".claude", "ROADMAP.md");
     if (fs.existsSync(claudeCandidate)) return claudeCandidate;
+    if (fs.existsSync(path.join(current, ".git")) || fs.existsSync(path.join(current, "package.json"))) {
+      return candidate;
+    }
     current = path.dirname(current);
   }
   return null;

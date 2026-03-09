@@ -17,6 +17,8 @@ async function readStdin() {
 function isHookSourceFile(filePath) {
   if (!filePath) return false;
   const normalized = filePath.replace(/\\/g, "/");
+  const repoPath = (process.env.USERPROFILE || process.env.HOME || "") + "/continuous-claude";
+  if (normalized.startsWith(repoPath.replace(/\\/g, "/"))) return false;
   return normalized.includes(".claude/hooks/src/") && normalized.endsWith(".ts");
 }
 function getStateFile(sessionId) {

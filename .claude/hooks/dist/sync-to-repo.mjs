@@ -40,6 +40,8 @@ function shouldSync(filePath) {
   if (!filePath) return false;
   const normalized = filePath.replace(/\\/g, "/");
   if (!normalized.includes(".claude/")) return false;
+  const normalizedRepo = REPO_DIR.replace(/\\/g, "/");
+  if (normalized.startsWith(normalizedRepo)) return false;
   const basename2 = path.basename(filePath);
   if (NEVER_SYNC.includes(basename2)) return false;
   return SYNC_PATTERNS.some((pattern) => pattern.test(filePath));

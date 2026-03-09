@@ -10,12 +10,30 @@
  * - Graceful degradation when indexing
  */
 
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, unlinkSync, mkdirSync } from 'fs';
 import { execSync, spawnSync } from 'child_process';
 import { join, resolve } from 'path';
 import { tmpdir } from 'os';
 import * as net from 'net';
 import * as crypto from 'crypto';
+
+/**
+ * Get the temp directory that the Python TLDR daemon uses.
+ * Python's Path("/tmp/...") resolves to C:\tmp\ on Windows,
+ * while Node's os.tmpdir() returns the user temp dir (e.g. AppData\Local\Temp).
+ * We must match the Python daemon's behavior for PID/lock file alignment.
+ */
+function getTldrTmpDir(): string {
+  if (process.platform === 'win32') {
+    const dir = 'C:/tmp';
+    // Ensure directory exists (Python auto-creates it, but be safe)
+    if (!existsSync(dir)) {
+      try { mkdirSync(dir, { recursive: true }); } catch { /* ignore */ }
+    }
+    return dir;
+  }
+  return tmpdir();
+}
 
 /**
  * Resolve project directory to absolute path.
@@ -32,7 +50,7 @@ function resolveProjectDir(projectDir: string): string {
 function getLockPath(projectDir: string): string {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash('md5').update(resolvedPath).digest('hex').substring(0, 8);
-  return `${tmpdir()}/tldr-${hash}.lock`;
+  return `${getTldrTmpDir()}/tldr-${hash}.lock`;
 }
 
 /**
@@ -41,7 +59,7 @@ function getLockPath(projectDir: string): string {
 function getPidPath(projectDir: string): string {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash('md5').update(resolvedPath).digest('hex').substring(0, 8);
-  return `${tmpdir()}/tldr-${hash}.pid`;
+  return `${getTldrTmpDir()}/tldr-${hash}.pid`;
 }
 
 /**
@@ -218,7 +236,7 @@ export function getConnectionInfo(projectDir: string): ConnectionInfo {
     return { type: 'tcp', host: '127.0.0.1', port };
   } else {
     // Unix socket
-    return { type: 'unix', path: `${tmpdir()}/tldr-${hash}.sock` };
+    return { type: 'unix', path: `${getTldrTmpDir()}/tldr-${hash}.sock` };
   }
 }
 
@@ -232,7 +250,7 @@ export function getConnectionInfo(projectDir: string): ConnectionInfo {
 export function getSocketPath(projectDir: string): string {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash('md5').update(resolvedPath).digest('hex').substring(0, 8);
-  return `${tmpdir()}/tldr-${hash}.sock`;
+  return `${getTldrTmpDir()}/tldr-${hash}.sock`;
 }
 
 /**

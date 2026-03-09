@@ -1,22 +1,35 @@
 // src/daemon-client.ts
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, unlinkSync, mkdirSync } from "fs";
 import { execSync, spawnSync } from "child_process";
 import { join, resolve } from "path";
 import { tmpdir } from "os";
 import * as net from "net";
 import * as crypto from "crypto";
+function getTldrTmpDir() {
+  if (process.platform === "win32") {
+    const dir = "C:/tmp";
+    if (!existsSync(dir)) {
+      try {
+        mkdirSync(dir, { recursive: true });
+      } catch {
+      }
+    }
+    return dir;
+  }
+  return tmpdir();
+}
 function resolveProjectDir(projectDir) {
   return resolve(projectDir);
 }
 function getLockPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
-  return `${tmpdir()}/tldr-${hash}.lock`;
+  return `${getTldrTmpDir()}/tldr-${hash}.lock`;
 }
 function getPidPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
-  return `${tmpdir()}/tldr-${hash}.pid`;
+  return `${getTldrTmpDir()}/tldr-${hash}.pid`;
 }
 function isDaemonProcessRunning(projectDir) {
   const pidPath = getPidPath(projectDir);
@@ -64,13 +77,13 @@ function getConnectionInfo(projectDir) {
     const port = 49152 + parseInt(hash, 16) % 1e4;
     return { type: "tcp", host: "127.0.0.1", port };
   } else {
-    return { type: "unix", path: `${tmpdir()}/tldr-${hash}.sock` };
+    return { type: "unix", path: `${getTldrTmpDir()}/tldr-${hash}.sock` };
   }
 }
 function getSocketPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
   const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
-  return `${tmpdir()}/tldr-${hash}.sock`;
+  return `${getTldrTmpDir()}/tldr-${hash}.sock`;
 }
 function getStatusFile(projectDir) {
   const statusPath = join(projectDir, ".tldr", "status");
