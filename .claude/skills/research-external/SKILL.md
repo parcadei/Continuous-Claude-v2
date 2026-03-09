@@ -82,8 +82,8 @@ Proceed? [Yes / Adjust settings]
 |-------|--------------|---------|
 | `library` | nia-docs | API docs, usage patterns, indexed source |
 | `code-examples` | exa-code-search | Real-world snippets from GitHub/SO |
-| `best-practices` | perplexity-search | Recommended approaches, patterns, comparisons |
-| `general` | All MCP tools | Comprehensive multi-source research |
+| `best-practices` | exa + WebSearch | Recommended approaches, patterns, comparisons |
+| `general` | nia + exa + context7 | Comprehensive multi-source research |
 
 ## Options
 
@@ -123,61 +123,64 @@ Primary tool: **nia-docs** — API documentation, usage patterns, code examples.
 (cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/nia_docs.py \
   --package "$LIBRARY" --grep "$TOPIC")
 
-# Supplement with official docs if URL known
-(cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/firecrawl_scrape.py \
-  --url "https://docs.example.com/api/$TOPIC" --format markdown)
+# Supplement with official docs if URL known (use WebFetch)
+# WebFetch tool for specific documentation URLs
 ```
 
-Thorough depth: multiple semantic queries with variations, grep for function/class names, scrape official docs pages.
+Thorough depth: multiple semantic queries with variations, grep for function/class names, WebFetch official docs pages.
 
 #### Focus: `best-practices`
 
-Primary tool: **perplexity-search** — recommended approaches, patterns, anti-patterns.
+Primary tools: **exa-code-search** (real-world examples) + **WebSearch** (web research).
 
 ```bash
-# AI-synthesized research (sonar-pro)
-(cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
-  --research "$TOPIC best practices 2024 2025")
+# Real-world implementation examples via Exa MCP
+# exa: search "$TOPIC best practices implementation" --type code --num_results 5
 
-# Comparing alternatives
-(cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
-  --reason "$TOPIC vs alternatives - which to choose?")
+# Web research via WebSearch tool
+# WebSearch: "$TOPIC best practices 2024 2025"
+
+# Quick API docs via Context7 if relevant library
+# context7: resolve-library-id "$LIBRARY" -> query-docs
 ```
 
 Thorough depth additions:
 ```bash
-# Chain-of-thought for complex decisions
-(cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
-  --reason "$TOPIC tradeoffs and considerations 2025")
+# Compare alternatives via Exa
+# exa: search "$TOPIC vs alternatives comparison" --num_results 5
 
-# Deep comprehensive research
-(cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
-  --deep "$TOPIC comprehensive guide 2025")
+# GitHub issues/discussions for community consensus
+(cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/mcp/github_search.py \
+  --query "$TOPIC best practices" --type issues)
 
-# Recent developments
-(cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
-  --search "$TOPIC latest developments" --recency month --max-results 5)
+# Deep library docs via Nia if specific package
+(cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/mcp/nia_docs.py \
+  --search "$TOPIC patterns")
 ```
 
 #### Focus: `general`
 
-Use ALL available MCP tools — comprehensive multi-source research.
+Use all active MCP tools — comprehensive multi-source research.
 
 ```bash
 # 2a: Library documentation (nia-docs)
-(cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/nia_docs.py \
+(cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/mcp/nia_docs.py \
   --search "$TOPIC")
 
-# 2b: Web research (perplexity)
-(cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
-  --research "$TOPIC")
+# 2b: Code examples (exa MCP)
+# exa: search "$TOPIC implementation example" --type code --num_results 5
 
-# 2c: Specific documentation pages found in step 2b (firecrawl)
-(cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/firecrawl_scrape.py \
-  --url "$FOUND_DOC_URL" --format markdown)
+# 2c: Quick API docs (context7 MCP)
+# context7: resolve-library-id "$LIBRARY" -> query-docs "$TOPIC"
+
+# 2d: Web research (WebSearch tool)
+# WebSearch: "$TOPIC"
+
+# 2e: Specific documentation pages (WebFetch tool)
+# WebFetch: "$FOUND_DOC_URL"
 ```
 
-Thorough depth: run all three with expanded queries, cross-reference findings, follow links for deeper context.
+Thorough depth: run all tools with expanded queries, cross-reference findings, follow links for deeper context.
 
 ### Step 3: Synthesize Findings
 
@@ -248,11 +251,17 @@ If an MCP tool fails (API key missing, rate limited, etc.):
 | Architecture decision | `create_plan` | Detailed planning |
 | Library comparison | Present to user | Decision making |
 
-## Required Environment
+## Required Environment (Always Available)
 
-- `NIA_API_KEY` or `nia` server in mcp_config.json
-- `PERPLEXITY_API_KEY` in environment or `~/.claude/.env`
-- `FIRECRAWL_API_KEY` and `firecrawl` server in mcp_config.json
+- `nia` MCP server registered in mcp.json (`NIA_API_KEY` set)
+- `exa` MCP server registered in mcp.json (free tier, no key needed)
+- `context7` MCP server registered in mcp.json (no key needed)
+- `github` MCP server registered in mcp.json (`GITHUB_TOKEN` set)
+
+## Optional Environment (Enhanced)
+
+- `PERPLEXITY_API_KEY` in Windows user env vars -- enables best-practices and web search focus modes. Without it, use WebSearch as fallback.
+- `FIRECRAWL_API_KEY` in Windows user env vars + `firecrawl` MCP server -- enables URL scraping. Without it, use WebFetch as fallback.
 
 ## Notes
 
