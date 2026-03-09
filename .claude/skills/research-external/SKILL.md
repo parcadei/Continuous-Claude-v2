@@ -80,7 +80,8 @@ Proceed? [Yes / Adjust settings]
 
 | Focus | Primary Tool | Purpose |
 |-------|--------------|---------|
-| `library` | nia-docs | API docs, usage patterns, code examples |
+| `library` | nia-docs | API docs, usage patterns, indexed source |
+| `code-examples` | exa-code-search | Real-world snippets from GitHub/SO |
 | `best-practices` | perplexity-search | Recommended approaches, patterns, comparisons |
 | `general` | All MCP tools | Comprehensive multi-source research |
 

@@ -603,6 +603,31 @@
       "evalTier": "verified",
       "evalDate": "2026-03-07"
     },
+    "exa-code-search": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Find real-world code examples via Exa - searches GitHub, StackOverflow, technical docs for copy-paste-ready snippets",
+      "promptTriggers": {
+        "keywords": [
+          "code example",
+          "code snippet",
+          "show me how",
+          "implementation example",
+          "usage example",
+          "exa search",
+          "exa code"
+        ],
+        "intentPatterns": [
+          "(show|find|get).*?(code|implementation).*?(example|snippet|sample)",
+          "how.*?(to|do).*?(use|implement|setup|configure).*?(with|in|for)",
+          "(example|snippet|sample).*?(code|implementation)"
+        ]
+      },
+      "evalScore": null,
+      "evalTier": "new",
+      "evalDate": "2026-03-09"
+    },
     "ast-grep-find": {
       "type": "domain",
       "enforcement": "suggest",
