@@ -99,35 +99,6 @@ function updateRalphState(signals, projectDir) {
     }
     return updated;
   }
-  const stateFile = join(projectDir, ".ralph-state.json");
-  if (!existsSync(stateFile)) {
-    return false;
-  }
-  const stateScript = join(homeDir, ".claude", "scripts", "ralph", "ralph-state.py");
-  if (!existsSync(stateScript)) {
-    return false;
-  }
-  for (const signal of signals) {
-    if (!signal.storyId) {
-      continue;
-    }
-    const result = spawnSync("python", [
-      stateScript,
-      "--project",
-      projectDir,
-      "signal",
-      "--story",
-      signal.storyId,
-      "--signal",
-      signal.type
-    ], {
-      encoding: "utf-8",
-      timeout: 5e3
-    });
-    if (result.status === 0) {
-      updated = true;
-    }
-  }
   return updated;
 }
 function generateStatusOutput(signals) {

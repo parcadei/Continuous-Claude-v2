@@ -107,6 +107,24 @@ if [[ -d "$DIST_SRC" ]]; then
     done
 fi
 
+# Sync templates/ralph/ (prompt templates for Ralph agents)
+TEMPLATES_SRC="$REPO_CLAUDE/templates/ralph"
+TEMPLATES_DST="$ACTIVE_CLAUDE/templates/ralph"
+if [[ -d "$TEMPLATES_SRC" ]]; then
+    $DRY_RUN || mkdir -p "$TEMPLATES_DST"
+    for src_file in "$TEMPLATES_SRC"/*; do
+        [[ ! -f "$src_file" ]] && continue
+        local_name=$(basename "$src_file")
+        dst_file="$TEMPLATES_DST/$local_name"
+        if $DRY_RUN; then
+            echo "[DRY RUN] Would copy: $src_file -> $dst_file"
+        else
+            cp "$src_file" "$dst_file"
+            $VERBOSE && echo "Copied: templates/ralph/$local_name" || true
+        fi
+    done
+fi
+
 # Sync scripts/ralph/*.py (only if target directory already exists)
 RALPH_SRC="$REPO_CLAUDE/scripts/ralph"
 RALPH_DST="$ACTIVE_CLAUDE/scripts/ralph"
@@ -201,6 +219,7 @@ if ! $DRY_RUN; then
     done
     verify_dir "hooks/dist (*.mjs)" "$REPO_CLAUDE/hooks/dist" "$ACTIVE_CLAUDE/hooks/dist" "*.mjs"
     verify_dir "scripts/ralph (*.py)" "$REPO_CLAUDE/scripts/ralph" "$ACTIVE_CLAUDE/scripts/ralph" "*.py"
+    verify_dir "templates/ralph" "$REPO_CLAUDE/templates/ralph" "$ACTIVE_CLAUDE/templates/ralph"
 
     if [[ "$VERIFY_FAIL" -eq 1 ]]; then
         echo "  WARNING: Some directories have file count mismatches"

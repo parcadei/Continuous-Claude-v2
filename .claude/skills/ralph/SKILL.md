@@ -167,7 +167,7 @@ For iteration limits (10/30/50 tiers) and BLOCKED format, see `references/state-
 See `references/agents.md` for ralph-skill-query.py command.
 
 ### 3.2 Spawn Agent
-Use Task tool. Provide: story ID, task description, file list, requirements.
+Use Task tool. **Always include `Task ID: X.Y`** in the prompt for task-monitor disambiguation. Provide: story ID, task ID, task description, file list, requirements.
 
 ### 3.3 Wait for Completion
 

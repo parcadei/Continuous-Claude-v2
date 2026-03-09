@@ -31,11 +31,14 @@ Task tool:
   subagent_type: kraken  # or spark, arbiter, etc.
   prompt: |
     Story: STORY-001
+    Task ID: 1.1
     Task: Implement user authentication
     Files: src/auth.ts, src/middleware.ts
     Requirements: [from PRD]
     Tests: Write unit tests for auth flow
 ```
+
+**IMPORTANT:** Always include `Task ID: X.Y` in agent prompts. The `ralph-task-monitor` hook uses this to disambiguate which task completed when multiple agents run in parallel. Without it, state updates are skipped for ambiguous cases.
 
 ## TDD Enforcement
 

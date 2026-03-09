@@ -1,6 +1,7 @@
 # Docker Agent Task: {{TASK_DESCRIPTION}}
 
 **Story:** {{STORY_ID}}
+**Task ID:** {{TASK_ID}}
 **Iteration:** {{ITERATION}} / {{MAX_ITERATIONS}}
 **Project:** {{PROJECT_NAME}}
 

@@ -10,6 +10,7 @@ What auto-syncs (and what does not) between `continuous-claude/` (repo) and `~/.
 | `skills/*/` | Yes | Post-commit hook copies | N/A |
 | `agents/*.yml` | Yes | Post-commit hook copies | N/A |
 | `scripts/ralph/*.py` | Yes (NEW) | Enhanced sync script | `bash scripts/sync-to-active.sh` |
+| `templates/ralph/*` | Yes (NEW) | Enhanced sync script | `bash scripts/sync-to-active.sh` |
 | `settings.json` | NO | Intentional — local config | Manual copy (risky) |
 | `settings.local.json` | NO | Intentional — machine-specific | Never sync |
 | `CLAUDE.md` | NO | Intentional — may differ per machine | Manual review |

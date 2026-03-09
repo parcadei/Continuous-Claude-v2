@@ -204,8 +204,14 @@ async function main() {
   } else if (inProgressTasks.length === 1) {
     tasksToUpdate = inProgressTasks;
   } else {
-    log2.warn(`Ambiguous: ${inProgressTasks.length} in_progress tasks, no task ID in prompt. Skipping update.`, { agentType });
-    return;
+    const byAgent = inProgressTasks.filter((t) => t.agent === agentType);
+    if (byAgent.length === 1) {
+      tasksToUpdate = byAgent;
+      log2.info(`Matched task ${byAgent[0].id} via agent type fallback`, { agentType });
+    } else {
+      log2.warn(`Ambiguous: ${inProgressTasks.length} in_progress tasks, no task ID in prompt. Skipping update.`, { agentType });
+      return;
+    }
   }
   for (const task of tasksToUpdate) {
     const taskId = String(task.id);

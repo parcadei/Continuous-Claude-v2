@@ -1,11 +1,12 @@
 # Project Roadmap
 
 ## Current Focus
-**Deep Review: Zombie Process Cleanup + ROADMAP Fix — Hardening Pass**
-- Zero cross-project contamination in any of 12 project ROADMAPs checked; Problem: `findstr ":${port}"` is substring — matches `:30020` when looking for `:3002`.
+**Memory Curation Plan: Remove Slop, Keep Signal**
+- `metadata->>'learning_type'` (text extraction); `metadata->>'context'` (text extraction)
 - Started: 2026-03-09
 
 ## Completed
+- [x] Deep Review: Zombie Process Cleanup + ROADMAP Fix — Hardening Pass (2026-03-09)
 - [x] Add Mixed Background Design Elements to CCv3 Light Landing Page (2026-03-09)
 - [x] Fix Sync-to-Repo Revert Loop + Re-apply Reverted Fixes (2026-03-07)
 - [x] [fix](hooks) break sync-to-repo revert loop + re-apply 7 code fixes (2026-03-07) `0adbdeb`
@@ -98,22 +99,10 @@
 - [x] Memory unit tests in opc/tests/ (2026-02)
 
 ## Planned
-- [ ] PRD: Continuous Claude Platform Optimization [prd-platform-optimization.md] (normal)
-_No planned items yet._
+- [ ] PRD: Continuous Claude Platform Optimization [prd-platform-optimization.md] (medium priority)
 
 ## Recent Planning Sessions
-### 2026-03-09: Deep Review: Zombie Process Cleanup + ROADMAP Fix — Hardening Pass
-**Summary:** Deep review of the implementation completed earlier this session. Two independent scouts audited every file and found **2 HIGH**, **2 MEDIUM**, and several LOW issues that need fixing to ensure reliability across all projects.
-
-**Key Decisions:**
-- Zero cross-project contamination in any of 12 project ROADMAPs checked
-- Problem: `findstr ":${port}"` is substring — matches `:30020` when looking for `:3002`.
-- Fix: Replace the netstat parsing with a post-filter that validates the exact port:
-- Problem: `kill -TERM -${pid}` sends to process group, which only works if process is group leader. `npx` is typically NOT a group leader.
-- Fix: Replace the Unix branch with positive-PID kill + child process cleanup:
-
-**Files:** path.join, package.json, npx.cmd, post-plan-roadmap.ts, dev-cleanup.mjs, C:/Users/david.hayes/Projects/NorthStar Transformation/scripts/dev-cleanup.mjs, dev-start.mjs, C:/Users/david.hayes/Projects/NorthStar Transformation/scripts/dev-start.mjs
-
+### 2026-03-09: Planning Session
 ### 2026-03-07: Add Mixed Background Design Elements to CCv3 Light Landing Page
 **Key Decisions:**
 - Target: Hero section (3W-0)
