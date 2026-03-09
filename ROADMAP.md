@@ -1,11 +1,12 @@
 # Project Roadmap
 
 ## Current Focus
-**Memory Curation Plan: Remove Slop, Keep Signal**
-- `metadata->>'learning_type'` (text extraction); `metadata->>'context'` (text extraction)
+**Evaluation: Exa Code Search Agent Skill**
+- The gap Exa fills: When you need real-world implementation examples (not docs, not file matches, not web articles -- actual working code). Nia indexes docs/repos for reference. Exa finds and curates code examples across the web.; The official skill prompt is well-designed (token isolation via Task agents, deduplication)
 - Started: 2026-03-09
 
 ## Completed
+- [x] Memory Curation Plan: Remove Slop, Keep Signal (2026-03-09)
 - [x] Deep Review: Zombie Process Cleanup + ROADMAP Fix — Hardening Pass (2026-03-09)
 - [x] Add Mixed Background Design Elements to CCv3 Light Landing Page (2026-03-09)
 - [x] Fix Sync-to-Repo Revert Loop + Re-apply Reverted Fixes (2026-03-07)
@@ -102,7 +103,18 @@
 - [ ] PRD: Continuous Claude Platform Optimization [prd-platform-optimization.md] (medium priority)
 
 ## Recent Planning Sessions
-### 2026-03-09: Planning Session
+### 2026-03-09: Evaluation: Exa Code Search Agent Skill
+**Summary:** We just added Nia MCP (16 tools, deep doc/repo indexing) to complement context7 (fast pre-indexed popular packages). The user wants to evaluate whether Exa Code Search adds value on top of these, before making changes.
+
+**Key Decisions:**
+- The gap Exa fills: When you need real-world implementation examples (not docs, not file matches, not web articles -- actual working code). Nia indexes docs/repos for reference. Exa finds and curates code examples across the web.
+- The official skill prompt is well-designed (token isolation via Task agents, deduplication)
+- Token isolation (always spawn in Task agents)
+- `library` focus -> Nia (unchanged)
+- `best-practices` focus -> Perplexity (unchanged)
+
+**Files:** ~/.claude/mcp.json, .claude/settings.local.json, .claude/skills/exa-code-search/SKILL.md, .claude/skills/research-external/SKILL.md, search-router/SKILL.md
+
 ### 2026-03-07: Add Mixed Background Design Elements to CCv3 Light Landing Page
 **Key Decisions:**
 - Target: Hero section (3W-0)

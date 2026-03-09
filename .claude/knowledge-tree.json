@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated_at": "2026-03-09T19:33:08.731007+00:00",
+  "updated_at": "2026-03-09T22:20:49.048111+00:00",
   "project": {
     "name": "continuous-claude",
     "description": "> Give Claude a notebook, memory, specialized assistants, and autonomous development capability — so every conversation builds on the last [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Claude Code](https://img.shields.io/badge/Claude-Code-orange.svg)](https://claude.ai/code)",
@@ -266,6 +266,30 @@
         "key_files": [
           "README.md"
         ]
+      },
+      ".claude\\skills\\_archive/": {
+        "purpose": "Project directory",
+        "key_files": null
+      },
+      ".claude\\skills\\_archive\\morph-apply/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\_archive\\morph-search/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\_archive\\research/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\_archive\\search-hierarchy/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\_archive\\search-tools/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
       },
       ".claude\\skills\\_eval/": {
         "purpose": "JavaScript modules",
@@ -604,6 +628,10 @@
         "key_files": null
       },
       ".claude\\skills\\environment-triage/": {
+        "purpose": "Markdown documentation",
+        "key_files": null
+      },
+      ".claude\\skills\\exa-code-search/": {
         "purpose": "Markdown documentation",
         "key_files": null
       },
@@ -1879,10 +1907,14 @@
   "goals": {
     "source": "ROADMAP.md",
     "current": {
-      "title": "Memory Curation Plan: Remove Slop, Keep Signal",
-      "description": "`metadata->>'learning_type'` (text extraction); `metadata->>'context'` (text extraction); Started: 2026-03-09"
+      "title": "Evaluation: Exa Code Search Agent Skill",
+      "description": "The gap Exa fills: When you need real-world implementation examples (not docs, not file matches, not web articles -- actual working code). Nia indexes docs/repos for reference. Exa finds and curates code examples across the web.; The official skill prompt is well-designed (token isolation via Task agents, deduplication); Started: 2026-03-09"
     },
     "completed": [
+      {
+        "title": "Memory Curation Plan: Remove Slop, Keep Signal",
+        "completed": "2026-03-09"
+      },
       {
         "title": "Deep Review: Zombie Process Cleanup + ROADMAP Fix — Hardening Pass",
         "completed": "2026-03-09"
@@ -2257,7 +2289,5 @@
   },
   "critical_info": {
     "env_vars": ".env.example"
-  },
-  "_stale": true,
-  "_invalidated_at": "2026-03-09T20:06:28.972Z"
+  }
 }
