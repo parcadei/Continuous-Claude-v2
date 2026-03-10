@@ -603,7 +603,7 @@ async function main() {
   fs.mkdirSync(path.dirname(roadmapPath), { recursive: true });
   fs.writeFileSync(roadmapPath, newContent, 'utf-8');
 
-  console.error(`✓ ROADMAP.md updated: ${planInfo.title}`);
+  console.error(`[post-plan-roadmap] ROADMAP.md updated: ${planInfo.title}`);
 
   // Store planning decisions in archival_memory for future recall
   storePlanningLearnings(planInfo, projectDir);

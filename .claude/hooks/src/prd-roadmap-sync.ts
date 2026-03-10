@@ -65,7 +65,7 @@ function readStdin(): Promise<string> {
     process.stdin.setEncoding('utf8');
     process.stdin.on('data', (chunk) => { data += chunk; });
     process.stdin.on('end', () => resolve(data));
-    setTimeout(() => resolve(data), 1000);
+    setTimeout(() => resolve(data), 100);
   });
 }
 
@@ -164,24 +164,30 @@ function findRoadmapPath(startDir: string): string | null {
     return roadmap;
   }
 
-  // Fallback: walk up from startDir but stop at project root indicators
+  // Fallback: find project root first, then look for ROADMAP within it.
+  // This prevents escaping the boundary when a parent dir has ROADMAP.md.
   let current = path.resolve(startDir);
   const root = path.parse(current).root;
 
+  // Step 1: Walk up to find the project boundary
+  let projectRoot: string | null = null;
   while (current !== root) {
-    const candidate = path.join(current, 'ROADMAP.md');
-    if (fs.existsSync(candidate)) return candidate;
-
-    const claudeCandidate = path.join(current, '.claude', 'ROADMAP.md');
-    if (fs.existsSync(claudeCandidate)) return claudeCandidate;
-
-    // Stop at project root — never escape above .git or package.json
     if (fs.existsSync(path.join(current, '.git')) ||
         fs.existsSync(path.join(current, 'package.json'))) {
-      return candidate;
+      projectRoot = current;
+      break;
     }
-
     current = path.dirname(current);
+  }
+
+  // Step 2: Look for ROADMAP only within the bounded project root
+  if (projectRoot) {
+    const candidate = path.join(projectRoot, 'ROADMAP.md');
+    if (fs.existsSync(candidate)) return candidate;
+    const claudeCandidate = path.join(projectRoot, '.claude', 'ROADMAP.md');
+    if (fs.existsSync(claudeCandidate)) return claudeCandidate;
+    // Return path for creation even if it doesn't exist yet
+    return candidate;
   }
 
   return null;
