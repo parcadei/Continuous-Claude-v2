@@ -74,6 +74,17 @@ async function main() {
   const failed = (tasks as any[]).filter(t => t.status === 'failed').length;
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
+  // Detect stale in_progress tasks (>30 min)
+  const STALE_THRESHOLD_MS = 30 * 60 * 1000;
+  const now = Date.now();
+  const staleCount = (tasks as any[]).filter(t => {
+    if (t.status !== 'in_progress' || !t.started_at) return false;
+    try {
+      const started = new Date(t.started_at).getTime();
+      return (now - started) > STALE_THRESHOLD_MS;
+    } catch { return false; }
+  }).length;
+
   // Retry queue
   const retryCount = (unified.retry_queue || []).length;
 
@@ -89,6 +100,7 @@ async function main() {
   ];
 
   if (inProgress > 0) parts.push(`active: ${inProgress}`);
+  if (staleCount > 0) parts.push(`STALE: ${staleCount}`);
   if (failed > 0) parts.push(`failed: ${failed}`);
   if (retryCount > 0) parts.push(`retry: ${retryCount}`);
   parts.push(`commit: ${lastCommitTime}`);

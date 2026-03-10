@@ -36,6 +36,24 @@ interface HookInput {
   };
 }
 
+// ─── Structured status detection (Priority 1) ──────────────
+// Agents can output structured JSON for unambiguous status reporting.
+// Format: {"ralph_status": {"task_id": "X.Y", "status": "complete", "commit": "abc123"}}
+interface RalphStructuredStatus {
+  task_id: string;
+  status: 'complete' | 'failed' | 'blocked';
+  commit?: string;
+  error?: string;
+}
+
+const STRUCTURED_JSON_RE = /\{"ralph_status"\s*:\s*\{[^}]+\}\s*\}/;
+
+// ─── XML status detection (Priority 2) ─────────────────────
+// Format: <TASK_COMPLETE task="1.1" commit="abc123"/>
+const XML_TASK_COMPLETE_RE = /<TASK_COMPLETE\s+task="(\d+(?:\.\d+)?)"\s*(?:commit="([^"]*)")?\s*\/?>/i;
+const XML_TASK_FAIL_RE = /<TASK_FAIL\s+task="(\d+(?:\.\d+)?)"\s*(?:error="([^"]*)")?\s*\/?>/i;
+
+// ─── Pattern matching (Priority 3 — fallback) ──────────────
 // Patterns indicating agent success
 const SUCCESS_PATTERNS = [
   /task\s+(?:is\s+)?complete/i,
@@ -68,6 +86,59 @@ function readStdin(): string {
   }
 }
 
+/**
+ * Priority 1: Try to parse structured JSON status from agent output.
+ * Returns null if no structured status found.
+ */
+function detectStructuredJSON(text: string): { taskId: string; success: boolean; commit?: string; reason?: string } | null {
+  const match = text.match(STRUCTURED_JSON_RE);
+  if (!match) return null;
+
+  try {
+    const parsed = JSON.parse(match[0]);
+    const status: RalphStructuredStatus = parsed.ralph_status;
+    if (!status || !status.task_id || !status.status) return null;
+
+    return {
+      taskId: status.task_id,
+      success: status.status === 'complete',
+      commit: status.commit,
+      reason: status.error || (status.status === 'failed' ? 'Agent reported failure' : undefined),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Priority 2: Try to parse XML task status tags.
+ * Returns null if no XML status found.
+ */
+function detectXMLStatus(text: string): { taskId: string; success: boolean; commit?: string; reason?: string } | null {
+  const completeMatch = text.match(XML_TASK_COMPLETE_RE);
+  if (completeMatch) {
+    return {
+      taskId: completeMatch[1],
+      success: true,
+      commit: completeMatch[2] || undefined,
+    };
+  }
+
+  const failMatch = text.match(XML_TASK_FAIL_RE);
+  if (failMatch) {
+    return {
+      taskId: failMatch[1],
+      success: false,
+      reason: failMatch[2] || 'Agent reported failure',
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Priority 3: Fallback pattern matching (original behavior).
+ */
 function detectOutcome(text: string): { success: boolean; reason?: string } | null {
   // Check failure first (more specific)
   for (const pattern of FAILURE_PATTERNS) {
@@ -123,8 +194,53 @@ async function main() {
 
   const agentType = input.tool_input?.subagent_type || 'unknown';
   const description = input.tool_input?.description || '';
+  const agentPrompt = String(input.tool_input?.prompt || '');
 
-  // Detect outcome from agent output
+  // ─── Priority 1: Structured JSON status ───────────────────
+  const structuredResult = detectStructuredJSON(resultText);
+  if (structuredResult) {
+    log.info(`Structured status detected for task ${structuredResult.taskId}`, { agentType, method: 'json' });
+    const commitArgs = structuredResult.commit ? ['--commit', structuredResult.commit] : [];
+    if (structuredResult.success) {
+      spawnSync('python', [
+        v2Script, '-p', projectDir, 'task-complete', '--id', structuredResult.taskId, ...commitArgs
+      ], { encoding: 'utf-8', timeout: 5000 });
+    } else {
+      spawnSync('python', [
+        v2Script, '-p', projectDir, 'task-fail', '--id', structuredResult.taskId,
+        '--error', structuredResult.reason || 'Agent reported failure'
+      ], { encoding: 'utf-8', timeout: 5000 });
+    }
+
+    const marker = structuredResult.success ? 'complete' : `failed: ${structuredResult.reason || 'unknown'}`;
+    const message = `\nRALPH TASK MONITOR: ${agentType} -> task ${structuredResult.taskId} ${marker} (structured JSON)\n`;
+    console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: message } }));
+    return;
+  }
+
+  // ─── Priority 2: XML status tags ──────────────────────────
+  const xmlResult = detectXMLStatus(resultText);
+  if (xmlResult) {
+    log.info(`XML status detected for task ${xmlResult.taskId}`, { agentType, method: 'xml' });
+    const commitArgs = xmlResult.commit ? ['--commit', xmlResult.commit] : [];
+    if (xmlResult.success) {
+      spawnSync('python', [
+        v2Script, '-p', projectDir, 'task-complete', '--id', xmlResult.taskId, ...commitArgs
+      ], { encoding: 'utf-8', timeout: 5000 });
+    } else {
+      spawnSync('python', [
+        v2Script, '-p', projectDir, 'task-fail', '--id', xmlResult.taskId,
+        '--error', xmlResult.reason || 'Agent reported failure'
+      ], { encoding: 'utf-8', timeout: 5000 });
+    }
+
+    const marker = xmlResult.success ? 'complete' : `failed: ${xmlResult.reason || 'unknown'}`;
+    const message = `\nRALPH TASK MONITOR: ${agentType} -> task ${xmlResult.taskId} ${marker} (XML tag)\n`;
+    console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: message } }));
+    return;
+  }
+
+  // ─── Priority 3: Pattern matching (original fallback) ─────
   const outcome = detectOutcome(resultText);
 
   if (!outcome) {
@@ -147,7 +263,6 @@ async function main() {
     return;
   }
 
-  // Find in-progress tasks (likely the one this agent was working on)
   const inProgressTasks = allTasks.filter((t: any) => t.status === 'in_progress');
 
   if (inProgressTasks.length === 0) {
@@ -156,35 +271,28 @@ async function main() {
   }
 
   // Try to extract task ID from agent prompt for disambiguation
-  const agentPrompt = String(input.tool_input?.prompt || '');
   const taskIdMatch = agentPrompt.match(TASK_ID_PATTERN);
   const extractedTaskId = taskIdMatch ? taskIdMatch[1] : null;
 
-  // Determine which tasks to update
   let tasksToUpdate: any[];
 
   if (extractedTaskId) {
-    // Task ID found in prompt — update only that task
     const matched = inProgressTasks.filter((t: any) => String(t.id) === extractedTaskId);
     if (matched.length > 0) {
       tasksToUpdate = matched;
       log.info(`Matched agent to task ${extractedTaskId} via prompt`, { agentType });
     } else {
-      // ID from prompt doesn't match any in_progress task — skip
       log.warn(`Task ID ${extractedTaskId} from prompt not found in in_progress tasks`, { agentType });
       return;
     }
   } else if (inProgressTasks.length === 1) {
-    // Only one in_progress task — safe to assume it's this agent's
     tasksToUpdate = inProgressTasks;
   } else {
-    // Multiple in_progress tasks and no ID — try matching by agent type
     const byAgent = inProgressTasks.filter((t: any) => t.agent === agentType);
     if (byAgent.length === 1) {
       tasksToUpdate = byAgent;
       log.info(`Matched task ${byAgent[0].id} via agent type fallback`, { agentType });
     } else {
-      // Still ambiguous — skip to avoid corruption
       log.warn(`Ambiguous: ${inProgressTasks.length} in_progress tasks, no task ID in prompt. Skipping update.`, { agentType });
       return;
     }
@@ -206,24 +314,23 @@ async function main() {
     }
   }
 
-  // Generate status output
   const statusLines = [
     '',
-    '─'.repeat(40),
-    `📋 RALPH TASK MONITOR: ${agentType} agent ${outcome.success ? 'completed' : 'failed'}`,
-    '─'.repeat(40),
+    '-'.repeat(40),
+    `RALPH TASK MONITOR: ${agentType} agent ${outcome.success ? 'completed' : 'failed'} (pattern match)`,
+    '-'.repeat(40),
   ];
 
   for (const task of tasksToUpdate) {
     const taskId = String(task.id);
     if (outcome.success) {
-      statusLines.push(`  ✓ Task ${taskId} marked complete`);
+      statusLines.push(`  Task ${taskId} marked complete`);
     } else {
-      statusLines.push(`  ✗ Task ${taskId} marked failed: ${outcome.reason || 'unknown'}`);
+      statusLines.push(`  Task ${taskId} marked failed: ${outcome.reason || 'unknown'}`);
     }
   }
 
-  statusLines.push('─'.repeat(40));
+  statusLines.push('-'.repeat(40));
   const message = statusLines.join('\n');
   console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: message } }));
 }

@@ -103,6 +103,9 @@ function readRalphUnifiedState(projectDir) {
 
 // src/ralph-task-monitor.ts
 var log2 = createLogger("ralph-task-monitor");
+var STRUCTURED_JSON_RE = /\{"ralph_status"\s*:\s*\{[^}]+\}\s*\}/;
+var XML_TASK_COMPLETE_RE = /<TASK_COMPLETE\s+task="(\d+(?:\.\d+)?)"\s*(?:commit="([^"]*)")?\s*\/?>/i;
+var XML_TASK_FAIL_RE = /<TASK_FAIL\s+task="(\d+(?:\.\d+)?)"\s*(?:error="([^"]*)")?\s*\/?>/i;
 var SUCCESS_PATTERNS = [
   /task\s+(?:is\s+)?complete/i,
   /implementation\s+(?:is\s+)?complete/i,
@@ -127,6 +130,42 @@ function readStdin() {
   } catch {
     return "{}";
   }
+}
+function detectStructuredJSON(text) {
+  const match = text.match(STRUCTURED_JSON_RE);
+  if (!match) return null;
+  try {
+    const parsed = JSON.parse(match[0]);
+    const status = parsed.ralph_status;
+    if (!status || !status.task_id || !status.status) return null;
+    return {
+      taskId: status.task_id,
+      success: status.status === "complete",
+      commit: status.commit,
+      reason: status.error || (status.status === "failed" ? "Agent reported failure" : void 0)
+    };
+  } catch {
+    return null;
+  }
+}
+function detectXMLStatus(text) {
+  const completeMatch = text.match(XML_TASK_COMPLETE_RE);
+  if (completeMatch) {
+    return {
+      taskId: completeMatch[1],
+      success: true,
+      commit: completeMatch[2] || void 0
+    };
+  }
+  const failMatch = text.match(XML_TASK_FAIL_RE);
+  if (failMatch) {
+    return {
+      taskId: failMatch[1],
+      success: false,
+      reason: failMatch[2] || "Agent reported failure"
+    };
+  }
+  return null;
 }
 function detectOutcome(text) {
   for (const pattern of FAILURE_PATTERNS) {
@@ -164,6 +203,73 @@ async function main() {
   if (!resultText) return;
   const agentType = input.tool_input?.subagent_type || "unknown";
   const description = input.tool_input?.description || "";
+  const agentPrompt = String(input.tool_input?.prompt || "");
+  const structuredResult = detectStructuredJSON(resultText);
+  if (structuredResult) {
+    log2.info(`Structured status detected for task ${structuredResult.taskId}`, { agentType, method: "json" });
+    const commitArgs = structuredResult.commit ? ["--commit", structuredResult.commit] : [];
+    if (structuredResult.success) {
+      spawnSync("python", [
+        v2Script,
+        "-p",
+        projectDir,
+        "task-complete",
+        "--id",
+        structuredResult.taskId,
+        ...commitArgs
+      ], { encoding: "utf-8", timeout: 5e3 });
+    } else {
+      spawnSync("python", [
+        v2Script,
+        "-p",
+        projectDir,
+        "task-fail",
+        "--id",
+        structuredResult.taskId,
+        "--error",
+        structuredResult.reason || "Agent reported failure"
+      ], { encoding: "utf-8", timeout: 5e3 });
+    }
+    const marker = structuredResult.success ? "complete" : `failed: ${structuredResult.reason || "unknown"}`;
+    const message2 = `
+RALPH TASK MONITOR: ${agentType} -> task ${structuredResult.taskId} ${marker} (structured JSON)
+`;
+    console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: "PostToolUse", additionalContext: message2 } }));
+    return;
+  }
+  const xmlResult = detectXMLStatus(resultText);
+  if (xmlResult) {
+    log2.info(`XML status detected for task ${xmlResult.taskId}`, { agentType, method: "xml" });
+    const commitArgs = xmlResult.commit ? ["--commit", xmlResult.commit] : [];
+    if (xmlResult.success) {
+      spawnSync("python", [
+        v2Script,
+        "-p",
+        projectDir,
+        "task-complete",
+        "--id",
+        xmlResult.taskId,
+        ...commitArgs
+      ], { encoding: "utf-8", timeout: 5e3 });
+    } else {
+      spawnSync("python", [
+        v2Script,
+        "-p",
+        projectDir,
+        "task-fail",
+        "--id",
+        xmlResult.taskId,
+        "--error",
+        xmlResult.reason || "Agent reported failure"
+      ], { encoding: "utf-8", timeout: 5e3 });
+    }
+    const marker = xmlResult.success ? "complete" : `failed: ${xmlResult.reason || "unknown"}`;
+    const message2 = `
+RALPH TASK MONITOR: ${agentType} -> task ${xmlResult.taskId} ${marker} (XML tag)
+`;
+    console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: "PostToolUse", additionalContext: message2 } }));
+    return;
+  }
   const outcome = detectOutcome(resultText);
   if (!outcome) {
     log2.info("No clear outcome detected from agent", { agentType, description });
@@ -188,7 +294,6 @@ async function main() {
     log2.info("No in-progress tasks to update", { agentType });
     return;
   }
-  const agentPrompt = String(input.tool_input?.prompt || "");
   const taskIdMatch = agentPrompt.match(TASK_ID_PATTERN);
   const extractedTaskId = taskIdMatch ? taskIdMatch[1] : null;
   let tasksToUpdate;
@@ -241,19 +346,19 @@ async function main() {
   }
   const statusLines = [
     "",
-    "\u2500".repeat(40),
-    `\u{1F4CB} RALPH TASK MONITOR: ${agentType} agent ${outcome.success ? "completed" : "failed"}`,
-    "\u2500".repeat(40)
+    "-".repeat(40),
+    `RALPH TASK MONITOR: ${agentType} agent ${outcome.success ? "completed" : "failed"} (pattern match)`,
+    "-".repeat(40)
   ];
   for (const task of tasksToUpdate) {
     const taskId = String(task.id);
     if (outcome.success) {
-      statusLines.push(`  \u2713 Task ${taskId} marked complete`);
+      statusLines.push(`  Task ${taskId} marked complete`);
     } else {
-      statusLines.push(`  \u2717 Task ${taskId} marked failed: ${outcome.reason || "unknown"}`);
+      statusLines.push(`  Task ${taskId} marked failed: ${outcome.reason || "unknown"}`);
     }
   }
-  statusLines.push("\u2500".repeat(40));
+  statusLines.push("-".repeat(40));
   const message = statusLines.join("\n");
   console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: "PostToolUse", additionalContext: message } }));
 }

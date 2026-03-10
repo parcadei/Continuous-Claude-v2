@@ -462,6 +462,14 @@ def cmd_task_start(args) -> int:
     if args.agent:
         task.agent = args.agent
     state.iteration += 1
+
+    # Auto-checkpoint: pre-task marker
+    state.checkpoints.append(Checkpoint(
+        commit="",
+        task_id=args.id,
+        message=f"pre-task: {task.name}",
+    ))
+
     save_state(state)
     print(json.dumps({"success": True, "task": task.to_dict(), "iteration": state.iteration}))
     return 0
@@ -486,6 +494,13 @@ def cmd_task_complete(args) -> int:
             task.duration_s = (datetime.now() - start).total_seconds()
         except ValueError:
             pass
+
+    # Auto-checkpoint: post-task with commit hash
+    state.checkpoints.append(Checkpoint(
+        commit=args.commit or "",
+        task_id=args.id,
+        message=f"post-task: {task.name}",
+    ))
 
     save_state(state)
     summary = state.summary()
@@ -666,6 +681,39 @@ def cmd_session_heartbeat(args) -> int:
     return 0
 
 
+def cmd_detect_stale(args) -> int:
+    """Find tasks stuck in_progress longer than threshold."""
+    project_path = os.path.abspath(args.project or os.getcwd())
+    state = require_state(project_path)
+
+    threshold_min = args.threshold_minutes or 30
+    threshold_s = threshold_min * 60
+    now = datetime.now()
+    stale = []
+
+    for task in state.tasks:
+        if task.status != "in_progress" or not task.started_at:
+            continue
+        try:
+            started = datetime.fromisoformat(task.started_at)
+            elapsed_s = (now - started).total_seconds()
+            if elapsed_s > threshold_s:
+                stale.append({
+                    **task.to_dict(),
+                    "elapsed_minutes": round(elapsed_s / 60, 1),
+                })
+        except ValueError:
+            continue
+
+    print(json.dumps({
+        "success": True,
+        "stale_tasks": stale,
+        "threshold_minutes": threshold_min,
+        "count": len(stale),
+    }, indent=2))
+    return 0
+
+
 def cmd_status(args) -> int:
     project_path = os.path.abspath(args.project or os.getcwd())
     state = require_state(project_path)
@@ -777,6 +825,10 @@ def main() -> int:
     # session-heartbeat
     subparsers.add_parser("session-heartbeat", help="Update session heartbeat")
 
+    # detect-stale
+    ds_p = subparsers.add_parser("detect-stale", help="Find stale in_progress tasks")
+    ds_p.add_argument("--threshold-minutes", type=int, default=30, help="Minutes before stale (default 30)")
+
     # status
     subparsers.add_parser("status", help="Full status")
 
@@ -804,6 +856,7 @@ def main() -> int:
         "session-deactivate": cmd_session_deactivate,
         "session-status": cmd_session_status,
         "session-heartbeat": cmd_session_heartbeat,
+        "detect-stale": cmd_detect_stale,
         "status": cmd_status,
         "progress": cmd_progress,
         "migrate": cmd_migrate,

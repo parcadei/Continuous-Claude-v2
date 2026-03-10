@@ -142,6 +142,17 @@ async function main() {
   const inProgress = tasks.filter((t) => t.status === "in_progress").length;
   const failed = tasks.filter((t) => t.status === "failed").length;
   const pct = total > 0 ? Math.round(completed / total * 100) : 0;
+  const STALE_THRESHOLD_MS = 30 * 60 * 1e3;
+  const now = Date.now();
+  const staleCount = tasks.filter((t) => {
+    if (t.status !== "in_progress" || !t.started_at) return false;
+    try {
+      const started = new Date(t.started_at).getTime();
+      return now - started > STALE_THRESHOLD_MS;
+    } catch {
+      return false;
+    }
+  }).length;
   const retryCount = (unified.retry_queue || []).length;
   const checkpoints = unified.checkpoints || [];
   const lastCheckpoint = checkpoints.length > 0 ? checkpoints[checkpoints.length - 1] : null;
@@ -151,6 +162,7 @@ async function main() {
     `RALPH: ${unified.story_id} ${bar} ${completed}/${total} (${pct}%)`
   ];
   if (inProgress > 0) parts.push(`active: ${inProgress}`);
+  if (staleCount > 0) parts.push(`STALE: ${staleCount}`);
   if (failed > 0) parts.push(`failed: ${failed}`);
   if (retryCount > 0) parts.push(`retry: ${retryCount}`);
   parts.push(`commit: ${lastCommitTime}`);

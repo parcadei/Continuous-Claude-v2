@@ -69,13 +69,21 @@ Do NOT use Ralph for: quick fixes (use spark directly), debugging (use debug-age
 
 > `session-start-continuity.ts` injects ROADMAP, knowledge tree, and goal-based memories at session start. Phase 0 adds the **feature-specific** query targeting the user's actual request. If resuming, check for "RALPH SESSION ACTIVE" in session start message.
 
-### 0.0 Project Readiness Check
+### 0.0 Project Readiness & Session Recovery
 
 Ensure infrastructure exists. See `references/state-management.md` for full commands.
 
 1. `.ralph/state.json` missing → `ralph-state-v2.py init`
 2. `.claude/knowledge-tree.json` missing → `knowledge_tree.py --project`
 3. `ROADMAP.md` missing → create minimal template
+
+**Session recovery (if resuming):**
+```bash
+python ~/.claude/scripts/ralph/ralph-state-v2.py -p ${PROJECT} detect-stale
+python ~/.claude/scripts/ralph/ralph-progress-sync.py -p ${PROJECT} reconcile
+```
+
+This detects abandoned in_progress tasks and reconciles markdown with state.
 
 Run silently — do NOT prompt user.
 
@@ -166,21 +174,46 @@ For iteration limits (10/30/50 tiers) and BLOCKED format, see `references/state-
 ### 3.1 Query Skill Router (optional)
 See `references/agents.md` for ralph-skill-query.py command.
 
-### 3.2 Spawn Agent
+### 3.2 Task Start [C:9]
+Mark the task as in_progress in state.json (auto-creates pre-task checkpoint):
+```bash
+python ~/.claude/scripts/ralph/ralph-state-v2.py -p ${PROJECT} task-start --id X.Y --agent <agent>
+```
+
+### 3.3 Spawn Agent
 Use Task tool. **Always include `Task ID: X.Y`** in the prompt for task-monitor disambiguation. Provide: story ID, task ID, task description, file list, requirements.
 
-### 3.3 Wait for Completion
+Recommend agents output structured status for reliable detection:
+```json
+{"ralph_status": {"task_id": "X.Y", "status": "complete", "commit": "<hash>"}}
+```
 
-### 3.4 External Verification [C:9]
+### 3.4 Wait for Completion
+
+### 3.5 External Verification [C:9]
 
 Run verification checklist after every agent. See `references/patterns.md` for full checklist and stack-specific commands.
 
-**If ANY check fails:** Do NOT mark [x]. Pass failure details to recovery agent. See `references/patterns.md` for error recovery and retry pattern (max 3 attempts).
+**If ANY check fails:** Do NOT mark complete. Pass failure details to recovery agent. See `references/patterns.md` for error recovery and retry pattern (max 3 attempts).
 
-### 3.5 Mark Task Complete
-Update `.ralph/IMPLEMENTATION_PLAN.md` with [x] **only after ALL verification checks pass**.
+### 3.6 Task Complete or Fail
+On success (auto-creates post-task checkpoint):
+```bash
+python ~/.claude/scripts/ralph/ralph-state-v2.py -p ${PROJECT} task-complete --id X.Y --commit <hash>
+```
 
-### 3.6 Continue or Finish
+On failure:
+```bash
+python ~/.claude/scripts/ralph/ralph-state-v2.py -p ${PROJECT} task-fail --id X.Y --error "<reason>"
+```
+
+### 3.7 Sync Markdown
+Regenerate IMPLEMENTATION_PLAN.md from state.json:
+```bash
+python ~/.claude/scripts/ralph/ralph-progress-sync.py -p ${PROJECT} sync
+```
+
+### 3.8 Continue or Finish
 More tasks → loop to 3.1. All done → Phase 4.
 
 ## Phase 4: Review & Merge
@@ -232,5 +265,5 @@ Verification checklist, error recovery, PRD/task templates, example session → 
 
 ---
 
-*Ralph Skill v3.2 - Docker Isolation with Memory Integration*
+*Ralph Skill v4.0 - State-First Progress Tracking*
 *Maestro's Autonomous Development Agent with Cross-Session Learning*

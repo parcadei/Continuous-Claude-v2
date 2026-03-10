@@ -40,6 +40,27 @@ Task tool:
 
 **IMPORTANT:** Always include `Task ID: X.Y` in agent prompts. The `ralph-task-monitor` hook uses this to disambiguate which task completed when multiple agents run in parallel. Without it, state updates are skipped for ambiguous cases.
 
+## Agent Output Convention
+
+Agents SHOULD output structured status for reliable detection by `ralph-task-monitor`:
+
+```json
+{"ralph_status": {"task_id": "X.Y", "status": "complete", "commit": "<hash>"}}
+```
+
+Or on failure:
+
+```json
+{"ralph_status": {"task_id": "X.Y", "status": "failed", "error": "<reason>"}}
+```
+
+This is a convention, not a requirement. The task monitor detects status in priority order:
+1. **Structured JSON** (`ralph_status` object) -- unambiguous, preferred
+2. **XML tags** (`<TASK_COMPLETE task="1.1" commit="abc123"/>`) -- explicit with task ID
+3. **Pattern matching** (fallback) -- heuristic, may miss edge cases
+
+When structured output is present, state updates happen immediately without disambiguation logic.
+
 ## TDD Enforcement
 
 | Phase | Agent | Contract |

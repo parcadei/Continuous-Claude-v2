@@ -28,10 +28,15 @@ tldr daemon start --project /workspace --background 2>/dev/null || true
 sleep 2
 ```
 
-### 0.1 Study the Plan
-Read `.ralph/IMPLEMENTATION_PLAN.md`:
-- Completed tasks (marked with [x])
-- Your next task (first unchecked [ ] item)
+### 0.1 Load State & Sync Plan
+Query state.json (single source of truth) and sync markdown:
+```bash
+python ~/.claude/scripts/ralph/ralph-state-v2.py -p /workspace status
+python ~/.claude/scripts/ralph/ralph-progress-sync.py -p /workspace sync
+```
+
+Then read `.ralph/IMPLEMENTATION_PLAN.md` for visual overview:
+- `[x]` complete, `[>]` in progress, `[!]` failed, `[#]` blocked, `[ ]` pending
 - Dependencies between tasks
 
 ### 0.2 Query Learnings
@@ -56,8 +61,12 @@ tldr impact function_name
 
 ## Phase 1: Select Task
 
-From IMPLEMENTATION_PLAN.md:
-- Select the first unchecked `[ ]` task
+Query state for ready tasks:
+```bash
+python ~/.claude/scripts/ralph/ralph-state-v2.py -p /workspace ready-tasks
+```
+
+- Select the first ready task (pending with dependencies met)
 - If all complete: `<COMPLETE/>`
 - If blocked: `<BLOCKED reason="..."/>`
 
@@ -185,10 +194,16 @@ npm run lint
 
 ## Phase 5: Complete
 
-### 5.1 Update the Plan
-Edit `.ralph/IMPLEMENTATION_PLAN.md`:
-- Mark task as complete: `[x]`
-- Add notes or learnings
+### 5.1 Update State & Plan
+Mark task complete in state.json (auto-creates post-task checkpoint):
+```bash
+python ~/.claude/scripts/ralph/ralph-state-v2.py -p /workspace task-complete --id X.Y --commit <hash>
+```
+
+Regenerate IMPLEMENTATION_PLAN.md from state:
+```bash
+python ~/.claude/scripts/ralph/ralph-progress-sync.py -p /workspace sync
+```
 
 ### 5.2 Store Learnings
 ```bash
