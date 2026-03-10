@@ -12,8 +12,8 @@ Get Claude Code with persistent memory running in 5 minutes.
 ## 1. Clone and Install (2 min)
 
 ```bash
-git clone https://github.com/parcadei/continuous-claude.git
-cd continuous-claude/opc
+git clone https://github.com/parcadei/Continuous-Claude-v3.git
+cd Continuous-Claude-v3/opc
 uv sync
 ```
 
@@ -26,7 +26,7 @@ uv run python scripts/setup/wizard.py
 The wizard walks you through 12 configuration steps including:
 - Database setup (PostgreSQL via Docker)
 - Optional API keys (Braintrust, Perplexity, Nia)
-- Claude Code integration (49 agents, 109 skills, 30 hooks)
+- Claude Code integration (31 agents, 137+ skills, 25 hooks)
 
 ## 3. Verify Installation (1 min)
 
@@ -52,8 +52,8 @@ Claude Code now has:
 
 - **Persistent Memory**: Learnings stored in PostgreSQL with vector search
 - **Handoff System**: Transfer context between sessions
-- **Skills Library**: 109 built-in capabilities
-- **Sub-agents**: 49 specialized agents for complex tasks
+- **Skills Library**: 137+ built-in capabilities
+- **Sub-agents**: 31 specialized agents for complex tasks
 
 ### Natural Language Commands
 
@@ -70,9 +70,9 @@ Just say these phrases to Claude:
 
 ```
 ~/.claude/
-├── agents/           # 49 specialized agents
-├── skills/           # 109 skills
-├── hooks/            # 30 lifecycle hooks
+├── agents/           # 31 specialized agents
+├── skills/           # 137+ skills
+├── hooks/            # 25 lifecycle hooks
 ├── rules/            # System policies
 └── settings.json     # Hook configuration
 

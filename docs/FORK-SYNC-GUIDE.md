@@ -7,7 +7,7 @@ How to safely pull updates from the upstream `parcadei/Continuous-Claude-v3` rep
 ```bash
 # Check for updates (safe, no changes)
 # On Windows Git Bash, use 'source' to run the script:
-cd C:\Users\david.hayes\continuous-claude
+cd ~/continuous-claude
 source scripts/check-upstream.sh
 
 # See full diff
@@ -17,7 +17,7 @@ source scripts/check-upstream.sh --diff
 source scripts/check-upstream.sh --merge
 
 # Alternative: run directly with bash
-bash -c 'cd /c/Users/david.hayes/continuous-claude && source scripts/check-upstream.sh'
+bash -c 'cd ~/continuous-claude && source scripts/check-upstream.sh'
 ```
 
 ## Understanding Your Remotes

@@ -40,10 +40,10 @@ The rest of the infrastructure lives globally in `~/.claude/` and activates auto
 
 | Component | Location | Count | Activates On |
 |-----------|----------|-------|--------------|
-| Hooks | `~/.claude/hooks/dist/` | 80+ | Every Claude Code event |
-| Skills | `~/.claude/skills/` | 120+ | `/command` invocations |
-| Agents | `~/.claude/agents/` | 16 | `Task` tool delegation |
-| Rules | `~/.claude/rules/` | 21 | Auto-loaded into context |
+| Hooks | `~/.claude/hooks/dist/` | 93 source (25 registered) | Every Claude Code event |
+| Skills | `~/.claude/skills/` | 137+ | `/command` invocations |
+| Agents | `~/.claude/agents/` | 31 | `Task` tool delegation |
+| Rules | `~/.claude/rules/` | 28 | Auto-loaded into context |
 | Memory | PostgreSQL (Docker) | Persistent | `recall_learnings.py` / hooks |
 
 ---
@@ -406,7 +406,7 @@ docker compose logs continuous-claude-postgres
     ====================================
     |           |          |           |
   hooks/     skills/    agents/    rules/
-  (80+)     (120+)     (16)       (21)
+  (93)      (137+)     (31)       (28)
     |           |          |           |
     +-----+-----+----+----+-----------+
           |          |

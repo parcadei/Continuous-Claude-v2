@@ -13,7 +13,7 @@
 
 - [**What Is This?**](#what-is-this) — The 30-second explanation
 - [**Can I Build Software Without Coding?**](#-can-i-build-software-without-knowing-how-to-code) — Yes, and here's how
-- [**What Makes This Fork Special?**](#-what-makes-this-fork-special) — Maestro, Ralph, 129+ skills, persistent memory, and more
+- [**What Makes This Fork Special?**](#-what-makes-this-fork-special) — Maestro, Ralph, 137+ skills, persistent memory, and more
 - [**Who Is This For?**](#who-is-this-for) — Marketing, sales, ops, product, engineering
 - [**Quick Start**](#quick-start) — Install in 5 minutes
 - [**What You Get**](#what-you-get) — Skills, agents, hooks, rules, browser automation
@@ -149,7 +149,7 @@ You: "Go ahead"
 </details>
 
 <details>
-<summary><strong>129+ Skills</strong> — Pre-built workflows triggered by describing what you want</summary>
+<summary><strong>137+ Skills</strong> — Pre-built workflows triggered by describing what you want</summary>
 
 Skills are pre-built workflows you trigger by describing what you want:
 
@@ -303,8 +303,8 @@ You need these installed:
 
 ```bash
 # Clone the repository
-git clone https://github.com/parcadei/continuous-claude.git
-cd continuous-claude/opc
+git clone https://github.com/parcadei/Continuous-Claude-v3.git
+cd Continuous-Claude-v3/opc
 
 # Run the setup wizard
 uv run python -m scripts.setup.wizard
@@ -319,8 +319,8 @@ The wizard walks you through 12 steps:
 3. ✅ Sets up the database and API keys (optional)
 4. ✅ Starts Docker containers for PostgreSQL
 5. ✅ Installs 31 specialized agents
-6. ✅ Installs 129+ skill workflows
-7. ✅ Installs 92 hook source files (23 registered)
+6. ✅ Installs 137+ skill workflows
+7. ✅ Installs 93 hook source files (25 registered)
 8. ✅ Installs code analysis tools (95% efficiency boost)
 9. ✅ Installs math capabilities (optional)
 10. ✅ Configures diagnostics and linting
@@ -349,7 +349,7 @@ That's it. You're now using Continuous Claude.
 
 ## What You Get
 
-### Skills (129+)
+### Skills (137+)
 
 **What they are:** Pre-built workflows you trigger by describing what you want
 
@@ -403,7 +403,7 @@ That's it. You're now using Continuous Claude.
 **Do I need to code?** No. Agents work on your behalf.
 
 <details>
-<summary>See full agent roster (31 agents across 8 categories)</summary>
+<summary>See full agent roster (31 agents across 9 categories)</summary>
 
 **Implementation (4)**
 - **kraken** — Test-driven implementation with strict TDD workflow
@@ -448,7 +448,7 @@ That's it. You're now using Continuous Claude.
 
 </details>
 
-### Hooks (92 source files, 23 registered)
+### Hooks (93 source files, 25 registered)
 
 **What they are:** Background helpers that run automatically at specific moments
 
@@ -497,7 +497,7 @@ That's it. You're now using Continuous Claude.
 
 </details>
 
-### Rules (24)
+### Rules (28)
 
 **What they are:** Guidelines that keep Claude consistent and safe
 
@@ -794,9 +794,9 @@ uv run python -m scripts.setup.wizard
 ```
 
 **Get help:**
-- [GitHub Issues](https://github.com/parcadei/continuous-claude/issues) — file a bug report
-- [Discussions](https://github.com/parcadei/continuous-claude/discussions) — ask questions
-- [Documentation](https://github.com/parcadei/continuous-claude/tree/main/docs) — detailed guides
+- [GitHub Issues](https://github.com/parcadei/Continuous-Claude-v3/issues) — file a bug report
+- [Discussions](https://github.com/parcadei/Continuous-Claude-v3/discussions) — ask questions
+- [Documentation](https://github.com/parcadei/Continuous-Claude-v3/tree/main/docs) — detailed guides
 - [Architecture Docs](.claude/docs/architecture/INDEX.md) — navigable system diagrams
 
 </details>
@@ -930,10 +930,10 @@ Then you can use all features (`/build`, `/fix`, etc.) with full context about y
 
 ```mermaid
 graph TB
-    UP[User Prompt] --> HL[Hook Layer<br/>92 src, 23 registered]
+    UP[User Prompt] --> HL[Hook Layer<br/>93 src, 25 registered]
     HL --> CC[Claude Core]
     CC --> TE[Tool Execution]
-    CC --> SK[Skills - 129+]
+    CC --> SK[Skills - 137+]
     CC --> AG[Agents - 31]
     CC --> MS[Memory System]
     SK --> AG
@@ -1261,11 +1261,11 @@ Two complementary browser automation systems:
 continuous-claude/
 ├── .claude/
 │   ├── agents/           # 31 specialized AI agents
-│   ├── hooks/            # 92 hook source files (23 registered)
+│   ├── hooks/            # 93 hook source files (25 registered)
 │   │   ├── src/          # TypeScript source
 │   │   └── dist/         # Compiled JavaScript
-│   ├── skills/           # 129+ modular capabilities
-│   ├── rules/            # 24 system policies
+│   ├── skills/           # 137+ modular capabilities
+│   ├── rules/            # 28 system policies
 │   ├── docs/architecture/ # Navigable architecture docs
 │   ├── scripts/          # Python utilities
 │   └── settings.json     # Hook configuration

@@ -93,7 +93,7 @@ Windows uses backslashes (`\`) but the codebase expects forward slashes (`/`) in
 
 - **Environment variables**: Use forward slashes in `.env` paths
   ```bash
-  CLAUDE_OPC_DIR=C:/Users/david.hayes/continuous-claude/opc
+  CLAUDE_OPC_DIR=C:/Users/<username>/continuous-claude/opc
   ```
 - **Docker paths**: Always use forward slashes
 - **Node scripts**: Auto-converts paths (no action needed)
@@ -368,7 +368,7 @@ npm run build
 
 The sync script automatically converts Windows-specific paths to portable `$HOME` paths:
 
-- **Before (Windows)**: `C:/Users/david.hayes/.claude/hooks/dist/...`
+- **Before (Windows)**: `C:/Users/<username>/.claude/hooks/dist/...`
 - **After (portable)**: `$HOME/.claude/hooks/dist/...`
 
 This allows the same `settings.json` to work on Windows, Mac, and Linux.

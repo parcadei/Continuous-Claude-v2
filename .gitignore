@@ -53,6 +53,9 @@ history.jsonl
 # Internal development docs (not for release)
 docs/_internal/
 
+# ROADMAP contains session-specific planning data (auto-updated by hooks)
+ROADMAP.md
+
 # Statsig telemetry
 statsig/
 
