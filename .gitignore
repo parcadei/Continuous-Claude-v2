@@ -28,6 +28,10 @@ shell-snapshots/
 file-history/
 history.jsonl
 
+# Claude runtime artifacts (machine-specific, auto-regenerated)
+.claude/extraction-state.json
+.claude/knowledge-tree.json
+
 # Claude cache and state
 .claude/cache/
 .claude/state/
