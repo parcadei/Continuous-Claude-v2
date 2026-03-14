@@ -77,6 +77,16 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $HOME/.claude/hooks/dist/mcp-directory-guard.mjs",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PreCompact": [
