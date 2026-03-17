@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { execSync, spawnSync } from 'child_process';
 import { readRalphUnifiedState, RalphUnifiedState } from './shared/state-schema.js';
+import { getProjectIdentity, isContentRelevantToProject } from './shared/project-relevance.js';
 
 interface SessionStartInput {
   type?: 'startup' | 'resume' | 'clear' | 'compact';  // Legacy field
@@ -594,6 +595,15 @@ async function main() {
             const firstLine = currentSection.split('\n')[0];
             roadmapCurrentFocus = firstLine.replace(/\*\*/g, '').trim();
             roadmapContext = `## ROADMAP - Current Focus\n${currentSection}`;
+
+            // Cross-project contamination guard
+            const identity = getProjectIdentity(projectDir);
+            const relevance = isContentRelevantToProject(roadmapCurrentFocus, identity);
+            if (!relevance.relevant) {
+              console.error(`[session-start-continuity] ROADMAP focus appears contaminated: ${relevance.reason}`);
+              roadmapCurrentFocus = '';
+              roadmapContext = '';
+            }
           }
         } catch (error) {
           console.error(`Warning: Error reading ROADMAP.md: ${error}`);

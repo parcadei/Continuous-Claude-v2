@@ -1,9 +1,112 @@
 #!/usr/bin/env node
 
 // src/post-plan-roadmap.ts
+import * as fs2 from "fs";
+import * as path2 from "path";
+import { spawn } from "child_process";
+
+// src/shared/project-relevance.ts
 import * as fs from "fs";
 import * as path from "path";
-import { spawn } from "child_process";
+function getProjectIdentity(projectDir) {
+  const resolvedDir = path.resolve(projectDir);
+  const dirName = path.basename(resolvedDir);
+  const identity = {
+    dirName,
+    registryName: null,
+    packageName: null,
+    keywords: [],
+    otherProjects: []
+  };
+  const dirKeywords = dirName.toLowerCase().split(/[-_\s]+/).filter((w) => w.length > 1);
+  const keywordSet = new Set(dirKeywords);
+  const registry = readRegistry(resolvedDir);
+  if (registry) {
+    for (const project of registry.projects) {
+      const projectPath = path.resolve(project.path);
+      if (projectPath === resolvedDir) {
+        identity.registryName = project.name;
+        const nameWords = project.name.toLowerCase().split(/[-_\s]+/).filter((w) => w.length > 1);
+        for (const w of nameWords) keywordSet.add(w);
+      } else {
+        identity.otherProjects.push(project.name);
+      }
+    }
+  }
+  try {
+    const pkgPath = path.join(resolvedDir, "package.json");
+    const pkgContent = fs.readFileSync(pkgPath, "utf-8");
+    const pkg = JSON.parse(pkgContent);
+    if (pkg.name && typeof pkg.name === "string") {
+      identity.packageName = pkg.name;
+      const cleanName = pkg.name.replace(/^@[^/]+\//, "");
+      const pkgWords = cleanName.toLowerCase().split(/[-_\s]+/).filter((w) => w.length > 1);
+      for (const w of pkgWords) keywordSet.add(w);
+    }
+  } catch {
+  }
+  if (identity.registryName) {
+    keywordSet.add(identity.registryName.toLowerCase());
+  }
+  identity.keywords = [...keywordSet];
+  return identity;
+}
+function isContentRelevantToProject(content, identity) {
+  if (!content || content.length < 50) {
+    return { relevant: true, confidence: "low", reason: "content too short" };
+  }
+  if (identity.otherProjects.length === 0) {
+    return { relevant: true, confidence: "low", reason: "no registry to compare against" };
+  }
+  const contentLower = content.toLowerCase();
+  for (const otherName of identity.otherProjects) {
+    const otherLower = otherName.toLowerCase();
+    if (!contentLower.includes(otherLower)) {
+      continue;
+    }
+    let thisProjectMentioned = false;
+    if (identity.registryName && contentLower.includes(identity.registryName.toLowerCase())) {
+      thisProjectMentioned = true;
+    }
+    if (!thisProjectMentioned) {
+      for (const kw of identity.keywords) {
+        if (kw.length < 3) continue;
+        if (contentLower.includes(kw)) {
+          thisProjectMentioned = true;
+          break;
+        }
+      }
+    }
+    if (!thisProjectMentioned) {
+      const thisName = identity.registryName || identity.dirName;
+      return {
+        relevant: false,
+        confidence: "high",
+        reason: `content mentions "${otherName}" but not "${thisName}"`
+      };
+    }
+  }
+  return { relevant: true, confidence: "low", reason: "no cross-project signals" };
+}
+function readRegistry(projectDir) {
+  const candidates = [
+    path.join(projectDir, ".claude", "project-registry.json"),
+    "C:/Users/david.hayes/continuous-claude/.claude/project-registry.json"
+  ];
+  for (const candidate of candidates) {
+    try {
+      const content = fs.readFileSync(candidate, "utf-8");
+      const parsed = JSON.parse(content);
+      if (parsed && Array.isArray(parsed.projects)) {
+        return parsed;
+      }
+    } catch {
+    }
+  }
+  return null;
+}
+
+// src/post-plan-roadmap.ts
 function parseRoadmap(content) {
   const result = {
     current: null,
@@ -291,9 +394,9 @@ function extractPlanInfo(planContent, filePath) {
   if (titleMatch && titleMatch[1].trim() !== "Planning Session") {
     title = titleMatch[1].trim();
   } else if (filePath) {
-    const basename = filePath.replace(/\\/g, "/").split("/").pop()?.replace(".md", "") || "";
-    if (basename && !basename.match(/^plan[-_]?\d*$/i)) {
-      title = basename.split(/[-_]/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    const basename2 = filePath.replace(/\\/g, "/").split("/").pop()?.replace(".md", "") || "";
+    if (basename2 && !basename2.match(/^plan[-_]?\d*$/i)) {
+      title = basename2.split(/[-_]/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
     }
   }
   let summary = "";
@@ -345,7 +448,7 @@ function storePlanningLearnings(planInfo, projectDir) {
     contentLines.push("", "Key Steps:", ...planInfo.steps.slice(0, 3).map((s) => `- ${s}`));
   }
   const content = contentLines.join("\n");
-  const opcDir = process.env.CLAUDE_OPC_DIR || path.join(process.env.USERPROFILE || process.env.HOME || "", "continuous-claude", "opc");
+  const opcDir = process.env.CLAUDE_OPC_DIR || path2.join(process.env.USERPROFILE || process.env.HOME || "", "continuous-claude", "opc");
   const sessionId = `plan-${Date.now()}`;
   try {
     const child = spawn("uv", [
@@ -392,14 +495,14 @@ async function main() {
     return;
   }
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-  const roadmapPath = path.join(projectDir, "ROADMAP.md");
-  const planDirNested = path.join(projectDir, ".claude", "plans");
-  const planDirDirect = path.join(projectDir, "plans");
+  const roadmapPath = path2.join(projectDir, "ROADMAP.md");
+  const planDirNested = path2.join(projectDir, ".claude", "plans");
+  const planDirDirect = path2.join(projectDir, "plans");
   const userHome = process.env.USERPROFILE || process.env.HOME || "";
-  const userPlanDir = path.join(userHome, ".claude", "plans");
+  const userPlanDir = path2.join(userHome, ".claude", "plans");
   const hasPlanFiles = (dir) => {
     try {
-      return fs.existsSync(dir) && fs.readdirSync(dir).some((f) => f.endsWith(".md"));
+      return fs2.existsSync(dir) && fs2.readdirSync(dir).some((f) => f.endsWith(".md"));
     } catch {
       return false;
     }
@@ -409,18 +512,18 @@ async function main() {
   const STALENESS_THRESHOLD_MS = 6e5;
   let planContent = "";
   let latestPlanPath;
-  if (fs.existsSync(planDir)) {
+  if (fs2.existsSync(planDir)) {
     const now = Date.now();
-    const planFiles = fs.readdirSync(planDir).filter((f) => f.endsWith(".md") && !f.startsWith("_")).map((f) => ({
+    const planFiles = fs2.readdirSync(planDir).filter((f) => f.endsWith(".md") && !f.startsWith("_")).map((f) => ({
       name: f,
-      mtime: fs.statSync(path.join(planDir, f)).mtime.getTime()
+      mtime: fs2.statSync(path2.join(planDir, f)).mtime.getTime()
     })).filter((f) => {
       if (isGlobalPlanDir) return now - f.mtime < STALENESS_THRESHOLD_MS;
       return true;
     }).sort((a, b) => b.mtime - a.mtime);
     if (planFiles.length > 0) {
-      planContent = fs.readFileSync(path.join(planDir, planFiles[0].name), "utf-8");
-      latestPlanPath = path.join(planDir, planFiles[0].name);
+      planContent = fs2.readFileSync(path2.join(planDir, planFiles[0].name), "utf-8");
+      latestPlanPath = path2.join(planDir, planFiles[0].name);
     }
   }
   const toolOutput = data.tool_output || data.tool_result || "";
@@ -428,8 +531,8 @@ async function main() {
     planContent = toolOutput;
   }
   let sections;
-  if (fs.existsSync(roadmapPath)) {
-    const existingContent = fs.readFileSync(roadmapPath, "utf-8");
+  if (fs2.existsSync(roadmapPath)) {
+    const existingContent = fs2.readFileSync(roadmapPath, "utf-8");
     sections = parseRoadmap(existingContent);
   } else {
     sections = {
@@ -440,6 +543,19 @@ async function main() {
     };
   }
   const planInfo = extractPlanInfo(planContent, latestPlanPath);
+  const identity = getProjectIdentity(projectDir);
+  const relevance = isContentRelevantToProject(planContent, identity);
+  if (!relevance.relevant) {
+    console.error(`[post-plan-roadmap] BLOCKED: Plan is about a different project. ${relevance.reason}`);
+    console.log(JSON.stringify({
+      result: "continue",
+      hookSpecificOutput: {
+        hookEventName: "PostToolUse",
+        additionalContext: `ROADMAP update skipped: cross-project guard triggered. "${planInfo.title}" does not match project "${identity.dirName}". ${relevance.reason}`
+      }
+    }));
+    return;
+  }
   const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
   if (planInfo.title && planInfo.title !== "Planning Session") {
     if (sections.current && sections.current.title !== planInfo.title) {
@@ -471,9 +587,9 @@ async function main() {
   }
   sections.sessions = sections.sessions.slice(0, 5);
   const newContent = generateRoadmap(sections);
-  fs.mkdirSync(path.dirname(roadmapPath), { recursive: true });
-  fs.writeFileSync(roadmapPath, newContent, "utf-8");
-  console.error(`\u2713 ROADMAP.md updated: ${planInfo.title}`);
+  fs2.mkdirSync(path2.dirname(roadmapPath), { recursive: true });
+  fs2.writeFileSync(roadmapPath, newContent, "utf-8");
+  console.error(`[post-plan-roadmap] ROADMAP.md updated: ${planInfo.title}`);
   storePlanningLearnings(planInfo, projectDir);
   const stats = [
     `Goal: ${planInfo.title}`,
@@ -494,11 +610,11 @@ ROADMAP: ${roadmapPath}`
   console.log(JSON.stringify(output));
 }
 async function readStdin() {
-  return new Promise((resolve) => {
+  return new Promise((resolve2) => {
     let data = "";
     process.stdin.setEncoding("utf-8");
     process.stdin.on("data", (chunk) => data += chunk);
-    process.stdin.on("end", () => resolve(data));
+    process.stdin.on("end", () => resolve2(data));
   });
 }
 main().catch((err) => {

@@ -36,13 +36,17 @@ function readActivity(sessionId) {
 function loadOrCreate(sessionId) {
   const existing = readActivity(sessionId);
   if (existing) {
+    if (!existing.agents) existing.agents = [];
+    if (!existing.mcp_servers) existing.mcp_servers = [];
     return existing;
   }
   return {
     session_id: sessionId,
     started_at: (/* @__PURE__ */ new Date()).toISOString(),
     skills: [],
-    hooks: []
+    hooks: [],
+    agents: [],
+    mcp_servers: []
   };
 }
 function upsertEntry(entries, name) {
@@ -60,6 +64,12 @@ function upsertEntry(entries, name) {
 function logSkill(sessionId, skillName) {
   const activity = loadOrCreate(sessionId);
   upsertEntry(activity.skills, skillName);
+  const filePath = getActivityPath(sessionId);
+  writeFileSync(filePath, JSON.stringify(activity), { encoding: "utf-8" });
+}
+function logAgent(sessionId, agentType) {
+  const activity = loadOrCreate(sessionId);
+  upsertEntry(activity.agents, agentType);
   const filePath = getActivityPath(sessionId);
   writeFileSync(filePath, JSON.stringify(activity), { encoding: "utf-8" });
 }
@@ -117,6 +127,10 @@ async function main() {
         success
       };
       logEvent(event);
+      try {
+        logAgent(data.session_id, agentType);
+      } catch {
+      }
     }
     process.exit(0);
   } catch {

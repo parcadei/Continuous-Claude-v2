@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync, appendFileSync, existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
-import { logSkill } from './shared/session-activity.js';
+import { logSkill, logAgent } from './shared/session-activity.js';
 
 interface HookInput {
     session_id: string;
@@ -81,6 +81,7 @@ async function main() {
             };
 
             logEvent(event);
+            try { logAgent(data.session_id, agentType); } catch { /* never break */ }
         }
 
         process.exit(0);

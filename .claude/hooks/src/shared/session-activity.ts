@@ -31,6 +31,8 @@ export interface SessionActivity {
   started_at: string;  // ISO timestamp
   skills: ActivationEntry[];
   hooks: ActivationEntry[];
+  agents: ActivationEntry[];
+  mcp_servers: ActivationEntry[];
 }
 
 // =============================================================================
@@ -83,6 +85,8 @@ export function initActivity(sessionId: string): void {
     started_at: new Date().toISOString(),
     skills: [],
     hooks: [],
+    agents: [],
+    mcp_servers: [],
   };
 
   writeFileSync(filePath, JSON.stringify(activity), { encoding: 'utf-8' });
@@ -125,6 +129,9 @@ export function readActivity(sessionId: string): SessionActivity | null {
 function loadOrCreate(sessionId: string): SessionActivity {
   const existing = readActivity(sessionId);
   if (existing) {
+    // Backfill for files created before agents/mcp_servers existed
+    if (!existing.agents) existing.agents = [];
+    if (!existing.mcp_servers) existing.mcp_servers = [];
     return existing;
   }
 
@@ -133,6 +140,8 @@ function loadOrCreate(sessionId: string): SessionActivity {
     started_at: new Date().toISOString(),
     skills: [],
     hooks: [],
+    agents: [],
+    mcp_servers: [],
   };
 }
 
@@ -178,6 +187,36 @@ export function logSkill(sessionId: string, skillName: string): void {
 export function logHook(sessionId: string, hookName: string): void {
   const activity = loadOrCreate(sessionId);
   upsertEntry(activity.hooks, hookName);
+
+  const filePath = getActivityPath(sessionId);
+  writeFileSync(filePath, JSON.stringify(activity), { encoding: 'utf-8' });
+}
+
+/**
+ * Logs an agent spawn for the session.
+ * Creates the activity file if it does not exist.
+ *
+ * @param sessionId - The session UUID
+ * @param agentType - Type of the agent (e.g. "scout", "kraken", "oracle")
+ */
+export function logAgent(sessionId: string, agentType: string): void {
+  const activity = loadOrCreate(sessionId);
+  upsertEntry(activity.agents, agentType);
+
+  const filePath = getActivityPath(sessionId);
+  writeFileSync(filePath, JSON.stringify(activity), { encoding: 'utf-8' });
+}
+
+/**
+ * Logs an MCP server usage for the session.
+ * Creates the activity file if it does not exist.
+ *
+ * @param sessionId - The session UUID
+ * @param serverName - Name of the MCP server (e.g. "nia", "github", "context7")
+ */
+export function logMcpServer(sessionId: string, serverName: string): void {
+  const activity = loadOrCreate(sessionId);
+  upsertEntry(activity.mcp_servers, serverName);
 
   const filePath = getActivityPath(sessionId);
   writeFileSync(filePath, JSON.stringify(activity), { encoding: 'utf-8' });

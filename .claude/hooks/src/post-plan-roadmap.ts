@@ -13,6 +13,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { spawn } from 'child_process';
 import * as os from 'os';
+import { getProjectIdentity, isContentRelevantToProject } from './shared/project-relevance.js';
 
 interface PostToolUseInput {
   tool_name: string;
@@ -563,6 +564,22 @@ async function main() {
   }
 
   const planInfo = extractPlanInfo(planContent, latestPlanPath);
+
+  // Cross-project contamination guard
+  const identity = getProjectIdentity(projectDir);
+  const relevance = isContentRelevantToProject(planContent, identity);
+  if (!relevance.relevant) {
+    console.error(`[post-plan-roadmap] BLOCKED: Plan is about a different project. ${relevance.reason}`);
+    console.log(JSON.stringify({
+      result: 'continue',
+      hookSpecificOutput: {
+        hookEventName: 'PostToolUse',
+        additionalContext: `ROADMAP update skipped: cross-project guard triggered. "${planInfo.title}" does not match project "${identity.dirName}". ${relevance.reason}`
+      }
+    }));
+    return;
+  }
+
   const today = new Date().toISOString().split('T')[0];
 
   if (planInfo.title && planInfo.title !== 'Planning Session') {

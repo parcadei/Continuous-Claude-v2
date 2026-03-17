@@ -26,6 +26,7 @@ This prevents zombie processes when restarting dev servers during development se
 |---------|------|--------|
 | Fourth Connect | 3000 | fourth-connect.localhost |
 | NorthStar Transformation | 3002 | northstar.localhost |
+| ECG Lead Reactivation Engine | 3003 | ecg.localhost |
 
 Note: `import.meta.dirname` requires Node 21.2+. Current machine runs Node 24.4.1.
 

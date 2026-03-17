@@ -42,6 +42,16 @@
       "status": "active"
     },
     {
+      "name": "ECG Lead Reactivation Engine",
+      "path": "C:/Users/david.hayes/Projects/ECG Lead Reactivation Engine",
+      "stack": ["Next.js", "TypeScript", "Tailwind", "Drizzle", "Neon", "Resend"],
+      "description": "Email reactivation engine for ECG/Addison Care leads",
+      "port": 3003,
+      "url": "https://ecg.localhost/",
+      "devCommand": "npm run dev",
+      "status": "active"
+    },
+    {
       "name": "LinkMap",
       "path": "C:/Users/david.hayes/Projects/linkmap",
       "stack": ["React", "TypeScript"],

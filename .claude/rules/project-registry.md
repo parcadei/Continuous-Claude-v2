@@ -10,6 +10,7 @@ A centralized project registry exists at `.claude/project-registry.json`. Use it
 | NorthStar Transformation | C:/Users/david.hayes/Projects/northstar-transformation | 3002 | https://northstar.localhost/ | active |
 | Fourth Connect | C:/Users/david.hayes/Projects/fourth-connect | 3000 | https://fourth-connect.localhost/ | active |
 | agent-factory | C:/Users/david.hayes/Projects/agent-factory | 3001 | -- | active |
+| ECG Lead Reactivation Engine | C:/Users/david.hayes/Projects/ECG Lead Reactivation Engine | 3003 | https://ecg.localhost/ | active |
 | LinkMap | C:/Users/david.hayes/Projects/linkmap | -- | -- | inactive |
 
 ## Usage

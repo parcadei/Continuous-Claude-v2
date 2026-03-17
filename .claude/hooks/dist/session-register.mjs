@@ -246,7 +246,9 @@ function initActivity(sessionId) {
     session_id: sessionId,
     started_at: (/* @__PURE__ */ new Date()).toISOString(),
     skills: [],
-    hooks: []
+    hooks: [],
+    agents: [],
+    mcp_servers: []
   };
   writeFileSync2(filePath, JSON.stringify(activity), { encoding: "utf-8" });
 }

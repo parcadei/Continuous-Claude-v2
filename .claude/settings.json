@@ -449,7 +449,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "node C:/Users/david.hayes/.claude/plugins/cache/claude-hud/claude-hud/0.0.7/dist/index.js"
+    "command": "node C:/Users/david.hayes/.claude/plugins/claude-hud/launcher.mjs"
   },
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true,

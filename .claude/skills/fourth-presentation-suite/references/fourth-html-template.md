@@ -764,108 +764,108 @@ Complete HTML file structure for reference. When generating presentations, follo
 <main class="presentation">
 
     <!-- SLIDE 1: Title -->
-    <section class="slide title-slide" id="slide-1">
+    <section class="slide title-slide" id="slide-1" data-slide-index="0">
         <div class="slide-inner">
-            <h1 class="reveal">{{PRESENTATION_TITLE}}</h1>
-            <p class="subtitle reveal">{{SUBTITLE}}</p>
-            <p class="presenter reveal">{{PRESENTER}} -- {{DATE}}</p>
+            <h1 class="reveal" data-fc-id="slide1-title-heading">{{PRESENTATION_TITLE}}</h1>
+            <p class="subtitle reveal" data-fc-id="slide1-title-subtitle">{{SUBTITLE}}</p>
+            <p class="presenter reveal" data-fc-id="slide1-title-presenter">{{PRESENTER}} -- {{DATE}}</p>
         </div>
     </section>
 
     <!-- SLIDE 2: Agenda -->
-    <section class="slide content-slide" id="slide-2">
+    <section class="slide content-slide" id="slide-2" data-slide-index="1">
         <div class="slide-inner">
-            <h2 class="reveal">Agenda</h2>
-            <ol class="reveal" style="list-style: decimal; padding-left: 1.5em; font-size: var(--text-body); line-height: 2;">
-                <li>{{AGENDA_ITEM_1}}</li>
-                <li>{{AGENDA_ITEM_2}}</li>
-                <li>{{AGENDA_ITEM_3}}</li>
-                <li>{{AGENDA_ITEM_4}}</li>
+            <h2 class="reveal" data-fc-id="slide2-agenda-header">Agenda</h2>
+            <ol class="reveal" data-fc-id="slide2-agenda-list" style="list-style: decimal; padding-left: 1.5em; font-size: var(--text-body); line-height: 2;">
+                <li data-fc-id="slide2-agenda-item1">{{AGENDA_ITEM_1}}</li>
+                <li data-fc-id="slide2-agenda-item2">{{AGENDA_ITEM_2}}</li>
+                <li data-fc-id="slide2-agenda-item3">{{AGENDA_ITEM_3}}</li>
+                <li data-fc-id="slide2-agenda-item4">{{AGENDA_ITEM_4}}</li>
             </ol>
         </div>
     </section>
 
     <!-- SLIDE 3: Section Break -->
-    <section class="slide section-break" id="slide-3">
+    <section class="slide section-break" id="slide-3" data-slide-index="2">
         <div class="slide-inner">
-            <h2 class="reveal">{{SECTION_TITLE}}</h2>
-            <p class="section-subtitle reveal">{{SECTION_SUBTITLE}}</p>
+            <h2 class="reveal" data-fc-id="slide3-section-heading">{{SECTION_TITLE}}</h2>
+            <p class="section-subtitle reveal" data-fc-id="slide3-section-subtitle">{{SECTION_SUBTITLE}}</p>
         </div>
     </section>
 
     <!-- SLIDE 4: Content (Single Column) -->
-    <section class="slide content-slide" id="slide-4">
+    <section class="slide content-slide" id="slide-4" data-slide-index="3">
         <div class="slide-inner">
-            <h2 class="reveal">{{CONTENT_TITLE}}</h2>
-            <ul>
-                <li class="reveal">{{BULLET_1}}</li>
-                <li class="reveal">{{BULLET_2}}</li>
-                <li class="reveal">{{BULLET_3}}</li>
-                <li class="reveal">{{BULLET_4}}</li>
+            <h2 class="reveal" data-fc-id="slide4-content-header">{{CONTENT_TITLE}}</h2>
+            <ul data-fc-id="slide4-content-list">
+                <li class="reveal" data-fc-id="slide4-content-bullet1">{{BULLET_1}}</li>
+                <li class="reveal" data-fc-id="slide4-content-bullet2">{{BULLET_2}}</li>
+                <li class="reveal" data-fc-id="slide4-content-bullet3">{{BULLET_3}}</li>
+                <li class="reveal" data-fc-id="slide4-content-bullet4">{{BULLET_4}}</li>
             </ul>
         </div>
     </section>
 
     <!-- SLIDE 5: Two Column -->
-    <section class="slide content-slide" id="slide-5">
+    <section class="slide content-slide" id="slide-5" data-slide-index="4">
         <div class="slide-inner">
-            <h2 class="reveal">{{TWO_COL_TITLE}}</h2>
+            <h2 class="reveal" data-fc-id="slide5-twocol-header">{{TWO_COL_TITLE}}</h2>
             <div class="two-column">
-                <div class="reveal">
-                    <h3 style="font-size: var(--text-h4); font-weight: 600; color: var(--fourth-deep-blue); margin-bottom: var(--gap-md);">{{LEFT_HEADING}}</h3>
-                    <p style="font-size: var(--text-body);">{{LEFT_CONTENT}}</p>
+                <div class="reveal" data-fc-id="slide5-twocol-left">
+                    <h3 data-fc-id="slide5-twocol-left-heading" style="font-size: var(--text-h4); font-weight: 600; color: var(--fourth-deep-blue); margin-bottom: var(--gap-md);">{{LEFT_HEADING}}</h3>
+                    <p data-fc-id="slide5-twocol-left-body" style="font-size: var(--text-body);">{{LEFT_CONTENT}}</p>
                 </div>
-                <div class="reveal">
-                    <h3 style="font-size: var(--text-h4); font-weight: 600; color: var(--fourth-deep-blue); margin-bottom: var(--gap-md);">{{RIGHT_HEADING}}</h3>
-                    <p style="font-size: var(--text-body);">{{RIGHT_CONTENT}}</p>
+                <div class="reveal" data-fc-id="slide5-twocol-right">
+                    <h3 data-fc-id="slide5-twocol-right-heading" style="font-size: var(--text-h4); font-weight: 600; color: var(--fourth-deep-blue); margin-bottom: var(--gap-md);">{{RIGHT_HEADING}}</h3>
+                    <p data-fc-id="slide5-twocol-right-body" style="font-size: var(--text-body);">{{RIGHT_CONTENT}}</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- SLIDE 6: Three Column -->
-    <section class="slide content-slide" id="slide-6">
+    <section class="slide content-slide" id="slide-6" data-slide-index="5">
         <div class="slide-inner">
-            <h2 class="reveal">{{THREE_COL_TITLE}}</h2>
+            <h2 class="reveal" data-fc-id="slide6-threecol-header">{{THREE_COL_TITLE}}</h2>
             <div class="three-column">
-                <div class="reveal">
+                <div class="reveal" data-fc-id="slide6-threecol-col1">
                     <div class="column-icon">{{ICON_1}}</div>
-                    <div class="column-title">{{COL_1_TITLE}}</div>
-                    <p style="font-size: var(--text-body);">{{COL_1_DESC}}</p>
+                    <div class="column-title" data-fc-id="slide6-threecol-col1-title">{{COL_1_TITLE}}</div>
+                    <p data-fc-id="slide6-threecol-col1-desc" style="font-size: var(--text-body);">{{COL_1_DESC}}</p>
                 </div>
-                <div class="reveal">
+                <div class="reveal" data-fc-id="slide6-threecol-col2">
                     <div class="column-icon">{{ICON_2}}</div>
-                    <div class="column-title">{{COL_2_TITLE}}</div>
-                    <p style="font-size: var(--text-body);">{{COL_2_DESC}}</p>
+                    <div class="column-title" data-fc-id="slide6-threecol-col2-title">{{COL_2_TITLE}}</div>
+                    <p data-fc-id="slide6-threecol-col2-desc" style="font-size: var(--text-body);">{{COL_2_DESC}}</p>
                 </div>
-                <div class="reveal">
+                <div class="reveal" data-fc-id="slide6-threecol-col3">
                     <div class="column-icon">{{ICON_3}}</div>
-                    <div class="column-title">{{COL_3_TITLE}}</div>
-                    <p style="font-size: var(--text-body);">{{COL_3_DESC}}</p>
+                    <div class="column-title" data-fc-id="slide6-threecol-col3-title">{{COL_3_TITLE}}</div>
+                    <p data-fc-id="slide6-threecol-col3-desc" style="font-size: var(--text-body);">{{COL_3_DESC}}</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- SLIDE 7: Quote -->
-    <section class="slide quote-slide" id="slide-7">
+    <section class="slide quote-slide" id="slide-7" data-slide-index="6">
         <div class="slide-inner">
             <div class="quote-mark reveal">"</div>
-            <p class="quote-text reveal">{{QUOTE_TEXT}}</p>
-            <p class="quote-attribution reveal">-- {{QUOTE_AUTHOR}}, {{QUOTE_TITLE}}</p>
+            <p class="quote-text reveal" data-fc-id="slide7-quote-text">{{QUOTE_TEXT}}</p>
+            <p class="quote-attribution reveal" data-fc-id="slide7-quote-attribution">-- {{QUOTE_AUTHOR}}, {{QUOTE_TITLE}}</p>
         </div>
     </section>
 
     <!-- SLIDE 8: Closing -->
-    <section class="slide closing-slide" id="slide-8">
+    <section class="slide closing-slide" id="slide-8" data-slide-index="7">
         <div class="slide-inner">
-            <h2 class="reveal">{{CLOSING_TITLE}}</h2>
-            <ul class="cta-list">
-                <li class="reveal">{{CTA_1}}</li>
-                <li class="reveal">{{CTA_2}}</li>
-                <li class="reveal">{{CTA_3}}</li>
+            <h2 class="reveal" data-fc-id="slide8-closing-header">{{CLOSING_TITLE}}</h2>
+            <ul class="cta-list" data-fc-id="slide8-closing-cta-list">
+                <li class="reveal" data-fc-id="slide8-closing-cta1">{{CTA_1}}</li>
+                <li class="reveal" data-fc-id="slide8-closing-cta2">{{CTA_2}}</li>
+                <li class="reveal" data-fc-id="slide8-closing-cta3">{{CTA_3}}</li>
             </ul>
-            <p class="reveal" style="font-size: var(--text-small); opacity: 0.8;">{{CONTACT_INFO}}</p>
+            <p class="reveal" data-fc-id="slide8-closing-contact" style="font-size: var(--text-small); opacity: 0.8;">{{CONTACT_INFO}}</p>
             <p class="powered-by-iq reveal">Powered by iQ</p>
         </div>
     </section>

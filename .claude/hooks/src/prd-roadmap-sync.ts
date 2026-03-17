@@ -505,6 +505,16 @@ function promoteToCurrent(content: string, item: RoadmapItem): string {
 async function handlePRDChange(filePath: string, content: string): Promise<HookOutput> {
   const metadata = extractPRDMetadata(content);
   const fileDir = path.dirname(filePath);
+
+  // Path containment check - don't update ROADMAP for files outside this project
+  const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  if (!path.resolve(filePath).startsWith(path.resolve(projectDir))) {
+    return {
+      result: 'continue',
+      message: 'PRD file is outside current project directory',
+    };
+  }
+
   const roadmapPath = findRoadmapPath(fileDir);
 
   if (!roadmapPath) {
@@ -550,6 +560,16 @@ async function handlePRDChange(filePath: string, content: string): Promise<HookO
 async function handleTasksChange(filePath: string, content: string): Promise<HookOutput> {
   const progress = extractTaskProgress(content, filePath);
   const fileDir = path.dirname(filePath);
+
+  // Path containment check - don't update ROADMAP for files outside this project
+  const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  if (!path.resolve(filePath).startsWith(path.resolve(projectDir))) {
+    return {
+      result: 'continue',
+      message: 'Tasks file is outside current project directory',
+    };
+  }
+
   const roadmapPath = findRoadmapPath(fileDir);
 
   if (!roadmapPath) {

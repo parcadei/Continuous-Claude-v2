@@ -168,13 +168,17 @@ function readActivity(sessionId) {
 function loadOrCreate(sessionId) {
   const existing = readActivity(sessionId);
   if (existing) {
+    if (!existing.agents) existing.agents = [];
+    if (!existing.mcp_servers) existing.mcp_servers = [];
     return existing;
   }
   return {
     session_id: sessionId,
     started_at: (/* @__PURE__ */ new Date()).toISOString(),
     skills: [],
-    hooks: []
+    hooks: [],
+    agents: [],
+    mcp_servers: []
   };
 }
 function upsertEntry(entries, name) {

@@ -1643,8 +1643,9 @@
         <h2>10. Card Variants</h2>
         <p>Enhanced cards with headers, footers, and interactive states.</p>
 
+        <!-- data-fc-id convention: data-fc-id="slideN-section-element" where N = slide number in the presentation -->
         <div class="demo-grid">
-            <div class="card">
+            <div class="card" data-fc-id="slideN-metrics-card1">
                 <div class="card-header">
                     <h3 class="card-title">Monthly Revenue</h3>
                     <p class="card-description">January - June 2026</p>
@@ -1655,7 +1656,7 @@
                 </div>
             </div>
 
-            <div class="card" x-data="{ expanded: false }">
+            <div class="card" data-fc-id="slideN-metrics-card2" x-data="{ expanded: false }">
                 <div class="card-header flex justify-between items-center">
                     <div>
                         <h3 class="card-title">Active Users</h3>
@@ -1689,22 +1690,22 @@
         <div class="demo-box">
             <p class="label">4-Field Stat Cards</p>
             <div class="stat-row">
-                <div class="stat-card stat-good">
+                <div class="stat-card stat-good" data-fc-id="slideN-stats-card1">
                     <div class="stat-value">346K</div>
                     <div class="stat-label">TOTAL LOGINS</div>
                     <div class="stat-change positive"><i data-lucide="trending-up" style="width: 14px; height: 14px;"></i> +12% QoQ</div>
                 </div>
-                <div class="stat-card stat-good">
+                <div class="stat-card stat-good" data-fc-id="slideN-stats-card2">
                     <div class="stat-value">94%</div>
                     <div class="stat-label">SATISFACTION</div>
                     <div class="stat-change positive"><i data-lucide="trending-up" style="width: 14px; height: 14px;"></i> +2pts QoQ</div>
                 </div>
-                <div class="stat-card stat-watch">
+                <div class="stat-card stat-watch" data-fc-id="slideN-stats-card3">
                     <div class="stat-value">73%</div>
                     <div class="stat-label">ADOPTION RATE</div>
                     <div class="stat-change neutral"><i data-lucide="minus" style="width: 14px; height: 14px;"></i> Flat QoQ</div>
                 </div>
-                <div class="stat-card stat-action">
+                <div class="stat-card stat-action" data-fc-id="slideN-stats-card4">
                     <div class="stat-value">$1.2M</div>
                     <div class="stat-label">AT-RISK REVENUE</div>
                     <div class="stat-change negative"><i data-lucide="trending-down" style="width: 14px; height: 14px;"></i> -8% QoQ</div>
@@ -1721,7 +1722,7 @@
         <p>Click-to-expand table rows for regional breakdowns. Parent rows show aggregates, child rows show detail.</p>
 
         <div class="demo-box" x-data="{ open: null }">
-            <table class="region-table">
+            <table class="region-table" data-fc-id="slideN-regions-table">
                 <thead>
                     <tr>
                         <th></th>
@@ -1790,17 +1791,17 @@
 
         <div class="demo-box">
             <div class="three-col">
-                <div class="feature-card">
+                <div class="feature-card" data-fc-id="slideN-features-card1">
                     <div class="icon-box icon-box-teal"><i data-lucide="life-buoy" style="width: 20px; height: 20px;"></i></div>
                     <h3>Customer Success Portal</h3>
                     <p>24/7 support and knowledge base access</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card" data-fc-id="slideN-features-card2">
                     <div class="icon-box icon-box-accent"><i data-lucide="graduation-cap" style="width: 20px; height: 20px;"></i></div>
                     <h3>Fourth University</h3>
                     <p>On-demand training and certification</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card" data-fc-id="slideN-features-card3">
                     <div class="icon-box icon-box-purple"><i data-lucide="users" style="width: 20px; height: 20px;"></i></div>
                     <h3>Community Forum</h3>
                     <p>Peer-to-peer learning and best practices</p>

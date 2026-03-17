@@ -736,38 +736,38 @@
          ========================================= -->
 
     <!-- PATTERN: Title Slide (Dark gradient + Logo) -->
-    <section class="slide title-slide bg-title" data-slide="0">
+    <section class="slide title-slide bg-title" data-slide="0" data-slide-index="0">
         <img src="{{FOURTH_LOGO_WHITE}}" class="fourth-logo-hero reveal" alt="Fourth">
         <div class="slide-content">
             <p class="label reveal">{{LABEL}}</p>
-            <h1 class="reveal">{{HEADING}}</h1>
-            <p class="subtitle reveal">{{SUBTITLE}}</p>
+            <h1 class="reveal" data-fc-id="slide1-title-heading">{{HEADING}}</h1>
+            <p class="subtitle reveal" data-fc-id="slide1-title-subtitle">{{SUBTITLE}}</p>
             <div class="accent-line reveal" style="margin: 2rem auto;"></div>
-            <p class="meta reveal">Author &bull; Date</p>
+            <p class="meta reveal" data-fc-id="slide1-title-meta">Author &bull; Date</p>
         </div>
     </section>
 
     <!-- PATTERN: Content Slide with Cards (teal glow) -->
-    <section class="slide bg-dark-radial" data-slide="1">
+    <section class="slide bg-dark-radial" data-slide="1" data-slide-index="1">
         <img src="{{FOURTH_LOGO_WHITE}}" class="fourth-logo-watermark" alt="">
         <div class="glow-bg glow-teal" style="top: 10%; right: -20%;"></div>
         <div class="slide-content">
             <p class="label reveal">Section Label</p>
-            <h2 class="reveal">Slide Heading</h2>
-            <p class="reveal">Introductory paragraph text goes here.</p>
+            <h2 class="reveal" data-fc-id="slide2-content-header">Slide Heading</h2>
+            <p class="reveal" data-fc-id="slide2-content-intro">Introductory paragraph text goes here.</p>
 
             <div class="card-grid reveal">
-                <div class="card">
+                <div class="card" data-fc-id="slide2-content-card1">
                     <div class="stat">42%</div>
                     <div class="stat-label">Metric Label</div>
                     <p style="margin-top: 0.75rem; font-size: 0.9rem;">Description text.</p>
                 </div>
-                <div class="card">
+                <div class="card" data-fc-id="slide2-content-card2">
                     <div class="stat stat-teal">$1.2M</div>
                     <div class="stat-label">Another Metric</div>
                     <p style="margin-top: 0.75rem; font-size: 0.9rem;">Description text.</p>
                 </div>
-                <div class="card">
+                <div class="card" data-fc-id="slide2-content-card3">
                     <h3>Card Title</h3>
                     <p style="font-size: 0.9rem;">Card content goes here.</p>
                 </div>
@@ -776,32 +776,32 @@
     </section>
 
     <!-- PATTERN: Two-Column Slide (sunrise warm glow) -->
-    <section class="slide bg-dark-tl" data-slide="2">
+    <section class="slide bg-dark-tl" data-slide="2" data-slide-index="2">
         <img src="{{FOURTH_LOGO_WHITE}}" class="fourth-logo-watermark" alt="">
         <div class="glow-bg glow-sunrise" style="bottom: 10%; left: -15%;"></div>
         <div class="slide-content">
             <p class="label label-purple reveal">Section Label</p>
-            <h2 class="reveal">Two Column Layout</h2>
+            <h2 class="reveal" data-fc-id="slide3-twocol-header">Two Column Layout</h2>
 
             <div class="two-col" style="margin-top: 2rem;">
                 <div>
-                    <div class="feature-item reveal">
+                    <div class="feature-item reveal" data-fc-id="slide3-twocol-feature1">
                         <div class="icon-box">&#127919;</div>
                         <div>
-                            <h4>Feature Title</h4>
+                            <h4 data-fc-id="slide3-twocol-feature1-title">Feature Title</h4>
                             <p>Feature description text goes here.</p>
                         </div>
                     </div>
-                    <div class="feature-item reveal">
+                    <div class="feature-item reveal" data-fc-id="slide3-twocol-feature2">
                         <div class="icon-box icon-box-teal">&#9889;</div>
                         <div>
-                            <h4>Another Feature</h4>
+                            <h4 data-fc-id="slide3-twocol-feature2-title">Another Feature</h4>
                             <p>More description text.</p>
                         </div>
                     </div>
                 </div>
                 <div class="reveal">
-                    <div class="highlight-box">
+                    <div class="highlight-box" data-fc-id="slide3-twocol-highlight">
                         <h3 style="color: var(--accent);">Highlight Box</h3>
                         <p style="margin: 0; color: var(--text-primary);">Important information goes here.</p>
                     </div>
@@ -811,24 +811,24 @@
     </section>
 
     <!-- PATTERN: Section Break (Deep Blue accent + iQ mark) -->
-    <section class="slide bg-section-break" data-slide="3" style="text-align: center;">
+    <section class="slide bg-section-break" data-slide="3" data-slide-index="3" style="text-align: center;">
         <div class="slide-content">
             <img src="{{FOURTH_IQ_ICON}}" class="fourth-iq-mark reveal" alt="iQ" style="margin: 0 auto 1.5rem; display: block;">
             <p class="label reveal" style="font-size: 0.65rem; letter-spacing: 0.3em;">Section 02</p>
-            <h1 class="reveal" style="font-size: clamp(2rem, 4.5vw, 3.5rem);">Section Title</h1>
+            <h1 class="reveal" data-fc-id="slide4-section-heading" style="font-size: clamp(2rem, 4.5vw, 3.5rem);">Section Title</h1>
             <div class="accent-line accent-line-center reveal"></div>
         </div>
     </section>
 
     <!-- PATTERN: Table Slide (purple glow) -->
-    <section class="slide bg-dark-br" data-slide="4">
+    <section class="slide bg-dark-br" data-slide="4" data-slide-index="4">
         <img src="{{FOURTH_LOGO_WHITE}}" class="fourth-logo-watermark" alt="">
         <div class="glow-bg glow-purple" style="top: 30%; right: -20%;"></div>
         <div class="slide-content">
             <p class="label reveal">Data</p>
-            <h2 class="reveal">Comparison Table</h2>
+            <h2 class="reveal" data-fc-id="slide5-table-header">Comparison Table</h2>
 
-            <table class="reveal matrix-table" style="margin-top: 2rem;">
+            <table class="reveal matrix-table" data-fc-id="slide5-table-data" style="margin-top: 2rem;">
                 <thead>
                     <tr>
                         <th>Feature</th>
@@ -856,13 +856,13 @@
     </section>
 
     <!-- PATTERN: Closing Slide (Dark gradient + Full Logo + Powered by iQ) -->
-    <section class="slide title-slide bg-closing" data-slide="5">
+    <section class="slide title-slide bg-closing" data-slide="5" data-slide-index="5">
         <div class="slide-content">
             <img src="{{FOURTH_LOGO_WHITE}}" class="fourth-logo-closing reveal" alt="Fourth">
-            <h2 class="reveal" style="margin-bottom: 0.75rem;">Thank You</h2>
-            <p class="subtitle reveal" style="margin: 0 auto;">Powered by iQ</p>
+            <h2 class="reveal" data-fc-id="slide6-closing-header" style="margin-bottom: 0.75rem;">Thank You</h2>
+            <p class="subtitle reveal" data-fc-id="slide6-closing-subtitle" style="margin: 0 auto;">Powered by iQ</p>
             <div class="accent-line accent-line-center reveal"></div>
-            <p class="meta reveal">Contact Information</p>
+            <p class="meta reveal" data-fc-id="slide6-closing-contact">Contact Information</p>
         </div>
     </section>
 

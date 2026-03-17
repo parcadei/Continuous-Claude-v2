@@ -11,7 +11,7 @@ function readStdin() {
       data += chunk;
     });
     process.stdin.on("end", () => resolve2(data));
-    setTimeout(() => resolve2(data), 1e3);
+    setTimeout(() => resolve2(data), 100);
   });
 }
 function isPRDFile(filePath) {
@@ -90,15 +90,20 @@ function findRoadmapPath(startDir) {
   }
   let current = path.resolve(startDir);
   const root = path.parse(current).root;
+  let projectRoot = null;
   while (current !== root) {
-    const candidate = path.join(current, "ROADMAP.md");
-    if (fs.existsSync(candidate)) return candidate;
-    const claudeCandidate = path.join(current, ".claude", "ROADMAP.md");
-    if (fs.existsSync(claudeCandidate)) return claudeCandidate;
     if (fs.existsSync(path.join(current, ".git")) || fs.existsSync(path.join(current, "package.json"))) {
-      return candidate;
+      projectRoot = current;
+      break;
     }
     current = path.dirname(current);
+  }
+  if (projectRoot) {
+    const candidate = path.join(projectRoot, "ROADMAP.md");
+    if (fs.existsSync(candidate)) return candidate;
+    const claudeCandidate = path.join(projectRoot, ".claude", "ROADMAP.md");
+    if (fs.existsSync(claudeCandidate)) return claudeCandidate;
+    return candidate;
   }
   return null;
 }
@@ -355,6 +360,13 @@ function promoteToCurrent(content, item) {
 async function handlePRDChange(filePath, content) {
   const metadata = extractPRDMetadata(content);
   const fileDir = path.dirname(filePath);
+  const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  if (!path.resolve(filePath).startsWith(path.resolve(projectDir))) {
+    return {
+      result: "continue",
+      message: "PRD file is outside current project directory"
+    };
+  }
   const roadmapPath = findRoadmapPath(fileDir);
   if (!roadmapPath) {
     return {
@@ -390,6 +402,13 @@ async function handlePRDChange(filePath, content) {
 async function handleTasksChange(filePath, content) {
   const progress = extractTaskProgress(content, filePath);
   const fileDir = path.dirname(filePath);
+  const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  if (!path.resolve(filePath).startsWith(path.resolve(projectDir))) {
+    return {
+      result: "continue",
+      message: "Tasks file is outside current project directory"
+    };
+  }
   const roadmapPath = findRoadmapPath(fileDir);
   if (!roadmapPath) {
     return {
