@@ -138,12 +138,16 @@ function detectStructuredJSON(text) {
     const parsed = JSON.parse(match[0]);
     const status = parsed.ralph_status;
     if (!status || !status.task_id || !status.status) return null;
-    return {
+    const result = {
       taskId: status.task_id,
       success: status.status === "complete",
       commit: status.commit,
       reason: status.error || (status.status === "failed" ? "Agent reported failure" : void 0)
     };
+    if (status.deploy_status !== void 0 && status.deploy_status !== null) {
+      result.deploy_status = status.deploy_status;
+    }
+    return result;
   } catch {
     return null;
   }
@@ -231,8 +235,9 @@ async function main() {
       ], { encoding: "utf-8", timeout: 5e3 });
     }
     const marker = structuredResult.success ? "complete" : `failed: ${structuredResult.reason || "unknown"}`;
+    const deployInfo = structuredResult.deploy_status ? ` [deploy: ${structuredResult.deploy_status}]` : "";
     const message2 = `
-RALPH TASK MONITOR: ${agentType} -> task ${structuredResult.taskId} ${marker} (structured JSON)
+RALPH TASK MONITOR: ${agentType} -> task ${structuredResult.taskId} ${marker}${deployInfo} (structured JSON)
 `;
     console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: "PostToolUse", additionalContext: message2 } }));
     return;

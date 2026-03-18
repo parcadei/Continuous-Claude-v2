@@ -53,6 +53,7 @@ Use this to route to the correct reference file:
 - **Advanced (API, webhooks)** → `references/advanced.md`
 - **Global flags** → `references/global-options.md`
 - **First-time setup** → `references/getting-started.md`
+- **Toolbar feedback, deployment comments, or thread management** -> `references/toolbar-and-collaboration.md`
 
 ## Anti-Patterns
 

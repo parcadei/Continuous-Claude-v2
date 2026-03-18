@@ -13,6 +13,9 @@
 | Debugging | debug-agent | Task |
 | Code review | critic | Task |
 | Refactor/cleanup | strategic-refactorer OR judge | Task |
+| Deploy verification | deployer | Verify preview deployment succeeded after implementation |
+| Build log analysis | deployer | Diagnose deployment failures from Vercel build logs |
+| Preview URL check | deployer | Confirm deployed content matches expectations |
 
 ## Skill Router Query
 

@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 // src/ralph-progress-inject.ts
-import { readFileSync as readFileSync2 } from "fs";
+import { readFileSync as readFileSync2, existsSync as existsSync3, writeFileSync } from "fs";
+import { join as join3 } from "path";
+import { tmpdir } from "os";
 
 // src/shared/logger.ts
 import { appendFileSync, existsSync, mkdirSync, statSync, renameSync } from "fs";
@@ -123,6 +125,34 @@ function timeAgo(isoString) {
   const hours = Math.round(minutes / 60);
   return `${hours}h ago`;
 }
+function getDeployRemindedPath(sessionId) {
+  return join3(tmpdir(), `claude-deploy-reminded-${sessionId}.json`);
+}
+function readDeployReminded(sessionId) {
+  try {
+    const path = getDeployRemindedPath(sessionId);
+    if (!existsSync3(path)) return /* @__PURE__ */ new Set();
+    const data = JSON.parse(readFileSync2(path, "utf-8"));
+    return new Set(Array.isArray(data) ? data : []);
+  } catch {
+    return /* @__PURE__ */ new Set();
+  }
+}
+function writeDeployReminded(sessionId, reminded) {
+  try {
+    writeFileSync(getDeployRemindedPath(sessionId), JSON.stringify([...reminded]));
+  } catch {
+  }
+}
+function getDeployReminder(task, isVercelProject, alreadyReminded) {
+  if (!isVercelProject) return null;
+  const isComplete = task.status === "complete" || task.status === "completed";
+  if (!isComplete) return null;
+  if (task.deploy_status) return null;
+  if (alreadyReminded.has(task.id)) return null;
+  return `[DEPLOY] Task ${task.id} completed but deploy not verified. Delegate to deployer agent:
+"Verify preview deployment for task ${task.id} -- check build logs and deploy status"`;
+}
 async function main() {
   const start = Date.now();
   let input = {};
@@ -166,7 +196,27 @@ async function main() {
   if (failed > 0) parts.push(`failed: ${failed}`);
   if (retryCount > 0) parts.push(`retry: ${retryCount}`);
   parts.push(`commit: ${lastCommitTime}`);
-  const message = parts.join(" | ");
+  let message = parts.join(" | ");
+  if (completed > 0) {
+    const vercelProjectPath = join3(projectDir, ".vercel", "project.json");
+    const isVercelProject = existsSync3(vercelProjectPath);
+    if (isVercelProject) {
+      const sessionId = input.session_id || "default";
+      const reminded = readDeployReminded(sessionId);
+      const reminders = [];
+      for (const task of tasks) {
+        const reminder = getDeployReminder(task, true, reminded);
+        if (reminder) {
+          reminders.push(reminder);
+          reminded.add(task.id);
+        }
+      }
+      if (reminders.length > 0) {
+        writeDeployReminded(sessionId, reminded);
+        message += "\n" + reminders.join("\n");
+      }
+    }
+  }
   const elapsed = Date.now() - start;
   if (elapsed > 100) {
     log2.warn("Progress injection slow", { elapsed });

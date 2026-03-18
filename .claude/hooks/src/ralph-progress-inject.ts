@@ -10,8 +10,9 @@
  * Runs on UserPromptSubmit
  */
 
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { tmpdir } from 'os';
 import { spawnSync } from 'child_process';
 import { createLogger } from './shared/logger.js';
 import { readRalphUnifiedState } from './shared/state-schema.js';
@@ -46,6 +47,51 @@ function timeAgo(isoString: string | null): string {
   if (minutes < 60) return `${minutes}m ago`;
   const hours = Math.round(minutes / 60);
   return `${hours}h ago`;
+}
+
+// ─── Deploy verification reminder ─────────────────────────
+// Tracks which tasks have already been reminded via a temp file
+
+function getDeployRemindedPath(sessionId: string): string {
+  return join(tmpdir(), `claude-deploy-reminded-${sessionId}.json`);
+}
+
+function readDeployReminded(sessionId: string): Set<string> {
+  try {
+    const path = getDeployRemindedPath(sessionId);
+    if (!existsSync(path)) return new Set();
+    const data = JSON.parse(readFileSync(path, 'utf-8'));
+    return new Set(Array.isArray(data) ? data : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function writeDeployReminded(sessionId: string, reminded: Set<string>): void {
+  try {
+    writeFileSync(getDeployRemindedPath(sessionId), JSON.stringify([...reminded]));
+  } catch {
+    // Non-critical -- fail silently
+  }
+}
+
+function getDeployReminder(
+  task: { id: string; status: string; deploy_status?: string | null; [key: string]: unknown },
+  isVercelProject: boolean,
+  alreadyReminded: Set<string>
+): string | null {
+  if (!isVercelProject) return null;
+
+  const isComplete = task.status === 'complete' || task.status === 'completed';
+  if (!isComplete) return null;
+
+  // Already has deploy verification -- no reminder needed
+  if (task.deploy_status) return null;
+
+  // Already reminded for this task
+  if (alreadyReminded.has(task.id)) return null;
+
+  return `[DEPLOY] Task ${task.id} completed but deploy not verified. Delegate to deployer agent:\n"Verify preview deployment for task ${task.id} -- check build logs and deploy status"`;
 }
 
 async function main() {
@@ -105,7 +151,33 @@ async function main() {
   if (retryCount > 0) parts.push(`retry: ${retryCount}`);
   parts.push(`commit: ${lastCommitTime}`);
 
-  const message = parts.join(' | ');
+  let message = parts.join(' | ');
+
+  // ─── Deploy verification reminder ───────────────────────
+  // Only check when there are completed tasks (avoid unnecessary file I/O)
+  if (completed > 0) {
+    const vercelProjectPath = join(projectDir, '.vercel', 'project.json');
+    const isVercelProject = existsSync(vercelProjectPath);
+
+    if (isVercelProject) {
+      const sessionId = input.session_id || 'default';
+      const reminded = readDeployReminded(sessionId);
+      const reminders: string[] = [];
+
+      for (const task of tasks as any[]) {
+        const reminder = getDeployReminder(task, true, reminded);
+        if (reminder) {
+          reminders.push(reminder);
+          reminded.add(task.id);
+        }
+      }
+
+      if (reminders.length > 0) {
+        writeDeployReminded(sessionId, reminded);
+        message += '\n' + reminders.join('\n');
+      }
+    }
+  }
 
   // Ensure < 100ms execution
   const elapsed = Date.now() - start;

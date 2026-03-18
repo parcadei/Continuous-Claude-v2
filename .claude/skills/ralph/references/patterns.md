@@ -84,6 +84,23 @@ Errors: [list of errors]
 Need: User intervention to diagnose
 ```
 
+## DEPLOY Phase (Vercel-linked projects only)
+
+When the project has `.vercel/project.json`, Ralph adds a deployment verification step after VERIFY:
+
+The full TDD cycle becomes: RED -> GREEN -> VERIFY -> DEPLOY (if Vercel-linked)
+
+1. **Delegate** to `deployer` agent: "Verify preview deployment for task X.Y"
+2. **Deployer checks**: latest deployment status, build logs, preview URL
+3. **Pass criteria**: `deploy_status: "preview_success"` in verification block
+4. **Fail handling**: If deploy fails, create a follow-up fix task (don't block the current task)
+
+This phase is **skipped** for non-Vercel projects (no `.vercel/project.json`).
+
+Template control:
+- `deploy_on_complete: preview` (default for Vercel projects) -- verify preview deploy
+- `deploy_on_complete: none` -- skip deploy verification even in Vercel projects
+
 ## Phase 4: Store Learnings
 
 After successful completion, store for future features:

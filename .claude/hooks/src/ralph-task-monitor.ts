@@ -39,11 +39,13 @@ interface HookInput {
 // ─── Structured status detection (Priority 1) ──────────────
 // Agents can output structured JSON for unambiguous status reporting.
 // Format: {"ralph_status": {"task_id": "X.Y", "status": "complete", "commit": "abc123"}}
+// Optional deploy_status: "preview_success" | "preview_failed" | "skipped" | null
 interface RalphStructuredStatus {
   task_id: string;
   status: 'complete' | 'failed' | 'blocked';
   commit?: string;
   error?: string;
+  deploy_status?: 'preview_success' | 'preview_failed' | 'skipped' | null;
 }
 
 const STRUCTURED_JSON_RE = /\{"ralph_status"\s*:\s*\{[^}]+\}\s*\}/;
@@ -90,7 +92,7 @@ function readStdin(): string {
  * Priority 1: Try to parse structured JSON status from agent output.
  * Returns null if no structured status found.
  */
-function detectStructuredJSON(text: string): { taskId: string; success: boolean; commit?: string; reason?: string } | null {
+function detectStructuredJSON(text: string): { taskId: string; success: boolean; commit?: string; reason?: string; deploy_status?: string } | null {
   const match = text.match(STRUCTURED_JSON_RE);
   if (!match) return null;
 
@@ -99,12 +101,19 @@ function detectStructuredJSON(text: string): { taskId: string; success: boolean;
     const status: RalphStructuredStatus = parsed.ralph_status;
     if (!status || !status.task_id || !status.status) return null;
 
-    return {
+    const result: { taskId: string; success: boolean; commit?: string; reason?: string; deploy_status?: string } = {
       taskId: status.task_id,
       success: status.status === 'complete',
       commit: status.commit,
       reason: status.error || (status.status === 'failed' ? 'Agent reported failure' : undefined),
     };
+
+    // Include deploy_status if present and non-null
+    if (status.deploy_status !== undefined && status.deploy_status !== null) {
+      result.deploy_status = status.deploy_status;
+    }
+
+    return result;
   } catch {
     return null;
   }
@@ -213,7 +222,8 @@ async function main() {
     }
 
     const marker = structuredResult.success ? 'complete' : `failed: ${structuredResult.reason || 'unknown'}`;
-    const message = `\nRALPH TASK MONITOR: ${agentType} -> task ${structuredResult.taskId} ${marker} (structured JSON)\n`;
+    const deployInfo = structuredResult.deploy_status ? ` [deploy: ${structuredResult.deploy_status}]` : '';
+    const message = `\nRALPH TASK MONITOR: ${agentType} -> task ${structuredResult.taskId} ${marker}${deployInfo} (structured JSON)\n`;
     console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: message } }));
     return;
   }

@@ -2643,7 +2643,14 @@
           "supabase setup",
           "vercel marketplace",
           "edge functions",
-          "serverless functions"
+          "serverless functions",
+          "vercel toolbar",
+          "deployment feedback",
+          "deployment status",
+          "build logs vercel",
+          "vercel comments",
+          "preview deploy",
+          "deploy verification"
         ],
         "intentPatterns": [
           "(deploy|push|ship).*?vercel",
