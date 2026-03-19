@@ -67,8 +67,9 @@ const SUCCESS_PATTERNS = [
   /<COMPLETE\s*\/?>/i,
 ];
 
-// Pattern to extract task ID from agent prompt
-const TASK_ID_PATTERN = /(?:Task|task)[- ]?(?:ID|id)?:?\s*(\d+(?:\.\d+)?)/;
+// Pattern to extract task ID from agent prompt or output
+// Matches: "Task ID: 1.2", "Task: 1.2", "task_id: 1.2", "task 1.2"
+const TASK_ID_PATTERN = /(?:task_id|Task ID|Task|task)[:\s_-]*(\d+(?:\.\d+)?)/i;
 
 // Patterns indicating agent failure
 const FAILURE_PATTERNS = [
@@ -226,6 +227,50 @@ async function main() {
     const message = `\nRALPH TASK MONITOR: ${agentType} -> task ${structuredResult.taskId} ${marker}${deployInfo} (structured JSON)\n`;
     console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: message } }));
     return;
+  }
+
+  // ─── Priority 1.5: Generic agent JSON success format ──────
+  // Handles common agent output: {"status": "success", ...} or {"status": "complete", ...}
+  // Only fires when there is exactly 1 in-progress task (no ambiguity).
+  {
+    let parsed: any = null;
+    try {
+      // Try to find a JSON object in the output (may have surrounding text)
+      const jsonMatch = resultText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+    } catch {
+      // not valid JSON, skip
+    }
+
+    if (parsed && (parsed.status === 'success' || parsed.status === 'complete')) {
+      // Fetch current task list to check for unambiguous single in-progress task
+      const listResult = spawnSync('python', [
+        v2Script, '-p', projectDir, 'task-list'
+      ], { encoding: 'utf-8', timeout: 5000 });
+
+      if (listResult.status === 0) {
+        let allTasks: any[] = [];
+        try {
+          allTasks = JSON.parse(listResult.stdout).tasks || [];
+        } catch { /* ignore */ }
+
+        const inProgressTasks = allTasks.filter((t: any) => t.status === 'in_progress');
+
+        if (inProgressTasks.length === 1) {
+          const task = inProgressTasks[0];
+          const taskId = String(task.id);
+          log.info(`Generic JSON success detected, auto-completing single in-progress task ${taskId}`, { agentType, method: 'json-fallback' });
+          spawnSync('python', [
+            v2Script, '-p', projectDir, 'task-complete', '--id', taskId
+          ], { encoding: 'utf-8', timeout: 5000 });
+          const message = `\nRALPH TASK MONITOR: ${agentType} -> task ${taskId} complete (generic JSON status)\n`;
+          console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: message } }));
+          return;
+        } else if (inProgressTasks.length > 1) {
+          log.info(`Generic JSON success found but ${inProgressTasks.length} in-progress tasks — skipping (ambiguous)`, { agentType });
+        }
+      }
+    }
   }
 
   // ─── Priority 2: XML status tags ──────────────────────────

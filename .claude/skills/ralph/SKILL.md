@@ -48,17 +48,19 @@ Do NOT use Ralph for: quick fixes (use spark directly), debugging (use debug-age
 ## Workflow Overview
 
 ```
-0. Context Loading (memory + knowledge tree)
-   ↓
-1. PRD Generation (ai-dev-tasks templates)
-   ↓
-2. Task Breakdown (generate-tasks.md)
-   ↓
-3. Delegation Loop (spawn agents)
-   ↓
-4. Parallel Execution (multiple agents)
-   ↓
-5. Review & Merge (verify + commit + store learnings)
+0.  Context Loading (memory + knowledge tree)
+    ↓
+0.5 Deep Research (optional, complex features)
+    ↓
+1.  PRD Generation (ai-dev-tasks templates)
+    ↓
+2.  Task Breakdown (generate-tasks.md)
+    ↓
+2.5 Adversarial Plan Gate (premortem)
+    ↓
+3.  Delegation Loop (spawn agents)
+    ↓
+4.  Goal Verification + Review & Merge
 ```
 
 ---
@@ -74,8 +76,12 @@ Do NOT use Ralph for: quick fixes (use spark directly), debugging (use debug-age
 Ensure infrastructure exists. See `references/state-management.md` for full commands.
 
 1. `.ralph/state.json` missing → `ralph-state-v2.py init`
-2. `.claude/knowledge-tree.json` missing → `knowledge_tree.py --project`
-3. `ROADMAP.md` missing → create minimal template
+2. Activate session so ralph-task-monitor hook can auto-complete tasks:
+   ```bash
+   python ~/.claude/scripts/ralph/ralph-state-v2.py -p ${PROJECT} session-activate
+   ```
+3. `.claude/knowledge-tree.json` missing → `knowledge_tree.py --project`
+4. `ROADMAP.md` missing → create minimal template
 
 **Session recovery (if resuming):**
 ```bash
@@ -115,6 +121,21 @@ Before interviewing, tell user:
 - "I found N relevant learnings from past work..."
 - "The project uses [stack] with [structure pattern]..."
 - "Current goal in ROADMAP: [goal]..."
+
+---
+
+## Phase 0.5: Deep Research (Optional) [C:7]
+
+For complex features (`complexity: high`), spawn parallel research before the interview:
+
+1. `oracle` -- external stack/docs research for the feature domain
+2. `scout` -- internal codebase patterns and existing implementations
+3. `pathfinder` -- similar implementations in other repos/open source
+
+Synthesize results into `/tasks/research-<feature>.md`. Feed findings into Phase 1 interview.
+
+**When to trigger:** Complex features, unfamiliar domains, or when user says "research first."
+**When to skip:** Simple features, well-understood domains, brownfield work in familiar code.
 
 ---
 
@@ -163,6 +184,24 @@ Break each parent into atomic sub-tasks (1.0 → 1.1, 1.2, etc.)
 ### 2.5 Save Tasks
 Create `/tasks/tasks-<feature>.md`. The `prd-roadmap-sync` hook auto-updates ROADMAP.md.
 
+## Phase 2.5: Adversarial Plan Gate [C:9]
+
+Before entering the delegation loop, stress-test the plan:
+
+1. Spawn `premortem` agent with the PRD + task list
+2. If HIGH severity risks found → BLOCK Phase 3, present risks to user
+3. User must either "accept risks" or "revise plan" before proceeding
+4. MEDIUM/LOW risks → note in state.json, proceed
+
+This is MANDATORY, not optional. Skip only if user explicitly says "skip premortem".
+
+```bash
+# The premortem skill handles the adversarial analysis
+# Pass the PRD and task file paths
+```
+
+---
+
 ## Phase 3: Delegation Loop [C:10]
 
 **THIS IS THE CRITICAL CHANGE: Ralph delegates, never implements.**
@@ -183,10 +222,12 @@ python ~/.claude/scripts/ralph/ralph-state-v2.py -p ${PROJECT} task-start --id X
 ### 3.3 Spawn Agent
 Use Task tool. **Always include `Task ID: X.Y`** in the prompt for task-monitor disambiguation. Provide: story ID, task ID, task description, file list, requirements.
 
-Recommend agents output structured status for reliable detection:
+REQUIRED in every agent prompt [C:9] -- add this instruction to the agent:
+"End your response with a JSON status block:
 ```json
-{"ralph_status": {"task_id": "X.Y", "status": "complete", "commit": "<hash>"}}
+{"ralph_status": {"task_id": "X.Y", "status": "complete|failed", "commit": "hash_or_none"}}
 ```
+"
 
 ### 3.4 Wait for Completion
 
@@ -207,11 +248,12 @@ On failure:
 python ~/.claude/scripts/ralph/ralph-state-v2.py -p ${PROJECT} task-fail --id X.Y --error "<reason>"
 ```
 
-### 3.7 Sync Markdown
-Regenerate IMPLEMENTATION_PLAN.md from state.json:
+### 3.7 Sync Markdown [C:9]
+MANDATORY after every task-complete or task-fail. Regenerate IMPLEMENTATION_PLAN.md from state.json:
 ```bash
 python ~/.claude/scripts/ralph/ralph-progress-sync.py -p ${PROJECT} sync
 ```
+Skipping this causes state.json and markdown to drift, breaking resume detection.
 
 ### 3.8 Continue or Finish
 More tasks → loop to 3.1. All done → Phase 4.
@@ -222,6 +264,18 @@ More tasks → loop to 3.1. All done → Phase 4.
 ```bash
 npm test && npm run typecheck && npm run lint  # or pytest/go test/cargo test
 ```
+
+### 4.1.5 Goal Verification [C:8]
+
+Before merging, spawn an independent verifier:
+
+1. Spawn `plan-reviewer` agent with: PRD path + `git diff main...HEAD` + task list
+2. Agent checks each PRD acceptance criterion against the actual changes
+3. Returns: pass/fail per criterion + gap list
+4. If any FAIL → block merge, route gaps back to delegation loop
+5. If all PASS → proceed to merge
+
+This ensures the orchestrator doesn't verify its own work.
 
 ### 4.2 Create Summary
 Document what was built, changes made, tests added.

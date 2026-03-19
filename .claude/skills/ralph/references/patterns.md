@@ -84,6 +84,80 @@ Errors: [list of errors]
 Need: User intervention to diagnose
 ```
 
+## Plan Gate Pattern
+
+Stress-test the plan before entering the delegation loop. Catches architectural flaws, missing dependencies, and scope creep early -- when changes are cheap.
+
+### When to Apply
+
+- ALWAYS before Phase 3 delegation loop (unless user says "skip premortem")
+- Especially critical for: new stack components, external integrations, schema changes
+
+### How It Works
+
+1. Spawn `premortem` agent with PRD path + task file path
+2. Agent analyzes: risk of each task, missing dependencies, ordering issues, scope gaps
+3. Returns severity-ranked risk list
+
+### Decision Matrix
+
+| Risk Severity | Action |
+|---------------|--------|
+| HIGH | BLOCK Phase 3. Present to user. Require "accept risks" or "revise plan" |
+| MEDIUM | Note in state.json under `risks` key. Proceed with awareness |
+| LOW | Log and proceed |
+
+### Example Prompt
+
+```
+Spawn premortem agent:
+  "Review this PRD and task breakdown for risks:
+   PRD: /tasks/prd-<feature>.md
+   Tasks: /tasks/tasks-<feature>.md
+   Identify: missing dependencies, wrong ordering, scope gaps,
+   architectural risks, security concerns.
+   Rate each: HIGH/MEDIUM/LOW severity."
+```
+
+---
+
+## Goal Verification Pattern
+
+Independent verification that implementation matches PRD acceptance criteria. Prevents the orchestrator from marking its own homework.
+
+### When to Apply
+
+- ALWAYS before merging in Phase 4 (4.1.5)
+- After all delegation loop tasks are complete
+
+### How It Works
+
+1. Spawn `plan-reviewer` agent with: PRD path, `git diff main...HEAD`, task list
+2. Agent maps each acceptance criterion to actual code changes
+3. Returns pass/fail per criterion + gap list
+
+### Decision Matrix
+
+| Result | Action |
+|--------|--------|
+| All criteria PASS | Proceed to merge |
+| Any criteria FAIL | Block merge, route gaps back to delegation loop as new tasks |
+| Criteria ambiguous | Ask user to clarify acceptance criteria |
+
+### Example Prompt
+
+```
+Spawn plan-reviewer agent:
+  "Verify implementation against PRD acceptance criteria:
+   PRD: /tasks/prd-<feature>.md
+   Tasks: /tasks/tasks-<feature>.md
+   Diff: git diff main...HEAD
+   For each acceptance criterion, check if the diff satisfies it.
+   Return: {criterion: string, status: 'pass'|'fail', evidence: string}[]"
+```
+
+---
+
 ## DEPLOY Phase (Vercel-linked projects only)
 
 When the project has `.vercel/project.json`, Ralph adds a deployment verification step after VERIFY:

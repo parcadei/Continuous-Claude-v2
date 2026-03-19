@@ -115,7 +115,7 @@ var SUCCESS_PATTERNS = [
   /<TASK_COMPLETE\s*\/?>/i,
   /<COMPLETE\s*\/?>/i
 ];
-var TASK_ID_PATTERN = /(?:Task|task)[- ]?(?:ID|id)?:?\s*(\d+(?:\.\d+)?)/;
+var TASK_ID_PATTERN = /(?:task_id|Task ID|Task|task)[:\s_-]*(\d+(?:\.\d+)?)/i;
 var FAILURE_PATTERNS = [
   /(?:test|build|compilation)\s+(?:failed|failing|errors?)/i,
   /could\s+not\s+(?:complete|fix|resolve)/i,
@@ -241,6 +241,50 @@ RALPH TASK MONITOR: ${agentType} -> task ${structuredResult.taskId} ${marker}${d
 `;
     console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: "PostToolUse", additionalContext: message2 } }));
     return;
+  }
+  {
+    let parsed = null;
+    try {
+      const jsonMatch = resultText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+    } catch {
+    }
+    if (parsed && (parsed.status === "success" || parsed.status === "complete")) {
+      const listResult2 = spawnSync("python", [
+        v2Script,
+        "-p",
+        projectDir,
+        "task-list"
+      ], { encoding: "utf-8", timeout: 5e3 });
+      if (listResult2.status === 0) {
+        let allTasks2 = [];
+        try {
+          allTasks2 = JSON.parse(listResult2.stdout).tasks || [];
+        } catch {
+        }
+        const inProgressTasks2 = allTasks2.filter((t) => t.status === "in_progress");
+        if (inProgressTasks2.length === 1) {
+          const task = inProgressTasks2[0];
+          const taskId = String(task.id);
+          log2.info(`Generic JSON success detected, auto-completing single in-progress task ${taskId}`, { agentType, method: "json-fallback" });
+          spawnSync("python", [
+            v2Script,
+            "-p",
+            projectDir,
+            "task-complete",
+            "--id",
+            taskId
+          ], { encoding: "utf-8", timeout: 5e3 });
+          const message2 = `
+RALPH TASK MONITOR: ${agentType} -> task ${taskId} complete (generic JSON status)
+`;
+          console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: "PostToolUse", additionalContext: message2 } }));
+          return;
+        } else if (inProgressTasks2.length > 1) {
+          log2.info(`Generic JSON success found but ${inProgressTasks2.length} in-progress tasks \u2014 skipping (ambiguous)`, { agentType });
+        }
+      }
+    }
   }
   const xmlResult = detectXMLStatus(resultText);
   if (xmlResult) {
