@@ -323,7 +323,7 @@ async function main() {
   } catch {
     input = {};
   }
-  const hooksDir = "C:/Users/david.hayes/.claude/hooks";
+  const hooksDir = `${claudeDir}/hooks`;
   const distDir = `${hooksDir}/dist`;
   const results = await Promise.all([
     // Inline task (no subprocess)

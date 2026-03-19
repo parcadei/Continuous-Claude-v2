@@ -530,11 +530,38 @@ def install_opc_integration(
                 shutil.rmtree(target_runtime)
             shutil.copytree(opc_runtime, target_runtime)
 
-        # Copy settings.json
+        # Generate settings.json from template (replaces hardcoded paths)
+        opc_template_path = opc_source / "settings.json.template"
         opc_settings_path = opc_source / "settings.json"
         target_settings_path = target_dir / "settings.json"
-        if opc_settings_path.exists():
+        if opc_template_path.exists():
+            generate_settings_json(
+                opc_template_path,
+                target_settings_path,
+                {
+                    "CLAUDE_HOME": str(target_dir).replace("\\", "/"),
+                    "OPC_DIR": str(opc_source.parent / "opc").replace("\\", "/"),
+                    "REPO_ROOT": str(opc_source.parent).replace("\\", "/"),
+                    "USER_HOME": str(Path.home()).replace("\\", "/"),
+                },
+            )
+        elif opc_settings_path.exists():
+            # Fallback: copy raw settings.json if no template exists
             shutil.copy2(opc_settings_path, target_settings_path)
+
+        # Generate project-registry.json from template (skips if target already exists)
+        opc_registry_template = opc_source / "project-registry.json.template"
+        target_registry_path = target_dir / "project-registry.json"
+        generate_project_registry(
+            opc_registry_template,
+            target_registry_path,
+            {
+                "CLAUDE_HOME": str(target_dir).replace("\\", "/"),
+                "OPC_DIR": str(opc_source.parent / "opc").replace("\\", "/"),
+                "REPO_ROOT": str(opc_source.parent).replace("\\", "/"),
+                "USER_HOME": str(Path.home()).replace("\\", "/"),
+            },
+        )
 
         # Copy scripts (core, math, tldr directories + root scripts)
         result["installed_scripts"] = _copy_scripts(opc_source, target_dir)
@@ -651,11 +678,38 @@ def install_opc_integration_symlink(
                     return result
                 raise
 
-        # Copy (not symlink) settings.json - user may want to customize
+        # Generate settings.json from template (replaces hardcoded paths)
+        opc_template_path = opc_source / "settings.json.template"
         opc_settings_path = opc_source / "settings.json"
         target_settings_path = target_dir / "settings.json"
-        if opc_settings_path.exists():
+        if opc_template_path.exists():
+            generate_settings_json(
+                opc_template_path,
+                target_settings_path,
+                {
+                    "CLAUDE_HOME": str(target_dir).replace("\\", "/"),
+                    "OPC_DIR": str(opc_source.parent / "opc").replace("\\", "/"),
+                    "REPO_ROOT": str(opc_source.parent).replace("\\", "/"),
+                    "USER_HOME": str(Path.home()).replace("\\", "/"),
+                },
+            )
+        elif opc_settings_path.exists():
+            # Fallback: copy raw settings.json if no template exists
             shutil.copy2(opc_settings_path, target_settings_path)
+
+        # Generate project-registry.json from template (skips if target already exists)
+        opc_registry_template = opc_source / "project-registry.json.template"
+        target_registry_path = target_dir / "project-registry.json"
+        generate_project_registry(
+            opc_registry_template,
+            target_registry_path,
+            {
+                "CLAUDE_HOME": str(target_dir).replace("\\", "/"),
+                "OPC_DIR": str(opc_source.parent / "opc").replace("\\", "/"),
+                "REPO_ROOT": str(opc_source.parent).replace("\\", "/"),
+                "USER_HOME": str(Path.home()).replace("\\", "/"),
+            },
+        )
 
         # Copy servers, runtime, plugins, scripts (these are less likely to be edited)
         # Users can manually symlink these if needed
@@ -676,6 +730,86 @@ def install_opc_integration_symlink(
         result["error"] = str(e)
 
     return result
+
+
+def generate_settings_json(
+    template_path: Path,
+    target_path: Path,
+    variables: dict[str, str],
+) -> None:
+    """Generate settings.json from a template by replacing placeholders.
+
+    Reads a settings.json.template file containing {{PLACEHOLDER}} tokens
+    and replaces them with machine-specific paths, writing the result to
+    target_path.
+
+    Args:
+        template_path: Path to settings.json.template
+        target_path: Path where generated settings.json will be written
+        variables: Dict mapping placeholder names to values, e.g.:
+            {
+                "CLAUDE_HOME": "C:/Users/someone/.claude",
+                "OPC_DIR": "C:/Users/someone/continuous-claude/opc",
+                "REPO_ROOT": "C:/Users/someone/continuous-claude",
+                "USER_HOME": "C:/Users/someone",
+            }
+
+    Raises:
+        FileNotFoundError: If template_path does not exist
+    """
+    if not template_path.exists():
+        raise FileNotFoundError(f"Template not found: {template_path}")
+
+    content = template_path.read_text(encoding="utf-8")
+
+    for name, value in variables.items():
+        # Ensure forward slashes for cross-platform compatibility
+        value = str(value).replace("\\", "/")
+        content = content.replace(f"{{{{{name}}}}}", value)
+
+    # Validate no unreplaced template variables remain
+    import re as _re
+    remaining = _re.findall(r'\{\{[A-Z_]+\}\}', content)
+    if remaining:
+        raise ValueError(f"Unresolved template variables in settings.json: {remaining}")
+
+    # Create parent directories if needed
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    target_path.write_text(content, encoding="utf-8")
+
+
+def generate_project_registry(
+    template_path: Path,
+    target_path: Path,
+    variables: dict[str, str],
+) -> None:
+    """Generate project-registry.json from a template by replacing placeholders.
+
+    Reads a project-registry.json.template file containing {{PLACEHOLDER}} tokens
+    and replaces them with machine-specific paths, writing the result to target_path.
+
+    Skips generation if target already exists (preserves user's existing registry).
+
+    Args:
+        template_path: Path to project-registry.json.template
+        target_path: Path where generated project-registry.json will be written
+        variables: Dict mapping placeholder names to values (same as generate_settings_json)
+    """
+    if not template_path.exists():
+        return
+
+    # Never overwrite an existing registry -- user may have added their own projects
+    if target_path.exists():
+        return
+
+    content = template_path.read_text(encoding="utf-8")
+
+    for name, value in variables.items():
+        value = str(value).replace("\\", "/")
+        content = content.replace(f"{{{{{name}}}}}", value)
+
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    target_path.write_text(content, encoding="utf-8")
 
 
 def strip_tldr_hooks_from_settings(settings_path: Path) -> bool:

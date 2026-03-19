@@ -506,6 +506,126 @@ def generate_env_file(config: dict[str, Any], env_path: Path) -> None:
     env_path.write_text("\n".join(lines))
 
 
+# =============================================================================
+# Behavioral Configuration (CLAUDE.md / RULES.md templates)
+# =============================================================================
+
+# Platform-specific default Docker paths (used when shutil.which fails)
+DOCKER_PLATFORM_DEFAULTS = {
+    "win32": r"C:\Program Files\Docker\Docker\resources\bin\docker.exe",
+    "linux": "/usr/bin/docker",
+    "darwin": "/usr/local/bin/docker",
+}
+
+
+def detect_docker_path() -> str:
+    """Auto-detect the Docker executable path.
+
+    Tries shutil.which first, then falls back to platform-specific defaults.
+
+    Returns:
+        str: Path to docker executable (best guess)
+    """
+    found = shutil.which("docker")
+    if found:
+        return found
+    return DOCKER_PLATFORM_DEFAULTS.get(sys.platform, "/usr/bin/docker")
+
+
+def load_and_substitute_template(
+    template_path: Path, substitutions: dict[str, str]
+) -> str:
+    """Load a template file and replace {{PLACEHOLDER}} tokens.
+
+    Args:
+        template_path: Path to the .template file
+        substitutions: Dict of placeholder_name -> replacement_value
+            (without the {{ }} delimiters)
+
+    Returns:
+        str: Template content with all placeholders replaced
+
+    Raises:
+        FileNotFoundError: If template_path does not exist
+    """
+    content = template_path.read_text(encoding="utf-8")
+    for key, value in substitutions.items():
+        content = content.replace("{{" + key + "}}", value)
+    return content
+
+
+def install_behavioral_config(
+    templates_dir: Path,
+    target_dir: Path,
+    docker_path: str,
+) -> dict[str, Any]:
+    """Install CLAUDE.md and RULES.md from templates.
+
+    Generates behavioral configuration files from templates, substituting
+    machine-specific values like Docker path. Skips files that already
+    exist to preserve user customizations.
+
+    Args:
+        templates_dir: Directory containing .template files
+        target_dir: Target ~/.claude/ directory
+        docker_path: Detected Docker executable path
+
+    Returns:
+        dict with keys:
+            claude_md_installed: bool
+            claude_md_skipped: bool
+            claude_md_error: str | None
+            rules_md_installed: bool
+            rules_md_skipped: bool
+            rules_md_error: str | None
+    """
+    result: dict[str, Any] = {
+        "claude_md_installed": False,
+        "claude_md_skipped": False,
+        "claude_md_error": None,
+        "rules_md_installed": False,
+        "rules_md_skipped": False,
+        "rules_md_error": None,
+    }
+
+    substitutions = {"DOCKER_PATH": docker_path}
+
+    # Ensure target directory exists
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    # CLAUDE.md
+    claude_target = target_dir / "CLAUDE.md"
+    claude_template = templates_dir / "CLAUDE.md.template"
+    if claude_target.exists():
+        result["claude_md_skipped"] = True
+    else:
+        try:
+            content = load_and_substitute_template(claude_template, substitutions)
+            claude_target.write_text(content, encoding="utf-8")
+            result["claude_md_installed"] = True
+        except FileNotFoundError:
+            result["claude_md_error"] = f"Template not found: {claude_template}"
+        except OSError as e:
+            result["claude_md_error"] = str(e)
+
+    # RULES.md
+    rules_target = target_dir / "RULES.md"
+    rules_template = templates_dir / "RULES.md.template"
+    if rules_target.exists():
+        result["rules_md_skipped"] = True
+    else:
+        try:
+            content = load_and_substitute_template(rules_template, substitutions)
+            rules_target.write_text(content, encoding="utf-8")
+            result["rules_md_installed"] = True
+        except FileNotFoundError:
+            result["rules_md_error"] = f"Template not found: {rules_template}"
+        except OSError as e:
+            result["rules_md_error"] = str(e)
+
+    return result
+
+
 async def run_setup_wizard() -> None:
     """Run the interactive setup wizard.
 
@@ -517,13 +637,14 @@ async def run_setup_wizard() -> None:
     5. Start Docker stack
     6. Run migrations
     7. Install Claude Code integration (hooks, skills, rules)
+    8. Install behavioral config (CLAUDE.md, RULES.md from templates)
     """
     console.print(
         Panel.fit("[bold]CLAUDE CONTINUITY KIT v3 - SETUP WIZARD[/bold]", border_style="blue")
     )
 
     # Step 0: Backup global ~/.claude (safety first)
-    console.print("\n[bold]Step 0/13: Backing up global Claude configuration...[/bold]")
+    console.print("\n[bold]Step 0/15: Backing up global Claude configuration...[/bold]")
     from scripts.setup.claude_integration import (
         backup_global_claude_dir,
         get_global_claude_dir,
@@ -540,7 +661,7 @@ async def run_setup_wizard() -> None:
         console.print("  [dim]No existing ~/.claude found (clean install)[/dim]")
 
     # Step 1: Check prerequisites (with installation offers)
-    console.print("\n[bold]Step 1/13: Checking system requirements...[/bold]")
+    console.print("\n[bold]Step 1/15: Checking system requirements...[/bold]")
     prereqs = await check_prerequisites_with_install_offers()
 
     if prereqs["docker"]:
@@ -565,7 +686,7 @@ async def run_setup_wizard() -> None:
         sys.exit(1)
 
     # Step 2: Database config
-    console.print("\n[bold]Step 2/13: Database Configuration[/bold]")
+    console.print("\n[bold]Step 2/15: Database Configuration[/bold]")
     console.print("  Choose your database backend:")
     console.print("    [bold]docker[/bold]    - PostgreSQL in Docker (recommended)")
     console.print("    [bold]embedded[/bold]  - Embedded PostgreSQL (no Docker needed)")
@@ -605,21 +726,21 @@ async def run_setup_wizard() -> None:
         db_config["mode"] = "docker"
 
     # Step 3: Embedding configuration
-    console.print("\n[bold]Step 3/13: Embedding Configuration[/bold]")
+    console.print("\n[bold]Step 3/15: Embedding Configuration[/bold]")
     if Confirm.ask("Configure embedding provider?", default=True):
         embeddings = await prompt_embedding_config()
     else:
         embeddings = {"provider": "local"}
 
     # Step 4: API keys
-    console.print("\n[bold]Step 4/13: API Keys (Optional)[/bold]")
+    console.print("\n[bold]Step 4/15: API Keys (Optional)[/bold]")
     if Confirm.ask("Configure API keys?", default=False):
         api_keys = await prompt_api_keys()
     else:
         api_keys = {"perplexity": "", "nia": "", "braintrust": ""}
 
     # Step 5: Generate .env
-    console.print("\n[bold]Step 5/13: Generating configuration...[/bold]")
+    console.print("\n[bold]Step 5/15: Generating configuration...[/bold]")
     config = {"database": db_config, "embeddings": embeddings, "api_keys": api_keys}
     env_path = Path.cwd() / ".env"
     generate_env_file(config, env_path)
@@ -627,7 +748,7 @@ async def run_setup_wizard() -> None:
 
     # Step 5: Container stack (Sandbox Infrastructure)
     runtime = prereqs.get("container_runtime", "docker")
-    console.print(f"\n[bold]Step 6/13: Container Stack (Sandbox Infrastructure)[/bold]")
+    console.print(f"\n[bold]Step 6/15: Container Stack (Sandbox Infrastructure)[/bold]")
     console.print("  The sandbox requires PostgreSQL and Redis for:")
     console.print("  - Agent coordination and scheduling")
     console.print("  - Build cache and LSP index storage")
@@ -655,7 +776,7 @@ async def run_setup_wizard() -> None:
             console.print(f"  You can start manually with: {runtime} compose up -d")
 
     # Step 6: Migrations
-    console.print("\n[bold]Step 7/13: Database Setup[/bold]")
+    console.print("\n[bold]Step 7/15: Database Setup[/bold]")
     if Confirm.ask("Run database migrations?", default=True):
         from scripts.setup.docker_setup import run_migrations, set_container_runtime
 
@@ -668,7 +789,7 @@ async def run_setup_wizard() -> None:
             console.print(f"  [red]ERROR[/red] {result.get('error', 'Unknown error')}")
 
     # Step 7: Claude Code Integration
-    console.print("\n[bold]Step 8/13: Claude Code Integration[/bold]")
+    console.print("\n[bold]Step 8/15: Claude Code Integration[/bold]")
     from scripts.setup.claude_integration import (
         analyze_conflicts,
         backup_claude_dir,
@@ -856,14 +977,88 @@ async def run_setup_wizard() -> None:
         else:
             console.print(f"  [dim]CLAUDE_OPC_DIR already in {shell_config.name}[/dim]")
     elif sys.platform == "win32":
-        console.print("  [yellow]NOTE[/yellow] Add to your environment:")
-        console.print(f'       set CLAUDE_OPC_DIR="{opc_dir}"')
+        import subprocess as _sp
+        opc_dir_str = str(opc_dir).replace("\\", "/")
+        result = _sp.run(["setx", "CLAUDE_OPC_DIR", opc_dir_str], capture_output=True, text=True)
+        if result.returncode == 0:
+            console.print(f"  [green]OK[/green] Set CLAUDE_OPC_DIR={opc_dir_str} (permanent user env var)")
+        else:
+            console.print(f"  [yellow]WARN[/yellow] Could not set CLAUDE_OPC_DIR automatically.")
+            console.print(f'       Manually run: setx CLAUDE_OPC_DIR "{opc_dir_str}"')
+        # Also set for current process
+        os.environ["CLAUDE_OPC_DIR"] = opc_dir_str
+        # Set PYTHONUTF8 for Windows (prevents cp1252 encoding crashes)
+        result = _sp.run(["setx", "PYTHONUTF8", "1"], capture_output=True, text=True)
+        if result.returncode == 0:
+            console.print("  [green]OK[/green] Set PYTHONUTF8=1 (prevents encoding crashes)")
+        else:
+            console.print("  [yellow]WARN[/yellow] Could not set PYTHONUTF8 automatically.")
+            console.print('       Manually run: setx PYTHONUTF8 1')
+        os.environ["PYTHONUTF8"] = "1"
     else:
         console.print("  [yellow]NOTE[/yellow] Add to your shell config:")
         console.print(f'       export CLAUDE_OPC_DIR="{opc_dir}"')
 
-    # Step 8: Math Features (Optional)
-    console.print("\n[bold]Step 9/13: Math Features (Optional)[/bold]")
+    # Step 8: Behavioral Configuration (CLAUDE.md / RULES.md)
+    console.print("\n[bold]Step 9/15: Behavioral Configuration (CLAUDE.md / RULES.md)[/bold]")
+    console.print("  CLAUDE.md and RULES.md define Claude Code's behavior:")
+    console.print("    - Philosophy, communication style, code standards")
+    console.print("    - Severity system, security constraints, workflow enforcement")
+    console.print("    - Agent delegation, skill enforcement, session continuity")
+    console.print("")
+    console.print("  [dim]Existing files are preserved (your customizations are safe).[/dim]")
+
+    # Locate templates relative to the repo root (one level above opc/)
+    repo_root = _project_root.parent  # _project_root is opc/, go up to repo root
+    templates_dir = repo_root / ".claude" / "templates"
+
+    if not templates_dir.exists():
+        console.print(f"  [yellow]WARN[/yellow] Templates directory not found: {templates_dir}")
+        console.print("  Skipping behavioral configuration.")
+    else:
+        docker_path = detect_docker_path()
+        console.print(f"  Docker path: {docker_path}")
+
+        bc_result = install_behavioral_config(templates_dir, claude_dir, docker_path)
+
+        if bc_result["claude_md_installed"]:
+            console.print("  [green]OK[/green] Generated CLAUDE.md from template")
+        elif bc_result["claude_md_skipped"]:
+            console.print("  [dim]CLAUDE.md already exists (preserved)[/dim]")
+        elif bc_result.get("claude_md_error"):
+            console.print(f"  [yellow]WARN[/yellow] CLAUDE.md: {bc_result['claude_md_error']}")
+
+        if bc_result["rules_md_installed"]:
+            console.print("  [green]OK[/green] Generated RULES.md from template")
+        elif bc_result["rules_md_skipped"]:
+            console.print("  [dim]RULES.md already exists (preserved)[/dim]")
+        elif bc_result.get("rules_md_error"):
+            console.print(f"  [yellow]WARN[/yellow] RULES.md: {bc_result['rules_md_error']}")
+
+    # Step 9: Git Hook Installation
+    console.print("\n[bold]Step 10/15: Git Hook Installation[/bold]")
+    repo_root_for_hook = _project_root.parent  # opc/../ = repo root
+    git_hooks_dir = repo_root_for_hook / ".git" / "hooks"
+    hook_src = repo_root_for_hook / "scripts" / "post-commit-hook.sh"
+
+    if git_hooks_dir.is_dir():
+        hook_dst = git_hooks_dir / "post-commit"
+        if hook_dst.exists():
+            console.print("  [dim]post-commit hook already installed (skipped)[/dim]")
+        elif not hook_src.exists():
+            console.print(f"  [yellow]WARN[/yellow] Source hook not found: {hook_src}")
+        else:
+            try:
+                shutil.copy2(str(hook_src), str(hook_dst))
+                os.chmod(str(hook_dst), 0o755)
+                console.print("  [green]OK[/green] Installed post-commit hook (auto-sync to ~/.claude/)")
+            except OSError as e:
+                console.print(f"  [yellow]WARN[/yellow] Could not install hook: {e}")
+    else:
+        console.print("  [dim]Not a git repo or .git/hooks missing (skipped)[/dim]")
+
+    # Step 10: Math Features (Optional)
+    console.print("\n[bold]Step 11/15: Math Features (Optional)[/bold]")
     console.print("  Math features include:")
     console.print("    - SymPy: symbolic algebra, calculus, equation solving")
     console.print("    - Z3: SMT solver for constraint satisfaction & proofs")
@@ -921,8 +1116,8 @@ async def run_setup_wizard() -> None:
         console.print("  Skipped math features")
         console.print("  [dim]Install later with: uv sync --extra math[/dim]")
 
-    # Step 9: TLDR Code Analysis Tool
-    console.print("\n[bold]Step 10/13: TLDR Code Analysis Tool[/bold]")
+    # Step 11: TLDR Code Analysis Tool
+    console.print("\n[bold]Step 12/15: TLDR Code Analysis Tool[/bold]")
     console.print("  TLDR provides token-efficient code analysis for LLMs:")
     console.print("    - 95% token savings vs reading raw files")
     console.print("    - 155x faster queries with daemon mode")
@@ -1080,8 +1275,8 @@ async def run_setup_wizard() -> None:
                 if strip_tldr_hooks_from_settings(settings_path):
                     console.print("  [green]OK[/green] TLDR hooks disabled")
 
-    # Step 10: Diagnostics Tools (Shift-Left Feedback)
-    console.print("\n[bold]Step 11/13: Diagnostics Tools (Shift-Left Feedback)[/bold]")
+    # Step 12: Diagnostics Tools (Shift-Left Feedback)
+    console.print("\n[bold]Step 13/15: Diagnostics Tools (Shift-Left Feedback)[/bold]")
     console.print("  Claude gets immediate type/lint feedback after editing files.")
     console.print("  This catches errors before tests run (shift-left).")
     console.print("")
@@ -1118,8 +1313,8 @@ async def run_setup_wizard() -> None:
     console.print("  [dim]Note: Currently only Python diagnostics are wired up.[/dim]")
     console.print("  [dim]TypeScript, Go, Rust coming soon.[/dim]")
 
-    # Step 11: Loogle (Lean 4 type search for /prove skill)
-    console.print("\n[bold]Step 12/13: Loogle (Lean 4 Type Search)[/bold]")
+    # Step 13: Loogle (Lean 4 type search for /prove skill)
+    console.print("\n[bold]Step 14/15: Loogle (Lean 4 Type Search)[/bold]")
     console.print("  Loogle enables type-aware search of Mathlib theorems:")
     console.print("    - Used by /prove skill for theorem proving")
     console.print("    - Search by type signature (e.g., 'Nontrivial _ ↔ _')")

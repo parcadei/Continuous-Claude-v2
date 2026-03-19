@@ -1,0 +1,575 @@
+{
+  "env": {
+    "CONTINUOUS_CLAUDE_COORDINATION": "true",
+    "ENABLE_TOOL_SEARCH": "auto:5",
+    "CLAUDE_OPC_DIR": "{{OPC_DIR}}",
+    "DATABASE_URL": "postgresql://claude:claude_dev@127.0.0.1:5432/continuous_claude"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "EnterPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/pre-plan-memory.mjs",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/agent-validate.mjs",
+            "timeout": 3000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/explore-to-scout.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/no-haiku-enforcer.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/navigator-validate.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/task-router.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/ralph-template-inject.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/maestro-enforcer.mjs",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/pre-tool-knowledge.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/tldr-context-inject.mjs",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/smart-search-router.mjs",
+            "timeout": 30000
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/tldr-read-enforcer.mjs",
+            "timeout": 30000
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/ralph-delegation-enforcer.mjs",
+            "timeout": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/navigator-safety.mjs",
+            "timeout": 3000
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/plan-to-ralph-enforcer.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/file-claims.mjs",
+            "timeout": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "TaskUpdate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/test-before-done.mjs",
+            "timeout": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "Skill",
+        "hooks": []
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/heartbeat.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/maestro-state-manager.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/guardrail-enforcer.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/skill-activation-prompt.mjs",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/memory-awareness.mjs",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/pageindex-navigator.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/maestro-detector.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/user-confirmation-detector.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/ralph-watchdog.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/ralph-progress-inject.mjs",
+            "timeout": 3000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/ralph-retry-reminder.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "python {{CLAUDE_HOME}}/hooks/braintrust_hooks.py user_prompt_submit",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/session-start-docker.mjs",
+            "timeout": 30000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/session-register.mjs",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/session-start-continuity.mjs",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/session-start-init-check.mjs",
+            "timeout": 15000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/session-start-recovery.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "python {{CLAUDE_HOME}}/hooks/braintrust_hooks.py session_start",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/roadmap-reconcile.mjs",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/session-start-tldr-cache.mjs",
+            "timeout": 15000
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/pre-compact-extract.mjs",
+            "timeout": 15000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/pre-compact-continuity.mjs",
+            "timeout": 15000
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/maestro-cleanup.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/session-end-extract.mjs",
+            "timeout": 15000
+          },
+          {
+            "type": "command",
+            "command": "python {{CLAUDE_HOME}}/hooks/braintrust_hooks.py session_end",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "python {{CLAUDE_HOME}}/hooks/braintrust_hooks.py stop",
+            "timeout": 15000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/session-outcome.mjs",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python {{CLAUDE_HOME}}/hooks/braintrust_hooks.py post_tool_use",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/agent-error-capture.mjs",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/agent-verification.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/ralph-task-monitor.mjs",
+            "timeout": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "Grep|Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/epistemic-reminder.mjs",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/post-plan-roadmap.mjs",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/plan-exit-tracker.mjs",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "TaskUpdate|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/roadmap-completion.mjs",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/git-commit-roadmap.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/ralph-monitor.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/test-run-tracker.mjs",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|Bash|TaskUpdate",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/smarter-everyday.mjs",
+            "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/prd-roadmap-sync.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/sync-to-repo.mjs",
+            "timeout": 15000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/git-auto-commit.mjs",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/tree-invalidate.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/pageindex-watch.mjs",
+            "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/auto-build.mjs",
+            "timeout": 10000
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/import-validator.mjs",
+            "timeout": 10000
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node {{CLAUDE_HOME}}/hooks/dist/periodic-extract.mjs",
+            "timeout": 2000
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "node {{CLAUDE_HOME}}/plugins/claude-hud/launcher.mjs"
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true,
+    "claude-hud@claude-hud": true,
+    "braintrust@braintrust-claude-plugin": true,
+    "trace-claude-code@braintrust-claude-plugin": true
+  },
+  "alwaysThinkingEnabled": true,
+  "skipDangerousModePermissionPrompt": true,
+  "autoCompact": false,
+  "allowedTools": [],
+  "warningLevel": "medium",
+  "mcpServers": {
+    "git": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "mcp-server-git",
+        "--repository",
+        "."
+      ]
+    },
+    "fetch": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "mcp-server-fetch"
+      ]
+    },
+    "firecrawl": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "env": {
+        "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
+      },
+      "disabled": true
+    },
+    "morph": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@morphllm/morphmcp"
+      ],
+      "env": {
+        "MORPH_API_KEY": "${MORPH_API_KEY}"
+      },
+      "disabled": true
+    },
+    "perplexity": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@perplexity-ai/mcp-server"
+      ],
+      "env": {
+        "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}"
+      },
+      "disabled": true
+    },
+    "nia": {
+      "type": "stdio",
+      "command": "pipx",
+      "args": [
+        "run",
+        "--no-cache",
+        "nia-mcp-server"
+      ],
+      "env": {
+        "NIA_API_KEY": "${NIA_API_KEY}",
+        "NIA_API_URL": "https://apigcp.trynia.ai/"
+      },
+      "disabled": true
+    },
+    "ast-grep": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@anthropic/mcp-ast-grep"
+      ],
+      "disabled": true
+    },
+    "repoprompt": {
+      "type": "stdio",
+      "command": "repoprompt_cli",
+      "args": [],
+      "disabled": true
+    },
+    "qlty": {
+      "type": "stdio",
+      "command": "{{CLAUDE_HOME}}/venv/bin/python",
+      "args": [
+        "{{CLAUDE_HOME}}/servers/qlty/server.py"
+      ],
+      "disabled": true
+    },
+    "pageindex": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@pageindex/mcp"
+      ]
+    }
+  },
+  "effortLevel": "high"
+}

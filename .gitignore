@@ -170,7 +170,7 @@ opc/spec/
 opc/packages/
 opc/migrations/
 opc/pyproject.toml
-opc/uv.lock
+# opc/uv.lock  # tracked in git for reproducible installs
 opc/README.md
 opc/LICENSE
 opc/.git/

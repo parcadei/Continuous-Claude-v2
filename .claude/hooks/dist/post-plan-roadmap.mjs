@@ -89,9 +89,10 @@ function isContentRelevantToProject(content, identity) {
   return { relevant: true, confidence: "low", reason: "no cross-project signals" };
 }
 function readRegistry(projectDir) {
+  const home = process.env.HOME || process.env.USERPROFILE || "";
   const candidates = [
     path.join(projectDir, ".claude", "project-registry.json"),
-    "C:/Users/david.hayes/continuous-claude/.claude/project-registry.json"
+    ...home ? [path.join(home, "continuous-claude", ".claude", "project-registry.json").replace(/\\/g, "/")] : []
   ];
   for (const candidate of candidates) {
     try {

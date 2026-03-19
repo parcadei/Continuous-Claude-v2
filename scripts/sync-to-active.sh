@@ -125,10 +125,11 @@ if [[ -d "$TEMPLATES_SRC" ]]; then
     done
 fi
 
-# Sync scripts/ralph/*.py (only if target directory already exists)
+# Sync scripts/ralph/*.py (create target directory if needed for fresh installs)
 RALPH_SRC="$REPO_CLAUDE/scripts/ralph"
 RALPH_DST="$ACTIVE_CLAUDE/scripts/ralph"
-if [[ -d "$RALPH_SRC" && -d "$RALPH_DST" ]]; then
+if [[ -d "$RALPH_SRC" ]]; then
+    $DRY_RUN || mkdir -p "$RALPH_DST"
     for src_file in "$RALPH_SRC"/*.py; do
         [[ ! -f "$src_file" ]] && continue
         local_name=$(basename "$src_file")
@@ -140,8 +141,6 @@ if [[ -d "$RALPH_SRC" && -d "$RALPH_DST" ]]; then
             $VERBOSE && echo "Copied: scripts/ralph/$local_name" || true
         fi
     done
-elif [[ -d "$RALPH_SRC" && ! -d "$RALPH_DST" ]]; then
-    $VERBOSE && echo "Skipped: scripts/ralph/ (target directory does not exist)" || true
 fi
 
 if ! $DRY_RUN && ! $SKIP_BUILD; then

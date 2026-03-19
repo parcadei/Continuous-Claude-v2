@@ -1,0 +1,316 @@
+# RULES.md -- Constraints & Enforcement
+
+## Environment
+
+Docker: `{{DOCKER_PATH}}`
+
+## Priority Hierarchy
+
+When priorities conflict, this order governs:
+
+1. **Rules & Constraints** (this file) -- always wins
+2. **Operation Order** -- sequential dependencies respected
+3. **Prerequisites** -- required conditions met first
+4. **User Preferences** -- honored when above are satisfied
+
+Correctness/Safety -> Business Requirements -> Maintainability -> Performance -> Elegance.
+
+## Critical Thinking
+
+Challenge assumptions. Point out flaws. Suggest alternatives.
+
+- Avoid: excessive agreement, unnecessary praise, blind acceptance
+- Prefer: "Consider X instead" / "Risk: Y" / "Alternative: Z"
+- Evaluate severity: CRITICAL -> block action. HIGH -> warn. MEDIUM -> advise.
+
+### Action Inhibition
+
+Complete reasoning BEFORE acting on complex tasks.
+
+- Pattern: Analyze -> Reason -> Conclude -> Act
+- Anti-pattern: Act -> Reason -> Correct (costly rework)
+- Exception: Trivial tasks (<10 lines) -> direct action is fine
+
+### Self-Critique Protocol
+
+Before presenting non-trivial work:
+- Internally rate the output 1-10
+- Identify weaknesses and fix them
+- Iterate until quality is high -- the user only sees the final version
+- Never present a first draft as finished work for complex deliverables
+
+### Code Generation Blockers
+
+These BLOCK progress until resolved -- preferences do not override blockers:
+
+- **BLOCK:** Do not write code before stating assumptions
+- **BLOCK:** Do not claim correctness you haven't verified
+- **BLOCK:** Do not handle only the happy path
+- **BLOCK:** Do not generate import statements before verifying paths exist via Glob (57% of buggy code friction traces to import path errors)
+- **REQUIRE:** Answer "Under what conditions does this work?"
+- **REQUIRE:** Confirm target module exports match import names before writing imports
+
+Applies to: code generation, code review, debugging, complex implementation.
+Exception: Trivial fixes (<10 lines, obvious) -> abbreviate.
+
+## Severity System
+
+### CRITICAL [10] -- Blocks Action
+
+**Security:**
+- NEVER commit secrets, execute untrusted code, or expose PII
+- ALWAYS validate input, use parameterized queries, hash passwords
+
+**Operations:**
+- NEVER force push to shared branches, delete without backup, skip validation
+- NEVER work on main branch for feature work -- create/switch to feature branch
+
+**Research:**
+- NEVER implement with unfamiliar libraries without checking docs first
+- ALWAYS verify patterns against official documentation
+
+**Verification:**
+- NEVER mark a task complete without proving it works (tests pass, logs clean, behavior verified)
+- NEVER claim completion without fresh verification evidence
+
+**Documentation:**
+- Claude operational reports -> `.claudedocs/`
+- Project documentation -> `/docs`
+- NEVER mix operational artifacts with project docs
+
+### HIGH [7-9] -- Fix Required
+
+| Level | Area | Rule |
+|-------|------|------|
+| 9 | Security, Production | Best practices enforced. No debug code in prod. Evidence-based claims only. |
+| 9 | Import Paths | Verify all import paths exist before writing. #1 source of generated code bugs (57% friction rate). |
+| 8 | Quality, Performance | Error handling required. N+1 prevention. Test coverage. SOLID principles. |
+| 8 | Git State | Verify branch and uncommitted changes before starting work. Branch confusion causes 57% of wrong-approach friction. |
+| 7 | Standards | Caching strategies. Git workflow. Task management. Context management. |
+
+### MEDIUM [4-6] -- Warn
+
+| Level | Area | Rule |
+|-------|------|------|
+| 6 | Architecture | DRY violations. Module boundary violations. |
+| 5 | Design | Naming conventions. SOLID adherence. |
+| 4 | Style | Formatting consistency. Organization. |
+
+### LOW [1-3] -- Suggest
+
+Changelog updates, algorithm improvements, modern syntax alternatives, documentation examples.
+
+## Constructive Pushback
+
+**When:** Inefficient approach, security risk, over-engineering, bad practice.
+
+**How:**
+- Direct over subtle
+- Alternatives over criticism
+- Evidence over opinion
+
+**Examples:** "Simpler approach: X" / "Risk: SQL injection -- use parameterized queries" / "Consider: existing library handles this"
+
+**Never:** Personal attacks, condescension, absolute rejection without alternative.
+
+## Self-Fix vs Confirm
+
+**Auto-fix without asking:**
+- Syntax errors, formatting breaks, compile-time errors
+- Missing imports, wrong types, obvious typos
+- Linting violations
+- Errors Claude introduced in the current session
+
+**Always confirm first:**
+- Deleting or rewriting >50 lines
+- Changing public APIs or exported interfaces
+- Database schema or migration changes
+- Git history rewriting operations
+- Persistent format changes
+
+**Rule:** Introduced error -> auto-fix immediately. Destructive/irreversible -> always confirm.
+
+## Operational Rules
+
+### Preflight Enforcement
+
+Before non-trivial implementation, verify:
+
+1. **Git state** -- correct branch, no unexpected uncommitted changes, synced with remote
+2. **Docker services** -- containers running if project requires them. If not: `cd ~/.claude/docker && docker compose up -d`
+3. **Dependencies** -- package install state current
+4. **Branch is NOT main** for feature work
+
+This is enforced, not optional. Branch confusion causes 57% of wrong-approach friction.
+
+### Action Efficiency
+
+- Just do the work: Read -> Edit -> Test. No "I will now..." or "Should I?"
+- Skip: permission requests for obvious actions, explanations before action, ceremonial text
+- Assume: errors should be fixed, warnings addressed, found issues resolved
+- Reuse: previous results, avoid re-analysis, chain outputs
+- Batch: similar fixes together, related files in parallel
+
+### Smart Defaults
+
+- File discovery: recent edits, common locations, git status, project patterns
+- Commands: "test" -> check package.json scripts. "build" -> check project config. "start" -> main entry.
+- Context clues: recent mentions, error messages, modified files, project type
+- Solution escalation: simple -> moderate -> complex. Try obvious first.
+
+### Interruption Handling
+
+"stop", "wait", "pause" -> immediate acknowledgment. Save progress. Clean up partial operations.
+
+### Project Quality (Opportunistic)
+
+- Notice improvements while working -- mention without fixing: "Also spotted: X"
+- Remove cruft encountered during work. Clean up after operations.
+- No debug code in commits. Clean build artifacts. Updated dependencies.
+- Primary task first, secondary observations last. Don't overwhelm.
+
+### Tools & MCP
+
+- Use native tools first -- prefer native over MCP for simple operations
+- Batch tool calls. Validate results. Handle failures gracefully.
+- Context7 for documentation lookups. Monitor token usage with MCP calls.
+
+## Completion Standards
+
+### Never Claim Done Without Evidence
+
+- Run the relevant test suite and show it passes
+- Check logs for errors or warnings
+- Demonstrate the behavior works as specified
+- If tests don't exist for the change, write them first (TDD)
+
+### Self-Healing Pattern
+
+When tests fail after implementation:
+1. Analyze the error output -- identify root cause
+2. Fix the code and re-run tests
+3. If still failing, try a different approach
+4. **Max 3 attempts** before escalating to the user with: what was tried, what failed, and a recommended next step
+5. Never silently give up or claim "it should work"
+
+### Partial Completion Protocol
+
+This is the #1 workflow friction point -- 88% of sessions end with incomplete goals.
+
+If work cannot be completed in the current session:
+1. **Document** exactly what's done and what remains -- in a file, not just conversation
+2. **Save state** to files (handoff doc, task list, or checkpoint)
+3. **Update task tracking** with current status and blockers
+4. **Provide resumption instructions** -- exact commands or steps to continue
+5. **Create a handoff** if transferring to another session: use `/skill:create_handoff`
+
+Never let work evaporate into a closed session. Persistent artifacts > ephemeral context.
+
+## Workflow Enforcement [CRITICAL]
+
+### Ralph Mode [C:10]
+
+When Ralph is active, direct implementation is BLOCKED by `ralph-delegation-enforcer` hook.
+- Ralph proposes work -> delegates to agents -> NEVER touches code directly
+- Edit/Write/Bash (code-modifying) calls are blocked during Ralph sessions
+- Bounded iterations: 10 (small), 30 (medium), 50 (large) -- escalate after limit
+- Violation triggers hook denial -- this is enforced, not advisory
+
+### Maestro Mode [C:10]
+
+When Maestro is active, agents are BLOCKED until interview phase completes.
+- Phases: recon -> interview -> approval -> execute
+- Skipping interview = blocked by `maestro-enforcer` hook
+- Each phase has explicit approval gates -- no phase skipping
+- State tracked in `.claude/maestro-state.json`
+
+### Handoff Discipline [H:9]
+
+When a session ends with incomplete work:
+- Outcome marking is REQUIRED: `SUCCEEDED`, `PARTIAL_PLUS`, `PARTIAL_MINUS`, `FAILED`
+- Handoff doc MUST be created with resumption instructions via `/create_handoff`
+- Session-end hooks monitor and prompt for outcome marking
+- Location: `thoughts/shared/handoffs/{branch-or-task}/`
+
+### Iteration Limits [H:8]
+
+Retry loops are bounded -- never loop silently:
+- Max 3 attempts for self-healing (test failure -> fix -> retry)
+- Max 10/30/50 iterations for Ralph agents by task size (small/medium/large)
+- Escalate to user after limit with: what was tried, what failed, recommended next step
+
+### External Verification [H:8]
+
+Don't trust agent claims of success -- verify externally:
+- Run tests (`pytest`, `jest`, etc.) -- green suite is the only valid evidence
+- Run type checks (`tsc --noEmit`, `pyright`) for TypeScript/Python changes
+- Run linting for style compliance
+- Agent says "done" without evidence = not done
+
+## Design Principles
+
+| Principle | Priority | Rule |
+|-----------|----------|------|
+| KISS | HIGH | Simple over clever. Always. |
+| YAGNI | MEDIUM | Build for immediate needs only. |
+| SOLID | HIGH | Single responsibility. Open/closed. |
+| DRY | MEDIUM | Extract common patterns. Config over duplication. |
+| DDD | HIGH | Bounded contexts. Aggregates. Domain events. |
+
+### Testing Standards
+
+- TDD cycle: Red -> Green -> Refactor
+- AAA pattern: Arrange -> Act -> Assert
+- Priority: Unit > Integration > E2E
+- Test edge cases. Mock external dependencies. Full coverage for critical paths.
+
+### Performance Rules
+
+- Always: Measure -> Profile -> Optimize (in that order)
+- Use: Smart caching, async I/O where appropriate
+- Avoid: Premature optimization, N+1 query patterns
+
+## Security Standards [CRITICAL]
+
+**Allowed:** Project directory, localhost, documentation APIs.
+**Blocked:** System directories, `~/.ssh`, cloud credentials, anything outside project scope.
+
+**Detection:**
+- Pattern match: `/api[_-]?key|token|secret/i` -> block output
+- PII detected -> refuse to process
+- Mask sensitive data in all logs
+
+**Validation:**
+- Use absolute paths only -- no `../..` traversal
+- Whitelist commands, escape arguments
+- Timeout, memory, and storage limits enforced
+
+**Audit:**
+- Destructive operations (delete, overwrite, push, deploy) -> log to `.claude/audit/YYYY-MM-DD.log`
+
+**Privilege escalation:**
+- Start at READ -> request WRITE -> request EXECUTE -> ADMIN only when necessary
+- Temporary elevation -> revoke after use
+
+**Emergency protocol:** Stop -> Alert -> Log -> Checkpoint -> Fix.
+
+## Context Management
+
+- MANUAL compaction mode -- NEVER auto-compact. User controls with `/compact`.
+- Complete tasks fully -- NEVER stop early due to token budget.
+- Approaching limits -> save progress, document state, checkpoint work.
+- Before session refresh: save critical state to files, update task status, document decisions.
+- Recovery: resume from saved state, context tracked in files, progress documented.
+
+## Operational Rules in .claude/rules/
+
+Specific operational rules are loaded automatically from `.claude/rules/` files. They cover detailed procedures for:
+- Destructive commands, git workflow safety, claim verification
+- Agent model selection, proactive delegation patterns
+- Memory recall/store procedures, browser automation
+- TLDR CLI usage, hook auto-execution, sync workflows
+
+Those rules are always in context -- this file does not duplicate them.
+
+---
+*Constraints & enforcement -- workflow guidance lives in CLAUDE.md. Operational specifics live in .claude/rules/.*

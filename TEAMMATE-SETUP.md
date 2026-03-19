@@ -19,6 +19,8 @@ python --version
 uv --version
 ```
 
+> **Note**: The setup wizard (`uv run python -m scripts.setup.wizard` from the `opc/` directory) handles Docker setup, database migrations, hook installation, and environment variable configuration automatically. You do not need to run any `npm install` or separate configuration steps.
+
 ---
 
 ## Quick Start (5 Steps)
@@ -58,30 +60,34 @@ docker ps | grep continuous-claude-postgres
 ### 4. Run Setup Wizard
 
 ```bash
-npm install
-npm run setup
+cd opc
+uv run python -m scripts.setup.wizard
 ```
 
-The wizard will:
-- Check Docker connectivity
-- Create database tables
-- Install Python dependencies
-- Verify daemon configuration
+The wizard handles everything automatically:
+- Docker connectivity check
+- Database table creation and migrations
+- Python dependency installation
+- Hook installation to `~/.claude/hooks/`
+- Environment variable configuration
 
 ### 5. Verify Installation
 
 ```bash
-# Check session status
-npm run status
+# Check Docker is running
+docker ps | grep continuous-claude-postgres
 
-# Check daemon
-npm run daemon:status
+# Check hooks are built
+ls ~/.claude/hooks/dist/*.mjs | wc -l
+
+# Check CLAUDE.md exists
+ls ~/.claude/CLAUDE.md
 ```
 
 You should see:
-- Active sessions (if any Claude instances running)
-- Daemon status (running/stopped)
-- Last memory extraction time
+- The postgres container listed
+- A count of `.mjs` hook files (typically 30+)
+- The path to your CLAUDE.md confirmed
 
 ---
 
@@ -108,20 +114,20 @@ Windows uses backslashes (`\`) but the codebase expects forward slashes (`/`) in
 
 **PowerShell** (recommended):
 ```powershell
-npm run setup
-npm run daemon:start
+cd opc
+uv run python -m scripts.setup.wizard
 ```
 
 **Git Bash**:
 ```bash
-npm run setup
-npm run daemon:start
+cd opc
+uv run python -m scripts.setup.wizard
 ```
 
 **CMD** (works but limited):
 ```cmd
-npm run setup
-npm run daemon:start
+cd opc
+uv run python -m scripts.setup.wizard
 ```
 
 ---

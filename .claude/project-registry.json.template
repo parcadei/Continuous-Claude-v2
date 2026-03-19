@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "projects": [
+    {
+      "name": "continuous-claude",
+      "path": "{{REPO_ROOT}}",
+      "stack": ["TypeScript", "Node.js", "PostgreSQL", "esbuild"],
+      "description": "Claude Code infrastructure -- hooks, skills, agents, memory",
+      "port": null,
+      "url": null,
+      "devCommand": null,
+      "status": "active"
+    }
+  ]
+}
