@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "scripts": {
+    "test:e2e": "npx playwright test",
+    "test:e2e:headed": "npx playwright test --headed",
+    "test:e2e:debug": "npx playwright test --debug",
+    "test:e2e:codegen": "npx playwright codegen",
+    "test:e2e:report": "npx playwright show-report",
+    "test:e2e:trace": "npx playwright show-trace"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "playwright": "^1.58.2"
+  }
+}

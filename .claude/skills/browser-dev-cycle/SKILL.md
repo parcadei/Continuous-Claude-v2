@@ -1,9 +1,9 @@
 ---
 name: browser-dev-cycle
-description: Full development cycle browser automation - viewing, debugging, testing, and visual inspection of web apps. Three-tier strategy using @playwright/mcp (MCP tools), Chrome DevTools MCP (performance), and Playwright-core (scripting). Triggers on "browse", "browser", "screenshot", "viewport", "performance trace", "network debug", "visual QA", "responsive test".
+description: Full development cycle browser automation for viewing, debugging, testing, and visual inspection of web apps. Four-tier strategy: @playwright/mcp (interaction), Chrome DevTools MCP (performance), Playwright-core (scripting), and Playwright CLI (e2e test suites). Use when users need to browse, take screenshots, debug network/performance, run e2e tests, record tests with codegen, or do visual QA. Triggers on "browser", "screenshot", "viewport", "performance trace", "network debug", "visual QA", "responsive test", "e2e test", "playwright test", "codegen", "test suite".
 ---
 
-# Browser Dev Cycle: Three-Tier Automation Strategy
+# Browser Dev Cycle: Four-Tier Automation Strategy
 
 Comprehensive browser automation covering interaction, performance analysis, and scripted testing. Use the lightest tier that gets the job done.
 
@@ -26,6 +26,7 @@ Comprehensive browser automation covering interaction, performance analysis, and
 | State save / restore | Tier 3 | Playwright-core scripts |
 | Multi-page orchestration | Tier 3 | Playwright-core scripts |
 | Visual regression | Tier 1 + Tier 3 | Screenshot compare |
+| Write/run E2E test suites | Tier 4 | Playwright CLI |
 
 ### ASCII Decision Tree
 
@@ -44,6 +45,10 @@ What do you need?
 |   +-> Tier 3: Playwright-core CDP scripts
 |       Full Playwright API via CDP connection. Write and run .mjs scripts.
 |
++-- Formal test suites / codegen / cross-browser
+|   +-> Tier 4: Playwright CLI
+|       Full test runner, codegen, traces, reports. Write and run .spec.ts files.
+|
 +-- Multiple of the above
     +-> Combine tiers as needed
 ```
@@ -53,6 +58,7 @@ What do you need?
 - **Start with Tier 1** for any interactive task — covers 80% of browser automation needs.
 - **Escalate to Tier 2** when you need performance metrics, network bodies, or computed CSS.
 - **Escalate to Tier 3** when you need programmatic control (loops, conditionals, mocking, recording).
+- **Escalate to Tier 4** when you need repeatable test suites, codegen recording, trace capture, or cross-browser testing.
 - **Tier 1 + Tier 2** can run against the same browser instance simultaneously via separate CDP sessions.
 - **Tier 3** scripts run as standalone Node.js processes and manage their own connections.
 
@@ -142,7 +148,26 @@ Full patterns and code examples: `references/tier3-scripting.md`
 
 ---
 
-## 5. Error Recovery
+## 5. TIER 4: Playwright CLI Testing
+
+Full Playwright test runner for formal E2E test suites, interactive codegen, and trace debugging.
+
+**Setup:** Already installed in continuous-claude (`npm install -D playwright @playwright/test && npx playwright install chromium`).
+
+**Key commands:**
+| Command | Use |
+|---------|-----|
+| `npm run test:e2e` | Run all tests |
+| `npm run test:e2e:headed` | Watch tests run visually |
+| `npm run test:e2e:debug` | Step through with inspector |
+| `npm run test:e2e:codegen` | Record interactions interactively |
+| `npm run test:e2e:report` | Open HTML test report |
+
+**Full reference:** See `references/tier4-cli-testing.md` for codegen workflow, Ralph integration, and when to use CLI vs MCP.
+
+---
+
+## 6. Error Recovery
 
 | Error | Cause | Recovery |
 |-------|-------|----------|
@@ -173,7 +198,7 @@ Recovery:
 
 ---
 
-## 6. Workbook Platform Patterns
+## 7. Workbook Platform Patterns
 
 Workbook-specific SPA patterns (Next.js on Railway):
 
@@ -186,7 +211,7 @@ Full patterns, breakpoints, known issues, and testing checklist: `references/wor
 
 ---
 
-## 7. Workflow Recipes
+## 8. Workflow Recipes
 
 Common multi-step workflows: Visual QA, API Debugging, Responsive Testing, Performance Profiling, State Management, End-to-End Feature Testing.
 
@@ -194,7 +219,7 @@ See: `references/workflow-recipes.md`
 
 ---
 
-## 8. Deprecation Notes
+## 9. Deprecation Notes
 
 | Deprecated Tool | Issue | Replacement |
 |----------------|-------|-------------|
@@ -213,6 +238,7 @@ The legacy `agent-browser` skill at `.claude/skills/agent-browser/SKILL.md` is p
 | `references/tier1-playwright-mcp.md` | Full tool tables, all parameters, modes, best practices |
 | `references/tier2-devtools.md` | Full tool tables, combined workflow, CWV targets |
 | `references/tier3-scripting.md` | Setup, code patterns, pre-built scripts |
+| `references/tier4-cli-testing.md` | Playwright CLI testing, codegen, Ralph integration |
 | `references/workflow-recipes.md` | Step-by-step recipes for common workflows |
 | `references/workbook-patterns.md` | Workbook SPA patterns, breakpoints, known issues |
 | `references/tool-comparison.md` | Capability matrix across all tools |

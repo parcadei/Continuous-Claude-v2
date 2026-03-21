@@ -99,6 +99,11 @@ session-env/
 telemetry/
 tldr/
 
+# Playwright test artifacts
+playwright-report/
+test-results/
+blob-report/
+
 # Tool caches
 .qlty/
 .ruff_cache/
