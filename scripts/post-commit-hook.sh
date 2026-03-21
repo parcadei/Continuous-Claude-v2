@@ -8,6 +8,6 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 SYNC_SCRIPT="$REPO_ROOT/scripts/sync-to-active.sh"
 
 if [[ -f "$SYNC_SCRIPT" ]]; then
-    echo "Syncing to ~/.claude..."
-    bash "$SYNC_SCRIPT" --skip-build
+    echo "Syncing to ~/.claude (background)..."
+    bash "$SYNC_SCRIPT" --skip-build &
 fi
