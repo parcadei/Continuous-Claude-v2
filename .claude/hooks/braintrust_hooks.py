@@ -177,23 +177,31 @@ def get_project_id(project_name: str) -> str | None:
 
 
 def insert_span(project_id: str, event: dict) -> str | None:
-    """Insert a span into Braintrust."""
+    """Insert a single span into Braintrust."""
+    result = batch_insert_spans(project_id, [event])
+    return result[0] if result else None
+
+
+def batch_insert_spans(project_id: str, events: list[dict]) -> list[str | None]:
+    """Insert multiple spans into Braintrust in a single API call."""
+    if not events:
+        return []
     try:
-        with httpx.Client(timeout=10) as client:
+        with httpx.Client(timeout=30) as client:
             resp = client.post(
                 f"{API_URL}/v1/project_logs/{project_id}/insert",
                 headers={
                     "Authorization": f"Bearer {API_KEY}",
                     "Content-Type": "application/json",
                 },
-                json={"events": [event]},
+                json={"events": events},
             )
             if resp.status_code == 200:
                 data = resp.json()
-                return data.get("row_ids", [None])[0]
+                return data.get("row_ids", [])
     except Exception as e:
-        log("ERROR", f"Failed to insert span: {e}")
-    return None
+        log("ERROR", f"Failed to batch insert {len(events)} spans: {e}")
+    return []
 
 
 # Hook implementations
@@ -432,8 +440,9 @@ def stop(input_data: dict) -> dict:
     # Get last processed line
     turn_last_line = get_session_value(session_id, "turn_last_line") or 0
 
-    # Process transcript
+    # Process transcript — collect events for batch insert
     llm_calls_created = 0
+    pending_events: list = []
     current_output_text = ""
     current_tool_calls: list = []
     current_model = ""
@@ -447,7 +456,7 @@ def stop(input_data: dict) -> dict:
     def create_llm_span(output_text: str, model: str, prompt_tokens: int,
                         completion_tokens: int, start_ts: str, end_ts: str,
                         tool_calls: list, input_history: list) -> bool:
-        """Create an LLM span in Braintrust."""
+        """Collect an LLM span event for batch insert."""
         nonlocal llm_calls_created
 
         if not output_text and not tool_calls:
@@ -491,11 +500,10 @@ def stop(input_data: dict) -> dict:
             },
         }
 
-        if insert_span(project_id, event):
-            llm_calls_created += 1
-            log("INFO", f"LLM span: {model} tokens={total_tokens} (turn={turn_span_id})")
-            return True
-        return False
+        pending_events.append(event)
+        llm_calls_created += 1
+        log("INFO", f"LLM span queued: {model} tokens={total_tokens} (turn={turn_span_id})")
+        return True
 
     # Read and process JSONL
     with open(conv_file, "r", encoding="utf-8", errors="replace") as f:
@@ -642,16 +650,18 @@ def stop(input_data: dict) -> dict:
                        current_start_timestamp, current_end_timestamp,
                        current_tool_calls, conversation_history.copy())
 
-    # Update turn span with end time
+    # Add turn finalization event to the batch
     end_time = int(datetime.now().timestamp())
     turn_update = {
         "id": turn_span_id,
         "_is_merge": True,
         "metrics": {"end": end_time},
     }
+    pending_events.append(turn_update)
 
-    log("DEBUG", f"Attempting turn finalization: turn={turn_span_id} project={project_id}")
-    insert_span(project_id, turn_update)
+    # Send all events in a single batch API call
+    log("DEBUG", f"Batch inserting {len(pending_events)} events: turn={turn_span_id} project={project_id}")
+    batch_insert_spans(project_id, pending_events)
 
     # Update state
     set_session_value(session_id, "turn_last_line", line_num)

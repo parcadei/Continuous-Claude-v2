@@ -83,34 +83,27 @@ function extractWithDedup(sessionId: string, projectDir: string, transcriptPath?
   if (transcriptPath && fs.existsSync(transcriptPath) && fs.existsSync(incrementalScript)) {
     const startLine = state?.last_extracted_line || 0;
 
-    console.error(`[SessionEnd:L3] Final sweep from line ${startLine} with dedup`);
+    console.error(`[SessionEnd:L3] Final sweep from line ${startLine} with dedup (fire-and-forget)`);
 
-    // Run incremental extraction for final sweep
-    const result = spawnSync('uv', [
+    // Run incremental extraction detached (don't block session end)
+    const child = spawn('uv', [
       'run', 'python', 'scripts/core/incremental_extract.py',
       '--transcript', transcriptPath,
       '--session-id', sessionId,
       '--start-line', startLine.toString(),
       '--state-file', stateFile,
       '--project-dir', projectDir,
-      '--max-learnings', '15',  // More generous at session end
+      '--max-learnings', '15',
       '--json'
     ], {
       cwd: opcDir,
-      encoding: 'utf-8',
+      detached: true,
+      stdio: 'ignore',
       env: { ...process.env, PYTHONPATH: opcDir },
-      timeout: 30000
     });
 
-    if (result.status === 0) {
-      try {
-        const data = JSON.parse(result.stdout.trim());
-        console.error(`[SessionEnd:L3] Extracted ${data.learnings_stored}, deduped ${data.learnings_deduped}`);
-      } catch {
-        console.error('[SessionEnd:L3] Extraction complete');
-      }
-      return;
-    }
+    child.unref();
+    return;
   }
 
   // Fallback to legacy extraction
