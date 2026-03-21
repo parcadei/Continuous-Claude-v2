@@ -1,55 +1,45 @@
 # Browser Automation Rules
 
-## Prerequisites [C:10]
-- ALWAYS call `tabs_context_mcp` first
-- ALWAYS create new tab for each conversation
-- NEVER reuse tabs from previous sessions
-- NEVER use stale refs without re-reading page
+## Tool Tiers
+
+| Tier | Tool | Use When |
+|------|------|----------|
+| 1 | @playwright/mcp | Default for all browser interaction -- navigate, click, screenshot, snapshot |
+| 2 | Chrome DevTools MCP | Performance traces, network debugging, memory snapshots, Lighthouse audits |
+| 3 | Playwright-core (scripting) | Complex multi-step flows, custom logic, when MCP tools are insufficient |
+| 4 | Playwright CLI | E2E test suites (`npx playwright test`), test recording (`npx playwright codegen`) |
+
+Load the `browser-dev-cycle` skill for full decision tree and tool reference.
+
+## Quick Start [H:8]
+
+1. Use `browser_navigate` to open a URL
+2. Use `browser_snapshot` to see the page (accessibility tree, not screenshot)
+3. Use `browser_click` / `browser_fill` / `browser_select_option` for interaction
+4. Use `browser_take_screenshot` for visual verification
+
+## Deprecated Tools [C:10]
+- `claude-in-chrome` (tabs_context_mcp, read_page, computer, form_input) -- DEPRECATED
+- Do NOT use these for new browser tasks
+- Legacy references in other files should be updated to @playwright/mcp
 
 ## Timing Rules [H:8]
 
 | After | Wait | Action |
 |-------|------|--------|
-| `navigate` (React) | 2s | `wait(2)` then `read_page` |
-| `navigate` (static) | 0.5s | `wait(0.5)` or immediate |
-| SPA route change | Re-read | Always `read_page` again |
-| `left_click` | 1s | Before verifying result |
-| "Detached" error | 1s | Then retry (succeeds) |
+| `browser_navigate` | Use `browser_wait_for` | Wait for network idle or specific element |
+| SPA route change | Re-snapshot | `browser_snapshot` to get fresh accessibility tree |
+| Form submission | 1-2s | Before verifying result |
 
 ## Error Recovery [H:9]
 
-| Error Message | Recovery |
-|---------------|----------|
-| "No element found with reference" | Re-read page, find element again |
-| "No tabs available" | `tabs_context_mcp`, create new tab |
-| "not a supported form input" | Use `computer({ action: "left_click" })` |
-| "Detached while handling" | `wait(1)`, retry action |
-| "OAuth token has expired" | Use refs from `read_page` instead |
-
-## Form Widget Rules [H:8]
-
-| Widget | Tool | Pattern |
-|--------|------|---------|
-| Text input | `form_input` | Standard |
-| Native checkbox | `form_input` | `value: true/false` |
-| Custom checkbox | `computer` | Click - NOT form_input |
-| Date picker | `form_input` | ISO: `"2026-01-15"` |
+| Error | Recovery |
+|-------|----------|
+| Element not found | Re-snapshot, find element in accessibility tree |
+| Page not loaded | Check URL, retry navigate |
+| Timeout | Increase wait, check if page requires auth |
 
 ## Anti-Patterns [C:10]
-- NEVER retry same failed action 3+ times without recovery
-- NEVER use stale refs without re-reading page
-- NEVER skip waits for React/SPA content
-- NEVER use `find()` for critical paths (OAuth errors)
-- NEVER use `form_input` on custom checkboxes
-
-## SPA Navigation [H:9]
-After any sidebar/menu click that changes route:
-1. `wait(1)`
-2. `read_page` (refs completely change)
-3. Find element again by text/role
-
-## Console Debugging [M:6]
-Call `read_console_messages` BEFORE triggering action to capture logs.
-
----
-*Generated from stress tests 2026-01-13*
+- NEVER use deprecated claude-in-chrome tools for new work
+- NEVER take screenshots when `browser_snapshot` (accessibility tree) would suffice
+- NEVER skip waits for dynamic content
