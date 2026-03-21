@@ -35,7 +35,7 @@ describe('web-lookup-advisor', () => {
       expect(detectWebFailure(input)).toBe(true);
     });
 
-    it('detects null/undefined response as failure', () => {
+    it('detects null response as failure', () => {
       const input = {
         session_id: SESSION,
         tool_name: 'WebFetch',
@@ -43,6 +43,26 @@ describe('web-lookup-advisor', () => {
         tool_response: null
       };
       expect(detectWebFailure(input)).toBe(true);
+    });
+
+    it('detects undefined response as failure', () => {
+      const input = {
+        session_id: SESSION,
+        tool_name: 'WebFetch',
+        tool_input: { url: 'https://example.com' },
+        tool_response: undefined
+      };
+      expect(detectWebFailure(input)).toBe(true);
+    });
+
+    it('does not false-positive on error field with non-string value', () => {
+      const input = {
+        session_id: SESSION,
+        tool_name: 'WebFetch',
+        tool_input: { url: 'https://example.com' },
+        tool_response: { status: 200, error: false, data: 'ok' }
+      };
+      expect(detectWebFailure(input)).toBe(false);
     });
 
     it('detects failure patterns in short error text', () => {

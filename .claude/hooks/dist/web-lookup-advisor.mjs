@@ -26,10 +26,9 @@ function detectWebFailure(input) {
   if (typeof response === "object" && response !== null) {
     const r = response;
     if (typeof r.status === "number" && r.status >= 400) return true;
-    if (r.error) return true;
+    if (typeof r.error === "string" && r.error.length > 0) return true;
   }
-  const responseStr = typeof response === "string" ? response : JSON.stringify(response);
-  if (FAILURE_PATTERNS.test(responseStr) && responseStr.length < 500) return true;
+  if (typeof response === "string" && FAILURE_PATTERNS.test(response) && response.length < 500) return true;
   return false;
 }
 function buildSuggestion(url) {

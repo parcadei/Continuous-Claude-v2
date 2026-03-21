@@ -16,6 +16,7 @@ Auth tiers: `public` (no login), `cookie` (browser cookies), `header` (CSRF/auth
 | Linux.do | `opencli linux-do` | cookie | Linux community forum |
 | Xiaohongshu | `opencli xiaohongshu` | intercept | Chinese lifestyle platform |
 | WeChat | `opencli wechat` | cookie | WeChat public accounts |
+| LinkedIn | `opencli linkedin` | cookie | Professional network, profiles, jobs |
 
 ### Twitter Examples
 
@@ -97,6 +98,7 @@ opencli reuters top -f json                   # Top news
 | BOSS Zhipin | `opencli boss` | cookie | Chinese job platform |
 | SMZDM | `opencli smzdm` | public | Chinese deals aggregator |
 | Ctrip | `opencli ctrip` | cookie | Chinese travel booking |
+| Chaoxing | `opencli chaoxing` | cookie | Chinese education platform |
 
 ## Reading
 
