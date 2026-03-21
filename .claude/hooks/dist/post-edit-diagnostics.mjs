@@ -1,5 +1,6 @@
 // src/post-edit-diagnostics.ts
 import { readFileSync as readFileSync2 } from "fs";
+import { spawnSync as spawnSync2 } from "child_process";
 
 // src/daemon-client.ts
 import { existsSync, readFileSync, writeFileSync, unlinkSync, mkdirSync } from "fs";
@@ -276,7 +277,7 @@ async function main() {
     ".py",
     ".pyx",
     ".pyi",
-    // TypeScript/JavaScript (TODO: add eslint/tsc)
+    // TypeScript/JavaScript (has linter: tsc --noEmit)
     ".ts",
     ".tsx",
     ".js",
@@ -308,12 +309,18 @@ async function main() {
     return;
   }
   const pythonExtensions = [".py", ".pyx", ".pyi"];
-  if (!pythonExtensions.includes(ext)) {
+  const tsJsExtensions = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];
+  const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  if (pythonExtensions.includes(ext)) {
+    runPythonDiagnostics(filePath, projectDir);
+  } else if (tsJsExtensions.includes(ext)) {
+    runTscDiagnostics(filePath, projectDir);
+  } else {
     console.log("{}");
-    return;
   }
+}
+function runPythonDiagnostics(filePath, projectDir) {
   try {
-    const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
     const response = queryDaemonSync(
       { cmd: "diagnostics", file: filePath },
       projectDir
@@ -336,7 +343,7 @@ async function main() {
       return;
     }
     const lines = [];
-    lines.push(`\u26A0\uFE0F Diagnostics: ${typeErrors} type errors, ${lintIssues} lint issues`);
+    lines.push(`Diagnostics: ${typeErrors} type errors, ${lintIssues} lint issues`);
     const maxPreviews = 5;
     const previews = errors.slice(0, maxPreviews);
     for (const err of previews) {
@@ -345,6 +352,69 @@ async function main() {
     }
     if (errors.length > maxPreviews) {
       const remaining = errors.length - maxPreviews;
+      lines.push(`   ... and ${remaining} more`);
+    }
+    const output = {
+      hookSpecificOutput: {
+        hookEventName: "PostToolUse",
+        additionalContext: lines.join("\n")
+      }
+    };
+    console.log(JSON.stringify(output));
+  } catch {
+    console.log("{}");
+  }
+}
+var TSC_LINE_REGEX = /^(.+)\((\d+),(\d+)\): (error|warning) TS(\d+): (.+)$/;
+function parseTscOutput(stdout) {
+  const diagnostics = [];
+  for (const line of stdout.split("\n")) {
+    const match = line.match(TSC_LINE_REGEX);
+    if (match) {
+      diagnostics.push({
+        file: match[1],
+        line: parseInt(match[2], 10),
+        column: parseInt(match[3], 10),
+        severity: match[4],
+        code: parseInt(match[5], 10),
+        message: match[6]
+      });
+    }
+  }
+  return diagnostics;
+}
+function runTscDiagnostics(filePath, projectDir) {
+  try {
+    const result = spawnSync2("tsc", ["--noEmit", "--pretty", "false"], {
+      cwd: projectDir,
+      timeout: 3e4,
+      encoding: "utf-8"
+    });
+    if (result.error || result.status === null) {
+      console.log("{}");
+      return;
+    }
+    const diagnostics = parseTscOutput(result.stdout || "");
+    const errorCount = diagnostics.filter((d) => d.severity === "error").length;
+    const warningCount = diagnostics.filter((d) => d.severity === "warning").length;
+    trackHookActivitySync("post-edit-diagnostics", projectDir, true, {
+      edits_analyzed: 1,
+      type_errors: errorCount,
+      lint_issues: warningCount
+    });
+    if (diagnostics.length === 0) {
+      console.log("{}");
+      return;
+    }
+    const lines = [];
+    lines.push(`Diagnostics: ${errorCount} type errors, ${warningCount} warnings`);
+    const maxPreviews = 5;
+    const previews = diagnostics.slice(0, maxPreviews);
+    for (const d of previews) {
+      lines.push(`   - ${d.file}:${d.line}:${d.column}: ${d.message}`);
+    }
+    if (diagnostics.length > maxPreviews) {
+      const remaining = diagnostics.length - maxPreviews;
       lines.push(`   ... and ${remaining} more`);
     }
     const output = {

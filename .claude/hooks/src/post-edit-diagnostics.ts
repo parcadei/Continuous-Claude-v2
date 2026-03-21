@@ -2,11 +2,13 @@
  * Post-Edit Diagnostics Hook
  *
  * Runs shift-left diagnostics after file edits.
- * Queries TLDR daemon for type errors and lint issues immediately after Edit/Write.
+ * - Python: Queries TLDR daemon for pyright + ruff diagnostics
+ * - TypeScript/JavaScript: Runs tsc --noEmit directly
  * Provides early feedback before tests run.
  */
 
 import { readFileSync } from 'fs';
+import { spawnSync } from 'child_process';
 import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
 
 interface HookInput {
@@ -45,7 +47,7 @@ async function main() {
   const codeExtensions = [
     // Python (has linters: pyright + ruff)
     '.py', '.pyx', '.pyi',
-    // TypeScript/JavaScript (TODO: add eslint/tsc)
+    // TypeScript/JavaScript (has linter: tsc --noEmit)
     '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs',
     // Go (TODO: add go vet)
     '.go',
@@ -69,17 +71,26 @@ async function main() {
     return;
   }
 
-  // Currently only Python has linters configured in tldr diagnostics
-  // Skip other languages until we add their linters
+  // Language-aware routing
   const pythonExtensions = ['.py', '.pyx', '.pyi'];
-  if (!pythonExtensions.includes(ext)) {
-    console.log('{}');
-    return;
-  }
+  const tsJsExtensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'];
+  const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 
-  // Query daemon for diagnostics
+  if (pythonExtensions.includes(ext)) {
+    // Python path: query TLDR daemon for pyright + ruff diagnostics
+    runPythonDiagnostics(filePath, projectDir);
+  } else if (tsJsExtensions.includes(ext)) {
+    // TypeScript/JavaScript path: run tsc --noEmit directly
+    runTscDiagnostics(filePath, projectDir);
+  } else {
+    // Other code extensions: no linter configured yet
+    console.log('{}');
+  }
+}
+
+/** Run Python diagnostics via TLDR daemon (pyright + ruff) */
+function runPythonDiagnostics(filePath: string, projectDir: string): void {
   try {
-    const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
     const response = queryDaemonSync(
       { cmd: 'diagnostics', file: filePath },
       projectDir
@@ -97,7 +108,7 @@ async function main() {
     const lintIssues = summary.lint_errors || summary.lint_issues || 0;
     const errors = response.errors || [];
 
-    // Track hook activity (P8) - reuse projectDir from above
+    // Track hook activity
     trackHookActivitySync('post-edit-diagnostics', projectDir, true, {
       edits_analyzed: 1,
       type_errors: typeErrors,
@@ -112,9 +123,8 @@ async function main() {
 
     // Build error summary
     const lines: string[] = [];
-    lines.push(`⚠️ Diagnostics: ${typeErrors} type errors, ${lintIssues} lint issues`);
+    lines.push(`Diagnostics: ${typeErrors} type errors, ${lintIssues} lint issues`);
 
-    // Show up to 5 error previews
     const maxPreviews = 5;
     const previews = errors.slice(0, maxPreviews);
 
@@ -125,7 +135,6 @@ async function main() {
       lines.push(`   - ${location}: ${err.message}`);
     }
 
-    // Show "... and N more" if there are more errors
     if (errors.length > maxPreviews) {
       const remaining = errors.length - maxPreviews;
       lines.push(`   ... and ${remaining} more`);
@@ -140,6 +149,100 @@ async function main() {
     console.log(JSON.stringify(output));
   } catch {
     // Daemon error - silently ignore (graceful degradation)
+    console.log('{}');
+  }
+}
+
+/** Regex for parsing tsc --noEmit --pretty false output lines */
+const TSC_LINE_REGEX = /^(.+)\((\d+),(\d+)\): (error|warning) TS(\d+): (.+)$/;
+
+interface TscDiagnostic {
+  file: string;
+  line: number;
+  column: number;
+  severity: 'error' | 'warning';
+  code: number;
+  message: string;
+}
+
+/** Parse tsc --pretty false output into structured diagnostics */
+function parseTscOutput(stdout: string): TscDiagnostic[] {
+  const diagnostics: TscDiagnostic[] = [];
+  for (const line of stdout.split('\n')) {
+    const match = line.match(TSC_LINE_REGEX);
+    if (match) {
+      diagnostics.push({
+        file: match[1],
+        line: parseInt(match[2], 10),
+        column: parseInt(match[3], 10),
+        severity: match[4] as 'error' | 'warning',
+        code: parseInt(match[5], 10),
+        message: match[6],
+      });
+    }
+  }
+  return diagnostics;
+}
+
+/** Run TypeScript/JavaScript diagnostics via tsc --noEmit */
+function runTscDiagnostics(filePath: string, projectDir: string): void {
+  try {
+    const result = spawnSync('tsc', ['--noEmit', '--pretty', 'false'], {
+      cwd: projectDir,
+      timeout: 30000,
+      encoding: 'utf-8',
+    });
+
+    // tsc not found or process error - silently skip
+    if (result.error || result.status === null) {
+      console.log('{}');
+      return;
+    }
+
+    // Parse tsc output (tsc returns non-zero on type errors, which is expected)
+    const diagnostics = parseTscOutput(result.stdout || '');
+
+    const errorCount = diagnostics.filter(d => d.severity === 'error').length;
+    const warningCount = diagnostics.filter(d => d.severity === 'warning').length;
+
+    // Track hook activity
+    trackHookActivitySync('post-edit-diagnostics', projectDir, true, {
+      edits_analyzed: 1,
+      type_errors: errorCount,
+      lint_issues: warningCount,
+    });
+
+    // No diagnostics - silent success
+    if (diagnostics.length === 0) {
+      console.log('{}');
+      return;
+    }
+
+    // Build error summary
+    const lines: string[] = [];
+    lines.push(`Diagnostics: ${errorCount} type errors, ${warningCount} warnings`);
+
+    const maxPreviews = 5;
+    const previews = diagnostics.slice(0, maxPreviews);
+
+    for (const d of previews) {
+      lines.push(`   - ${d.file}:${d.line}:${d.column}: ${d.message}`);
+    }
+
+    if (diagnostics.length > maxPreviews) {
+      const remaining = diagnostics.length - maxPreviews;
+      lines.push(`   ... and ${remaining} more`);
+    }
+
+    const output: HookOutput = {
+      hookSpecificOutput: {
+        hookEventName: 'PostToolUse',
+        additionalContext: lines.join('\n')
+      }
+    };
+    console.log(JSON.stringify(output));
+  } catch {
+    // tsc error - silently ignore (graceful degradation)
     console.log('{}');
   }
 }

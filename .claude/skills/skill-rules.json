@@ -2745,6 +2745,31 @@
           "explore.*synthesize"
         ]
       }
+    },
+    "serena": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "LSP-powered semantic code intelligence via Serena MCP",
+      "promptTriggers": {
+        "keywords": [
+          "serena",
+          "go to definition",
+          "find references",
+          "code navigation",
+          "symbol overview",
+          "code intelligence",
+          "semantic search",
+          "find usages",
+          "where defined"
+        ],
+        "intentPatterns": [
+          "go.*(to|find).*(definition|definition of)",
+          "find.*(references|callers|usages)",
+          "who.*(calls|uses).*(this|function|method)",
+          "where.*(is|defined).*(function|class|symbol)"
+        ]
+      }
     }
   },
   "agents": {
