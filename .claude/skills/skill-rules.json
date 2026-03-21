@@ -2720,6 +2720,31 @@
       "evalScore": 100,
       "evalTier": "verified",
       "evalDate": "2026-03-07"
+    },
+    "opencli": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Universal CLI hub for web data extraction via opencli browser bridge",
+      "promptTriggers": {
+        "keywords": [
+          "opencli",
+          "open-cli",
+          "open cli",
+          "search twitter",
+          "check hackernews",
+          "reddit top",
+          "youtube trending",
+          "browser cli",
+          "web cli"
+        ],
+        "intentPatterns": [
+          "opencli.*(command|run|use|install|setup)",
+          "(search|check|browse|fetch|pull).*(twitter|reddit|hackernews|youtube|bilibili|linkedin)",
+          "(create|generate|build).*(adapter|cli).*(website|site|url)",
+          "explore.*synthesize"
+        ]
+      }
     }
   },
   "agents": {
