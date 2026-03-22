@@ -83,5 +83,17 @@
       "extract v2"
     ],
     "priority": 80
+  },
+  "init-project": {
+    "keywords": [
+      "init project",
+      "initialize project",
+      "new project setup",
+      "start new project",
+      "setup project",
+      "setup ccv3",
+      "setup continuous claude"
+    ],
+    "priority": 95
   }
 }
