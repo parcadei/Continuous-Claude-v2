@@ -5,11 +5,30 @@
 | Tier | Tool | Use When |
 |------|------|----------|
 | 1 | @playwright/mcp | Default for all browser interaction -- navigate, click, screenshot, snapshot |
-| 2 | Chrome DevTools MCP | Performance traces, network debugging, memory snapshots, Lighthouse audits |
+| 2 | CDP CLI (`scripts/cdp.mjs`) | Performance metrics, network debugging, a11y audit, Lighthouse, console logs |
 | 3 | Playwright-core (scripting) | Complex multi-step flows, custom logic, when MCP tools are insufficient |
 | 4 | Playwright CLI | E2E test suites (`npx playwright test`), test recording (`npx playwright codegen`) |
 
 Load the `browser-dev-cycle` skill for full decision tree and tool reference.
+
+## Tier 2 Quick Reference (CDP CLI)
+
+Requires Chrome running with `--remote-debugging-port=9222`.
+
+```bash
+node scripts/cdp.mjs navigate <url>     # navigate + wait
+node scripts/cdp.mjs perf               # TTFB, DOM, LCP, resources
+node scripts/cdp.mjs network            # resource timing entries
+node scripts/cdp.mjs a11y               # accessibility audit
+node scripts/cdp.mjs console            # console messages
+node scripts/cdp.mjs lighthouse <url>   # Lighthouse scores + Core Web Vitals
+node scripts/cdp.mjs snapshot [-i]      # accessibility tree
+node scripts/cdp.mjs screenshot [path]  # screenshot
+node scripts/cdp.mjs eval <expr>        # evaluate JS
+node scripts/cdp.mjs tabs              # list open tabs
+```
+
+All output is JSON. Replaces chrome-devtools-mcp (32x fewer tokens, 100% vs 72% reliability).
 
 ## Quick Start [H:8]
 

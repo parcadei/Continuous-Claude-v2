@@ -4,7 +4,12 @@
     {
       "name": "continuous-claude",
       "path": "C:/Users/david.hayes/continuous-claude",
-      "stack": ["TypeScript", "Node.js", "PostgreSQL", "esbuild"],
+      "stack": [
+        "TypeScript",
+        "Node.js",
+        "PostgreSQL",
+        "esbuild"
+      ],
       "description": "Claude Code infrastructure -- hooks, skills, agents, memory",
       "port": null,
       "url": null,
@@ -14,7 +19,13 @@
     {
       "name": "NorthStar Transformation",
       "path": "C:/Users/david.hayes/Projects/northstar-transformation",
-      "stack": ["Next.js", "TypeScript", "Tailwind", "Drizzle", "Neon"],
+      "stack": [
+        "Next.js",
+        "TypeScript",
+        "Tailwind",
+        "Drizzle",
+        "Neon"
+      ],
       "description": "AI transformation platform for enterprise",
       "port": 3002,
       "url": "https://northstar.localhost/",
@@ -24,7 +35,11 @@
     {
       "name": "Fourth Connect",
       "path": "C:/Users/david.hayes/Projects/fourth-connect",
-      "stack": ["Next.js", "TypeScript", "Tailwind"],
+      "stack": [
+        "Next.js",
+        "TypeScript",
+        "Tailwind"
+      ],
       "description": "Fourth brand platform",
       "port": 3000,
       "url": "https://fourth-connect.localhost/",
@@ -34,7 +49,12 @@
     {
       "name": "agent-factory",
       "path": "C:/Users/david.hayes/Projects/agent-factory",
-      "stack": ["Next.js", "AI SDK v6", "OpenRouter", "Docker"],
+      "stack": [
+        "Next.js",
+        "AI SDK v6",
+        "OpenRouter",
+        "Docker"
+      ],
       "description": "Vercel AI SDK agent builder",
       "port": 3001,
       "url": null,
@@ -44,7 +64,14 @@
     {
       "name": "ECG Lead Reactivation Engine",
       "path": "C:/Users/david.hayes/Projects/ECG Lead Reactivation Engine",
-      "stack": ["Next.js", "TypeScript", "Tailwind", "Drizzle", "Neon", "Resend"],
+      "stack": [
+        "Next.js",
+        "TypeScript",
+        "Tailwind",
+        "Drizzle",
+        "Neon",
+        "Resend"
+      ],
       "description": "Email reactivation engine for ECG/Addison Care leads",
       "port": 3003,
       "url": "https://ecg.localhost/",
@@ -54,7 +81,10 @@
     {
       "name": "LinkMap",
       "path": "C:/Users/david.hayes/Projects/linkmap",
-      "stack": ["React", "TypeScript"],
+      "stack": [
+        "React",
+        "TypeScript"
+      ],
       "description": "Link management tool",
       "port": null,
       "url": null,

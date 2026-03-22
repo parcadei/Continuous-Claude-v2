@@ -1,98 +1,76 @@
-# Tier 2: Chrome DevTools MCP Full Reference
+# Tier 2: CDP CLI (`scripts/cdp.mjs`)
+
+Replaces chrome-devtools-mcp. Stateless CLI using playwright-core over CDP.
 
 ## Setup
 
-Add to project `.mcp.json`:
+Chrome must be running with remote debugging enabled:
 
-```json
-{
-  "mcpServers": {
-    "chrome-devtools": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "chrome-devtools-mcp@latest"],
-      "type": "stdio"
-    }
-  }
-}
+```bash
+chrome.exe --remote-debugging-port=9222 --user-data-dir=%TEMP%\chrome-cdp
 ```
 
-Requires Chrome running with `--remote-debugging-port=9222`. The MCP server connects via CDP.
+Override the CDP URL with `CDP_URL` env var (default: `http://localhost:9222`).
 
 ## When to Use Tier 2 Over Tier 1
 
 | Scenario | Why Tier 2 |
 |----------|-----------|
-| Measure FCP, LCP, CLS, TTI | `devtools_performance_getMetrics` — Tier 1 has no performance API |
-| Debug failed API calls | `devtools_network_getRequestContent` shows response bodies |
-| Console errors with stack traces | `devtools_console_getMessages` includes source-mapped locations |
-| CSS debugging | `devtools_css_getComputedStyles` shows final computed values |
-| Memory leak investigation | `devtools_performance_getMetrics` tracks JS heap size over time |
-| Profile rendering | `devtools_performance_startTrace` captures CPU profiles and paint events |
+| Measure TTFB, LCP, DOM timing | `cdp.mjs perf` -- Tier 1 has no performance API |
+| List network requests with sizes | `cdp.mjs network` -- Resource Timing API data |
+| Console error capture | `cdp.mjs console` -- captures console messages |
+| Accessibility audit | `cdp.mjs a11y` -- checks images, labels, headings, lang |
+| Lighthouse scores | `cdp.mjs lighthouse <url>` -- full Lighthouse audit |
+| Full a11y tree | `cdp.mjs snapshot` -- accessibility tree snapshot |
 
-## Tool Reference
+## Command Reference
 
-### Screenshots and DOM
+### Navigation & Inspection
 
-| Tool | Description |
-|------|-------------|
-| `devtools_screenshot` | Capture page screenshot. |
-| `devtools_dom_querySelector` | Find a single element by CSS selector. Returns node ID. |
-| `devtools_dom_querySelectorAll` | Find all elements matching CSS selector. |
-| `devtools_dom_getAttributes` | Get attributes for a DOM node. |
-| `devtools_dom_getOuterHTML` | Get outer HTML of a node. |
+| Command | Description |
+|---------|-------------|
+| `node cdp.mjs navigate <url>` | Navigate to URL, return title + status |
+| `node cdp.mjs snapshot [-i]` | Accessibility tree (-i = interesting only) |
+| `node cdp.mjs screenshot [path] [--full]` | Screenshot (default: screenshot.png) |
+| `node cdp.mjs eval <expression>` | Evaluate JS in page context |
+| `node cdp.mjs title` | Get page title |
+| `node cdp.mjs url` | Get current URL |
+| `node cdp.mjs tabs` | List all open browser tabs |
 
-### Network
+### Performance & Network
 
-| Tool | Description |
-|------|-------------|
-| `devtools_network_getRequests` | List all network requests with URL, method, status, timing. |
-| `devtools_network_getRequestContent` | Get the response body for a specific request. |
-| `devtools_network_enable` | Start capturing network traffic. |
-| `devtools_network_disable` | Stop capturing network traffic. |
+| Command | Description |
+|---------|-------------|
+| `node cdp.mjs perf` | TTFB, domInteractive, domComplete, LCP, resource count/size |
+| `node cdp.mjs network` | List all resource timing entries with name, type, duration, size |
+| `node cdp.mjs lighthouse <url>` | Lighthouse audit: performance, a11y, best practices, SEO scores + Core Web Vitals |
 
-### Performance
+### Debugging
 
-| Tool | Description |
-|------|-------------|
-| `devtools_performance_getMetrics` | Get runtime metrics (JS heap, DOM nodes, layouts, etc.). |
-| `devtools_performance_startTrace` | Start a performance trace (CPU profile, rendering, etc.). |
-| `devtools_performance_stopTrace` | Stop trace and get results. |
-
-### Console
-
-| Tool | Description |
-|------|-------------|
-| `devtools_console_getMessages` | Get console messages with source-mapped stack traces. |
-| `devtools_console_evaluate` | Evaluate JavaScript expression in page context. |
-| `devtools_console_clear` | Clear console messages. |
-
-### CSS
-
-| Tool | Description |
-|------|-------------|
-| `devtools_css_getComputedStyles` | Get computed CSS properties for a DOM node. |
-| `devtools_css_getMatchedStyles` | Get matched CSS rules for a node. |
-| `devtools_css_getInlineStyles` | Get inline styles for a node. |
-
-### Accessibility
-
-| Tool | Description |
-|------|-------------|
-| `devtools_accessibility_getTree` | Get the full accessibility tree. |
-| `devtools_accessibility_queryNodes` | Query accessibility nodes by role or name. |
+| Command | Description |
+|---------|-------------|
+| `node cdp.mjs console` | Capture console messages |
+| `node cdp.mjs a11y` | Accessibility audit: img-no-alt, no-accessible-name, input-no-label, heading-skip, missing-lang |
 
 ## Tier 1 + Tier 2 Combined Workflow
 
-Both tiers can connect to the same Chrome instance simultaneously — no conflicts, they use separate CDP sessions.
+Both tiers connect to the same Chrome instance -- no conflicts.
 
-Example: Navigate with Tier 1, measure Core Web Vitals with Tier 2.
+```bash
+# 1. Navigate with Tier 1 (Playwright MCP)
+browser_navigate "https://example.com"
 
-```
-1. devtools_network_enable          -> start capturing
-2. browser_navigate (Tier 1)        -> load the page
-3. devtools_network_getRequests     -> list all requests
-4. devtools_network_getRequestContent -> inspect response bodies
-5. devtools_console_getMessages     -> check for JS errors
+# 2. Measure performance with Tier 2 (CDP CLI)
+node scripts/cdp.mjs perf
+
+# 3. Check network requests
+node scripts/cdp.mjs network
+
+# 4. Run accessibility audit
+node scripts/cdp.mjs a11y
+
+# 5. Get Lighthouse scores
+node scripts/cdp.mjs lighthouse https://example.com
 ```
 
 ## Core Web Vitals Targets
@@ -102,4 +80,26 @@ Example: Navigate with Tier 1, measure Core Web Vitals with Tier 2.
 | FCP | < 1.8s | First Contentful Paint |
 | LCP | < 2.5s | Largest Contentful Paint |
 | CLS | < 0.1 | Cumulative Layout Shift |
-| TTI | < 3.8s | Time to Interactive |
+| TBT | < 200ms | Total Blocking Time |
+
+## Output Format
+
+All commands output JSON to stdout:
+
+```json
+{"success": true, "url": "...", "ttfb": 42, "domInteractive": 180, ...}
+```
+
+On error:
+```json
+{"success": false, "error": "Cannot connect to Chrome at http://localhost:9222..."}
+```
+
+## Why CLI Over MCP
+
+| Dimension | MCP (old) | CLI (current) |
+|-----------|-----------|---------------|
+| Reliability | 72% (Scalekit benchmark) | 100% |
+| Token cost | 44,026 per query | 1,365 per query |
+| Schema overhead | ~17,000 tokens | 0 |
+| Tool names | Undocumented, changed between versions | Stable CLI interface |
