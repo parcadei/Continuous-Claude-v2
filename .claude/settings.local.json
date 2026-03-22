@@ -8,7 +8,15 @@
       "Bash(findstr:*)",
       "Bash(tldr:*)",
       "Bash(node:*)",
-      "Bash($env:DEBUG=\"tldr*\")"
+      "Bash($env:DEBUG=\"tldr*\")",
+      "mcp__serena__onboarding",
+      "mcp__serena__write_memory",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__find_symbol",
+      "Read(//c/Users/david.hayes/.claude/skills/skill-forge/**)",
+      "Bash(python -m scripts.quick_validate C:/Users/david.hayes/continuous-claude/.claude/skills/serena)",
+      "Bash(python -m scripts.run_loop --eval-set auto --skill-path C:/Users/david.hayes/continuous-claude/.claude/skills/serena --model claude-opus-4-6 --max-iterations 5 --verbose)",
+      "Bash(python -m scripts.run_loop --eval-set C:/Users/david.hayes/continuous-claude/.claude/skills/serena/evals/trigger-eval.json --skill-path C:/Users/david.hayes/continuous-claude/.claude/skills/serena --model claude-opus-4-6 --max-iterations 5 --verbose)"
     ]
   },
   "enableAllProjectMcpServers": true,

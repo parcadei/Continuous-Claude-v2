@@ -41,11 +41,12 @@ export function detectWebFailure(input: HookInput): boolean {
   if (typeof response === 'object' && response !== null) {
     const r = response as Record<string, unknown>;
     if (typeof r.status === 'number' && r.status >= 400) return true;
-    if (typeof r.error === 'string' && r.error.length > 0) return true;
+    if (r.error) return true;
   }
 
-  // Check for failure patterns in string responses only (avoid false positives from JSON key names)
-  if (typeof response === 'string' && FAILURE_PATTERNS.test(response) && response.length < 500) return true;
+  // Check for failure patterns in short responses (avoid false positives on long successful pages)
+  const responseStr = typeof response === 'string' ? response : JSON.stringify(response);
+  if (FAILURE_PATTERNS.test(responseStr) && responseStr.length < 500) return true;
 
   return false;
 }

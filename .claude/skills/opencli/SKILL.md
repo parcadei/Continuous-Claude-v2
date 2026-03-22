@@ -14,7 +14,7 @@ Turns websites into CLI commands via your running Chrome session. No API keys --
 
 | Need | Reference |
 |------|-----------|
-| Run a platform command (twitter, hackernews, reddit, etc.) | `references/commands.md` |
+| Run a platform command (twitter, hn, reddit, etc.) | `references/commands.md` |
 | Create adapter for a new site | `references/adapter-pipeline.md` |
 | Windows-specific setup or issues | `references/windows-notes.md` |
 | Quick command | See Quick Reference below |

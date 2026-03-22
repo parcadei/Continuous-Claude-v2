@@ -7,10 +7,12 @@ continuous-claude (repo)  →  ~/.claude (active)
         ↓                         ↓
     Edit here                 Auto-receives
         ↓                         ↓
-    git commit              post-commit hook
+    git commit              post-commit hook (background)
         ↓                         ↓
     git push                Hooks rebuilt
 ```
+
+**Note:** Post-commit sync runs in the background (`&`) so `git commit` returns instantly. Sync completes asynchronously.
 
 ## Quick Workflow
 

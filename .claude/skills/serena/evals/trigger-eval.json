@@ -1,0 +1,22 @@
+[
+  {"query": "where is the runHook function defined?", "should_trigger": true},
+  {"query": "find all callers of processWebhook before I refactor it", "should_trigger": true},
+  {"query": "use serena to check what this module exports", "should_trigger": true},
+  {"query": "I need to trace where this import comes from through the barrel files", "should_trigger": true},
+  {"query": "what's the symbol overview for session-register.ts?", "should_trigger": true},
+  {"query": "who calls this function? I want to see all usages across the codebase", "should_trigger": true},
+  {"query": "navigate to the definition of HookInput type", "should_trigger": true},
+  {"query": "I'm about to rename this class, show me all references first", "should_trigger": true},
+  {"query": "use code intelligence to understand the auth module structure", "should_trigger": true},
+  {"query": "configure serena for a new Python project", "should_trigger": true},
+  {"query": "search the codebase for files containing 'webhook'", "should_trigger": false},
+  {"query": "run the test suite for the hooks directory", "should_trigger": false},
+  {"query": "show me the git log for this file", "should_trigger": false},
+  {"query": "deploy this to Vercel", "should_trigger": false},
+  {"query": "fix the TypeScript compilation error on line 42", "should_trigger": false},
+  {"query": "create a new React component for the dashboard", "should_trigger": false},
+  {"query": "what does this regular expression match?", "should_trigger": false},
+  {"query": "install the lodash package", "should_trigger": false},
+  {"query": "run tldr diagnostics on the project", "should_trigger": false},
+  {"query": "check memory for past approaches to this bug", "should_trigger": false}
+]

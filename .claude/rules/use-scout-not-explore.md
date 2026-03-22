@@ -10,7 +10,7 @@ For codebase exploration tasks, use `scout` (Sonnet) instead of `Explore` (Haiku
 ## When exploring codebases
 
 ```
-Task tool with:
+Agent tool with:
   subagent_type: "scout"  ← use this
   NOT: "Explore"          ← not this
 ```

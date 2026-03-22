@@ -2,6 +2,8 @@
 
 Manual stores should be rare and high-value. 98% of entries are auto-extracted by hooks — only store manually when you have a genuine insight that won't be captured automatically.
 
+**L0 quality gate:** The extraction pipeline auto-blocks NOISE entries (quality score <3) before they reach PostgreSQL. If a learning doesn't appear in recall, the quality scorer may have filtered it -- this is intentional.
+
 ## DO Store Manually
 
 | Situation | Type |

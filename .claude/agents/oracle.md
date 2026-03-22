@@ -1,6 +1,6 @@
 ---
 name: oracle
-description: External research - web, docs, APIs via 6-tool research stack
+description: External research - web, docs, APIs via 7-tool research stack
 model: opus
 tools: [Read, Bash, WebSearch]
 ---
@@ -37,7 +37,7 @@ $CLAUDE_PROJECT_DIR = /path/to/project
 
 ## Step 2: Choose Your Research Tool
 
-You have 6 external research tools. Choose based on what you need:
+You have 7 external research tools. Choose based on what you need:
 
 ### Quick API Docs (Context7 MCP)
 
@@ -111,6 +111,23 @@ cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/mcp/firecrawl_scrape.py
 **Best for:** Extracting content from specific URLs found during research
 **Note:** Requires `FIRECRAWL_API_KEY` + MCP server. If unavailable, use WebFetch instead.
 
+### Platform Data (OpenCLI)
+
+Structured data from 44 web platforms via authenticated Chrome bridge.
+
+```bash
+# Twitter/X search
+opencli twitter search "rate limiting" -f json
+
+# HackerNews top stories
+opencli hackernews top -f json
+
+# Reddit search
+opencli reddit search "fastapi rate limiting" -f json
+```
+
+**Best for:** Social media, news aggregators, video platforms -- anywhere you need authenticated, structured data instead of HTML scraping. 44 adapters: Twitter, Reddit, HackerNews, YouTube, LinkedIn, GitHub trending, and more.
+
 ### GitHub Search (GitHub MCP)
 
 Search code, repos, and issues on GitHub.
@@ -135,13 +152,14 @@ cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/mcp/github_search.py \
 | Deep library docs | Nia | Context7 + WebFetch |
 | Real-world code examples | Exa | GitHub Search |
 | Best practices / comparisons | Exa + WebSearch | GitHub issues |
+| Platform data (social/news/video) | OpenCLI | WebSearch |
 | Specific URL content | WebFetch | N/A |
 | Repo/issue search | GitHub MCP | Exa |
 
 ### Graceful Degradation
 
 Some tools may not have API keys configured:
-- **Always available (use these first):** Context7, Nia, Exa, GitHub MCP, WebSearch, WebFetch
+- **Always available (use these first):** Context7, Nia, Exa, OpenCLI, GitHub MCP, WebSearch, WebFetch
 - **Dormant (no API keys, do NOT use as primary):** Perplexity, Firecrawl — infrastructure exists for future activation but these tools will fail today. Never route primary research through them.
 
 If a tool fails, log the error and continue with alternatives. Partial results are valuable.

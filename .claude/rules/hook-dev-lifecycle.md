@@ -31,6 +31,7 @@
 | settings.json race | Used Edit tool on settings.json | Use Node.js atomic read-modify-write instead |
 | Sync gap | Changed in repo, not in ~/.claude | `bash scripts/sync-to-active.sh` |
 | Windows encoding crash | Unicode/emoji in Python hooks | Use ASCII only |
+| SessionEnd "Hook cancelled" | Blocking spawnSync exceeds timeout | Use fire-and-forget spawn (detached, unref'd) for long operations; bump timeout to 30-60s in settings.json |
 
 ## Key Architecture Notes
 
