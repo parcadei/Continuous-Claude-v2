@@ -8,9 +8,10 @@ for a set of queries. Outputs results as JSON.
 import argparse
 import json
 import os
-import select
+import queue
 import subprocess
 import sys
+import threading
 import time
 import uuid
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -30,6 +31,15 @@ def find_project_root() -> Path:
         if (parent / ".claude").is_dir():
             return parent
     return current
+
+
+def _pipe_reader(stream, q):
+    """Background thread: push chunks from stream into queue, then sentinel None."""
+    try:
+        for chunk in iter(lambda: stream.read(8192), b""):
+            q.put(chunk)
+    finally:
+        q.put(None)
 
 
 def run_single_query(
@@ -97,20 +107,22 @@ def run_single_query(
         pending_tool_name = None
         accumulated_json = ""
 
+        chunk_queue = queue.Queue()
+        reader_thread = threading.Thread(
+            target=_pipe_reader, args=(process.stdout, chunk_queue), daemon=True
+        )
+        reader_thread.start()
+
         try:
             while time.time() - start_time < timeout:
-                if process.poll() is not None:
-                    remaining = process.stdout.read()
-                    if remaining:
-                        buffer += remaining.decode("utf-8", errors="replace")
+                if process.poll() is not None and chunk_queue.empty():
                     break
 
-                ready, _, _ = select.select([process.stdout], [], [], 1.0)
-                if not ready:
+                try:
+                    chunk = chunk_queue.get(timeout=0.5)
+                except queue.Empty:
                     continue
-
-                chunk = os.read(process.stdout.fileno(), 8192)
-                if not chunk:
+                if chunk is None:
                     break
                 buffer += chunk.decode("utf-8", errors="replace")
 
