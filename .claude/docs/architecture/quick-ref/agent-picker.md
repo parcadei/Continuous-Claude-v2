@@ -6,8 +6,9 @@
 |------|-------|-------|-------|
 | **Research** |
 | Explore codebase | scout | sonnet | Internal code only |
-| External docs/APIs | oracle | opus | Web research |
+| External docs/APIs/Exa/OpenCLI | oracle | opus | 7-tool research stack (Context7, Nia, Exa, OpenCLI, GitHub, WebSearch, WebFetch) |
 | GitHub repos | pathfinder | opus | Clone and analyze |
+| Symbol navigation | Serena | MCP | go-to-definition, find-references (resolves re-exports) |
 | **Planning** |
 | Feature design | architect | opus | Before implementing |
 | Refactor plan | phoenix | opus | Migration planning |
@@ -29,6 +30,8 @@
 | Investigation | debug-agent | opus | Find root cause |
 | Complex bugs | sleuth | opus | Multi-file tracing |
 | Security issues | aegis | opus | Vulnerability analysis |
+| **Deployment** |
+| Vercel deploy/monitor | deployer | sonnet | Deploy, verify, debug deployments |
 
 ## Quick Decision
 
@@ -38,6 +41,7 @@ Need tests? ──→ kraken
 Need to understand code first? ──→ scout
 Need external info? ──→ oracle
 Don't know where bug is? ──→ debug-agent
+Need to deploy? ──→ deployer
 ```
 
 ## Parallel Combinations

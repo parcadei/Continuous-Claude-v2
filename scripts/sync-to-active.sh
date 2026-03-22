@@ -35,7 +35,7 @@ done
 
 $VERBOSE && echo "Syncing: $REPO_CLAUDE → $ACTIVE_CLAUDE" || true
 
-SYNC_DIRS="hooks/src rules agents skills"
+SYNC_DIRS="hooks/src rules agents skills docs"
 
 NEVER_SYNC="CLAUDE.md RULES.md .env .credentials.json settings.json history.jsonl knowledge-tree.json"
 

@@ -1,210 +1,131 @@
 # Hook Catalog
 
-> 100+ hooks organized by lifecycle
+**Total registered: 55 hooks across 6 event types**
+Last updated: 2026-03-21
 
-## By Lifecycle
+## SessionStart (9 hooks)
 
-### SessionStart
+| Hook | Description |
+|------|-------------|
+| session-start-docker | Ensure Docker services are running |
+| session-register | Register session in PostgreSQL for cross-terminal coordination |
+| session-start-continuity | Load handoffs and prior session context |
+| session-start-init-check | Auto-generate knowledge tree if missing |
+| session-start-recovery | Recover from interrupted sessions |
+| braintrust_hooks session_start | Braintrust observability trace init |
+| roadmap-reconcile | Sync ROADMAP.md with actual state on session start |
+| session-start-tldr-cache | Pre-cache TLDR structure analysis |
+| hook-health-monitor | Verify hook registration health on startup |
 
-| Hook | Purpose | Blocks |
-|------|---------|--------|
-| `session-start-docker.mjs` | Ensure Docker services running | No |
-| `session-start-parallel.mjs` | Parallel setup tasks | No |
-| `session-register.mjs` | Register in coordination DB | No |
-| `session-start-continuity.mjs` | Load handoff ledger | No |
-| `session-start-init-check.mjs` | Verify infrastructure | No |
-| `session-start-tree-daemon.ps1` | Start knowledge tree watcher | No |
-| `session-start-memory-daemon.ps1` | Start memory daemon | No |
+## UserPromptSubmit (12 hooks)
 
-### UserPromptSubmit
+| Hook | Description |
+|------|-------------|
+| heartbeat | Session keepalive heartbeat to PostgreSQL |
+| maestro-state-manager | Manage Maestro workflow phase state |
+| guardrail-enforcer | Enforce operational guardrails on user prompts |
+| skill-activation-prompt | Detect skill trigger keywords in user input |
+| memory-awareness | Inject relevant memories from semantic search |
+| pageindex-navigator | Route to PageIndex for document queries |
+| maestro-detector | Detect /maestro workflow activation |
+| user-confirmation-detector | Detect user confirmations for gated operations |
+| ralph-watchdog | Monitor Ralph iteration limits and escalation |
+| ralph-progress-inject | Inject Ralph progress state into context |
+| ralph-retry-reminder | Remind about failed Ralph agent retries |
+| braintrust_hooks user_prompt_submit | Braintrust prompt-level tracing |
 
-| Hook | Purpose | Blocks |
-|------|---------|--------|
-| `heartbeat.mjs` | Session keepalive to database | No |
-| `memory-awareness.mjs` | **Inject relevant memories** | No |
-| `user-confirmation-detector.mjs` | **Capture "it's fixed" signals** | No |
-| `maestro-state-manager.mjs` | **Track maestro workflow state** | No |
-| `skill-activation-prompt.mjs` | Detect skill triggers | No |
-| `guardrail-enforcer.mjs` | Apply guardrails | No |
+## PreToolUse (17 hooks)
 
-### PreToolUse
+| Hook | Matcher | Description |
+|------|---------|-------------|
+| pre-plan-memory | EnterPlanMode | Recall relevant memories before planning |
+| agent-validate | Agent | Validate agent type and configuration |
+| explore-to-scout | Agent | Redirect Explore agent to scout |
+| no-haiku-enforcer | Agent | Block haiku model selection for agents |
+| navigator-validate | Agent | Validate navigator agent configuration |
+| task-router | Agent | Suggest better agent for task type |
+| ralph-template-inject | Agent | Inject Ralph templates into agent prompts |
+| maestro-enforcer | Agent | Enforce Maestro phase gating (block skipping) |
+| pre-tool-knowledge | Agent | Inject knowledge tree context for agents |
+| tldr-context-inject | Agent | Inject TLDR analysis context for agents |
+| smart-search-router | Grep | Route to AST-grep or TLDR for structured searches |
+| tldr-read-enforcer | Read | Suggest TLDR structure before reading large files |
+| ralph-delegation-enforcer | Edit\|Write\|Bash | Block direct code edits when Ralph is active |
+| navigator-safety | Bash | Safety checks for bash commands |
+| plan-to-ralph-enforcer | Edit\|Write | Block code edits after plan approval (use Ralph) |
+| file-claims | Edit\|Write | Distributed file locking across sessions |
+| test-before-done | TaskUpdate | Require test evidence before marking task complete |
 
-| Hook | Matches | Purpose | Blocks |
-|------|---------|---------|--------|
-| `file-claims.mjs` | Edit | Distributed file locking | **Yes** |
-| `ralph-delegation-enforcer.mjs` | Task | **Enforce ralph routing** | **Yes** |
-| `git-memory-check.mjs` | Bash | **Check memory before git** | **Yes** |
-| `explore-to-scout.mjs` | Task | Redirect Explore→scout | No |
-| `pre-compact-extract.mjs` | Compact | **Extract learnings before compression** | No |
-| `task-router.mjs` | Task | Suggest better agent | No |
-| `pre-tool-knowledge.mjs` | Task | Inject knowledge tree context | No |
-| `hook-auto-execute.mjs` | * | Auto-run blocked commands | No |
+## PostToolUse (21 hooks)
 
-### PostToolUse
+| Hook | Matcher | Description |
+|------|---------|-------------|
+| braintrust_hooks post_tool_use | * | Braintrust tool-use tracing |
+| agent-error-capture | Agent | Capture and log agent errors |
+| agent-verification | Agent | Verify agent output claims |
+| ralph-task-monitor | Agent | Track Ralph delegated task completion |
+| epistemic-reminder | Grep\|Read | Warn about unverified grep/read claims |
+| post-plan-roadmap | ExitPlanMode | Sync plan to ROADMAP.md after approval |
+| plan-exit-tracker | ExitPlanMode | Track plan approval state for enforcement |
+| roadmap-completion | TaskUpdate\|Bash | Track roadmap task completions |
+| git-commit-roadmap | Bash | Update ROADMAP.md after git commits |
+| ralph-monitor | Bash | Monitor Ralph bash command output |
+| test-run-tracker | Bash | Track test execution results |
+| smarter-everyday | Edit\|Write\|Bash\|TaskUpdate | Extract learnings from tool use patterns (L0) |
+| prd-roadmap-sync | Write\|Edit | Sync PRD changes to ROADMAP.md |
+| sync-to-repo | Write\|Edit | Auto-sync ~/.claude changes to continuous-claude repo |
+| git-auto-commit | Write\|Edit | Auto-commit ~/.claude file changes |
+| tree-invalidate | Write\|Edit | Mark knowledge tree stale after file changes |
+| pageindex-watch | Write\|Edit | Update PageIndex after doc file changes |
+| auto-build | Write\|Edit | Auto-rebuild hooks after source changes |
+| import-validator | Edit\|Write | Validate import paths after code edits |
+| periodic-extract | * | Periodic learning extraction (L0 timer) |
+| telemetry-tracker | Skill\|Task | Track skill and task usage telemetry |
+| mcp-activity-tracker | * | Track MCP server tool usage |
+| vercel-deploy-context | Bash | Inject Vercel deployment context after deploy commands |
+| post-edit-diagnostics | Edit\|Write | Run type check and lint after code edits |
+| web-lookup-advisor | WebFetch\|WebSearch | Suggest Nia/context7 before web lookups |
 
-| Hook | Matches | Purpose | Blocks |
-|------|---------|---------|--------|
-| `pageindex-watch.mjs` | Write\|Edit | **Rebuild PageIndex on .md changes** | No |
-| `smarter-everyday.mjs` | * | **Detect problem resolution patterns** | No |
-| `session-end-extract.mjs` | SessionEnd | **Final learning extraction sweep** | No |
-| `agent-error-capture.mjs` | Task | **Log agent failures** | No |
-| `epistemic-reminder.mjs` | Grep | Warn about grep claims | No |
-| `roadmap-completion.mjs` | TaskUpdate | Mark goals complete | No |
-| `post-plan-roadmap.mjs` | ExitPlanMode | Update ROADMAP from plan | No |
-| `prd-roadmap-sync.mjs` | Write\|Edit | Sync PRD/Tasks with ROADMAP | No |
-| `git-commit-roadmap.mjs` | Bash | **Add commits to ROADMAP Completed** | No |
-| `sync-to-repo.mjs` | Write\|Edit | Auto-sync to team repo | No |
+## PreCompact (2 hooks)
 
-### PreCompact
+| Hook | Description |
+|------|-------------|
+| pre-compact-extract | Extract learnings before context compaction (L1) |
+| pre-compact-continuity | Save continuity state before compaction |
 
-| Hook | Purpose | Blocks |
-|------|---------|--------|
-| `pre-compact-extract.mjs` | Extract learnings before context compression | No |
+## SessionEnd (5 hooks)
 
-### SessionEnd
+| Hook | Description |
+|------|-------------|
+| maestro-cleanup | Clean up Maestro workflow state files |
+| session-end-extract | Extract session learnings on close (L2) |
+| braintrust_hooks session_end | Finalize Braintrust session trace |
+| braintrust_hooks stop | Flush Braintrust trace data |
+| session-outcome | Prompt for session outcome marking |
 
-| Hook | Purpose | Blocks |
-|------|---------|--------|
-| `session-end-extract.mjs` | Final learning extraction sweep | No |
+## Blocking Hooks
 
-## Blocking Hooks (3 Total)
+Only PreToolUse hooks can block tool execution via `permissionDecision: "deny"`.
 
-Only PreToolUse hooks can block. Currently **3 hooks** can block:
-
-| Hook | Trigger | When It Blocks |
-|------|---------|----------------|
-| `file-claims.mjs` | Edit | File claimed by another session |
-| `ralph-delegation-enforcer.mjs` | Task | Non-Ralph agents during Ralph workflow |
-| `git-memory-check.mjs` | Bash | Git commands that violate stored preferences |
-
-When blocked:
-
-```json
-{
-  "decision": "block",
-  "reason": "File claimed by another session"
-}
-```
-
-The tool execution is prevented and reason shown.
-
-## Learning Extraction Hooks
-
-These hooks capture learnings for the memory system:
-
-| Hook | When | What It Captures |
-|------|------|------------------|
-| `memory-awareness.mjs` | User prompt | Injects relevant past learnings |
-| `smarter-everyday.mjs` | Post tool use | Problem resolution patterns |
-| `user-confirmation-detector.mjs` | User prompt | "It's fixed", "that worked" signals |
-| `pre-compact-extract.mjs` | Pre-compact | Learnings before context compression |
-| `session-end-extract.mjs` | Session end | Final sweep for unextracted learnings |
-
-## Workflow Hooks
-
-| Hook | Purpose |
-|------|---------|
-| `maestro-state-manager.mjs` | Track maestro workflow state across prompts |
-| `ralph-delegation-enforcer.mjs` | Ensure tasks route through ralph agents |
-
-### ROADMAP Hooks (4 total)
-
-| Hook | Trigger | ROADMAP Section |
-|------|---------|-----------------|
-| `post-plan-roadmap.mjs` | ExitPlanMode | Current Focus + Recent Planning |
-| `prd-roadmap-sync.mjs` | Write\|Edit PRD files | Planned |
-| `git-commit-roadmap.mjs` | Bash git commit | Completed |
-| `roadmap-completion.mjs` | TaskUpdate completed | Current Focus → Completed |
+Key blockers:
+- **file-claims** -- prevents concurrent edits to same file across sessions
+- **ralph-delegation-enforcer** -- blocks direct code edits when Ralph is active
+- **plan-to-ralph-enforcer** -- blocks code edits after plan approval
+- **maestro-enforcer** -- blocks phase-skipping in Maestro workflows
+- **no-haiku-enforcer** -- blocks haiku model selection for agents
+- **test-before-done** -- blocks task completion without test evidence
 
 ## File Locations
 
 ```
 ~/.claude/hooks/
-├── src/              # TypeScript source (100+ files)
-├── dist/             # Compiled JS (run these)
-├── build.sh          # Compiler script
-└── package.json
+  src/              # TypeScript source
+  dist/             # Compiled JS (esbuild output, .mjs)
+  package.json      # Dependencies and build script
+  braintrust_hooks.py  # Python hooks for Braintrust observability
 ```
 
 ## Registration
 
-In `~/.claude/settings.json`:
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Edit",
-        "hooks": ["node ~/.claude/hooks/dist/file-claims.mjs"]
-      },
-      {
-        "matcher": "Task",
-        "hooks": ["node ~/.claude/hooks/dist/ralph-delegation-enforcer.mjs"]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": ["node ~/.claude/hooks/dist/git-memory-check.mjs"]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": ["node ~/.claude/hooks/dist/pageindex-watch.mjs"]
-      },
-      {
-        "matcher": "Grep",
-        "hooks": ["node ~/.claude/hooks/dist/epistemic-reminder.mjs"]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": ["node ~/.claude/hooks/dist/memory-awareness.mjs"]
-      },
-      {
-        "hooks": ["node ~/.claude/hooks/dist/user-confirmation-detector.mjs"]
-      }
-    ]
-  }
-}
-```
-
-## Common Hook Patterns
-
-| Pattern | Example | Use Case |
-|---------|---------|----------|
-| Block + reason | file-claims | Prevent conflicts |
-| Inject message | memory-awareness | Add context |
-| Log + continue | heartbeat | Tracking |
-| Modify input | task-router | Redirect |
-| Extract data | smarter-everyday | Learning capture |
-
-## Debugging
-
-```bash
-# Test hook manually
-echo '{"tool_name":"Edit","tool_input":{}}' | \
-  node ~/.claude/hooks/dist/my-hook.mjs
-
-# Hook stderr visible in terminal
-# Check for JSON parse errors
-```
-
-## Creating New Hooks
-
-1. Create `src/my-hook.ts`
-2. Export lifecycle function
-3. Run `npm run build` or `./build.sh`
-4. Add to settings.json
-5. Test with echo | node
-
-## Hook Categories
-
-| Category | Hooks | Purpose |
-|----------|-------|---------|
-| Session | 7 | Setup, teardown, registration |
-| Memory | 5 | Learning extraction, recall |
-| Workflow | 4 | Ralph, maestro, ROADMAP |
-| Safety | 3 | File claims, git checks |
-| Context | 3 | Knowledge tree, routing |
-| Observability | 2 | Logging, error capture |
+All hooks registered in `~/.claude/settings.json` under `hooks.<EventType>[]`.
+Use Node.js atomic read-modify-write to update settings.json (never Edit tool).

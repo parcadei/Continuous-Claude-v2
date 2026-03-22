@@ -32,16 +32,26 @@ RESEARCH
     ├── GitHub repos/issues/PRs?
     │   └── YES → pathfinder
     │
-    └── Multiple sources needed?
-        └── YES → Parallel: scout + oracle
+    ├── Multiple sources needed?
+    │   └── YES → Parallel: scout + oracle
+    │
+    ├── Symbol navigation (go-to-def, find-refs)?
+    │   └── YES → Serena MCP (resolves through barrel files, re-exports)
+    │   Text pattern search → scout / Grep
+    │
+    └── Structured platform data (Twitter, Reddit, HN, YouTube)?
+        └── YES → opencli first (44 platform adapters)
+        General web research → oracle (WebSearch)
 ```
 
 **Quick Reference:**
-| Need | Agent | Notes |
-|------|-------|-------|
+| Need | Agent/Tool | Notes |
+|------|------------|-------|
 | Find code patterns | scout | Uses Grep, Glob, Read |
 | Library docs | oracle | Uses WebSearch, WebFetch |
 | External repo | pathfinder | Clones and analyzes |
+| Symbol navigation | Serena MCP | Go-to-def, find-refs, resolves barrel files |
+| Platform data | opencli | Twitter, Reddit, HN, YouTube (44 adapters) |
 
 ---
 
@@ -166,40 +176,12 @@ Before ANY task:
 
 **Commands:**
 ```bash
-# Recall before starting (hybrid - best accuracy)
-cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/recall_learnings.py --query "relevant keywords" --hybrid
+# Recall before starting
+recall_learnings.py --query "relevant keywords"
 
 # Store after learning something
-cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/store_learning.py --type WORKING_SOLUTION --content "what worked"
+store_learning.py --type WORKING_SOLUTION --content "what worked"
 ```
-
----
-
-## Search Method Selection
-
-```
-SEARCH/RECALL
-    │
-    ├── Large structured document (ROADMAP, ARCHITECTURE)?
-    │   └── YES → --pageindex
-    │
-    ├── Need highest accuracy?
-    │   └── YES → --hybrid (recommended)
-    │
-    ├── Pattern/approach recall?
-    │   └── YES → default (vector)
-    │
-    └── Fast keyword/tag search?
-        └── YES → --text-only
-```
-
-**Quick Reference:**
-| Query Type | Flag | When |
-|------------|------|------|
-| "What does ROADMAP say about X?" | `--pageindex` | Structured doc queries |
-| "How did we solve X?" | `--hybrid` | Best accuracy |
-| Code patterns | (default) | Semantic similarity |
-| Keyword search | `--text-only` | Fast, exact matches |
 
 ---
 

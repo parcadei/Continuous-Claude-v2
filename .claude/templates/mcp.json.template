@@ -1,0 +1,62 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@upstash/context7-mcp@latest"],
+      "type": "stdio"
+    },
+    "github": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "type": "stdio"
+    },
+    "shadcn": {
+      "command": "shadcn",
+      "args": ["mcp"],
+      "env": { "NODE_TLS_REJECT_UNAUTHORIZED": "0" },
+      "type": "stdio"
+    },
+    "playwright": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@playwright/mcp@latest"],
+      "type": "stdio"
+    },
+    "chrome-devtools": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "chrome-devtools-mcp@latest"],
+      "type": "stdio"
+    },
+    "shadcnspace-mcp": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "shadcnspace-mcp@latest"],
+      "type": "stdio"
+    },
+    "next-devtools": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "next-devtools-mcp@latest"],
+      "type": "stdio"
+    },
+    "pageindex": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@pageindex/mcp"],
+      "type": "stdio"
+    },
+    "nia": {
+      "command": "cmd",
+      "args": ["/c", "uv", "tool", "run", "nia-mcp-server"],
+      "env": {
+        "NIA_API_KEY": "${NIA_API_KEY}",
+        "NIA_API_URL": "https://apigcp.trynia.ai/"
+      },
+      "type": "stdio"
+    },
+    "serena": {
+      "type": "stdio",
+      "command": "serena",
+      "args": ["start-mcp-server", "--context", "claude-code"]
+    }
+  }
+}

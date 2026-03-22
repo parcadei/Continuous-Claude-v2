@@ -40,7 +40,7 @@ fi
 $VERBOSE && echo "Syncing: $SRC -> $DST"
 
 # Directories to sync
-SYNC_DIRS="hooks/src rules agents skills scripts"
+SYNC_DIRS="hooks/src rules agents skills scripts docs"
 
 # Files/patterns to never sync
 NEVER_SYNC="CLAUDE.md RULES.md .env .credentials.json settings.json history.jsonl knowledge-tree.json"
