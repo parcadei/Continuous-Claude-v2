@@ -5,6 +5,12 @@ description: Query optimization and migration best practices
 
 # Databases Skill
 
+## Neon-Specific Operations
+
+For Neon Postgres branch management, connection strings, and project operations, see the `neonctl` skill.
+- CLI: `neonctl branches list`, `neonctl connection-string`, `neonctl set-context`
+- MCP: `mcp__Neon__run_sql`, `mcp__Neon__create_branch`
+
 ## Iron Law
 NO database changes without query optimization check.
 

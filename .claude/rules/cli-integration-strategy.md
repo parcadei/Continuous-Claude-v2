@@ -1,0 +1,57 @@
+# CLI Integration Strategy
+
+## Decision Tree: How to Give Claude Code Access to a New Platform
+
+When a new platform or application needs agent access, follow this priority order:
+
+### 1. Native CLI exists? (gh, vercel, railway, neonctl, docker)
+Install it, create skill + rule, use **Pattern 1** (Direct Bash + Skill + Rule).
+This is the gold standard — maintained by the vendor, structured output, battle-tested.
+
+### 2. Web platform with browser login? (Twitter, Reddit, HN, LinkedIn)
+Use **OpenCLI** adapter (existing or generate new with `opencli generate`).
+Zero API keys — reuses Chrome session cookies via browser bridge.
+
+### 3. Accessible via MCP? (Notion, Playwright, Paper, Neon)
+Use **MCP integration**. Best when the tool vendor ships an MCP server.
+Note: CLI is often better than MCP for scripted/batch operations (32x fewer tokens).
+
+### 4. Desktop software with source code? (GIMP, Blender, LibreOffice)
+Use **CLI-Anything** plugin to auto-generate a Python Click CLI wrapper.
+Install: `/plugin marketplace add HKUDS/CLI-Anything`
+Review generated code for security before deploying.
+
+### 5. Has a REST API but no CLI? (internal services, custom platforms)
+Write a **thin CLI wrapper script** (like `scripts/cdp.mjs`).
+Pattern: single file, JSON output to stdout, subcommand interface.
+
+### 6. None of the above?
+Use **browser automation** (Playwright MCP) as last resort.
+Highest friction, lowest reliability — only for truly GUI-only workflows.
+
+## Current CLI Inventory (18 tools)
+
+| Pattern | Tools |
+|---------|-------|
+| Direct Bash + Skill + Rule | tldr, opencli, gh, vercel, railway, neonctl, qlty, git, playwright, cdp.mjs |
+| Python harness via uv run | ast-grep, morph, braintrust, github-search |
+| MCP server | Serena, Playwright MCP, Notion, Paper, Exa, Neon, Vercel Cloud |
+| Agent delegation | deployer (Vercel + Railway), arbiter/atlas (tests) |
+
+## Known Gaps
+
+| Platform | Status | Priority |
+|----------|--------|----------|
+| Railway CLI | INTEGRATED — skill + rule + deployer agent (2026-03-23) | DONE |
+| neonctl | INTEGRATED — skill + databases cross-ref (2026-03-23) | DONE |
+| Linear | OpenCLI generate failed (SPA, no discoverable API). Needs `@linear/sdk` or GraphQL CLI wrapper | MEDIUM |
+| CLI-Anything | Not installed — for future desktop software control | LOW |
+
+## Integration Checklist (when adding a new CLI)
+
+1. Install the CLI globally (`npm i -g` or `pip install`)
+2. Verify it works: `<tool> --version` or `<tool> --help`
+3. Create skill at `.claude/skills/<tool-name>/SKILL.md`
+4. Create rule if safety gates needed (deploy, delete, etc.)
+5. Update this inventory table
+6. Sync to `~/.claude/`: `bash scripts/sync-to-active.sh`
