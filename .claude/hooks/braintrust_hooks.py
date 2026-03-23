@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import os
+import random
 import socket
 import sys
 import uuid
@@ -38,6 +39,18 @@ PROJECT = os.environ.get("BRAINTRUST_CC_PROJECT", "claude-code")
 API_URL = os.environ.get("BRAINTRUST_API_URL", "https://api.braintrust.dev")
 DEBUG = os.environ.get("BRAINTRUST_CC_DEBUG", "false").lower() == "true"
 TRACE_ENABLED = os.environ.get("TRACE_TO_BRAINTRUST", "false").lower() == "true"
+SAMPLE_RATE = float(os.environ.get("BRAINTRUST_SAMPLE_RATE", "1.0"))
+
+# Tools to SKIP tracing (high-volume, low-signal -- biggest data consumers)
+EXCLUDED_TOOLS = {
+    "Read", "Glob", "Grep", "ToolSearch",
+    "TaskList", "TaskGet", "TaskCreate", "TaskUpdate",
+    "CronList", "CronCreate", "CronDelete",
+    "ListMcpResourcesTool", "ReadMcpResourceTool",
+}
+
+# Max chars for tool input/output in PostToolUse spans
+TOOL_PAYLOAD_MAX_CHARS = 8192
 
 
 def ensure_dirs():
@@ -224,6 +237,12 @@ def session_start(input_data: dict) -> dict:
         debug(f"Session already has root span: {existing}")
         return {"result": "continue"}
 
+    # Session sampling -- skip tracing for a fraction of sessions
+    if SAMPLE_RATE < 1.0 and random.random() > SAMPLE_RATE:
+        set_session_value(session_id, "sampled_out", True)
+        log("INFO", f"Session {session_id} sampled out (rate={SAMPLE_RATE})")
+        return {"result": "continue"}
+
     project_id = get_project_id(PROJECT)
     if not project_id:
         log("ERROR", "Failed to get project")
@@ -296,6 +315,10 @@ def user_prompt_submit(input_data: dict) -> dict:
     if not session_id:
         return {"result": "continue"}
 
+    # Skip sampled-out sessions
+    if get_session_value(session_id, "sampled_out"):
+        return {"result": "continue"}
+
     root_span_id = get_session_value(session_id, "root_span_id")
     project_id = get_session_value(session_id, "project_id")
 
@@ -335,6 +358,20 @@ def user_prompt_submit(input_data: dict) -> dict:
     return {"result": "continue"}
 
 
+def _truncate_payload(data: Any, max_chars: int = TOOL_PAYLOAD_MAX_CHARS) -> Any:
+    """Truncate large payloads to reduce Braintrust log volume."""
+    if isinstance(data, str):
+        if len(data) > max_chars:
+            return data[:max_chars] + f"... [truncated, {len(data)} total chars]"
+        return data
+    if isinstance(data, dict):
+        s = json.dumps(data, default=str)
+        if len(s) > max_chars:
+            return s[:max_chars] + f"... [truncated, {len(s)} total chars]"
+        return data
+    return data
+
+
 def post_tool_use(input_data: dict) -> dict:
     """Handle PostToolUse hook."""
     debug("PostToolUse hook triggered")
@@ -346,6 +383,15 @@ def post_tool_use(input_data: dict) -> dict:
     tool_name = input_data.get("tool_name", "")
 
     if not session_id or not tool_name:
+        return {"result": "continue"}
+
+    # Skip sampled-out sessions
+    if get_session_value(session_id, "sampled_out"):
+        return {"result": "continue"}
+
+    # Skip excluded tools (high-volume, low-signal)
+    if tool_name in EXCLUDED_TOOLS:
+        debug(f"Skipping excluded tool: {tool_name}")
         return {"result": "continue"}
 
     turn_span_id = get_session_value(session_id, "current_turn_span_id")
@@ -360,12 +406,16 @@ def post_tool_use(input_data: dict) -> dict:
     tool_input = input_data.get("tool_input", {})
     tool_output = input_data.get("tool_response", input_data.get("output", {}))
 
+    # Truncate payloads to reduce data volume
+    tool_input = _truncate_payload(tool_input)
+    tool_output = _truncate_payload(tool_output)
+
     # Determine span name
-    if tool_name in ("Read", "Write", "Edit", "MultiEdit"):
-        file_path = tool_input.get("file_path", tool_input.get("path", ""))
+    if tool_name in ("Write", "Edit", "MultiEdit"):
+        file_path = tool_input.get("file_path", tool_input.get("path", "")) if isinstance(tool_input, dict) else ""
         span_name = f"{tool_name}: {Path(file_path).name}" if file_path else tool_name
     elif tool_name in ("Bash", "Terminal"):
-        cmd = str(tool_input.get("command", ""))[:50]
+        cmd = str(tool_input.get("command", "") if isinstance(tool_input, dict) else tool_input)[:50]
         span_name = f"Terminal: {cmd}"
     else:
         span_name = tool_name
@@ -410,6 +460,10 @@ def stop(input_data: dict) -> dict:
 
     if not session_id:
         debug("No session ID")
+        return {"result": "continue"}
+
+    # Skip sampled-out sessions
+    if get_session_value(session_id, "sampled_out"):
         return {"result": "continue"}
 
     # Get session state
@@ -703,12 +757,13 @@ def main():
                 os.environ[key.strip()] = value.strip()
 
     # Reload config after .env
-    global API_KEY, PROJECT, API_URL, DEBUG, TRACE_ENABLED
+    global API_KEY, PROJECT, API_URL, DEBUG, TRACE_ENABLED, SAMPLE_RATE
     API_KEY = os.environ.get("BRAINTRUST_API_KEY", "")
     PROJECT = os.environ.get("BRAINTRUST_CC_PROJECT", "claude-code")
     API_URL = os.environ.get("BRAINTRUST_API_URL", "https://api.braintrust.dev")
     DEBUG = os.environ.get("BRAINTRUST_CC_DEBUG", "false").lower() == "true"
     TRACE_ENABLED = os.environ.get("TRACE_TO_BRAINTRUST", "false").lower() == "true"
+    SAMPLE_RATE = float(os.environ.get("BRAINTRUST_SAMPLE_RATE", "1.0"))
 
     try:
         stdin_data = sys.stdin.read()
