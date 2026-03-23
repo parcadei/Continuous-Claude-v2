@@ -38,8 +38,8 @@ TIER_1_CRITICAL = [
     DocConfig("ROADMAP.md", IndexTier.CRITICAL, "ROADMAP", "Project roadmap and goals"),
     DocConfig("README.md", IndexTier.CRITICAL, "README", "Project overview"),
     DocConfig("docs/ARCHITECTURE.md", IndexTier.CRITICAL, "ARCHITECTURE", "System architecture"),
-    DocConfig(".claude/docs/CONTINUOUS-CLAUDE-GUIDE.md", IndexTier.CRITICAL, "DOCUMENTATION", "User guide"),
-    DocConfig(".claude/docs/CONTINUOUS-CLAUDE-CHEATSHEET.md", IndexTier.CRITICAL, "DOCUMENTATION", "Quick reference"),
+    DocConfig(".claude/CONTINUOUS-CLAUDE-GUIDE.md", IndexTier.CRITICAL, "DOCUMENTATION", "User guide"),
+    DocConfig(".claude/CONTINUOUS-CLAUDE-CHEATSHEET.md", IndexTier.CRITICAL, "DOCUMENTATION", "Quick reference"),
 ]
 
 TIER_2_ARCHITECTURE = [
@@ -54,6 +54,8 @@ TIER_2_ARCHITECTURE = [
     DocConfig(".claude/docs/architecture/quick-ref/hook-catalog.md", IndexTier.ARCHITECTURE, "DOCUMENTATION", "Hook catalog"),
     DocConfig(".claude/docs/architecture/quick-ref/command-ref.md", IndexTier.ARCHITECTURE, "DOCUMENTATION", "Command reference"),
     DocConfig("docs/memory-architecture.md", IndexTier.ARCHITECTURE, "ARCHITECTURE", "Memory system design"),
+    DocConfig("docs/hooks/README.md", IndexTier.ARCHITECTURE, "DOCUMENTATION", "Full hook reference (718 lines)"),
+    DocConfig("docs/agents/README.md", IndexTier.ARCHITECTURE, "DOCUMENTATION", "Agent selection guide (750 lines)"),
 ]
 
 TOP_SKILLS = [

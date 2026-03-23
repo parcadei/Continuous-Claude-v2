@@ -306,7 +306,39 @@ ${lines.join("\n")}
 Install relevant skills to enhance your work on this project.`
     );
   }
-  if (missing.length === 0 && skillWarnings.length === 0 && skillRecommendationMessages.length === 0) {
+  const maintenanceWarnings = [];
+  const roadmapPath = path.join(projectDir, "ROADMAP.md");
+  if (fs.existsSync(roadmapPath)) {
+    try {
+      const roadmapContent = fs.readFileSync(roadmapPath, "utf-8");
+      const completedCount = (roadmapContent.match(/^- \[x\]/gm) || []).length;
+      if (completedCount > 50) {
+        maintenanceWarnings.push(`[i] ROADMAP has ${completedCount} completed items (threshold: 50). Consider archiving old entries.`);
+      }
+    } catch {
+    }
+  }
+  if (projectDir.includes("continuous-claude")) {
+    const hookSrcDir = path.join(projectDir, ".claude", "hooks", "src");
+    const hookDistDir = path.join(projectDir, ".claude", "hooks", "dist");
+    if (fs.existsSync(hookSrcDir) && fs.existsSync(hookDistDir)) {
+      try {
+        const distMtime = fs.statSync(hookDistDir).mtimeMs;
+        const staleFiles = fs.readdirSync(hookSrcDir).filter((f) => f.endsWith(".ts")).filter((f) => {
+          try {
+            return fs.statSync(path.join(hookSrcDir, f)).mtimeMs > distMtime;
+          } catch {
+            return false;
+          }
+        });
+        if (staleFiles.length > 0) {
+          maintenanceWarnings.push(`[!] Hook dist/ is stale -- ${staleFiles.length} source files newer than dist. Run: cd ~/.claude/hooks && npm run build`);
+        }
+      } catch {
+      }
+    }
+  }
+  if (missing.length === 0 && skillWarnings.length === 0 && skillRecommendationMessages.length === 0 && maintenanceWarnings.length === 0) {
     console.log(JSON.stringify({ result: "continue" }));
     return;
   }
@@ -321,6 +353,10 @@ Install relevant skills to enhance your work on this project.`
   if (skillRecommendationMessages.length > 0) {
     if (message) message += "\n";
     message += skillRecommendationMessages.join("\n");
+  }
+  if (maintenanceWarnings.length > 0) {
+    if (message) message += "\n";
+    message += maintenanceWarnings.join("\n");
   }
   console.error(message);
   const output = {
