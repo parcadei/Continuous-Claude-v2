@@ -1,0 +1,26 @@
+{
+  "suite": "qlty",
+  "timestamp": "2026-03-24T03:30:39.987Z",
+  "tests": [
+    {
+      "name": "qlty --version exits 0",
+      "status": "skip",
+      "reason": "qlty not installed",
+      "tier": "smoke"
+    },
+    {
+      "name": "qlty skill file exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "pass": 1,
+    "fail": 0,
+    "skip": 1
+  },
+  "grade": "A",
+  "duration_ms": 110
+}

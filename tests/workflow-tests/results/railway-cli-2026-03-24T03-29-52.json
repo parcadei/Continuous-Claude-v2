@@ -1,0 +1,74 @@
+{
+  "suite": "railway-cli",
+  "timestamp": "2026-03-24T03:29:49.075Z",
+  "tests": [
+    {
+      "name": "railway --help exits 0",
+      "status": "pass",
+      "duration_ms": 926,
+      "tier": "smoke"
+    },
+    {
+      "name": "railway -V outputs version",
+      "status": "pass",
+      "duration_ms": 1000,
+      "tier": "smoke"
+    },
+    {
+      "name": "SKILL.md exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "references/deployment.md exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "references/environment.md exists",
+      "status": "pass",
+      "duration_ms": 1,
+      "tier": "smoke"
+    },
+    {
+      "name": "references/monitoring.md exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "references/services.md exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "railway-deploy rule exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "SKILL.md contains name: railway-cli",
+      "status": "pass",
+      "duration_ms": 1,
+      "tier": "smoke"
+    },
+    {
+      "name": "railway whoami returns username",
+      "status": "pass",
+      "duration_ms": 1520,
+      "tier": "integration"
+    }
+  ],
+  "summary": {
+    "total": 10,
+    "pass": 10,
+    "fail": 0,
+    "skip": 0
+  },
+  "grade": "A",
+  "duration_ms": 3453
+}

@@ -1,0 +1,62 @@
+{
+  "suite": "opencli",
+  "timestamp": "2026-03-24T03:30:38.087Z",
+  "tests": [
+    {
+      "name": "opencli --version exits 0",
+      "status": "pass",
+      "duration_ms": 884,
+      "tier": "smoke"
+    },
+    {
+      "name": "opencli list returns 30+ lines (44+ adapters)",
+      "status": "pass",
+      "duration_ms": 2110,
+      "tier": "smoke"
+    },
+    {
+      "name": "SKILL.md exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "opencli-first.md rule exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "opencli-first.md does not reference Chrome DevTools MCP",
+      "status": "pass",
+      "duration_ms": 1,
+      "tier": "smoke"
+    },
+    {
+      "name": "opencli doctor exits 0",
+      "status": "pass",
+      "duration_ms": 918,
+      "tier": "integration"
+    },
+    {
+      "name": "hackernews top returns JSON array with >= 1 item",
+      "status": "pass",
+      "duration_ms": 1561,
+      "tier": "integration"
+    },
+    {
+      "name": "opencli list contains hackernews adapter",
+      "status": "pass",
+      "duration_ms": 2377,
+      "tier": "integration"
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "pass": 8,
+    "fail": 0,
+    "skip": 0
+  },
+  "grade": "A",
+  "duration_ms": 7854
+}

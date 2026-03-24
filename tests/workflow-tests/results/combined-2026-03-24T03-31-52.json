@@ -1,0 +1,125 @@
+{
+  "timestamp": "2026-03-24T03:31:52.334Z",
+  "overall": {
+    "total": 106,
+    "pass": 94,
+    "fail": 1,
+    "skip": 11,
+    "grade": "B",
+    "passRate": 98.9
+  },
+  "suites": [
+    {
+      "name": "browser-automation",
+      "total": 8,
+      "pass": 8,
+      "fail": 0,
+      "skip": 0,
+      "grade": "A"
+    },
+    {
+      "name": "cdp-cli",
+      "total": 13,
+      "pass": 2,
+      "fail": 1,
+      "skip": 10,
+      "grade": "F"
+    },
+    {
+      "name": "cli-strategy",
+      "total": 13,
+      "pass": 13,
+      "fail": 0,
+      "skip": 0,
+      "grade": "A"
+    },
+    {
+      "name": "deployer-agent",
+      "total": 11,
+      "pass": 11,
+      "fail": 0,
+      "skip": 0,
+      "grade": "A"
+    },
+    {
+      "name": "docker",
+      "total": 4,
+      "pass": 4,
+      "fail": 0,
+      "skip": 0,
+      "grade": "A"
+    },
+    {
+      "name": "gh-cli",
+      "total": 2,
+      "pass": 2,
+      "fail": 0,
+      "skip": 0,
+      "grade": "A"
+    },
+    {
+      "name": "neonctl",
+      "total": 11,
+      "pass": 11,
+      "fail": 0,
+      "skip": 0,
+      "grade": "A"
+    },
+    {
+      "name": "opencli",
+      "total": 8,
+      "pass": 8,
+      "fail": 0,
+      "skip": 0,
+      "grade": "A"
+    },
+    {
+      "name": "qlty",
+      "total": 2,
+      "pass": 1,
+      "fail": 0,
+      "skip": 1,
+      "grade": "A"
+    },
+    {
+      "name": "railway-cli",
+      "total": 10,
+      "pass": 10,
+      "fail": 0,
+      "skip": 0,
+      "grade": "A"
+    },
+    {
+      "name": "skill-rules",
+      "total": 9,
+      "pass": 9,
+      "fail": 0,
+      "skip": 0,
+      "grade": "A"
+    },
+    {
+      "name": "stale-refs",
+      "total": 6,
+      "pass": 6,
+      "fail": 0,
+      "skip": 0,
+      "grade": "A"
+    },
+    {
+      "name": "tldr",
+      "total": 4,
+      "pass": 4,
+      "fail": 0,
+      "skip": 0,
+      "grade": "A"
+    },
+    {
+      "name": "vercel-cli",
+      "total": 5,
+      "pass": 5,
+      "fail": 0,
+      "skip": 0,
+      "grade": "A"
+    }
+  ]
+}

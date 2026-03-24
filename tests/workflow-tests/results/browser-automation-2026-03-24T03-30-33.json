@@ -1,0 +1,62 @@
+{
+  "suite": "browser-automation",
+  "timestamp": "2026-03-24T03:30:33.180Z",
+  "tests": [
+    {
+      "name": "browser-automation.md rule exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "browser-automation.md contains CDP CLI",
+      "status": "pass",
+      "duration_ms": 1,
+      "tier": "smoke"
+    },
+    {
+      "name": "browser-automation.md Tier 2 row does not reference Chrome DevTools MCP",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "tier2-devtools.md reference exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "tier2-devtools.md contains cdp.mjs",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "browser-dev-cycle SKILL.md contains CDP CLI",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "tool-comparison.md contains CDP CLI",
+      "status": "pass",
+      "duration_ms": 1,
+      "tier": "smoke"
+    },
+    {
+      "name": "workflow-recipes.md does not contain devtools_ prefix",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "pass": 8,
+    "fail": 0,
+    "skip": 0
+  },
+  "grade": "A",
+  "duration_ms": 6
+}

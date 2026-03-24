@@ -1,0 +1,68 @@
+{
+  "suite": "skill-rules",
+  "timestamp": "2026-03-24T03:30:49.356Z",
+  "tests": [
+    {
+      "name": "repo copy exists",
+      "status": "pass",
+      "duration_ms": 1,
+      "tier": "smoke"
+    },
+    {
+      "name": "active copy exists",
+      "status": "pass",
+      "duration_ms": 1,
+      "tier": "smoke"
+    },
+    {
+      "name": "repo copy has railway-cli key",
+      "status": "pass",
+      "duration_ms": 1,
+      "tier": "smoke"
+    },
+    {
+      "name": "repo copy has neonctl key",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "railway-cli score >= 80",
+      "status": "pass",
+      "duration_ms": 2,
+      "tier": "smoke"
+    },
+    {
+      "name": "neonctl score >= 80",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "railway-cli keywords include \"railway\"",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "neonctl keywords include \"neonctl\"",
+      "status": "pass",
+      "duration_ms": 1,
+      "tier": "smoke"
+    },
+    {
+      "name": "active copy matches repo copy for railway-cli and neonctl",
+      "status": "pass",
+      "duration_ms": 3,
+      "tier": "smoke"
+    }
+  ],
+  "summary": {
+    "total": 9,
+    "pass": 9,
+    "fail": 0,
+    "skip": 0
+  },
+  "grade": "A",
+  "duration_ms": 11
+}

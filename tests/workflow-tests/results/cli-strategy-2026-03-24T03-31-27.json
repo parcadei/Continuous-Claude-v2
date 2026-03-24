@@ -1,0 +1,92 @@
+{
+  "suite": "cli-strategy",
+  "timestamp": "2026-03-24T03:31:24.254Z",
+  "tests": [
+    {
+      "name": "strategy file exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "integration"
+    },
+    {
+      "name": "contains 6-tier decision tree",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "integration"
+    },
+    {
+      "name": "Railway marked DONE",
+      "status": "pass",
+      "duration_ms": 1,
+      "tier": "integration"
+    },
+    {
+      "name": "neonctl marked DONE",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "integration"
+    },
+    {
+      "name": "inventory contains railway",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "integration"
+    },
+    {
+      "name": "inventory contains neonctl",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "integration"
+    },
+    {
+      "name": "inventory contains cdp.mjs",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "integration"
+    },
+    {
+      "name": "inventory contains opencli",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "integration"
+    },
+    {
+      "name": "does NOT reference Chrome DevTools MCP",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "integration"
+    },
+    {
+      "name": "railway --help exits 0",
+      "status": "pass",
+      "duration_ms": 768,
+      "tier": "integration"
+    },
+    {
+      "name": "neonctl --help exits 0",
+      "status": "pass",
+      "duration_ms": 1143,
+      "tier": "integration"
+    },
+    {
+      "name": "gh --version exits 0",
+      "status": "pass",
+      "duration_ms": 174,
+      "tier": "integration"
+    },
+    {
+      "name": "vercel --version exits 0",
+      "status": "pass",
+      "duration_ms": 1023,
+      "tier": "integration"
+    }
+  ],
+  "summary": {
+    "total": 13,
+    "pass": 13,
+    "fail": 0,
+    "skip": 0
+  },
+  "grade": "A",
+  "duration_ms": 3112
+}

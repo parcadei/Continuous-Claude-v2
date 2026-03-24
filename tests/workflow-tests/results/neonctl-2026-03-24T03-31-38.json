@@ -1,0 +1,80 @@
+{
+  "suite": "neonctl",
+  "timestamp": "2026-03-24T03:31:32.859Z",
+  "tests": [
+    {
+      "name": "neonctl --help exits 0",
+      "status": "pass",
+      "duration_ms": 1171,
+      "tier": "smoke"
+    },
+    {
+      "name": "neonctl -v outputs version",
+      "status": "pass",
+      "duration_ms": 1112,
+      "tier": "smoke"
+    },
+    {
+      "name": "SKILL.md exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "references/branches.md exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "references/connection.md exists",
+      "status": "pass",
+      "duration_ms": 1,
+      "tier": "smoke"
+    },
+    {
+      "name": "references/sql.md exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "references/projects.md exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "neonctl-safety rule exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "SKILL.md contains -o json",
+      "status": "pass",
+      "duration_ms": 1,
+      "tier": "smoke"
+    },
+    {
+      "name": "databases skill references neonctl",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "neonctl me -o json returns valid JSON",
+      "status": "pass",
+      "duration_ms": 3674,
+      "tier": "integration"
+    }
+  ],
+  "summary": {
+    "total": 11,
+    "pass": 11,
+    "fail": 0,
+    "skip": 0
+  },
+  "grade": "A",
+  "duration_ms": 5962
+}

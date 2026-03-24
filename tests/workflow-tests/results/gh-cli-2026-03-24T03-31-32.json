@@ -1,0 +1,26 @@
+{
+  "suite": "gh-cli",
+  "timestamp": "2026-03-24T03:31:31.005Z",
+  "tests": [
+    {
+      "name": "gh --version exits 0",
+      "status": "pass",
+      "duration_ms": 190,
+      "tier": "smoke"
+    },
+    {
+      "name": "gh api user returns login",
+      "status": "pass",
+      "duration_ms": 1535,
+      "tier": "integration"
+    }
+  ],
+  "summary": {
+    "total": 2,
+    "pass": 2,
+    "fail": 0,
+    "skip": 0
+  },
+  "grade": "A",
+  "duration_ms": 1727
+}

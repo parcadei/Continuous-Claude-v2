@@ -1,0 +1,93 @@
+{
+  "suite": "cdp-cli",
+  "timestamp": "2026-03-24T03:30:59.650Z",
+  "tests": [
+    {
+      "name": "cdp.mjs file exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "help returns valid JSON with 13 commands",
+      "status": "fail",
+      "error": "Expected 13 commands, got 14: navigate <url>, snapshot [-i], screenshot [path] [--full], eval <expression>, title, url, perf, network, console, a11y, lighthouse <url>, tabs, cleanup, help",
+      "duration_ms": 1072,
+      "tier": "smoke"
+    },
+    {
+      "name": "help output includes cleanup command",
+      "status": "pass",
+      "duration_ms": 1804,
+      "tier": "smoke"
+    },
+    {
+      "name": "navigate to example.com",
+      "status": "skip",
+      "reason": "Chrome not available or navigate failed",
+      "tier": "integration"
+    },
+    {
+      "name": "title returns non-empty string",
+      "status": "skip",
+      "reason": "Chrome not available",
+      "tier": "integration"
+    },
+    {
+      "name": "url starts with http",
+      "status": "skip",
+      "reason": "Chrome not available",
+      "tier": "integration"
+    },
+    {
+      "name": "perf returns ttfb as number",
+      "status": "skip",
+      "reason": "Chrome not available",
+      "tier": "integration"
+    },
+    {
+      "name": "network returns count as number",
+      "status": "skip",
+      "reason": "Chrome not available",
+      "tier": "integration"
+    },
+    {
+      "name": "a11y returns issueCount as number",
+      "status": "skip",
+      "reason": "Chrome not available",
+      "tier": "integration"
+    },
+    {
+      "name": "snapshot returns nodeCount > 0",
+      "status": "skip",
+      "reason": "Chrome not available",
+      "tier": "integration"
+    },
+    {
+      "name": "eval \"1+1\" returns 2",
+      "status": "skip",
+      "reason": "Chrome not available",
+      "tier": "integration"
+    },
+    {
+      "name": "tabs returns count > 0",
+      "status": "skip",
+      "reason": "Chrome not available",
+      "tier": "integration"
+    },
+    {
+      "name": "cleanup succeeds",
+      "status": "skip",
+      "reason": "Chrome not available",
+      "tier": "integration"
+    }
+  ],
+  "summary": {
+    "total": 13,
+    "pass": 2,
+    "fail": 1,
+    "skip": 10
+  },
+  "grade": "F",
+  "duration_ms": 24475
+}

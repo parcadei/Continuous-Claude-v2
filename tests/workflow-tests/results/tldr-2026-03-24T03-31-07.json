@@ -1,0 +1,38 @@
+{
+  "suite": "tldr",
+  "timestamp": "2026-03-24T03:31:05.628Z",
+  "tests": [
+    {
+      "name": "tldr --help or tldr help exits 0",
+      "status": "pass",
+      "duration_ms": 996,
+      "tier": "integration"
+    },
+    {
+      "name": "tldr tree returns output for scripts dir",
+      "status": "pass",
+      "duration_ms": 437,
+      "tier": "integration"
+    },
+    {
+      "name": "tldr structure returns output for cdp.mjs",
+      "status": "pass",
+      "duration_ms": 481,
+      "tier": "integration"
+    },
+    {
+      "name": "tldr search finds functions in scripts dir",
+      "status": "pass",
+      "duration_ms": 380,
+      "tier": "integration"
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "pass": 4,
+    "fail": 0,
+    "skip": 0
+  },
+  "grade": "A",
+  "duration_ms": 2299
+}

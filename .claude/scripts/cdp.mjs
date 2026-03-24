@@ -27,16 +27,48 @@
 //   a11y                        Accessibility audit
 //   lighthouse <url>            Run Lighthouse audit (requires lighthouse CLI)
 //   tabs                        List all open tabs/pages
+//   cleanup                     Kill managed Chrome process and remove PID file
 //   help                        Show this help
 
 import { chromium } from 'playwright-core';
-import { execSync, spawn } from 'child_process';
-import { existsSync, readFileSync } from 'fs';
+import { spawn, spawnSync } from 'child_process';
+import { existsSync, readFileSync, writeFileSync, rmSync, unlinkSync } from 'fs';
 import { join } from 'path';
 
 const CDP_URL = process.env.CDP_URL || 'http://localhost:9222';
+const PID_FILE = join(process.env.TEMP || '/tmp', 'cdp-chrome.pid');
 const cmd = process.argv[2];
 const args = process.argv.slice(3);
+
+function readPid() {
+  try {
+    if (existsSync(PID_FILE)) {
+      return parseInt(readFileSync(PID_FILE, 'utf8').trim(), 10);
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
+function writePid(pid) {
+  try { writeFileSync(PID_FILE, String(pid), 'utf8'); } catch { /* ignore */ }
+}
+
+function isProcessRunning(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function killPid(pid) {
+  try { process.kill(pid); } catch { /* ignore */ }
+}
+
+function removePidFile() {
+  try { unlinkSync(PID_FILE); } catch { /* ignore */ }
+}
 
 function out(data) {
   console.log(JSON.stringify(data));
@@ -65,6 +97,7 @@ function help() {
       'a11y': 'Accessibility audit (images, labels, headings, lang)',
       'lighthouse <url>': 'Run Lighthouse audit via CLI (JSON output)',
       'tabs': 'List all open browser tabs',
+      'cleanup': 'Kill managed Chrome process and remove PID file',
       'help': 'Show available commands',
     },
   });
@@ -87,6 +120,21 @@ async function launchChrome() {
   const chromePath = findChrome();
   const port = CDP_URL.match(/:(\d+)/)?.[1] || '9222';
 
+  // Check PID file — if a managed Chrome is already running, try to connect directly
+  const existingPid = readPid();
+  if (existingPid && isProcessRunning(existingPid)) {
+    process.stderr.write('CDP CLI: Found managed Chrome (PID ' + existingPid + '). Trying to connect...\n');
+    try {
+      const browser = await chromium.connectOverCDP(CDP_URL);
+      const contexts = browser.contexts();
+      if (contexts.length) {
+        process.stderr.write('CDP CLI: Connected to existing managed Chrome\n');
+        return browser;
+      }
+      await browser.close();
+    } catch { /* managed process exists but not reachable on CDP port, continue to launch */ }
+  }
+
   // Strategy 1: Try to restart user's Chrome with debug port
   // This preserves credentials, cookies, and login sessions
   process.stderr.write('CDP CLI: No Chrome on port ' + port + '. Launching with your profile...\n');
@@ -100,9 +148,10 @@ async function launchChrome() {
     stdio: 'ignore',
   });
   child.unref();
+  writePid(child.pid);
 
-  // Wait for Chrome to become reachable (up to 10 seconds)
-  for (let i = 0; i < 20; i++) {
+  // Wait for Chrome to become reachable (up to 15 seconds)
+  for (let i = 0; i < 30; i++) {
     await new Promise(r => setTimeout(r, 500));
     try {
       const browser = await chromium.connectOverCDP(CDP_URL);
@@ -120,6 +169,10 @@ async function launchChrome() {
   process.stderr.write('CDP CLI: Default profile locked. Launching clean profile (no credentials)...\n');
   const userDataDir = join(process.env.TEMP || '/tmp', 'chrome-cdp');
 
+  // Remove stale SingletonLock that prevents Chrome from starting with this profile
+  const lockPath = join(userDataDir, 'SingletonLock');
+  try { rmSync(lockPath, { force: true }); } catch { /* ignore */ }
+
   const child2 = spawn(chromePath, [
     '--remote-debugging-port=' + port,
     '--user-data-dir=' + userDataDir,
@@ -130,8 +183,10 @@ async function launchChrome() {
     stdio: 'ignore',
   });
   child2.unref();
+  writePid(child2.pid);
 
-  for (let i = 0; i < 16; i++) {
+  // Wait for Chrome to become reachable (up to 10 seconds)
+  for (let i = 0; i < 20; i++) {
     await new Promise(r => setTimeout(r, 500));
     try {
       const browser = await chromium.connectOverCDP(CDP_URL);
@@ -154,7 +209,7 @@ async function connect() {
   try {
     browser = await chromium.connectOverCDP(CDP_URL);
   } catch (e) {
-    if (e.message.includes('ECONNREFUSED') || e.message.includes('connect')) {
+    if (e.message.includes('ECONNREFUSED')) {
       // Auto-launch Chrome
       browser = await launchChrome();
     } else {
@@ -175,6 +230,21 @@ async function connect() {
 async function main() {
   if (!cmd || cmd === 'help' || cmd === '--help' || cmd === '-h') {
     help();
+    return;
+  }
+
+  if (cmd === 'cleanup') {
+    const pid = readPid();
+    if (pid && isProcessRunning(pid)) {
+      killPid(pid);
+      removePidFile();
+      ok({ message: 'Killed Chrome process ' + pid + ' and removed PID file' });
+    } else if (pid) {
+      removePidFile();
+      ok({ message: 'Chrome process ' + pid + ' was not running. Removed stale PID file.' });
+    } else {
+      ok({ message: 'No PID file found. Nothing to clean up.' });
+    }
     return;
   }
 
@@ -199,29 +269,32 @@ async function main() {
         const interestingOnly = args.includes('-i');
         // Use CDP directly since page.accessibility was removed in Playwright 1.49+
         const cdpSession = await page.context().newCDPSession(page);
-        const { nodes } = await cdpSession.send('Accessibility.getFullAXTree');
-        await cdpSession.detach();
+        try {
+          const { nodes } = await cdpSession.send('Accessibility.getFullAXTree');
 
-        // Build a simplified tree
-        function simplifyNode(node) {
-          const result = {};
-          if (node.role?.value && node.role.value !== 'none') result.role = node.role.value;
-          if (node.name?.value) result.name = node.name.value;
-          if (node.value?.value) result.value = node.value.value;
-          if (node.description?.value) result.description = node.description.value;
-          return result;
+          // Build a simplified tree
+          function simplifyNode(node) {
+            const result = {};
+            if (node.role?.value && node.role.value !== 'none') result.role = node.role.value;
+            if (node.name?.value) result.name = node.name.value;
+            if (node.value?.value) result.value = node.value.value;
+            if (node.description?.value) result.description = node.description.value;
+            return result;
+          }
+
+          let tree;
+          if (interestingOnly) {
+            tree = nodes
+              .map(simplifyNode)
+              .filter(n => n.role && n.role !== 'generic' && n.role !== 'InlineTextBox' && (n.name || n.value));
+          } else {
+            tree = nodes.map(simplifyNode).filter(n => n.role);
+          }
+
+          ok({ nodeCount: tree.length, snapshot: tree });
+        } finally {
+          await cdpSession.detach();
         }
-
-        let tree;
-        if (interestingOnly) {
-          tree = nodes
-            .map(simplifyNode)
-            .filter(n => n.role && n.role !== 'generic' && n.role !== 'InlineTextBox' && (n.name || n.value));
-        } else {
-          tree = nodes.map(simplifyNode).filter(n => n.role);
-        }
-
-        ok({ nodeCount: tree.length, snapshot: tree });
         break;
       }
 
@@ -367,19 +440,30 @@ async function main() {
       }
 
       case 'lighthouse': {
-        const url = args[0] || page.url();
-        if (!url || url === 'about:blank') {
+        const lhUrl = args[0] || page.url();
+        if (!lhUrl || lhUrl === 'about:blank') {
           fail('Usage: lighthouse <url>');
           break;
         }
         try {
-          const output = execSync(
-            `npx lighthouse "${url}" --output=json --chrome-flags="--headless" --only-categories=performance,accessibility,best-practices,seo --quiet`,
-            { maxBuffer: 10 * 1024 * 1024, timeout: 120000 }
-          );
-          const report = JSON.parse(output.toString());
+          const result = spawnSync('npx', [
+            'lighthouse', lhUrl, '--output=json',
+            '--chrome-flags=--headless', '--port=0',
+            '--only-categories=performance,accessibility,best-practices,seo',
+            '--quiet'
+          ], { maxBuffer: 10 * 1024 * 1024, timeout: 120000 });
+
+          if (result.error) {
+            throw result.error;
+          }
+          if (result.status !== 0) {
+            const stderr = result.stderr ? result.stderr.toString().slice(0, 200) : 'unknown error';
+            throw new Error('Lighthouse exited with code ' + result.status + ': ' + stderr);
+          }
+
+          const report = JSON.parse(result.stdout.toString());
           ok({
-            url: report.finalUrl || url,
+            url: report.finalUrl || lhUrl,
             scores: {
               performance: Math.round((report.categories.performance?.score || 0) * 100),
               accessibility: Math.round((report.categories.accessibility?.score || 0) * 100),
@@ -395,7 +479,7 @@ async function main() {
             },
           });
         } catch (e) {
-          fail('Lighthouse failed: ' + (e.stderr ? e.stderr.toString().slice(0, 200) : e.message));
+          fail('Lighthouse failed: ' + e.message);
         }
         break;
       }

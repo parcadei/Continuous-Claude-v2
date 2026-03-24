@@ -1,0 +1,92 @@
+{
+  "suite": "cdp-cli",
+  "timestamp": "2026-03-24T03:32:21.999Z",
+  "tests": [
+    {
+      "name": "cdp.mjs file exists",
+      "status": "pass",
+      "duration_ms": 0,
+      "tier": "smoke"
+    },
+    {
+      "name": "help returns valid JSON with >= 13 commands",
+      "status": "pass",
+      "duration_ms": 634,
+      "tier": "smoke"
+    },
+    {
+      "name": "help output includes cleanup command",
+      "status": "pass",
+      "duration_ms": 588,
+      "tier": "smoke"
+    },
+    {
+      "name": "navigate to example.com",
+      "status": "pass",
+      "duration_ms": 27716,
+      "tier": "integration"
+    },
+    {
+      "name": "title returns non-empty string",
+      "status": "pass",
+      "duration_ms": 1239,
+      "tier": "integration"
+    },
+    {
+      "name": "url starts with http",
+      "status": "pass",
+      "duration_ms": 1268,
+      "tier": "integration"
+    },
+    {
+      "name": "perf returns ttfb as number",
+      "status": "pass",
+      "duration_ms": 1214,
+      "tier": "integration"
+    },
+    {
+      "name": "network returns count as number",
+      "status": "pass",
+      "duration_ms": 1239,
+      "tier": "integration"
+    },
+    {
+      "name": "a11y returns issueCount as number",
+      "status": "pass",
+      "duration_ms": 1212,
+      "tier": "integration"
+    },
+    {
+      "name": "snapshot returns nodeCount > 0",
+      "status": "pass",
+      "duration_ms": 1232,
+      "tier": "integration"
+    },
+    {
+      "name": "eval \"1+1\" returns 2",
+      "status": "pass",
+      "duration_ms": 1258,
+      "tier": "integration"
+    },
+    {
+      "name": "tabs returns count > 0",
+      "status": "pass",
+      "duration_ms": 1210,
+      "tier": "integration"
+    },
+    {
+      "name": "cleanup succeeds",
+      "status": "pass",
+      "duration_ms": 601,
+      "tier": "integration"
+    }
+  ],
+  "summary": {
+    "total": 13,
+    "pass": 13,
+    "fail": 0,
+    "skip": 0
+  },
+  "grade": "A",
+  "duration_ms": 39414
+}

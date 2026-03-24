@@ -1,0 +1,38 @@
+{
+  "suite": "docker",
+  "timestamp": "2026-03-24T03:31:27.814Z",
+  "tests": [
+    {
+      "name": "docker --version exits 0",
+      "status": "pass",
+      "duration_ms": 589,
+      "tier": "integration"
+    },
+    {
+      "name": "docker compose version exits 0",
+      "status": "pass",
+      "duration_ms": 686,
+      "tier": "integration"
+    },
+    {
+      "name": "docker ps exits 0 (daemon running)",
+      "status": "pass",
+      "duration_ms": 547,
+      "tier": "integration"
+    },
+    {
+      "name": "Postgres container healthy (pg_isready)",
+      "status": "pass",
+      "duration_ms": 1229,
+      "tier": "integration"
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "pass": 4,
+    "fail": 0,
+    "skip": 0
+  },
+  "grade": "A",
+  "duration_ms": 3054
+}
