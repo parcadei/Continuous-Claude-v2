@@ -11,6 +11,8 @@ The Neon CLI (`neonctl`) manages Neon Postgres projects, branches, databases, an
 
 `neonctl auth` opens a browser for OAuth login. Credentials are stored in `~/.config/neonctl/`. Alternatively, set `--api-key` or the `NEON_API_KEY` env var.
 
+If commands fail with auth errors, run `neonctl auth` to re-authenticate via browser, or set `NEON_API_KEY` environment variable for CI.
+
 ## Quick Start
 
 ```bash

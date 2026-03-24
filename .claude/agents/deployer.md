@@ -23,6 +23,7 @@ You manage deployments for the current project. Detect the platform first, then 
 | User mentions "railway" | Railway | Load Railway context |
 | User mentions "vercel" | Vercel | Load Vercel context |
 | Neither detected | Ask user | Clarify which platform |
+| BOTH `.vercel/` and `.railway/` exist | Ask user | Do not guess — ask which platform they intend to deploy to |
 
 ---
 
@@ -80,9 +81,10 @@ When asked to verify a deployment:
 | View HTTP logs | CLI | `railway logs --http` |
 | Stream live logs | CLI | `railway logs` |
 | Manage env vars | CLI | `railway variable list/set/delete` |
-| Rollback | CLI | `railway down` |
+| Remove latest deploy | CLI | `railway down` (WARNING: removes deployment, NOT a rollback to previous version) |
+| List deployments | CLI | `railway deployment list -s <service>` |
 | Redeploy | CLI | `railway redeploy` |
-| Restart (no rebuild) | CLI | `railway restart` |
+| Restart (no rebuild) | CLI | `railway restart` (confirm with user before running) |
 | Open dashboard | CLI | `railway open` |
 | Domain management | CLI | `railway domain` |
 | Database shell | CLI | `railway connect` |
@@ -119,3 +121,4 @@ When delegated by Ralph for deploy verification:
 - For Vercel monitoring: prefer Cloud MCP tools (structured, filterable)
 - For Railway: all operations use CLI via Bash
 - If neither `.vercel/` nor `.railway/` exists, report that the project is not linked to a deployment platform
+- For true Railway rollback: `railway deployment list -s <service>` to find prior deployment ID, then use Railway dashboard to promote it. `railway down` is NOT a rollback — it removes the latest deployment.

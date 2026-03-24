@@ -39,6 +39,15 @@ railway logs <deployment-id>                  # logs from a specific deployment
 railway logs --latest                         # logs from latest deployment (even if failed)
 ```
 
+## List Deployments
+
+```bash
+railway deployment list -s <service>      # List deployments with IDs
+railway deployment list -s backend -o json # JSON output for scripting
+```
+
+Note: needed to get deployment IDs for targeted `railway logs <deployment-id>`.
+
 ## Status
 
 ```bash

@@ -19,7 +19,7 @@ neonctl branches create --name dev --schema-only      # schema only, no data
 neonctl branches create --name temp --psql            # create and connect via psql
 ```
 
-Key flags: `--name`, `--parent`, `--schema-only`, `--cu <size>`, `--suspend-timeout <seconds>`, `--expires-at <ISO-date>`, `--no-compute`
+Key flags: `--name`, `--parent`, `--schema-only`, `--cu <size>`, `--suspend-timeout <seconds>`, `--expires-at <ISO-date>`, `--no-compute`, `--type read_only` (creates a read replica)
 
 ## Get Branch Details
 
@@ -40,6 +40,14 @@ neonctl branches reset dev --preserve-under-name old  # keep old data under new 
 
 ```bash
 neonctl branches delete feature/auth
+```
+
+## Additional Operations
+
+```bash
+neonctl branches restore <target> <source>[@timestamp]  # Point-in-time restore
+neonctl branches rename <id|name> <new-name>            # Rename branch
+neonctl branches set-default <id|name>                  # Change default branch
 ```
 
 ## Schema Diff

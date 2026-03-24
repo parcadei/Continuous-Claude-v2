@@ -3348,5 +3348,30 @@
       "medium": "Moderate - Trigger for clear matches",
       "low": "Optional - Trigger only for explicit matches"
     }
+  },
+  "railway-cli": {
+    "keywords": [
+      "railway",
+      "railway deploy",
+      "railway up",
+      "railway logs",
+      "railway status",
+      "railway variables",
+      "railway environment"
+    ],
+    "score": 90,
+    "status": "verified"
+  },
+  "neonctl": {
+    "keywords": [
+      "neonctl",
+      "neon branch",
+      "neon database",
+      "connection string",
+      "neon project",
+      "neon postgres"
+    ],
+    "score": 90,
+    "status": "verified"
   }
 }

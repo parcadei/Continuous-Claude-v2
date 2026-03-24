@@ -1,6 +1,6 @@
 ---
 name: browser-dev-cycle
-description: Full development cycle browser automation for viewing, debugging, testing, and visual inspection of web apps. Four-tier strategy: @playwright/mcp (interaction), Chrome DevTools MCP (performance), Playwright-core (scripting), and Playwright CLI (e2e test suites). Use when users need to browse, take screenshots, debug network/performance, run e2e tests, record tests with codegen, or do visual QA. Triggers on "browser", "screenshot", "viewport", "performance trace", "network debug", "visual QA", "responsive test", "e2e test", "playwright test", "codegen", "test suite".
+description: Full development cycle browser automation for viewing, debugging, testing, and visual inspection of web apps. Four-tier strategy: @playwright/mcp (interaction), CDP CLI (`scripts/cdp.mjs`) (performance), Playwright-core (scripting), and Playwright CLI (e2e test suites). Use when users need to browse, take screenshots, debug network/performance, run e2e tests, record tests with codegen, or do visual QA. Triggers on "browser", "screenshot", "viewport", "performance trace", "network debug", "visual QA", "responsive test", "e2e test", "playwright test", "codegen", "test suite".
 ---
 
 # Browser Dev Cycle: Four-Tier Automation Strategy
@@ -15,11 +15,11 @@ Comprehensive browser automation covering interaction, performance analysis, and
 |------|------|------|
 | Navigate, click, fill forms, screenshot | Tier 1 | @playwright/mcp |
 | Accessibility snapshot | Tier 1 | `browser_snapshot` |
-| Performance trace / profiling | Tier 2 | Chrome DevTools MCP |
-| Core Web Vitals | Tier 2 | Chrome DevTools MCP |
-| Network HAR detail / response bodies | Tier 2 | Chrome DevTools MCP |
-| Console errors with stack traces | Tier 2 | Chrome DevTools MCP |
-| CSS computed styles debugging | Tier 2 | Chrome DevTools MCP |
+| Performance trace / profiling | Tier 2 | CDP CLI (`scripts/cdp.mjs`) |
+| Core Web Vitals | Tier 2 | CDP CLI (`scripts/cdp.mjs`) |
+| Network HAR detail / response bodies | Tier 2 | CDP CLI (`scripts/cdp.mjs`) |
+| Console errors with stack traces | Tier 2 | CDP CLI (`scripts/cdp.mjs`) |
+| CSS computed styles debugging | Tier 2 | CDP CLI (`scripts/cdp.mjs`) |
 | Network mocking / interception | Tier 3 | Playwright-core scripts |
 | Viewport matrix testing | Tier 3 | Playwright-core scripts |
 | Video / trace recording | Tier 3 | Playwright-core scripts |
@@ -38,7 +38,7 @@ What do you need?
 |       Direct MCP tool calls. No scripting needed.
 |
 +-- Performance profiling / network analysis
-|   +-> Tier 2: Chrome DevTools MCP
+|   +-> Tier 2: CDP CLI (`scripts/cdp.mjs`)
 |       CPU traces, Core Web Vitals, response bodies, computed styles.
 |
 +-- Scripted tests / network mocking / recording
@@ -97,34 +97,19 @@ Full tool reference with all parameters: `references/tier1-playwright-mcp.md`
 
 ---
 
-## 3. TIER 2: Chrome DevTools MCP
+## 3. TIER 2: CDP CLI (`scripts/cdp.mjs`)
 
 For performance analysis, network debugging, and CSS inspection.
 
-**Setup** (add to `.mcp.json`):
-```json
-{
-  "mcpServers": {
-    "chrome-devtools": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "chrome-devtools-mcp@latest"],
-      "type": "stdio"
-    }
-  }
-}
+See [Tier 2 Reference](references/tier2-devtools.md) for full CDP CLI command reference.
+
+Quick usage:
 ```
-
-Requires Chrome running with `--remote-debugging-port=9222`.
-
-**Key tools by category:**
-- **DOM:** `devtools_dom_querySelector`, `devtools_dom_getOuterHTML`
-- **Network:** `devtools_network_enable`, `devtools_network_getRequests`, `devtools_network_getRequestContent`
-- **Performance:** `devtools_performance_getMetrics`, `devtools_performance_startTrace`, `devtools_performance_stopTrace`
-- **Console:** `devtools_console_getMessages`, `devtools_console_evaluate`
-- **CSS:** `devtools_css_getComputedStyles`, `devtools_css_getMatchedStyles`
-- **Accessibility:** `devtools_accessibility_getTree`
-
-Full tool reference with all parameters: `references/tier2-devtools.md`
+node scripts/cdp.mjs perf               # Performance metrics
+node scripts/cdp.mjs network            # Network requests
+node scripts/cdp.mjs a11y               # Accessibility audit
+node scripts/cdp.mjs lighthouse <url>   # Lighthouse scores
+```
 
 ---
 

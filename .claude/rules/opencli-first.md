@@ -21,7 +21,7 @@ for structured, repeatable web queries:
 - One-off page reads: WebFetch
 - General web search: WebSearch
 - Interactive browser tasks: Claude-in-Chrome
-- Performance profiling: Chrome DevTools MCP
+- Performance profiling: CDP CLI (node scripts/cdp.mjs perf)
 
 ## Why
 

@@ -36,6 +36,8 @@ Key flags: `--name`, `--region-id`, `--org-id`, `--database`, `--role`, `--set-c
 
 Available regions: `aws-us-west-2`, `aws-us-east-1`, `aws-us-east-2`, `aws-eu-central-1`, `aws-ap-southeast-1`, `aws-ap-southeast-2`, `azure-eastus2`
 
+Note: Neon adds regions over time. Run `neonctl projects create --help` for the current list.
+
 ## Update a Project
 
 ```bash

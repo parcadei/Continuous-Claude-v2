@@ -15,8 +15,7 @@ railway unlink                                # disassociate project from direct
 ## Managing Services
 
 ```bash
-railway service                               # interactive service selection (link)
-railway service link                          # link to a service in current project
+railway service link                          # link to a service in current project (bare `railway service` is deprecated)
 railway service status                        # show deployment status for services
 railway service logs                          # view logs from a service
 railway service redeploy                      # redeploy a service
@@ -70,6 +69,14 @@ railway mcp                                   # start a local MCP server for AI-
 ```
 
 Provides AI agents with structured access to Railway project management.
+
+## Environments
+
+```bash
+railway environment list              # List all environments
+railway environment create <name>     # Create new environment (e.g. staging)
+railway environment delete <name>     # Delete environment
+```
 
 ## SSH Access
 

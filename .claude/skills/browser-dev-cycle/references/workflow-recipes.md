@@ -25,12 +25,10 @@ Step 5: Accessibility check
 ## API Debugging
 
 ```
-Option A: Chrome DevTools MCP (Tier 2)
-  1. devtools_network_enable          -> start capturing
-  2. browser_navigate (Tier 1)        -> trigger the page load
-  3. devtools_network_getRequests     -> list all requests
-  4. devtools_network_getRequestContent -> inspect response bodies
-  5. devtools_console_getMessages     -> check for JS errors
+Option A: CDP CLI (Tier 2)
+  1. browser_navigate (Tier 1)        -> trigger the page load
+  2. node scripts/cdp.mjs network            # list all requests
+  3. node scripts/cdp.mjs console            # check for JS errors
 
 Option B: Network Mocking (Tier 3)
   1. page.route('**/api/failing-endpoint', ...) -> return mock data
@@ -59,13 +57,13 @@ Step 4: Accessibility at key viewports
 
 ```
 Step 1: Baseline metrics (Tier 2)
-  devtools_performance_getMetrics -> record JS heap, DOM count, layout count
+  node scripts/cdp.mjs perf               # runtime metrics
+  node scripts/cdp.mjs lighthouse <url>   # full performance audit
 
-Step 2: Trace
-  devtools_performance_startTrace
+Step 2: Load trace
   browser_navigate (Tier 1) -> load the page
   Wait 3-5s for page to settle
-  devtools_performance_stopTrace -> analyze results
+  node scripts/cdp.mjs perf               # re-capture after load
 
 Step 3: Core Web Vitals targets
   FCP  < 1.8s

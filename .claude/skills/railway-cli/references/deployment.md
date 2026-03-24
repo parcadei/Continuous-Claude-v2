@@ -52,4 +52,5 @@ railway restart -y                            # skip confirmation
 - **ALWAYS** confirm with the user before running `railway up` or `railway down`
 - Use `railway status` to verify the linked project/service before deploying
 - In CI, use `railway up --ci` or `railway up --json` to avoid interactive prompts
+  Note: `--ci` streams build logs only then exits. `--json` outputs all logs as JSON objects. They are not equivalent.
 - Use `-y` flag on `railway down`, `railway redeploy`, and `railway restart` to skip confirmation in scripts

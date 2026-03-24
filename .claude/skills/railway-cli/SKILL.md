@@ -20,6 +20,16 @@ railway link -e production               # link to specific environment
 
 **When something goes wrong, check linking first** -- run `railway status` to see what project, environment, and service you are linked to. Verify with `railway whoami` that you are on the correct account.
 
+## Authentication
+
+```bash
+railway login                    # Browser OAuth (default)
+railway login --browserless      # Token-based auth for headless/CI environments
+railway logout                   # Clear saved credentials
+```
+
+If commands fail with auth errors, run `railway login` to re-authenticate.
+
 ## Quick Start
 
 ```bash

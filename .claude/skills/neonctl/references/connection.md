@@ -13,11 +13,11 @@ Alias: `neonctl cs`
 ## Pooled vs Direct Connections
 
 ```bash
-neonctl connection-string --pooled            # pooled (PgBouncer, port 5432)
-neonctl connection-string                     # direct (port 5432, no pooler)
+neonctl connection-string --pooled            # pooled (PgBouncer)
+neonctl connection-string                     # direct (no pooler)
 ```
 
-- **Pooled (`--pooled`)**: Use for serverless/edge functions, short-lived connections, high concurrency
+- **Pooled (`--pooled`)**: Use for serverless/edge functions, short-lived connections, high concurrency. The hostname contains `-pooler.` (e.g. `ep-xxx-pooler.region.aws.neon.tech`). Both pooled and direct use port 5432 — the difference is the hostname, not the port.
 - **Direct**: Use for long-running processes, migrations, session-level features (prepared statements, advisory locks)
 
 ## Flags
