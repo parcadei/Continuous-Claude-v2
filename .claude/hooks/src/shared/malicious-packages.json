@@ -1,7 +1,10 @@
 {
   "pypi": {
     "litellm": {
-      "blocked_versions": ["1.82.7", "1.82.8"],
+      "blocked_versions": [
+        "1.82.7",
+        "1.82.8"
+      ],
       "reason": "TeamPCP supply chain attack via compromised Trivy CI/CD - credential stealer targeting SSH keys, cloud creds, K8s configs",
       "date": "2026-03-24",
       "advisory": "https://futuresearch.ai/blog/litellm-pypi-supply-chain-attack/"
@@ -24,41 +27,2095 @@
       "blocked_all": true,
       "reason": "Typosquat of python-dateutil - known malware",
       "date": "2019-06-01"
+    },
+    "langflow": {
+      "blocked_versions": [],
+      "reason": "Langflow has an Arbitrary File Write (RCE) via v2 API (GHSA-g2j9-7rj2-gm6c)",
+      "date": "2026-03-19",
+      "advisory": "https://github.com/advisories/GHSA-g2j9-7rj2-gm6c"
+    },
+    "mesop": {
+      "blocked_versions": [],
+      "reason": "Mesop Affected by Unauthenticated Remote Code Execution via Test Suite Route /exec-py (GHSA-gjgx-rvqr-6w6v)",
+      "date": "2026-03-18",
+      "advisory": "https://github.com/advisories/GHSA-gjgx-rvqr-6w6v"
+    },
+    "glances": {
+      "blocked_versions": [],
+      "reason": "Glances's Browser API Exposes Reusable Downstream Credentials via `/api/4/serverslist` (GHSA-r297-p3v4-wp8m)",
+      "date": "2026-03-16",
+      "advisory": "https://github.com/advisories/GHSA-r297-p3v4-wp8m"
+    },
+    "authlib": {
+      "blocked_versions": [],
+      "reason": "Authlib JWS JWK Header Injection: Signature Verification Bypass (GHSA-wvwj-cvrp-7pv5)",
+      "date": "2026-03-16",
+      "advisory": "https://github.com/advisories/GHSA-wvwj-cvrp-7pv5"
+    },
+    "sglang": {
+      "blocked_versions": [],
+      "reason": "SGLang's encoder parallel disaggregation system is vulnerable to unauthenticated remote code execution through the disaggregation module (GHSA-jx93-g359-86wm)",
+      "date": "2026-03-12",
+      "advisory": "https://github.com/advisories/GHSA-jx93-g359-86wm"
+    },
+    "mcp-atlassian": {
+      "blocked_versions": [],
+      "reason": "MCP Atlassian has an arbitrary file write leading to arbitrary code execution via unconstrained download_path in confluence_download_attachment (GHSA-xjgw-4wvw-rgm4)",
+      "date": "2026-03-10",
+      "advisory": "https://github.com/advisories/GHSA-xjgw-4wvw-rgm4"
+    },
+    "picklescan": {
+      "blocked_versions": [],
+      "reason": "PickleScan has multiple stdlib modules with direct RCE not in blocklist (GHSA-g38g-8gr9-h9xp)",
+      "date": "2026-03-03",
+      "advisory": "https://github.com/advisories/GHSA-g38g-8gr9-h9xp"
+    },
+    "vitrage": {
+      "blocked_versions": [],
+      "reason": "OpenStack Vitrage: Unauthorized Access to the Host can Lead to Eval Injection (GHSA-8xwf-cr4r-856r)",
+      "date": "2026-02-27",
+      "advisory": "https://github.com/advisories/GHSA-8xwf-cr4r-856r"
+    },
+    "flask-reuploaded": {
+      "blocked_versions": [],
+      "reason": "Flask-Reuploaded vulnerable to Remote Code Execution via Server-Side Template Injection (GHSA-65mp-fq8v-56jr)",
+      "date": "2026-02-25",
+      "advisory": "https://github.com/advisories/GHSA-65mp-fq8v-56jr"
+    },
+    "bugsink": {
+      "blocked_versions": [],
+      "reason": "Bugsink is vulnerable to Stored XSS via Pygments fallback in stacktrace rendering (GHSA-vp6q-7m36-pq3w)",
+      "date": "2026-02-25",
+      "advisory": "https://github.com/advisories/GHSA-vp6q-7m36-pq3w"
+    },
+    "ormar": {
+      "blocked_versions": [],
+      "reason": "ormar is vulnerable to SQL Injection through aggregate functions min() and max() (GHSA-xxh2-68g9-8jqr)",
+      "date": "2026-02-23",
+      "advisory": "https://github.com/advisories/GHSA-xxh2-68g9-8jqr"
+    },
+    "mlflow": {
+      "blocked_versions": [],
+      "reason": "MLflow Use of Default Password Authentication Bypass Vulnerability (GHSA-gq3w-7jj3-x7gr)",
+      "date": "2026-02-21",
+      "advisory": "https://github.com/advisories/GHSA-gq3w-7jj3-x7gr"
+    },
+    "semantic-kernel": {
+      "blocked_versions": [],
+      "reason": "Microsoft Semantic Kernel InMemoryVectorStore filter functionality vulnerable to remote code execution (GHSA-xjw9-4gw8-4rqx)",
+      "date": "2026-02-19",
+      "advisory": "https://github.com/advisories/GHSA-xjw9-4gw8-4rqx"
+    },
+    "nltk": {
+      "blocked_versions": [],
+      "reason": "NLTK has a Zip Slip Vulnerability (GHSA-7p94-766c-hgjp)",
+      "date": "2026-02-18",
+      "advisory": "https://github.com/advisories/GHSA-7p94-766c-hgjp"
+    },
+    "azure-ai-language-conversations-authoring": {
+      "blocked_versions": [],
+      "reason": "Azure AI Language Authoring Elevation of Privilege Vulnerability can Lead to RCE (GHSA-436v-jg82-p533)",
+      "date": "2026-02-10",
+      "advisory": "https://github.com/advisories/GHSA-436v-jg82-p533"
+    },
+    "keylime": {
+      "blocked_versions": [],
+      "reason": "Keylime Missing Authentication for Critical Function and Improper Authentication (GHSA-4jqp-9qjv-57m2)",
+      "date": "2026-02-06",
+      "advisory": "https://github.com/advisories/GHSA-4jqp-9qjv-57m2"
+    },
+    "dydx-v4-client": {
+      "blocked_versions": [],
+      "reason": "A single post-release of dydx-v4-client contained obfuscated multi-stage loader (GHSA-4f84-67cv-qrv3)",
+      "date": "2026-02-06",
+      "advisory": "https://github.com/advisories/GHSA-4f84-67cv-qrv3"
+    },
+    "microsoft.semantickernel.core": {
+      "blocked_versions": [],
+      "reason": "Semantic Kernel has Arbitrary File Write via AI Agent Function Calling in .NET SDK (GHSA-2ww3-72rp-wpp4)",
+      "date": "2026-02-06",
+      "advisory": "https://github.com/advisories/GHSA-2ww3-72rp-wpp4"
+    },
+    "epyt-flow": {
+      "blocked_versions": [],
+      "reason": "EPyT-Flow vulnerable to unsafe JSON deserialization (__type__) (GHSA-74vm-8frp-7w68)",
+      "date": "2026-02-04",
+      "advisory": "https://github.com/advisories/GHSA-74vm-8frp-7w68"
+    },
+    "unstructured": {
+      "blocked_versions": [],
+      "reason": "Unstructured has Path Traversal via Malicious MSG Attachment that Allows Arbitrary File Write (GHSA-gm8q-m8mv-jj5m)",
+      "date": "2026-02-03",
+      "advisory": "https://github.com/advisories/GHSA-gm8q-m8mv-jj5m"
+    },
+    "bambuddy": {
+      "blocked_versions": [],
+      "reason": "Bambuddy Uses Hardcoded Secret Key + Many API Endpoints do not Require Authentication (GHSA-gc24-px2r-5qmf)",
+      "date": "2026-02-02",
+      "advisory": "https://github.com/advisories/GHSA-gc24-px2r-5qmf"
+    },
+    "langroid": {
+      "blocked_versions": [],
+      "reason": "Langroid has WAF Bypass Leading to RCE in TableChatAgent (GHSA-x34r-63hx-w57f)",
+      "date": "2026-02-02",
+      "advisory": "https://github.com/advisories/GHSA-x34r-63hx-w57f"
+    },
+    "vllm": {
+      "blocked_versions": [],
+      "reason": "vLLM has RCE In Video Processing (GHSA-4r2x-xpjr-7cvv)",
+      "date": "2026-02-02",
+      "advisory": "https://github.com/advisories/GHSA-4r2x-xpjr-7cvv"
+    },
+    "ai.h2o:h2o-core": {
+      "blocked_versions": [],
+      "reason": "H2O has an External Control of File Name or Path vulnerability (GHSA-wj3h-wx8g-x699)",
+      "date": "2026-02-02",
+      "advisory": "https://github.com/advisories/GHSA-wj3h-wx8g-x699"
+    },
+    "h2o": {
+      "blocked_versions": [],
+      "reason": "H2O has an External Control of File Name or Path vulnerability (GHSA-wj3h-wx8g-x699)",
+      "date": "2026-02-02",
+      "advisory": "https://github.com/advisories/GHSA-wj3h-wx8g-x699"
+    },
+    "cai-framework": {
+      "blocked_versions": [],
+      "reason": "CAI find_file Agent Tool has Command Injection Vulnerability Through Argument Injection (GHSA-jfpc-wj3m-qw2m)",
+      "date": "2026-01-30",
+      "advisory": "https://github.com/advisories/GHSA-jfpc-wj3m-qw2m"
+    },
+    "dfir-unfurl": {
+      "blocked_versions": [],
+      "reason": "Unfurl's debug mode cannot be disabled due to string config parsing (Werkzeug debugger exposure) (GHSA-vg9h-jx4v-cwx2)",
+      "date": "2026-01-29",
+      "advisory": "https://github.com/advisories/GHSA-vg9h-jx4v-cwx2"
+    },
+    "dcap-qvl": {
+      "blocked_versions": [],
+      "reason": "dcap-qvl has Missing Verification for QE Identity (GHSA-796p-j2gh-9m2q)",
+      "date": "2026-01-26",
+      "advisory": "https://github.com/advisories/GHSA-796p-j2gh-9m2q"
+    },
+    "@phala/dcap-qvl": {
+      "blocked_versions": [],
+      "reason": "dcap-qvl has Missing Verification for QE Identity (GHSA-796p-j2gh-9m2q)",
+      "date": "2026-01-26",
+      "advisory": "https://github.com/advisories/GHSA-796p-j2gh-9m2q"
+    },
+    "@phala/dcap-qvl-web": {
+      "blocked_versions": [],
+      "reason": "dcap-qvl has Missing Verification for QE Identity (GHSA-796p-j2gh-9m2q)",
+      "date": "2026-01-26",
+      "advisory": "https://github.com/advisories/GHSA-796p-j2gh-9m2q"
+    },
+    "@phala/dcap-qvl-node": {
+      "blocked_versions": [],
+      "reason": "dcap-qvl has Missing Verification for QE Identity (GHSA-796p-j2gh-9m2q)",
+      "date": "2026-01-26",
+      "advisory": "https://github.com/advisories/GHSA-796p-j2gh-9m2q"
+    },
+    "crawl4ai": {
+      "blocked_versions": [],
+      "reason": "Crawl4AI is Vulnerable to Remote Code Execution in Docker API via Hooks Parameter (GHSA-5882-5rx9-xgxp)",
+      "date": "2026-01-16",
+      "advisory": "https://github.com/advisories/GHSA-5882-5rx9-xgxp"
+    },
+    "uni2ts": {
+      "blocked_versions": [],
+      "reason": "Salesforce Uni2TS has a Code Injection vulnerability (GHSA-7x99-8x99-xc54)",
+      "date": "2026-01-10",
+      "advisory": "https://github.com/advisories/GHSA-7x99-8x99-xc54"
+    },
+    "wolfssl": {
+      "blocked_versions": [],
+      "reason": "wolfSSL Python module vulnerable to Improper Authentication (GHSA-vj87-jj27-4h9c)",
+      "date": "2026-01-08",
+      "advisory": "https://github.com/advisories/GHSA-vj87-jj27-4h9c"
+    },
+    "terminal-controller": {
+      "blocked_versions": [],
+      "reason": "terminal-controller-mcp vulnerable to Command Injection (GHSA-h4rf-624j-gj33)",
+      "date": "2026-01-07",
+      "advisory": "https://github.com/advisories/GHSA-h4rf-624j-gj33"
+    },
+    "langchain-core": {
+      "blocked_versions": [],
+      "reason": "LangChain serialization injection vulnerability enables secret extraction in dumps/loads APIs (GHSA-c67j-w6g6-q2cm)",
+      "date": "2025-12-23",
+      "advisory": "https://github.com/advisories/GHSA-c67j-w6g6-q2cm"
+    },
+    "weblate": {
+      "blocked_versions": [],
+      "reason": "Weblate is vulnerable to RCE through Git config file overwrite (GHSA-8vcg-cfxj-p5m3)",
+      "date": "2025-12-18",
+      "advisory": "https://github.com/advisories/GHSA-8vcg-cfxj-p5m3"
+    },
+    "apache-airflow-providers-edge3": {
+      "blocked_versions": [],
+      "reason": "Apache Airflow Providers Edge3 exposes internal API allowing RCE in web server context (GHSA-66h8-3g48-6hx8)",
+      "date": "2025-12-17",
+      "advisory": "https://github.com/advisories/GHSA-66h8-3g48-6hx8"
+    },
+    "pgadmin4": {
+      "blocked_versions": [],
+      "reason": "pgadmin4 has a Meta-Command Filter Command Execution (GHSA-fxmw-jcgr-w44v)",
+      "date": "2025-12-11",
+      "advisory": "https://github.com/advisories/GHSA-fxmw-jcgr-w44v"
+    },
+    "asyncmy": {
+      "blocked_versions": [],
+      "reason": "asyncmy is vulnerable to SQL injection via crafted dict keys (GHSA-qhqw-rrw9-25rm)",
+      "date": "2025-12-02",
+      "advisory": "https://github.com/advisories/GHSA-qhqw-rrw9-25rm"
+    },
+    "ray": {
+      "blocked_versions": [],
+      "reason": "Ray's New Token Authentication is Disabled By Default (GHSA-gx77-xgc2-4888)",
+      "date": "2025-11-27",
+      "advisory": "https://github.com/advisories/GHSA-gx77-xgc2-4888"
+    },
+    "modular": {
+      "blocked_versions": [],
+      "reason": "Modular Max Serve has Unsafe Deserialization vulnerability (GHSA-7xcv-9j6c-2fmc)",
+      "date": "2025-11-18",
+      "advisory": "https://github.com/advisories/GHSA-7xcv-9j6c-2fmc"
+    },
+    "joserfc": {
+      "blocked_versions": [],
+      "reason": "joserfc has Possible Uncontrolled Resource Consumption Vulnerability Triggered by Logging Arbitrarily Large JWT Token Payloads (GHSA-frfh-8v73-gjg4)",
+      "date": "2025-11-18",
+      "advisory": "https://github.com/advisories/GHSA-frfh-8v73-gjg4"
+    },
+    "astrbot": {
+      "blocked_versions": [],
+      "reason": "AstrBot is vulnerable to RCE with hard-coded JWT signing keys (GHSA-4m32-cjv7-f425)",
+      "date": "2025-11-14",
+      "advisory": "https://github.com/advisories/GHSA-4m32-cjv7-f425"
+    },
+    "django": {
+      "blocked_versions": [],
+      "reason": "Django vulnerable to SQL injection via _connector keyword argument in QuerySet and Q objects. (GHSA-frmv-pr5f-9mcr)",
+      "date": "2025-11-05",
+      "advisory": "https://github.com/advisories/GHSA-frmv-pr5f-9mcr"
+    },
+    "keras": {
+      "blocked_versions": [],
+      "reason": "Keras framework vulnerable to deserialization of untrusted data (GHSA-cvhh-q5g5-qprp)",
+      "date": "2025-10-17",
+      "advisory": "https://github.com/advisories/GHSA-cvhh-q5g5-qprp"
+    },
+    "pyquokka": {
+      "blocked_versions": [],
+      "reason": "pyquokka is Vulnerable to Remote Code Execution by Pickle Deserialization via FlightServer  (GHSA-f74j-gffq-vm9p)",
+      "date": "2025-10-17",
+      "advisory": "https://github.com/advisories/GHSA-f74j-gffq-vm9p"
+    },
+    "bbot": {
+      "blocked_versions": [],
+      "reason": "BBOT's insufficient sanitization issues in gitdumper.py can lead to RCE (GHSA-h6m2-r6h9-4c44)",
+      "date": "2025-10-09",
+      "advisory": "https://github.com/advisories/GHSA-h6m2-r6h9-4c44"
+    },
+    "scio-pypi": {
+      "blocked_versions": [],
+      "reason": "scio is vunerable to  Remote Command Execution  through PyTorch (GHSA-m9mp-6x32-5rhg)",
+      "date": "2025-10-09",
+      "advisory": "https://github.com/advisories/GHSA-m9mp-6x32-5rhg"
+    },
+    "pyfory": {
+      "blocked_versions": [],
+      "reason": "Apache Pyfory python is vulnerable to deserialization of untrusted data (GHSA-538v-3wq9-4h3r)",
+      "date": "2025-10-01",
+      "advisory": "https://github.com/advisories/GHSA-538v-3wq9-4h3r"
+    },
+    "pyfury": {
+      "blocked_versions": [],
+      "reason": "Apache Pyfory python is vulnerable to deserialization of untrusted data (GHSA-538v-3wq9-4h3r)",
+      "date": "2025-10-01",
+      "advisory": "https://github.com/advisories/GHSA-538v-3wq9-4h3r"
+    },
+    "invokeai": {
+      "blocked_versions": [],
+      "reason": "InvokeAI has External Control of File Name or Path (GHSA-vv9c-xxg7-wmv7)",
+      "date": "2025-09-18",
+      "advisory": "https://github.com/advisories/GHSA-vv9c-xxg7-wmv7"
+    },
+    "mcp-kubernetes-server": {
+      "blocked_versions": [],
+      "reason": "mcp-kubernetes-server has an OS Command Injection vulnerability (GHSA-4hqq-7q79-932p)",
+      "date": "2025-09-15",
+      "advisory": "https://github.com/advisories/GHSA-4hqq-7q79-932p"
+    },
+    "internetarchive": {
+      "blocked_versions": [],
+      "reason": "internetarchive Vulnerable to Directory Traversal in File.download() (GHSA-wx3r-v6h7-frjp)",
+      "date": "2025-09-05",
+      "advisory": "https://github.com/advisories/GHSA-wx3r-v6h7-frjp"
+    },
+    "tkeasygui": {
+      "blocked_versions": [],
+      "reason": "TkEasyGUI Vulnerable to OS Command Injection (GHSA-hfrj-3w3g-jv32)",
+      "date": "2025-09-05",
+      "advisory": "https://github.com/advisories/GHSA-hfrj-3w3g-jv32"
+    },
+    "usd-core": {
+      "blocked_versions": [],
+      "reason": "Pixar OpenUSD Sdf_PathNode Module Use-After-Free Vulnerability Leading to Potential Remote Code Execution (GHSA-58p5-r2f6-g2cj)",
+      "date": "2025-09-04",
+      "advisory": "https://github.com/advisories/GHSA-58p5-r2f6-g2cj"
+    },
+    "deepdiff": {
+      "blocked_versions": [],
+      "reason": "DeepDiff Class Pollution in Delta class leading to DoS, Remote Code Execution, and more (GHSA-mw26-5g2v-hqw3)",
+      "date": "2025-09-03",
+      "advisory": "https://github.com/advisories/GHSA-mw26-5g2v-hqw3"
+    },
+    "executorch": {
+      "blocked_versions": [],
+      "reason": "ExecuTorch integer overflow vulnerability (GHSA-hj95-mhgf-jxc4)",
+      "date": "2025-08-08",
+      "advisory": "https://github.com/advisories/GHSA-hj95-mhgf-jxc4"
+    },
+    "org.pytorch:executorch-android": {
+      "blocked_versions": [],
+      "reason": "ExecuTorch integer overflow vulnerability (GHSA-hj95-mhgf-jxc4)",
+      "date": "2025-08-08",
+      "advisory": "https://github.com/advisories/GHSA-hj95-mhgf-jxc4"
+    },
+    "pyload-ng": {
+      "blocked_versions": [],
+      "reason": "pyLoad CNL Blueprint allows Path Traversal through `dlc_path` which leads to Remote Code Execution (RCE) (GHSA-48rp-jc79-2264)",
+      "date": "2025-08-04",
+      "advisory": "https://github.com/advisories/GHSA-48rp-jc79-2264"
+    },
+    "num2words": {
+      "blocked_versions": [],
+      "reason": "num2words subjected to phishing attack, two versions published containing malware (GHSA-jxr6-qrxx-2ph2)",
+      "date": "2025-07-31",
+      "advisory": "https://github.com/advisories/GHSA-jxr6-qrxx-2ph2"
+    },
+    "bentoml": {
+      "blocked_versions": [],
+      "reason": "BentoML SSRF Vulnerability in File Upload Processing   (GHSA-mrmq-3q62-6cc8)",
+      "date": "2025-07-29",
+      "advisory": "https://github.com/advisories/GHSA-mrmq-3q62-6cc8"
+    },
+    "smolagents": {
+      "blocked_versions": [],
+      "reason": "smolagents has Sandbox Escape Vulnerability in the local_python_executor.py Module (GHSA-6v92-r5mx-h5fx)",
+      "date": "2025-07-27",
+      "advisory": "https://github.com/advisories/GHSA-6v92-r5mx-h5fx"
+    },
+    "apache-airflow-providers-snowflake": {
+      "blocked_versions": [],
+      "reason": "Apache Airflow Providers Snowflake package allows for Special Element Injection via CopyFromExternalStageToSnowflakeOperator (GHSA-9r64-3wmc-x8m8)",
+      "date": "2025-06-26",
+      "advisory": "https://github.com/advisories/GHSA-9r64-3wmc-x8m8"
+    },
+    "rfc3161-client": {
+      "blocked_versions": [],
+      "reason": "rfc3161-client has insufficient verification for timestamp response signatures (GHSA-6qhv-4h7r-2g9m)",
+      "date": "2025-06-20",
+      "advisory": "https://github.com/advisories/GHSA-6qhv-4h7r-2g9m"
+    },
+    "langflow-base": {
+      "blocked_versions": [],
+      "reason": "Langflow Unauth RCE (GHSA-rvqx-wpfh-mfx7)",
+      "date": "2025-06-17",
+      "advisory": "https://github.com/advisories/GHSA-rvqx-wpfh-mfx7"
+    },
+    "salt": {
+      "blocked_versions": [],
+      "reason": "Salt vulnerable to directory traversal attack in file receiving method (GHSA-8pcp-r83j-fc92)",
+      "date": "2025-06-13",
+      "advisory": "https://github.com/advisories/GHSA-8pcp-r83j-fc92"
+    },
+    "backend.ai": {
+      "blocked_versions": [],
+      "reason": "BackendAI Missing Authentication for Critical Function (GHSA-ww28-4m4v-cq4j)",
+      "date": "2025-06-09",
+      "advisory": "https://github.com/advisories/GHSA-ww28-4m4v-cq4j"
+    },
+    "llama-index": {
+      "blocked_versions": [],
+      "reason": "llama_index vulnerable to SQL Injection (GHSA-v3c8-3pr6-gr7p)",
+      "date": "2025-06-05",
+      "advisory": "https://github.com/advisories/GHSA-v3c8-3pr6-gr7p"
+    },
+    "org.apache.iotdb:iotdb-core": {
+      "blocked_versions": [],
+      "reason": "Apache IoTDB Vulnerable to Remote Code Execution (GHSA-f4rq-f4j9-f6rm)",
+      "date": "2025-05-14",
+      "advisory": "https://github.com/advisories/GHSA-f4rq-f4j9-f6rm"
+    },
+    "apache-iotdb": {
+      "blocked_versions": [],
+      "reason": "Apache IoTDB Vulnerable to Remote Code Execution (GHSA-f4rq-f4j9-f6rm)",
+      "date": "2025-05-14",
+      "advisory": "https://github.com/advisories/GHSA-f4rq-f4j9-f6rm"
+    },
+    "browser-use": {
+      "blocked_versions": [],
+      "reason": "Browser Use allows bypassing `allowed_domains` by putting a decoy domain in http auth username portion of a URL (GHSA-x39x-9qw5-ghrf)",
+      "date": "2025-05-05",
+      "advisory": "https://github.com/advisories/GHSA-x39x-9qw5-ghrf"
+    },
+    "h11": {
+      "blocked_versions": [],
+      "reason": "h11 accepts some malformed Chunked-Encoding bodies (GHSA-vqfr-h8mv-ghfj)",
+      "date": "2025-04-24",
+      "advisory": "https://github.com/advisories/GHSA-vqfr-h8mv-ghfj"
+    },
+    "torch": {
+      "blocked_versions": [],
+      "reason": "PyTorch: `torch.load` with `weights_only=True` leads to remote code execution (GHSA-53q9-r3pm-6pq6)",
+      "date": "2025-04-18",
+      "advisory": "https://github.com/advisories/GHSA-53q9-r3pm-6pq6"
+    },
+    "jupyter-remote-desktop-proxy": {
+      "blocked_versions": [],
+      "reason": "TigerVNC accessible via the network and not just via a UNIX socket as intended (GHSA-vrq4-9hc3-cgp7)",
+      "date": "2025-04-12",
+      "advisory": "https://github.com/advisories/GHSA-vrq4-9hc3-cgp7"
+    },
+    "lnbits": {
+      "blocked_versions": [],
+      "reason": "LNbits Lightning Network Payment System Vulnerable to Server-Side Request Forgery via LNURL Authentication Callback (GHSA-qp8j-p87f-c8cc)",
+      "date": "2025-04-07",
+      "advisory": "https://github.com/advisories/GHSA-qp8j-p87f-c8cc"
+    },
+    "dtale": {
+      "blocked_versions": [],
+      "reason": "Duplicate Advisory: D-Tale Command Injection vulnerability (GHSA-gjxm-x497-4h6h)",
+      "date": "2025-03-20",
+      "advisory": "https://github.com/advisories/GHSA-gjxm-x497-4h6h"
+    },
+    "kedro": {
+      "blocked_versions": [],
+      "reason": "Kedro deserialization vulnerability (GHSA-747f-ww56-4q4h)",
+      "date": "2025-03-20",
+      "advisory": "https://github.com/advisories/GHSA-747f-ww56-4q4h"
+    },
+    "agentscope": {
+      "blocked_versions": [],
+      "reason": "AgentScope path traversal vulnerability (GHSA-c4cc-w454-4634)",
+      "date": "2025-03-20",
+      "advisory": "https://github.com/advisories/GHSA-c4cc-w454-4634"
+    },
+    "aim": {
+      "blocked_versions": [],
+      "reason": "Aim  path traversal in LockManager.release_locks (GHSA-4qcx-jx49-6qrh)",
+      "date": "2025-03-20",
+      "advisory": "https://github.com/advisories/GHSA-4qcx-jx49-6qrh"
+    },
+    "pytorch-lightning": {
+      "blocked_versions": [],
+      "reason": "PyTorch Lightning path traversal vulnerability (GHSA-4cv3-v7pv-rfhf)",
+      "date": "2025-03-20",
+      "advisory": "https://github.com/advisories/GHSA-4cv3-v7pv-rfhf"
+    },
+    "llama-index-packs-finchat": {
+      "blocked_versions": [],
+      "reason": "llama-index-packs-finchat SQL Injection vulnerability (GHSA-x48g-hm9c-ww42)",
+      "date": "2025-03-20",
+      "advisory": "https://github.com/advisories/GHSA-x48g-hm9c-ww42"
+    },
+    "llama-index-retrievers-duckdb-retriever": {
+      "blocked_versions": [],
+      "reason": " LlamaIndex Retrievers Integration: DuckDBRetriever SQL Injection (GHSA-339r-cjv9-x78g)",
+      "date": "2025-03-20",
+      "advisory": "https://github.com/advisories/GHSA-339r-cjv9-x78g"
+    },
+    "dbgpt": {
+      "blocked_versions": [],
+      "reason": "DB-GPT Arbitrary File Write vulnerability (GHSA-7gj6-22m4-qfhx)",
+      "date": "2025-03-20",
+      "advisory": "https://github.com/advisories/GHSA-7gj6-22m4-qfhx"
+    },
+    "horovod": {
+      "blocked_versions": [],
+      "reason": "Horovod Vulnerable to Command Injection (GHSA-mrhh-3ggq-23p2)",
+      "date": "2025-03-20",
+      "advisory": "https://github.com/advisories/GHSA-mrhh-3ggq-23p2"
+    },
+    "dask": {
+      "blocked_versions": [],
+      "reason": "Withdrawn Advisory: Dask Vulnerable to Command Injection (GHSA-xqgj-r6xv-9cw4)",
+      "date": "2025-03-20",
+      "advisory": "https://github.com/advisories/GHSA-xqgj-r6xv-9cw4"
+    },
+    "qiskit-terra": {
+      "blocked_versions": [],
+      "reason": "Qiskit allows arbitrary code execution decoding QPY format versions < 13 (GHSA-6m2c-76ff-6vrf)",
+      "date": "2025-03-14",
+      "advisory": "https://github.com/advisories/GHSA-6m2c-76ff-6vrf"
+    },
+    "qiskit": {
+      "blocked_versions": [],
+      "reason": "Qiskit allows arbitrary code execution decoding QPY format versions < 13 (GHSA-6m2c-76ff-6vrf)",
+      "date": "2025-03-14",
+      "advisory": "https://github.com/advisories/GHSA-6m2c-76ff-6vrf"
+    },
+    "plotai": {
+      "blocked_versions": [],
+      "reason": "PlotAI eval vulnerability (GHSA-2hmp-5wqg-f24h)",
+      "date": "2025-03-10",
+      "advisory": "https://github.com/advisories/GHSA-2hmp-5wqg-f24h"
+    },
+    "jupyterhub-ltiauthenticator": {
+      "blocked_versions": [],
+      "reason": "LTI JupyterHub Authenticator does not properly validate JWT Signature (GHSA-mcgx-2gcr-p3hp)",
+      "date": "2025-02-25",
+      "advisory": "https://github.com/advisories/GHSA-mcgx-2gcr-p3hp"
+    },
+    "pandasai": {
+      "blocked_versions": [],
+      "reason": "PandasAI interactive prompt function Remote Code Execution (RCE) (GHSA-vv2h-2w3q-3fx7)",
+      "date": "2025-02-11",
+      "advisory": "https://github.com/advisories/GHSA-vv2h-2w3q-3fx7"
+    },
+    "django-unicorn": {
+      "blocked_versions": [],
+      "reason": "Django-Unicorn Class Pollution Vulnerability, Leading to XSS, DoS and Authentication Bypass (GHSA-g9wf-5777-gq43)",
+      "date": "2025-02-03",
+      "advisory": "https://github.com/advisories/GHSA-g9wf-5777-gq43"
+    },
+    "sentry": {
+      "blocked_versions": [],
+      "reason": "Sentry's improper authentication on SAML SSO process allows user impersonation (GHSA-7pq6-v88g-wf3w)",
+      "date": "2025-01-15",
+      "advisory": "https://github.com/advisories/GHSA-7pq6-v88g-wf3w"
+    },
+    "gradio": {
+      "blocked_versions": [],
+      "reason": "Gradio Blocked Path ACL Bypass Vulnerability (GHSA-j2jg-fq62-7c3h)",
+      "date": "2025-01-14",
+      "advisory": "https://github.com/advisories/GHSA-j2jg-fq62-7c3h"
+    },
+    "rasa-pro": {
+      "blocked_versions": [],
+      "reason": "Rasa Allows Remote Code Execution via Remote Model Loading (GHSA-cpv4-ggrr-7j9v)",
+      "date": "2025-01-14",
+      "advisory": "https://github.com/advisories/GHSA-cpv4-ggrr-7j9v"
+    },
+    "rasa": {
+      "blocked_versions": [],
+      "reason": "Rasa Allows Remote Code Execution via Remote Model Loading (GHSA-cpv4-ggrr-7j9v)",
+      "date": "2025-01-14",
+      "advisory": "https://github.com/advisories/GHSA-cpv4-ggrr-7j9v"
+    },
+    "cobbler": {
+      "blocked_versions": [],
+      "reason": "cobbler allows anyone to connect to cobbler XML-RPC server with known password and make changes (GHSA-m26c-fcgh-cp6h)",
+      "date": "2024-11-18",
+      "advisory": "https://github.com/advisories/GHSA-m26c-fcgh-cp6h"
+    },
+    "codechecker": {
+      "blocked_versions": [],
+      "reason": "codechecker authentication method confusion vulnerability allows logging in as the built-in root user from an external service (GHSA-fpm5-2wcj-vfr7)",
+      "date": "2024-11-06",
+      "advisory": "https://github.com/advisories/GHSA-fpm5-2wcj-vfr7"
+    },
+    "waitress": {
+      "blocked_versions": [],
+      "reason": "Waitress has request processing race condition in HTTP pipelining with invalid first request (GHSA-9298-4cf8-g4wj)",
+      "date": "2024-10-29",
+      "advisory": "https://github.com/advisories/GHSA-9298-4cf8-g4wj"
+    },
+    "changedetection.io": {
+      "blocked_versions": [],
+      "reason": "changedetection.io has a Server Side Template Injection using Jinja2 which allows Remote Command Execution (GHSA-4r7v-whpg-8rx3)",
+      "date": "2024-10-15",
+      "advisory": "https://github.com/advisories/GHSA-4r7v-whpg-8rx3"
+    },
+    "langchain-experimental": {
+      "blocked_versions": [],
+      "reason": "LangChain Experimental Eval Injection vulnerability (GHSA-p2qj-r53j-h3xj)",
+      "date": "2024-09-19",
+      "advisory": "https://github.com/advisories/GHSA-p2qj-r53j-h3xj"
+    },
+    "agpt": {
+      "blocked_versions": [],
+      "reason": "AutoGPT bypass of the shell commands denylist settings (GHSA-g84q-54hf-36rg)",
+      "date": "2024-09-11",
+      "advisory": "https://github.com/advisories/GHSA-g84q-54hf-36rg"
+    },
+    "llama-index-core": {
+      "blocked_versions": [],
+      "reason": "LlamaIndex includes an exec call for `import {cls_name}` (GHSA-fxc2-8m62-m85x)",
+      "date": "2024-08-22",
+      "advisory": "https://github.com/advisories/GHSA-fxc2-8m62-m85x"
+    },
+    "torchserve": {
+      "blocked_versions": [],
+      "reason": "TorchServe vulnerable to bypass of allowed_urls configuration (GHSA-wxcx-gg9c-fwp2)",
+      "date": "2024-07-18",
+      "advisory": "https://github.com/advisories/GHSA-wxcx-gg9c-fwp2"
+    },
+    "fiona": {
+      "blocked_versions": [],
+      "reason": "Fiona affected by CVE-2023-45853 related to MiniZip madler-zlib (GHSA-q5fm-55c2-v6j9)",
+      "date": "2024-07-16",
+      "advisory": "https://github.com/advisories/GHSA-q5fm-55c2-v6j9"
+    },
+    "vanna": {
+      "blocked_versions": [],
+      "reason": "vanna vulnerable to remote code execution caused by prompt injection (GHSA-rrqq-fv6m-692m)",
+      "date": "2024-06-27",
+      "advisory": "https://github.com/advisories/GHSA-rrqq-fv6m-692m"
+    },
+    "lightning": {
+      "blocked_versions": [],
+      "reason": "pytorch-lightning vulnerable to Arbitrary File Write via /v1/runs API endpoint (GHSA-mr7h-w2qc-ffc2)",
+      "date": "2024-06-27",
+      "advisory": "https://github.com/advisories/GHSA-mr7h-w2qc-ffc2"
+    },
+    "lollms": {
+      "blocked_versions": [],
+      "reason": "Remote Code Execution via path traversal bypass in lollms (GHSA-mvrm-fh8q-6wr2)",
+      "date": "2024-06-22",
+      "advisory": "https://github.com/advisories/GHSA-mvrm-fh8q-6wr2"
+    },
+    "org.apache.submarine:submarine-server-core": {
+      "blocked_versions": [],
+      "reason": "Apache Submarine Server Core Incorrect Authorization vulnerability (GHSA-6q97-8v3g-rpxw)",
+      "date": "2024-06-12",
+      "advisory": "https://github.com/advisories/GHSA-6q97-8v3g-rpxw"
+    },
+    "apache-submarine": {
+      "blocked_versions": [],
+      "reason": "Apache Submarine Server Core Incorrect Authorization vulnerability (GHSA-6q97-8v3g-rpxw)",
+      "date": "2024-06-12",
+      "advisory": "https://github.com/advisories/GHSA-6q97-8v3g-rpxw"
+    },
+    "jupyter-server-proxy": {
+      "blocked_versions": [],
+      "reason": "Jupyter Server Proxy has a reflected XSS issue in host parameter (GHSA-fvcq-4x64-hqxr)",
+      "date": "2024-06-11",
+      "advisory": "https://github.com/advisories/GHSA-fvcq-4x64-hqxr"
+    },
+    "qdrant-client": {
+      "blocked_versions": [],
+      "reason": "qdrant input validation failure  (GHSA-7m75-x27w-r52r)",
+      "date": "2024-06-03",
+      "advisory": "https://github.com/advisories/GHSA-7m75-x27w-r52r"
+    },
+    "mocodo": {
+      "blocked_versions": [],
+      "reason": "Mocodo vulnerable to SQL injection in `/web/generate.php` (GHSA-j6cv-98jx-mrwr)",
+      "date": "2024-05-28",
+      "advisory": "https://github.com/advisories/GHSA-j6cv-98jx-mrwr"
+    },
+    "ait-core": {
+      "blocked_versions": [],
+      "reason": "NASA AIT-Core vulnerable to remote code execution (GHSA-jqff-8g2v-642h)",
+      "date": "2024-05-21",
+      "advisory": "https://github.com/advisories/GHSA-jqff-8g2v-642h"
+    },
+    "pymysql": {
+      "blocked_versions": [],
+      "reason": "PyMySQL SQL Injection vulnerability (GHSA-v9hf-5j83-6xpp)",
+      "date": "2024-05-21",
+      "advisory": "https://github.com/advisories/GHSA-v9hf-5j83-6xpp"
+    },
+    "consoleme": {
+      "blocked_versions": [],
+      "reason": "ConsoleMe has an Arbitrary File Read Vulnerability via Limited Git command (GHSA-3783-62vc-jr7x)",
+      "date": "2024-05-16",
+      "advisory": "https://github.com/advisories/GHSA-3783-62vc-jr7x"
+    },
+    "llama-cpp-python": {
+      "blocked_versions": [],
+      "reason": "llama-cpp-python vulnerable to Remote Code Execution by Server-Side Template Injection in Model Metadata (GHSA-56xg-wfcc-g829)",
+      "date": "2024-05-13",
+      "advisory": "https://github.com/advisories/GHSA-56xg-wfcc-g829"
+    },
+    "frigate": {
+      "blocked_versions": [],
+      "reason": "Malicious Long Unicode filenames may cause a Multiple Application-level Denial of Service (GHSA-w4h6-9wrp-v5jq)",
+      "date": "2024-05-09",
+      "advisory": "https://github.com/advisories/GHSA-w4h6-9wrp-v5jq"
+    },
+    "cbpi4": {
+      "blocked_versions": [],
+      "reason": "CraftBeerPi 4 allows arbitrary code execution (GHSA-4f92-w438-f484)",
+      "date": "2024-05-02",
+      "advisory": "https://github.com/advisories/GHSA-4f92-w438-f484"
+    },
+    "python-jose": {
+      "blocked_versions": [],
+      "reason": "python-jose algorithm confusion with OpenSSH ECDSA keys (GHSA-6c5p-j8vq-pqhj)",
+      "date": "2024-04-26",
+      "advisory": "https://github.com/advisories/GHSA-6c5p-j8vq-pqhj"
+    },
+    "zenml": {
+      "blocked_versions": [],
+      "reason": "Directory traversal in zenml (GHSA-6h3f-43vq-53hj)",
+      "date": "2024-04-16",
+      "advisory": "https://github.com/advisories/GHSA-6h3f-43vq-53hj"
+    },
+    "lektor": {
+      "blocked_versions": [],
+      "reason": "Lektor does not sanitize database path traversal (GHSA-wv28-7fpw-fj49)",
+      "date": "2024-03-27",
+      "advisory": "https://github.com/advisories/GHSA-wv28-7fpw-fj49"
+    },
+    "whoogle-search": {
+      "blocked_versions": [],
+      "reason": "Whoogle Search Path Traversal vulnerability (GHSA-q97g-c29h-x2p7)",
+      "date": "2024-03-14",
+      "advisory": "https://github.com/advisories/GHSA-q97g-c29h-x2p7"
+    },
+    "paddlepaddle": {
+      "blocked_versions": [],
+      "reason": "PaddlePaddle Path Traversal vulnerability (GHSA-2rp8-hff9-c5wr)",
+      "date": "2024-03-07",
+      "advisory": "https://github.com/advisories/GHSA-2rp8-hff9-c5wr"
+    },
+    "flask-appbuilder": {
+      "blocked_versions": [],
+      "reason": "Flask-AppBuilder vulnerable to incorrect authentication when using auth type OpenID  (GHSA-j2pw-vp55-fqqj)",
+      "date": "2024-02-28",
+      "advisory": "https://github.com/advisories/GHSA-j2pw-vp55-fqqj"
+    },
+    "pymatgen": {
+      "blocked_versions": [],
+      "reason": "pymatgen vulnerable to arbitrary code execution when parsing a maliciously crafted JonesFaithfulTransformation transformation_string (GHSA-vgv8-5cpj-qj2f)",
+      "date": "2024-02-21",
+      "advisory": "https://github.com/advisories/GHSA-vgv8-5cpj-qj2f"
+    },
+    "apache-airflow-providers-mongo": {
+      "blocked_versions": [],
+      "reason": "Improper Certificate Validation in apache airflow mongo hook (GHSA-x5pm-h33q-cjrw)",
+      "date": "2024-02-20",
+      "advisory": "https://github.com/advisories/GHSA-x5pm-h33q-cjrw"
+    },
+    "dirac": {
+      "blocked_versions": [],
+      "reason": "DIRAC's TokenManager does not check permissions on cached tokens (GHSA-59qj-jcjv-662j)",
+      "date": "2024-02-08",
+      "advisory": "https://github.com/advisories/GHSA-59qj-jcjv-662j"
+    },
+    "products.sqlalchemyda": {
+      "blocked_versions": [],
+      "reason": "SQLAlchemyDA unauthenticated arbitrary SQL query execution (GHSA-r3jc-3qmm-w3pw)",
+      "date": "2024-02-07",
+      "advisory": "https://github.com/advisories/GHSA-r3jc-3qmm-w3pw"
+    },
+    "vyper": {
+      "blocked_versions": [],
+      "reason": "Vyper negative array index bounds checks (GHSA-52xq-j7v9-v4v2)",
+      "date": "2024-02-07",
+      "advisory": "https://github.com/advisories/GHSA-52xq-j7v9-v4v2"
+    },
+    "synthcity": {
+      "blocked_versions": [],
+      "reason": "Deserialization of untrusted data in synthcity (GHSA-4957-7vhp-7v59)",
+      "date": "2024-01-26",
+      "advisory": "https://github.com/advisories/GHSA-4957-7vhp-7v59"
+    },
+    "apache-superset": {
+      "blocked_versions": [],
+      "reason": "Cross-site Scripting in Apache superset (GHSA-rwhh-6x83-84v6)",
+      "date": "2024-01-23",
+      "advisory": "https://github.com/advisories/GHSA-rwhh-6x83-84v6"
+    },
+    "embedchain": {
+      "blocked_versions": [],
+      "reason": "Code execution in Embedchain (GHSA-rhhj-5436-95vf)",
+      "date": "2024-01-21",
+      "advisory": "https://github.com/advisories/GHSA-rhhj-5436-95vf"
+    },
+    "llama-hub": {
+      "blocked_versions": [],
+      "reason": "Unsafe yaml deserialization in llama-hub (GHSA-297x-2qf3-jrj3)",
+      "date": "2024-01-21",
+      "advisory": "https://github.com/advisories/GHSA-297x-2qf3-jrj3"
+    },
+    "pillow": {
+      "blocked_versions": [],
+      "reason": "Arbitrary Code Execution in Pillow (GHSA-3f63-hfp8-52jq)",
+      "date": "2024-01-19",
+      "advisory": "https://github.com/advisories/GHSA-3f63-hfp8-52jq"
+    },
+    "aries-cloudagent": {
+      "blocked_versions": [],
+      "reason": "Hyperledger Aries Cloud Agent Python result of presentation verification not checked for LDP-VC (GHSA-97x9-59rv-q5pm)",
+      "date": "2024-01-09",
+      "advisory": "https://github.com/advisories/GHSA-97x9-59rv-q5pm"
+    },
+    "transformers": {
+      "blocked_versions": [],
+      "reason": "transformers has a Deserialization of Untrusted Data vulnerability (GHSA-3863-2447-669p)",
+      "date": "2023-12-19",
+      "advisory": "https://github.com/advisories/GHSA-3863-2447-669p"
+    },
+    "sap-xssec": {
+      "blocked_versions": [],
+      "reason": "Improper Privilege Management in sap-xssec (GHSA-6mjg-37cp-42x5)",
+      "date": "2023-12-13",
+      "advisory": "https://github.com/advisories/GHSA-6mjg-37cp-42x5"
+    },
+    "ibis-framework": {
+      "blocked_versions": [],
+      "reason": "Ibis PyArrow dependency allows arbitrary code execution when loading a malicious data file (GHSA-x563-6hqv-26mr)",
+      "date": "2023-11-17",
+      "advisory": "https://github.com/advisories/GHSA-x563-6hqv-26mr"
+    },
+    "piccolo": {
+      "blocked_versions": [],
+      "reason": "piccolo SQL Injection via named transaction savepoints (GHSA-xq59-7jf3-rjc6)",
+      "date": "2023-11-12",
+      "advisory": "https://github.com/advisories/GHSA-xq59-7jf3-rjc6"
+    },
+    "label-studio": {
+      "blocked_versions": [],
+      "reason": "Label Studio has Hardcoded Django `SECRET_KEY` that can be Abused to Forge Session Tokens (GHSA-f475-x83m-rx5m)",
+      "date": "2023-11-09",
+      "advisory": "https://github.com/advisories/GHSA-f475-x83m-rx5m"
+    },
+    "pyarrow": {
+      "blocked_versions": [],
+      "reason": "PyArrow: Arbitrary code execution when loading a malicious data file (GHSA-5wvp-7f3h-6wmm)",
+      "date": "2023-11-09",
+      "advisory": "https://github.com/advisories/GHSA-5wvp-7f3h-6wmm"
+    },
+    "transmute-core": {
+      "blocked_versions": [],
+      "reason": "transmute-core unsafe YAML deserialization vulnerability (GHSA-w9cp-3x79-2p8p)",
+      "date": "2023-11-02",
+      "advisory": "https://github.com/advisories/GHSA-w9cp-3x79-2p8p"
+    },
+    "langchain": {
+      "blocked_versions": [],
+      "reason": "Langchain SQL Injection vulnerability (GHSA-8h5w-f6q9-wg35)",
+      "date": "2023-10-21",
+      "advisory": "https://github.com/advisories/GHSA-8h5w-f6q9-wg35"
+    },
+    "modoboa": {
+      "blocked_versions": [],
+      "reason": "modoboa Cross-site Scripting vulnerability (GHSA-pqgm-9g82-wcm7)",
+      "date": "2023-10-20",
+      "advisory": "https://github.com/advisories/GHSA-pqgm-9g82-wcm7"
+    },
+    "pyminizip": {
+      "blocked_versions": [],
+      "reason": "pyminizip affected by zlib's integer overflow/heap based buffer overflow vulnerability due to vulnerable dependency (GHSA-mq29-j5xf-cjwr)",
+      "date": "2023-10-14",
+      "advisory": "https://github.com/advisories/GHSA-mq29-j5xf-cjwr"
+    },
+    "pydash": {
+      "blocked_versions": [],
+      "reason": "pydash Command Injection vulnerability (GHSA-8mjr-6c96-39w8)",
+      "date": "2023-09-28",
+      "advisory": "https://github.com/advisories/GHSA-8mjr-6c96-39w8"
+    },
+    "searchor": {
+      "blocked_versions": [],
+      "reason": "Searchor CLI's Search vulnerable to Arbitrary Code using Eval (GHSA-66m2-493m-crh2)",
+      "date": "2023-09-25",
+      "advisory": "https://github.com/advisories/GHSA-66m2-493m-crh2"
+    },
+    "gevent": {
+      "blocked_versions": [],
+      "reason": "Gevent allows remote attacker to escalate privileges (GHSA-x7m3-jprg-wc5g)",
+      "date": "2023-09-25",
+      "advisory": "https://github.com/advisories/GHSA-x7m3-jprg-wc5g"
+    },
+    "reportlab": {
+      "blocked_versions": [],
+      "reason": "ReportLab vulnerable to remote code execution via paraparser (GHSA-pj98-2xf6-cff5)",
+      "date": "2023-09-20",
+      "advisory": "https://github.com/advisories/GHSA-pj98-2xf6-cff5"
+    },
+    "numexpr": {
+      "blocked_versions": [],
+      "reason": "Langchain vulnerable to arbitrary code execution via the evaluate function in the numexpr library (GHSA-f73w-4m7g-ch9x)",
+      "date": "2023-09-01",
+      "advisory": "https://github.com/advisories/GHSA-f73w-4m7g-ch9x"
+    },
+    "zbar": {
+      "blocked_versions": [],
+      "reason": "Heap-based buffer overflow in ZBar (GHSA-mhp6-jvpx-2p4m)",
+      "date": "2023-08-29",
+      "advisory": "https://github.com/advisories/GHSA-mhp6-jvpx-2p4m"
+    },
+    "gitpython": {
+      "blocked_versions": [],
+      "reason": "GitPython vulnerable to remote code execution due to insufficient sanitization of input arguments (GHSA-pr76-5cm5-w9cj)",
+      "date": "2023-08-11",
+      "advisory": "https://github.com/advisories/GHSA-pr76-5cm5-w9cj"
+    },
+    "mindsdb": {
+      "blocked_versions": [],
+      "reason": "MindsDB can be made to not verify SSL certificates (GHSA-8hx6-qv6f-xgcw)",
+      "date": "2023-08-01",
+      "advisory": "https://github.com/advisories/GHSA-8hx6-qv6f-xgcw"
+    },
+    "matrix-sydent": {
+      "blocked_versions": [],
+      "reason": "Sydent does not verify email server certificates (GHSA-p6hw-wm59-3g5g)",
+      "date": "2023-07-31",
+      "advisory": "https://github.com/advisories/GHSA-p6hw-wm59-3g5g"
+    },
+    "postgraas-server": {
+      "blocked_versions": [],
+      "reason": "postgraas-server vulnerable to SQL injection (GHSA-vghm-8cjp-hjw6)",
+      "date": "2023-07-18",
+      "advisory": "https://github.com/advisories/GHSA-vghm-8cjp-hjw6"
+    },
+    "xalpha": {
+      "blocked_versions": [],
+      "reason": "xalpha vulnerable to Remote Code Execution (GHSA-jx3q-5rgf-vrrr)",
+      "date": "2023-07-11",
+      "advisory": "https://github.com/advisories/GHSA-jx3q-5rgf-vrrr"
+    },
+    "scipy": {
+      "blocked_versions": [],
+      "reason": "Withdrawn: Use after free in SciPy (GHSA-jrfm-2h82-xg28)",
+      "date": "2023-07-06",
+      "advisory": "https://github.com/advisories/GHSA-jrfm-2h82-xg28"
+    },
+    "apache-airflow-providers-apache-hive": {
+      "blocked_versions": [],
+      "reason": "Apache Airflow Hive Provider Beeline remote code execution with Principal (GHSA-hg6c-qqcm-r79r)",
+      "date": "2023-07-03",
+      "advisory": "https://github.com/advisories/GHSA-hg6c-qqcm-r79r"
+    },
+    "pipreqs": {
+      "blocked_versions": [],
+      "reason": "pipreqs vulnerable to Dependency Confusion (GHSA-v4f4-23wc-99mh)",
+      "date": "2023-06-30",
+      "advisory": "https://github.com/advisories/GHSA-v4f4-23wc-99mh"
+    },
+    "fief-server": {
+      "blocked_versions": [],
+      "reason": "fief-server Server-Side Template Injection vulnerability (GHSA-hj8m-9fhf-v7jp)",
+      "date": "2023-06-23",
+      "advisory": "https://github.com/advisories/GHSA-hj8m-9fhf-v7jp"
+    },
+    "toui": {
+      "blocked_versions": [],
+      "reason": "toui allows user-specific variables to be shared between users (GHSA-hh7j-pg39-q563)",
+      "date": "2023-05-24",
+      "advisory": "https://github.com/advisories/GHSA-hh7j-pg39-q563"
+    },
+    "ckan": {
+      "blocked_versions": [],
+      "reason": "Ckan remote code execution and private information access via crafted resource ids (GHSA-446m-hmmm-hm8m)",
+      "date": "2023-05-24",
+      "advisory": "https://github.com/advisories/GHSA-446m-hmmm-hm8m"
+    },
+    "apache-airflow": {
+      "blocked_versions": [],
+      "reason": "Apache Airflow vulnerable to Privilege Context Switching Error (GHSA-jchm-fm4q-c2fp)",
+      "date": "2023-05-08",
+      "advisory": "https://github.com/advisories/GHSA-jchm-fm4q-c2fp"
+    },
+    "pysha3": {
+      "blocked_versions": [],
+      "reason": "Buffer overflow in sponge queue functions (GHSA-6w4m-2xhg-2658)",
+      "date": "2023-04-26",
+      "advisory": "https://github.com/advisories/GHSA-6w4m-2xhg-2658"
+    },
+    "sha3": {
+      "blocked_versions": [],
+      "reason": "Buffer overflow in sponge queue functions (GHSA-6w4m-2xhg-2658)",
+      "date": "2023-04-26",
+      "advisory": "https://github.com/advisories/GHSA-6w4m-2xhg-2658"
+    },
+    "org.apache.iotdb:iotdb-grafana-connector": {
+      "blocked_versions": [],
+      "reason": "Apache IoTDB Grafana Connector vulnerable to Improper Authentication (GHSA-pvjv-386f-c8wh)",
+      "date": "2023-04-17",
+      "advisory": "https://github.com/advisories/GHSA-pvjv-386f-c8wh"
+    },
+    "org.apache.spark:spark-core_2.12": {
+      "blocked_versions": [],
+      "reason": "Apache Spark vulnerable to Improper Privilege Management (GHSA-329j-jfvr-rhr6)",
+      "date": "2023-04-17",
+      "advisory": "https://github.com/advisories/GHSA-329j-jfvr-rhr6"
+    },
+    "org.apache.spark:spark-core_2.13": {
+      "blocked_versions": [],
+      "reason": "Apache Spark vulnerable to Improper Privilege Management (GHSA-329j-jfvr-rhr6)",
+      "date": "2023-04-17",
+      "advisory": "https://github.com/advisories/GHSA-329j-jfvr-rhr6"
+    },
+    "pyspark": {
+      "blocked_versions": [],
+      "reason": "Apache Spark vulnerable to Improper Privilege Management (GHSA-329j-jfvr-rhr6)",
+      "date": "2023-04-17",
+      "advisory": "https://github.com/advisories/GHSA-329j-jfvr-rhr6"
+    },
+    "farm-haystack": {
+      "blocked_versions": [],
+      "reason": "Use of hard-coded, security-relevant constants in deepset-ai/haystack (GHSA-w7qg-j435-78qw)",
+      "date": "2023-03-30",
+      "advisory": "https://github.com/advisories/GHSA-w7qg-j435-78qw"
+    },
+    "tensorflow": {
+      "blocked_versions": [],
+      "reason": "TensorFlow has a heap out-of-buffer read vulnerability in the QuantizeAndDequantize operation (GHSA-gw97-ff7c-9v96)",
+      "date": "2023-03-24",
+      "advisory": "https://github.com/advisories/GHSA-gw97-ff7c-9v96"
+    },
+    "tensorflow-cpu": {
+      "blocked_versions": [],
+      "reason": "TensorFlow has a heap out-of-buffer read vulnerability in the QuantizeAndDequantize operation (GHSA-gw97-ff7c-9v96)",
+      "date": "2023-03-24",
+      "advisory": "https://github.com/advisories/GHSA-gw97-ff7c-9v96"
+    },
+    "tensorflow-gpu": {
+      "blocked_versions": [],
+      "reason": "TensorFlow has a heap out-of-buffer read vulnerability in the QuantizeAndDequantize operation (GHSA-gw97-ff7c-9v96)",
+      "date": "2023-03-24",
+      "advisory": "https://github.com/advisories/GHSA-gw97-ff7c-9v96"
+    },
+    "weixin-python": {
+      "blocked_versions": [],
+      "reason": "weixin-python XML External Entity vulnerability (GHSA-h384-ph77-3699)",
+      "date": "2023-03-21",
+      "advisory": "https://github.com/advisories/GHSA-h384-ph77-3699"
+    },
+    "apache-airflow-providers-google": {
+      "blocked_versions": [],
+      "reason": "Apache Airflow Google Provider Improper Input Validation vulnerability (GHSA-8g23-2q5p-8866)",
+      "date": "2023-02-24",
+      "advisory": "https://github.com/advisories/GHSA-8g23-2q5p-8866"
+    },
+    "apache-airflow-providers-apache-sqoop": {
+      "blocked_versions": [],
+      "reason": "Apache Airflow Sqoop Provider Improper Input Validation vulnerability (GHSA-j69x-v4wc-3fpf)",
+      "date": "2023-02-24",
+      "advisory": "https://github.com/advisories/GHSA-j69x-v4wc-3fpf"
+    },
+    "turbogears": {
+      "blocked_versions": [],
+      "reason": "Header injection in TurboGears (GHSA-8q38-w56m-qq2c)",
+      "date": "2023-02-04",
+      "advisory": "https://github.com/advisories/GHSA-8q38-w56m-qq2c"
+    },
+    "apache-airflow-providers-mysql": {
+      "blocked_versions": [],
+      "reason": "Command Injection in Apache Airflow and Apache Airflow MySQL Provider (GHSA-c732-xvv8-g94c)",
+      "date": "2023-01-21",
+      "advisory": "https://github.com/advisories/GHSA-c732-xvv8-g94c"
+    },
+    "rdiffweb": {
+      "blocked_versions": [],
+      "reason": "rdiffweb Improper Access Control vulnerability (GHSA-m8r9-qxx8-mrxp)",
+      "date": "2022-12-27",
+      "advisory": "https://github.com/advisories/GHSA-m8r9-qxx8-mrxp"
+    },
+    "py7zr": {
+      "blocked_versions": [],
+      "reason": "py7zr directory traversal vulnerability (GHSA-m8xw-9x5x-6vh3)",
+      "date": "2022-12-06",
+      "advisory": "https://github.com/advisories/GHSA-m8xw-9x5x-6vh3"
+    },
+    "wger": {
+      "blocked_versions": [],
+      "reason": "wger vulnerable to brute force attempts (GHSA-gr58-76rp-mmg4)",
+      "date": "2022-11-24",
+      "advisory": "https://github.com/advisories/GHSA-gr58-76rp-mmg4"
+    },
+    "acryl-datahub": {
+      "blocked_versions": [],
+      "reason": "acryl-datahub missing JWT signature check (GHSA-r8gm-v65f-c973)",
+      "date": "2022-10-31",
+      "advisory": "https://github.com/advisories/GHSA-r8gm-v65f-c973"
+    },
+    "pikepdf": {
+      "blocked_versions": [],
+      "reason": "Duplicate Advisory: Improper Restriction of XML External Entity Reference in pikepdf (GHSA-x58j-j539-w8mv)",
+      "date": "2022-10-24",
+      "advisory": "https://github.com/advisories/GHSA-x58j-j539-w8mv"
+    },
+    "shinken": {
+      "blocked_versions": [],
+      "reason": "Shinken Solutions Shinken Monitoring vulnerable to Incorrect Access Control (GHSA-p373-jqfm-j6wr)",
+      "date": "2022-10-20",
+      "advisory": "https://github.com/advisories/GHSA-p373-jqfm-j6wr"
+    },
+    "joblib": {
+      "blocked_versions": [],
+      "reason": "joblib vulnerable to arbitrary code execution (GHSA-6hrg-qmvc-2xh8)",
+      "date": "2022-09-27",
+      "advisory": "https://github.com/advisories/GHSA-6hrg-qmvc-2xh8"
+    },
+    "python-jwt": {
+      "blocked_versions": [],
+      "reason": "python-jwt vulnerable to token forgery with new claims (GHSA-5p8v-58qm-c7fp)",
+      "date": "2022-09-21",
+      "advisory": "https://github.com/advisories/GHSA-5p8v-58qm-c7fp"
+    },
+    "vncauthproxy": {
+      "blocked_versions": [],
+      "reason": "VNCAuthProxy authentication bypass vulnerability (GHSA-237r-mx84-7x8c)",
+      "date": "2022-09-16",
+      "advisory": "https://github.com/advisories/GHSA-237r-mx84-7x8c"
+    },
+    "python-scciclient": {
+      "blocked_versions": [],
+      "reason": "python-scciclient vulnerable to Man-in-the-middle (MITM) attacks (GHSA-rf3f-3p37-2qh4)",
+      "date": "2022-09-02",
+      "advisory": "https://github.com/advisories/GHSA-rf3f-3p37-2qh4"
+    },
+    "nvflare": {
+      "blocked_versions": [],
+      "reason": "NVFLARE unsafe deserialization due to Pickle (GHSA-6qv6-q77g-7qm6)",
+      "date": "2022-08-31",
+      "advisory": "https://github.com/advisories/GHSA-6qv6-q77g-7qm6"
+    },
+    "exotel": {
+      "blocked_versions": [],
+      "reason": "exotel-py includes code execution backdoor inserted by a third party (GHSA-cv6j-9835-p7fh)",
+      "date": "2022-08-28",
+      "advisory": "https://github.com/advisories/GHSA-cv6j-9835-p7fh"
+    },
+    "keystone": {
+      "blocked_versions": [],
+      "reason": "Openstack Keystone Incorrect Authorization vulnerability (GHSA-cc99-whm5-mmq3)",
+      "date": "2022-08-27",
+      "advisory": "https://github.com/advisories/GHSA-cc99-whm5-mmq3"
+    },
+    "wmagent": {
+      "blocked_versions": [],
+      "reason": "WMAgent arbitrary code execution via a crafted dbs-client package (GHSA-4vq7-8699-4xgc)",
+      "date": "2022-07-29",
+      "advisory": "https://github.com/advisories/GHSA-4vq7-8699-4xgc"
+    },
+    "reqmgr2": {
+      "blocked_versions": [],
+      "reason": "WMAgent arbitrary code execution via a crafted dbs-client package (GHSA-4vq7-8699-4xgc)",
+      "date": "2022-07-29",
+      "advisory": "https://github.com/advisories/GHSA-4vq7-8699-4xgc"
+    },
+    "reqmon": {
+      "blocked_versions": [],
+      "reason": "WMAgent arbitrary code execution via a crafted dbs-client package (GHSA-4vq7-8699-4xgc)",
+      "date": "2022-07-29",
+      "advisory": "https://github.com/advisories/GHSA-4vq7-8699-4xgc"
+    },
+    "global-workqueue": {
+      "blocked_versions": [],
+      "reason": "WMAgent arbitrary code execution via a crafted dbs-client package (GHSA-4vq7-8699-4xgc)",
+      "date": "2022-07-29",
+      "advisory": "https://github.com/advisories/GHSA-4vq7-8699-4xgc"
+    },
+    "octobot": {
+      "blocked_versions": [],
+      "reason": "Octobot mishandles Tentacles upload (GHSA-fr75-x856-q6j8)",
+      "date": "2022-07-17",
+      "advisory": "https://github.com/advisories/GHSA-fr75-x856-q6j8"
+    },
+    "distributed": {
+      "blocked_versions": [],
+      "reason": "Workers for local Dask clusters mistakenly listened on public interfaces (GHSA-hwqr-f3v9-hwxr)",
+      "date": "2022-07-15",
+      "advisory": "https://github.com/advisories/GHSA-hwqr-f3v9-hwxr"
+    },
+    "ganga": {
+      "blocked_versions": [],
+      "reason": "Ganga allows absolute path traversal (GHSA-7488-6x3r-23w5)",
+      "date": "2022-07-13",
+      "advisory": "https://github.com/advisories/GHSA-7488-6x3r-23w5"
+    },
+    "chainerrl-visualizer": {
+      "blocked_versions": [],
+      "reason": "ChainerRL Visualizer 0.1.1 vulnerable to Path Traversal via unsafe use of send_file function (GHSA-687h-86vc-5x59)",
+      "date": "2022-07-12",
+      "advisory": "https://github.com/advisories/GHSA-687h-86vc-5x59"
+    },
+    "shiva": {
+      "blocked_versions": [],
+      "reason": "Tooxie Shiva 0.10.0 allows absolute path traversal because Flask send_file function used unsafely (GHSA-qp72-96p2-g644)",
+      "date": "2022-07-12",
+      "advisory": "https://github.com/advisories/GHSA-qp72-96p2-g644"
+    },
+    "opendiamond": {
+      "blocked_versions": [],
+      "reason": "SatyaLab opendiamond 10.1.1 vulnerable to path traversal because Flask send_file function used unsafely (GHSA-x2pc-fqrw-hc7f)",
+      "date": "2022-07-12",
+      "advisory": "https://github.com/advisories/GHSA-x2pc-fqrw-hc7f"
+    },
+    "rpc.py": {
+      "blocked_versions": [],
+      "reason": "rpc.py vulnerable to Deserialization of Untrusted Data (GHSA-8rq8-f485-7v8x)",
+      "date": "2022-07-09",
+      "advisory": "https://github.com/advisories/GHSA-8rq8-f485-7v8x"
+    },
+    "couchbase": {
+      "blocked_versions": [],
+      "reason": "Couchbase Sync Gateway admin credentials not verified when using X.509 client cert authentication (GHSA-9266-j9v3-q4j5)",
+      "date": "2022-06-11",
+      "advisory": "https://github.com/advisories/GHSA-9266-j9v3-q4j5"
+    },
+    "cookiecutter": {
+      "blocked_versions": [],
+      "reason": "OS Command Injection in cookiecutter (GHSA-f4q6-9qm4-h8j4)",
+      "date": "2022-06-09",
+      "advisory": "https://github.com/advisories/GHSA-f4q6-9qm4-h8j4"
+    },
+    "api-res-py": {
+      "blocked_versions": [],
+      "reason": "Backdoor in api-res-py (GHSA-6978-4w92-428p)",
+      "date": "2022-06-09",
+      "advisory": "https://github.com/advisories/GHSA-6978-4w92-428p"
+    },
+    "django-s3file": {
+      "blocked_versions": [],
+      "reason": "Path Traversal in django-s3file (GHSA-4w8f-hjm9-xwgf)",
+      "date": "2022-06-06",
+      "advisory": "https://github.com/advisories/GHSA-4w8f-hjm9-xwgf"
+    },
+    "bottle": {
+      "blocked_versions": [],
+      "reason": "Denial of service in bottle (GHSA-xhp9-4947-rq78)",
+      "date": "2022-06-03",
+      "advisory": "https://github.com/advisories/GHSA-xhp9-4947-rq78"
+    },
+    "ctx": {
+      "blocked_versions": [],
+      "reason": "Embedded Malicious Code in ctx (GHSA-67r3-h899-9w95)",
+      "date": "2022-06-02",
+      "advisory": "https://github.com/advisories/GHSA-67r3-h899-9w95"
+    },
+    "ansible": {
+      "blocked_versions": [],
+      "reason": "Ansible Code Injection Vulnerability (GHSA-66c7-5pwv-mm3j)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-66c7-5pwv-mm3j"
+    },
+    "numpy": {
+      "blocked_versions": [],
+      "reason": "Numpy Deserialization of Untrusted Data (GHSA-9fq2-x9r6-wfmf)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-9fq2-x9r6-wfmf"
+    },
+    "lmdb": {
+      "blocked_versions": [],
+      "reason": "py-lmdb Invalid write operation (GHSA-pf3p-v9xp-mrvf)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-pf3p-v9xp-mrvf"
+    },
+    "ops-cli": {
+      "blocked_versions": [],
+      "reason": "Ops CLI Deserialization of Untrusted Data vulnerability (GHSA-x23q-4j9j-9cxw)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-x23q-4j9j-9cxw"
+    },
+    "lxdui": {
+      "blocked_versions": [],
+      "reason": "AdaptiveScale LXDUI Hardcoded JWT Secret Key (GHSA-p4xh-4869-8vrg)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-p4xh-4869-8vrg"
+    },
+    "lin-cms": {
+      "blocked_versions": [],
+      "reason": "Lin-CMS-Flask vulnerable to Improper Authentication (GHSA-h6r2-pgvx-683c)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-h6r2-pgvx-683c"
+    },
+    "git-big-picture": {
+      "blocked_versions": [],
+      "reason": "git-big-picture Code Execution (GHSA-x38j-4rr5-hqrj)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-x38j-4rr5-hqrj"
+    },
+    "jsonpickle": {
+      "blocked_versions": [],
+      "reason": "jsonpickle unsafe deserialization (GHSA-j66q-qmrc-89rx)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-j66q-qmrc-89rx"
+    },
+    "scalyr-agent-2": {
+      "blocked_versions": [],
+      "reason": "Scalyr Agent 2 Missing SSL Certificate Validation (GHSA-738x-v49g-p6hx)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-738x-v49g-p6hx"
+    },
+    "scikit-learn": {
+      "blocked_versions": [],
+      "reason": "scikit-learn Deserialization of Untrusted Data (GHSA-jjw5-xxj6-pcv5)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-jjw5-xxj6-pcv5"
+    },
+    "misp-maltego": {
+      "blocked_versions": [],
+      "reason": "Maltego incorrectly shares a MISP connection across users in a remote-transform use case (GHSA-fj35-m94r-9h4c)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-fj35-m94r-9h4c"
+    },
+    "plone": {
+      "blocked_versions": [],
+      "reason": "Plone Unauthenticated Write Vulnerability (GHSA-w6g9-xccc-347h)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-w6g9-xccc-347h"
+    },
+    "plone.app.contenttypes": {
+      "blocked_versions": [],
+      "reason": "Plone Unauthenticated Write Vulnerability (GHSA-w6g9-xccc-347h)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-w6g9-xccc-347h"
+    },
+    "octavia": {
+      "blocked_versions": [],
+      "reason": "OpenStack Octavia Amphora-Agent not requiring Client-Certificate (GHSA-r4v4-3jj7-jc29)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-r4v4-3jj7-jc29"
+    },
+    "os-vif": {
+      "blocked_versions": [],
+      "reason": "OpenStack os-vif Ageing time of 0 disables linuxbridge MAC learning (GHSA-mcpw-cp35-p3h8)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-mcpw-cp35-p3h8"
+    },
+    "linotp": {
+      "blocked_versions": [],
+      "reason": "LinOTP replay vulnerability with auto resynchronization enabled for TOTP token (GHSA-rqg8-xjp2-pg9w)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-rqg8-xjp2-pg9w"
+    },
+    "openstack-magnum": {
+      "blocked_versions": [],
+      "reason": "Openstack Magnum Unsafe Credential Handling (GHSA-793v-r35j-9rp9)",
+      "date": "2022-05-24",
+      "advisory": "https://github.com/advisories/GHSA-793v-r35j-9rp9"
+    },
+    "org.eclipse.jgit:org.eclipse.jgit": {
+      "blocked_versions": [],
+      "reason": "JGit Improper Input Validation vulnerability (GHSA-6vvc-c2m3-cjf3)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-6vvc-c2m3-cjf3"
+    },
+    "mercurial": {
+      "blocked_versions": [],
+      "reason": "JGit Improper Input Validation vulnerability (GHSA-6vvc-c2m3-cjf3)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-6vvc-c2m3-cjf3"
+    },
+    "pywebdav": {
+      "blocked_versions": [],
+      "reason": "PyWebDAV SQL Injection vulnerability (GHSA-69vw-jfq7-935g)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-69vw-jfq7-935g"
+    },
+    "graphite-web": {
+      "blocked_versions": [],
+      "reason": "graphite-web is vulnerable to Remote Code Execution (GHSA-ch3j-w953-hfcm)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-ch3j-w953-hfcm"
+    },
+    "python-swiftclient": {
+      "blocked_versions": [],
+      "reason": "Python Swift client is vulnerable to Missing SSL Certificate Check (GHSA-p3xv-97g8-4wmj)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-p3xv-97g8-4wmj"
+    },
+    "dulwich": {
+      "blocked_versions": [],
+      "reason": "Dulwich Buffer Overflow when handling pack files (GHSA-vjjf-3rvg-gv3v)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-vjjf-3rvg-gv3v"
+    },
+    "murano": {
+      "blocked_versions": [],
+      "reason": "OpenStack Murano Code Execution (GHSA-87r7-q54j-f9qg)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-87r7-q54j-f9qg"
+    },
+    "murano-dashboard": {
+      "blocked_versions": [],
+      "reason": "OpenStack Murano Code Execution (GHSA-87r7-q54j-f9qg)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-87r7-q54j-f9qg"
+    },
+    "python-muranoclient": {
+      "blocked_versions": [],
+      "reason": "OpenStack Murano Code Execution (GHSA-87r7-q54j-f9qg)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-87r7-q54j-f9qg"
+    },
+    "radicale": {
+      "blocked_versions": [],
+      "reason": "Radicale is vulnerable to directory traversal on Windows Filesystem Storage Backend component (GHSA-84cw-mxhv-qvv4)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-84cw-mxhv-qvv4"
+    },
+    "notebook": {
+      "blocked_versions": [],
+      "reason": "Improper Input Validation in Jupyter Notebook (GHSA-92mr-v722-f48m)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-92mr-v722-f48m"
+    },
+    "ipython": {
+      "blocked_versions": [],
+      "reason": "Improper Input Validation in Jupyter Notebook (GHSA-92mr-v722-f48m)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-92mr-v722-f48m"
+    },
+    "pysaml2": {
+      "blocked_versions": [],
+      "reason": "PySAML2 XML external entity attack (GHSA-m269-wj6g-c459)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-m269-wj6g-c459"
+    },
+    "pygments": {
+      "blocked_versions": [],
+      "reason": "Command Injection in Pygments (GHSA-fff8-4w9p-7v76)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-fff8-4w9p-7v76"
+    },
+    "swift": {
+      "blocked_versions": [],
+      "reason": "OpenStack Object Storage (swift) Code Injection vulnerability (GHSA-v7mh-3jgf-r26c)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-v7mh-3jgf-r26c"
+    },
+    "swauth": {
+      "blocked_versions": [],
+      "reason": "OpenStack Swauth object/proxy server writing Auth Token to log file (GHSA-qhq8-xwqv-pvv9)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-qhq8-xwqv-pvv9"
+    },
+    "calibreweb": {
+      "blocked_versions": [],
+      "reason": "SQL injection in calibreweb (GHSA-8ppf-x4gr-2x7g)",
+      "date": "2022-05-17",
+      "advisory": "https://github.com/advisories/GHSA-8ppf-x4gr-2x7g"
+    },
+    "ipsilon": {
+      "blocked_versions": [],
+      "reason": "Session Fixation in ipsilon (GHSA-376m-3rm2-9jm6)",
+      "date": "2022-05-14",
+      "advisory": "https://github.com/advisories/GHSA-376m-3rm2-9jm6"
+    },
+    "nova": {
+      "blocked_versions": [],
+      "reason": "OpenStack Nova logs sensitive context from notification exceptions (GHSA-f4g4-cj8f-3cr9)",
+      "date": "2022-05-14",
+      "advisory": "https://github.com/advisories/GHSA-f4g4-cj8f-3cr9"
+    },
+    "sqlalchemy": {
+      "blocked_versions": [],
+      "reason": "SQLAlchemy vulnerable to SQL injection (GHSA-hfg2-wf6j-x53p)",
+      "date": "2022-05-14",
+      "advisory": "https://github.com/advisories/GHSA-hfg2-wf6j-x53p"
+    },
+    "django-anymail": {
+      "blocked_versions": [],
+      "reason": "django-anymail Includes Sensitive Information in Log Files (GHSA-qh9x-mc42-vg4g)",
+      "date": "2022-05-14",
+      "advisory": "https://github.com/advisories/GHSA-qh9x-mc42-vg4g"
+    },
+    "django-tastypie": {
+      "blocked_versions": [],
+      "reason": "Django Tastypie Improper Deserialization of YAML Data (GHSA-qgvw-qc2q-gv5q)",
+      "date": "2022-05-14",
+      "advisory": "https://github.com/advisories/GHSA-qgvw-qc2q-gv5q"
+    },
+    "neutron": {
+      "blocked_versions": [],
+      "reason": "OpenStack Neutron allows remote attackers to bypass an intended ICMPv6-spoofing protection mechanism (GHSA-3vj4-cvjp-482h)",
+      "date": "2022-05-14",
+      "advisory": "https://github.com/advisories/GHSA-3vj4-cvjp-482h"
+    },
+    "kerberos": {
+      "blocked_versions": [],
+      "reason": "python-kerberos vulnerable to KDC spoofing attacks (GHSA-mffc-9gx5-99g3)",
+      "date": "2022-05-14",
+      "advisory": "https://github.com/advisories/GHSA-mffc-9gx5-99g3"
+    },
+    "pykerberos": {
+      "blocked_versions": [],
+      "reason": "python-kerberos vulnerable to KDC spoofing attacks (GHSA-mffc-9gx5-99g3)",
+      "date": "2022-05-14",
+      "advisory": "https://github.com/advisories/GHSA-mffc-9gx5-99g3"
+    },
+    "asyncssh": {
+      "blocked_versions": [],
+      "reason": "AsyncSSH SSH Server Authentication Bypass (GHSA-97cv-6pjf-5f9q)",
+      "date": "2022-05-14",
+      "advisory": "https://github.com/advisories/GHSA-97cv-6pjf-5f9q"
+    },
+    "donfig": {
+      "blocked_versions": [],
+      "reason": "Donfig Command Injection in collect_yaml method (GHSA-3qr5-h7w4-3gx3)",
+      "date": "2022-05-14",
+      "advisory": "https://github.com/advisories/GHSA-3qr5-h7w4-3gx3"
+    },
+    "web2py": {
+      "blocked_versions": [],
+      "reason": "web2py is vulnerable to password brute-force attack (GHSA-gv85-wgxc-vc56)",
+      "date": "2022-05-14",
+      "advisory": "https://github.com/advisories/GHSA-gv85-wgxc-vc56"
+    },
+    "sickrage": {
+      "blocked_versions": [],
+      "reason": "SiCKRAGE Discloses Plaintext Credentials (GHSA-jrcv-3c5h-rh3q)",
+      "date": "2022-05-13",
+      "advisory": "https://github.com/advisories/GHSA-jrcv-3c5h-rh3q"
+    },
+    "pyanyapi": {
+      "blocked_versions": [],
+      "reason": "Unsafe pyyaml load usage in PyAnyAPI (GHSA-vg8g-jpm9-jh8r)",
+      "date": "2022-05-13",
+      "advisory": "https://github.com/advisories/GHSA-vg8g-jpm9-jh8r"
+    },
+    "nnabla": {
+      "blocked_versions": [],
+      "reason": "Sony Neural Network Libraries reliance on untrusted inputs prior to v1.0.10 (GHSA-4q2w-rw7m-xqw6)",
+      "date": "2022-05-13",
+      "advisory": "https://github.com/advisories/GHSA-4q2w-rw7m-xqw6"
+    },
+    "marcador": {
+      "blocked_versions": [],
+      "reason": "Code-execution backdoor in marcador (GHSA-57qv-h9m7-jxfg)",
+      "date": "2022-05-09",
+      "advisory": "https://github.com/advisories/GHSA-57qv-h9m7-jxfg"
+    },
+    "python-libnmap": {
+      "blocked_versions": [],
+      "reason": "Argument injection in python-libnmap (GHSA-qwqv-j7jr-4hp6)",
+      "date": "2022-05-06",
+      "advisory": "https://github.com/advisories/GHSA-qwqv-j7jr-4hp6"
+    },
+    "djblets": {
+      "blocked_versions": [],
+      "reason": "ReviewBoard and Djblets library are vulnerable to code execution (GHSA-58h8-44mg-r43x)",
+      "date": "2022-05-05",
+      "advisory": "https://github.com/advisories/GHSA-58h8-44mg-r43x"
+    },
+    "reviewboard": {
+      "blocked_versions": [],
+      "reason": "ReviewBoard and Djblets library are vulnerable to code execution (GHSA-58h8-44mg-r43x)",
+      "date": "2022-05-05",
+      "advisory": "https://github.com/advisories/GHSA-58h8-44mg-r43x"
+    },
+    "zodb3": {
+      "blocked_versions": [],
+      "reason": "Zope Object Database (ZODB) Arbitrary files reading and deletion (GHSA-m52m-2qpx-9j4j)",
+      "date": "2022-05-02",
+      "advisory": "https://github.com/advisories/GHSA-m52m-2qpx-9j4j"
+    },
+    "roundup": {
+      "blocked_versions": [],
+      "reason": "Roundup xml-rpc server improper check of property permissions (GHSA-j59j-h3g7-cpmf)",
+      "date": "2022-05-01",
+      "advisory": "https://github.com/advisories/GHSA-j59j-h3g7-cpmf"
+    },
+    "httpx": {
+      "blocked_versions": [],
+      "reason": "Improper Input Validation in httpx (GHSA-h8pj-cxx2-jfg2)",
+      "date": "2022-04-29",
+      "advisory": "https://github.com/advisories/GHSA-h8pj-cxx2-jfg2"
+    },
+    "twisted": {
+      "blocked_versions": [],
+      "reason": "Inconsistent Interpretation of HTTP Requests in twisted.web (GHSA-c2jg-hw38-jrqq)",
+      "date": "2022-04-04",
+      "advisory": "https://github.com/advisories/GHSA-c2jg-hw38-jrqq"
+    },
+    "poetry": {
+      "blocked_versions": [],
+      "reason": "Poetry before v1.1.9 contains Untrusted Search Path (GHSA-xr2c-5w89-63pv)",
+      "date": "2022-03-23",
+      "advisory": "https://github.com/advisories/GHSA-xr2c-5w89-63pv"
+    },
+    "mitmproxy": {
+      "blocked_versions": [],
+      "reason": "Insufficient Protection against HTTP Request Smuggling in mitmproxy (GHSA-gcx2-gvj7-pxv3)",
+      "date": "2022-03-22",
+      "advisory": "https://github.com/advisories/GHSA-gcx2-gvj7-pxv3"
+    },
+    "libvcs": {
+      "blocked_versions": [],
+      "reason": "Command injection in libvcs and vcspull (GHSA-mv2w-4jqc-6fg4)",
+      "date": "2022-03-15",
+      "advisory": "https://github.com/advisories/GHSA-mv2w-4jqc-6fg4"
+    },
+    "vcspull": {
+      "blocked_versions": [],
+      "reason": "Command injection in libvcs and vcspull (GHSA-mv2w-4jqc-6fg4)",
+      "date": "2022-03-15",
+      "advisory": "https://github.com/advisories/GHSA-mv2w-4jqc-6fg4"
+    },
+    "gerapy": {
+      "blocked_versions": [],
+      "reason": "Duplicate Advisory: Incorrect Authorization in Gerapy (GHSA-29vr-79w7-p649)",
+      "date": "2022-03-11",
+      "advisory": "https://github.com/advisories/GHSA-29vr-79w7-p649"
+    },
+    "org.apache.spark:spark-parent_2.11": {
+      "blocked_versions": [],
+      "reason": "Improper Authentication in Apache Spark (GHSA-wgx7-jwwm-cgjv)",
+      "date": "2022-02-10",
+      "advisory": "https://github.com/advisories/GHSA-wgx7-jwwm-cgjv"
+    },
+    "apkleaks": {
+      "blocked_versions": [],
+      "reason": "Improper Neutralization of Argument Delimiters in a Decompiling Package Process in APKLeaks (GHSA-8434-v7xw-8m9x)",
+      "date": "2022-01-21",
+      "advisory": "https://github.com/advisories/GHSA-8434-v7xw-8m9x"
+    },
+    "onionshare-cli": {
+      "blocked_versions": [],
+      "reason": "Remote unauthenticated attackers able to upload files in Onionshare (GHSA-7g47-xxff-9p85)",
+      "date": "2021-11-19",
+      "advisory": "https://github.com/advisories/GHSA-7g47-xxff-9p85"
+    },
+    "starkbank-ecdsa": {
+      "blocked_versions": [],
+      "reason": "Improper Verification of Cryptographic Signature in starkbank-ecdsa (GHSA-92vm-mxjf-jqf3)",
+      "date": "2021-11-10",
+      "advisory": "https://github.com/advisories/GHSA-92vm-mxjf-jqf3"
+    },
+    "jupyterhub-firstuseauthenticator": {
+      "blocked_versions": [],
+      "reason": "Improper Access Control in jupyterhub-firstuseauthenticator (GHSA-5xvc-vgmp-jgc3)",
+      "date": "2021-10-28",
+      "advisory": "https://github.com/advisories/GHSA-5xvc-vgmp-jgc3"
+    },
+    "nameko": {
+      "blocked_versions": [],
+      "reason": "Nameko Arbitrary code execution due to YAML deserialization (GHSA-6p52-jr3q-c94g)",
+      "date": "2021-10-19",
+      "advisory": "https://github.com/advisories/GHSA-6p52-jr3q-c94g"
+    },
+    "omero-web": {
+      "blocked_versions": [],
+      "reason": "Inconsistent input sanitisation leads to XSS vectors (GHSA-g67g-hvc3-xmvf)",
+      "date": "2021-10-14",
+      "advisory": "https://github.com/advisories/GHSA-g67g-hvc3-xmvf"
+    },
+    "omero-figure": {
+      "blocked_versions": [],
+      "reason": "Inconsistent input sanitisation leads to XSS vectors (GHSA-g67g-hvc3-xmvf)",
+      "date": "2021-10-14",
+      "advisory": "https://github.com/advisories/GHSA-g67g-hvc3-xmvf"
+    },
+    "python-keystoneclient": {
+      "blocked_versions": [],
+      "reason": "Inadequate Encryption Strength in python-keystoneclient (GHSA-c3xq-cj8f-7829)",
+      "date": "2021-10-12",
+      "advisory": "https://github.com/advisories/GHSA-c3xq-cj8f-7829"
+    },
+    "simiki": {
+      "blocked_versions": [],
+      "reason": "Command Injection in Simiki (GHSA-w873-xcqq-x922)",
+      "date": "2021-09-01",
+      "advisory": "https://github.com/advisories/GHSA-w873-xcqq-x922"
+    },
+    "quokka": {
+      "blocked_versions": [],
+      "reason": "Improper Restriction of XML External Entity Reference in Quokka (GHSA-4q2r-qxp6-h5j6)",
+      "date": "2021-08-30",
+      "advisory": "https://github.com/advisories/GHSA-4q2r-qxp6-h5j6"
+    },
+    "django-widgy": {
+      "blocked_versions": [],
+      "reason": "Unrestricted Upload of File with Dangerous Type in django-widgy (GHSA-98hv-qff3-8793)",
+      "date": "2021-08-30",
+      "advisory": "https://github.com/advisories/GHSA-98hv-qff3-8793"
+    },
+    "binderhub": {
+      "blocked_versions": [],
+      "reason": "remote code execution via git repo provider (GHSA-9jjr-qqfp-ppwx)",
+      "date": "2021-08-30",
+      "advisory": "https://github.com/advisories/GHSA-9jjr-qqfp-ppwx"
+    },
+    "arrayfire": {
+      "blocked_versions": [],
+      "reason": "Potential memory corruption in arrayfire (GHSA-69fv-gw6g-8ccg)",
+      "date": "2021-08-25",
+      "advisory": "https://github.com/advisories/GHSA-69fv-gw6g-8ccg"
+    },
+    "onefuzz": {
+      "blocked_versions": [],
+      "reason": "Improper Authorization and Origin Validation Error in OneFuzz (GHSA-q5vh-6whw-x745)",
+      "date": "2021-08-13",
+      "advisory": "https://github.com/advisories/GHSA-q5vh-6whw-x745"
+    },
+    "impacket": {
+      "blocked_versions": [],
+      "reason": "Path traversal in impacket (GHSA-mj63-64x7-57xf)",
+      "date": "2021-06-18",
+      "advisory": "https://github.com/advisories/GHSA-mj63-64x7-57xf"
+    },
+    "localstack": {
+      "blocked_versions": [],
+      "reason": "Command injection in LocalStack (GHSA-hpr6-f4vq-mxch)",
+      "date": "2021-06-18",
+      "advisory": "https://github.com/advisories/GHSA-hpr6-f4vq-mxch"
+    },
+    "tendenci": {
+      "blocked_versions": [],
+      "reason": "Deserialization of Untrusted Data in Tendenci (GHSA-jqmc-fxxp-r589)",
+      "date": "2021-06-18",
+      "advisory": "https://github.com/advisories/GHSA-jqmc-fxxp-r589"
+    },
+    "jw.util": {
+      "blocked_versions": [],
+      "reason": "OS Command Injection in jw.util (GHSA-h72c-w3q3-55qq)",
+      "date": "2021-06-02",
+      "advisory": "https://github.com/advisories/GHSA-h72c-w3q3-55qq"
+    },
+    "svglib": {
+      "blocked_versions": [],
+      "reason": "SVGlib Vulnerable to XXE Attacks (GHSA-3vcg-8p79-jpcv)",
+      "date": "2021-05-06",
+      "advisory": "https://github.com/advisories/GHSA-3vcg-8p79-jpcv"
+    },
+    "libtaxii": {
+      "blocked_versions": [],
+      "reason": "libtaxii Server-Side Request Forgery vulnerability (GHSA-836c-xg97-8p4h)",
+      "date": "2021-04-30",
+      "advisory": "https://github.com/advisories/GHSA-836c-xg97-8p4h"
+    },
+    "pyyaml": {
+      "blocked_versions": [],
+      "reason": "Deserialization of Untrusted Data in PyYAML (GHSA-3pqx-4fqf-j49f)",
+      "date": "2021-04-20",
+      "advisory": "https://github.com/advisories/GHSA-3pqx-4fqf-j49f"
+    },
+    "petl": {
+      "blocked_versions": [],
+      "reason": "Duplicate Advisory: XML Injection in petl (GHSA-69q2-p9xp-739v)",
+      "date": "2021-04-20",
+      "advisory": "https://github.com/advisories/GHSA-69q2-p9xp-739v"
+    },
+    "asyncpg": {
+      "blocked_versions": [],
+      "reason": "Asyncpg Arbitrary Code Execution Via Access to an Uninitialized Pointer (GHSA-2xpj-f5g2-8p7m)",
+      "date": "2021-04-20",
+      "advisory": "https://github.com/advisories/GHSA-2xpj-f5g2-8p7m"
+    },
+    "pwntools": {
+      "blocked_versions": [],
+      "reason": "pwntools Server-Side Template Injection (SSTI) vulnerability (GHSA-7xc5-ggpp-g249)",
+      "date": "2021-04-20",
+      "advisory": "https://github.com/advisories/GHSA-7xc5-ggpp-g249"
+    },
+    "clickhouse-driver": {
+      "blocked_versions": [],
+      "reason": "Arbitrary code execution in clickhouse-driver (GHSA-vgv5-cxvh-vfxh)",
+      "date": "2021-04-07",
+      "advisory": "https://github.com/advisories/GHSA-vgv5-cxvh-vfxh"
+    },
+    "datasette-indieauth": {
+      "blocked_versions": [],
+      "reason": "Implementation trusts the \"me\" field returned by the authorization server without verifying it (GHSA-mjcr-rqjg-rhg3)",
+      "date": "2020-11-24",
+      "advisory": "https://github.com/advisories/GHSA-mjcr-rqjg-rhg3"
+    },
+    "alerta-server": {
+      "blocked_versions": [],
+      "reason": "LDAP authentication bypass with empty password (GHSA-5hmm-x8q8-w5jh)",
+      "date": "2020-11-06",
+      "advisory": "https://github.com/advisories/GHSA-5hmm-x8q8-w5jh"
+    },
+    "lookatme": {
+      "blocked_versions": [],
+      "reason": "Markdown-supplied Shell Command Execution (GHSA-c84h-w6cr-5v8q)",
+      "date": "2020-10-27",
+      "advisory": "https://github.com/advisories/GHSA-c84h-w6cr-5v8q"
+    },
+    "tuf": {
+      "blocked_versions": [],
+      "reason": "Incorrect threshold signature computation in TUF (GHSA-pwqf-9h7j-7mv8)",
+      "date": "2020-08-21",
+      "advisory": "https://github.com/advisories/GHSA-pwqf-9h7j-7mv8"
+    },
+    "indy-node": {
+      "blocked_versions": [],
+      "reason": "Uncontrolled Resource Consumption in Indy Node (GHSA-3gw4-m5w7-v89c)",
+      "date": "2020-06-11",
+      "advisory": "https://github.com/advisories/GHSA-3gw4-m5w7-v89c"
+    },
+    "drf-jwt": {
+      "blocked_versions": [],
+      "reason": "Django Rest Framework jwt allows obtaining new token from notionally invalidated token (GHSA-fpjm-rp2g-3r4c)",
+      "date": "2020-06-05",
+      "advisory": "https://github.com/advisories/GHSA-fpjm-rp2g-3r4c"
+    },
+    "ecdsa": {
+      "blocked_versions": [],
+      "reason": "Improper Verification of Cryptographic Signature in Pure-Python ECDSA (GHSA-8qxj-f9rh-9fg2)",
+      "date": "2020-04-01",
+      "advisory": "https://github.com/advisories/GHSA-8qxj-f9rh-9fg2"
+    },
+    "easybuild-framework": {
+      "blocked_versions": [],
+      "reason": "GitHub personal access token leaking into temporary EasyBuild (debug) logs (GHSA-2wx6-wc87-rmjm)",
+      "date": "2020-03-19",
+      "advisory": "https://github.com/advisories/GHSA-2wx6-wc87-rmjm"
+    },
+    "psd-tools": {
+      "blocked_versions": [],
+      "reason": "Potential buffer overflow in psd-tools (GHSA-22jr-vc7j-g762)",
+      "date": "2020-03-16",
+      "advisory": "https://github.com/advisories/GHSA-22jr-vc7j-g762"
+    },
+    "docutils": {
+      "blocked_versions": [],
+      "reason": "python-docutils allows insecure usage of temporary files (GHSA-cg75-6938-wx58)",
+      "date": "2020-03-13",
+      "advisory": "https://github.com/advisories/GHSA-cg75-6938-wx58"
+    },
+    "requests-kerberos": {
+      "blocked_versions": [],
+      "reason": "Improper Authentication in requests-kerberos (GHSA-wh37-37xw-54hr)",
+      "date": "2020-03-10",
+      "advisory": "https://github.com/advisories/GHSA-wh37-37xw-54hr"
+    },
+    "rediswrapper": {
+      "blocked_versions": [],
+      "reason": "Uncontrolled deserialization of a pickled object in rediswrapper allows attackers to execute arbitrary scripts (GHSA-vrcf-g539-x6h3)",
+      "date": "2019-11-20",
+      "advisory": "https://github.com/advisories/GHSA-vrcf-g539-x6h3"
+    },
+    "limnoria": {
+      "blocked_versions": [],
+      "reason": "Eval injection in Supybot/Limnoria (GHSA-6g88-vr3v-76mf)",
+      "date": "2019-11-20",
+      "advisory": "https://github.com/advisories/GHSA-6g88-vr3v-76mf"
+    },
+    "mitogen": {
+      "blocked_versions": [],
+      "reason": "Undirectional routing wasn't respected in some cases in Mitogen (GHSA-8rf6-w2mx-4xjh)",
+      "date": "2019-08-19",
+      "advisory": "https://github.com/advisories/GHSA-8rf6-w2mx-4xjh"
+    },
+    "aubio": {
+      "blocked_versions": [],
+      "reason": "aubio Buffer Overflow vulnerability (GHSA-grmf-4fq6-2r79)",
+      "date": "2019-07-26",
+      "advisory": "https://github.com/advisories/GHSA-grmf-4fq6-2r79"
+    },
+    "ladon": {
+      "blocked_versions": [],
+      "reason": "Improper Restriction of XML External Entity Reference in ladon (GHSA-vg35-vc9f-q7x2)",
+      "date": "2019-07-26",
+      "advisory": "https://github.com/advisories/GHSA-vg35-vc9f-q7x2"
+    },
+    "python-ironic-inspector-client": {
+      "blocked_versions": [],
+      "reason": "Injection vulnerability that affects ironic-discoverd (GHSA-x64g-wjmw-w328)",
+      "date": "2019-07-05",
+      "advisory": "https://github.com/advisories/GHSA-x64g-wjmw-w328"
+    },
+    "ironic-inspector": {
+      "blocked_versions": [],
+      "reason": "Injection vulnerability that affects ironic-discoverd (GHSA-x64g-wjmw-w328)",
+      "date": "2019-07-05",
+      "advisory": "https://github.com/advisories/GHSA-x64g-wjmw-w328"
+    },
+    "django-rest-registration": {
+      "blocked_versions": [],
+      "reason": "Improper Verification of Cryptographic Signature in django-rest-registration (GHSA-p3w6-jcg4-52xh)",
+      "date": "2019-07-02",
+      "advisory": "https://github.com/advisories/GHSA-p3w6-jcg4-52xh"
+    },
+    "buildbot": {
+      "blocked_versions": [],
+      "reason": "Improper Authentication in Buildbot (GHSA-g86p-hgx5-2pfh)",
+      "date": "2019-05-29",
+      "advisory": "https://github.com/advisories/GHSA-g86p-hgx5-2pfh"
+    },
+    "splunk-sdk": {
+      "blocked_versions": [],
+      "reason": "splunk-sdk does not properly verify untrusted TLS server certificates (GHSA-f58w-649r-qjr9)",
+      "date": "2019-03-25",
+      "advisory": "https://github.com/advisories/GHSA-f58w-649r-qjr9"
+    },
+    "ipycache": {
+      "blocked_versions": [],
+      "reason": "ipycache is vulnerable to Code Injection (GHSA-gcm4-q2pg-xw89)",
+      "date": "2019-03-25",
+      "advisory": "https://github.com/advisories/GHSA-gcm4-q2pg-xw89"
+    },
+    "modulemd": {
+      "blocked_versions": [],
+      "reason": "modulemd uses an unsafe function for processing externally provided data (GHSA-jhjh-ghwx-6h7r)",
+      "date": "2019-01-17",
+      "advisory": "https://github.com/advisories/GHSA-jhjh-ghwx-6h7r"
+    },
+    "recurly": {
+      "blocked_versions": [],
+      "reason": "Recurly vulnerable to SSRF (GHSA-38rv-5jqc-m2cv)",
+      "date": "2019-01-04",
+      "advisory": "https://github.com/advisories/GHSA-38rv-5jqc-m2cv"
+    },
+    "bleach": {
+      "blocked_versions": [],
+      "reason": "Bleach URI Scheme Restriction Bypass (GHSA-m9mq-p2f9-cfqv)",
+      "date": "2019-01-04",
+      "advisory": "https://github.com/advisories/GHSA-m9mq-p2f9-cfqv"
+    },
+    "ymlref": {
+      "blocked_versions": [],
+      "reason": "Code injection in ymlref (GHSA-8r8j-xvfj-36f9)",
+      "date": "2018-12-19",
+      "advisory": "https://github.com/advisories/GHSA-8r8j-xvfj-36f9"
+    },
+    "pycrypto": {
+      "blocked_versions": [],
+      "reason": "Buffer Overflow in pycrypto (GHSA-cq27-v7xp-c356)",
+      "date": "2018-12-14",
+      "advisory": "https://github.com/advisories/GHSA-cq27-v7xp-c356"
+    },
+    "urllib3": {
+      "blocked_versions": [],
+      "reason": "Exposure of Sensitive Information to an Unauthorized Actor in urllib3 (GHSA-www2-v7xj-xrc6)",
+      "date": "2018-12-12",
+      "advisory": "https://github.com/advisories/GHSA-www2-v7xj-xrc6"
+    },
+    "superset": {
+      "blocked_versions": [],
+      "reason": "Deserialization of Untrusted Data in superset (GHSA-vxp9-wv2f-wqmw)",
+      "date": "2018-11-09",
+      "advisory": "https://github.com/advisories/GHSA-vxp9-wv2f-wqmw"
+    },
+    "python-gnupg": {
+      "blocked_versions": [],
+      "reason": "python-gnupg vulnerable to shell injection (GHSA-vcr5-xr9h-mvc5)",
+      "date": "2018-11-06",
+      "advisory": "https://github.com/advisories/GHSA-vcr5-xr9h-mvc5"
+    },
+    "pycsw": {
+      "blocked_versions": [],
+      "reason": "SQL Injection in pycsw (GHSA-hg4c-rgvm-964g)",
+      "date": "2018-08-15",
+      "advisory": "https://github.com/advisories/GHSA-hg4c-rgvm-964g"
+    },
+    "rope": {
+      "blocked_versions": [],
+      "reason": "Code injection in rope (GHSA-r38r-qp28-2m63)",
+      "date": "2018-07-26",
+      "advisory": "https://github.com/advisories/GHSA-r38r-qp28-2m63"
+    },
+    "django-piston": {
+      "blocked_versions": [],
+      "reason": "Django-piston and Django-tastypie do not properly deserialize YAML data (GHSA-pvhp-v9qp-xf5r)",
+      "date": "2018-07-23",
+      "advisory": "https://github.com/advisories/GHSA-pvhp-v9qp-xf5r"
+    },
+    "confire": {
+      "blocked_versions": [],
+      "reason": "Unsafe deserialization in confire (GHSA-m85c-9mf8-m2m6)",
+      "date": "2018-07-18",
+      "advisory": "https://github.com/advisories/GHSA-m85c-9mf8-m2m6"
+    },
+    "tablib": {
+      "blocked_versions": [],
+      "reason": "Loaded Databook of Tablib prone to python insertion resulting in command execution (GHSA-gcr6-rf47-jrgf)",
+      "date": "2018-07-13",
+      "advisory": "https://github.com/advisories/GHSA-gcr6-rf47-jrgf"
+    },
+    "diffoscope": {
+      "blocked_versions": [],
+      "reason": "Diffoscope may write to arbitrary locations due to an untrusted archive (GHSA-8p5c-f328-9fvv)",
+      "date": "2018-07-13",
+      "advisory": "https://github.com/advisories/GHSA-8p5c-f328-9fvv"
+    },
+    "owlmixin": {
+      "blocked_versions": [],
+      "reason": "Unsafe deserialization in owlmixin (GHSA-ccmq-qvcp-5mrm)",
+      "date": "2018-07-13",
+      "advisory": "https://github.com/advisories/GHSA-ccmq-qvcp-5mrm"
+    },
+    "mlalchemy": {
+      "blocked_versions": [],
+      "reason": "Unsafe deserialization in MLAlchemy (GHSA-xpm8-98mx-h4c5)",
+      "date": "2018-07-13",
+      "advisory": "https://github.com/advisories/GHSA-xpm8-98mx-h4c5"
+    },
+    "django_make_app": {
+      "blocked_versions": [],
+      "reason": "django_make_app is vulnerable to Code Injection (GHSA-9pv8-q5rx-c8gq)",
+      "date": "2018-07-13",
+      "advisory": "https://github.com/advisories/GHSA-9pv8-q5rx-c8gq"
+    },
+    "koji": {
+      "blocked_versions": [],
+      "reason": "Koji hub call does not perform correct access checks (GHSA-6mww-xvh7-fq4f)",
+      "date": "2018-07-12",
+      "advisory": "https://github.com/advisories/GHSA-6mww-xvh7-fq4f"
+    },
+    "eve": {
+      "blocked_versions": [],
+      "reason": "Eve allows execution of arbitrary code (GHSA-8jxq-75rw-fhj9)",
+      "date": "2018-07-12",
+      "advisory": "https://github.com/advisories/GHSA-8jxq-75rw-fhj9"
+    },
+    "paramiko": {
+      "blocked_versions": [],
+      "reason": "Paramiko not properly checking authentication before processing other requests (GHSA-232r-66cg-79px)",
+      "date": "2018-07-12",
+      "advisory": "https://github.com/advisories/GHSA-232r-66cg-79px"
     }
   },
   "npm": {
     "event-stream": {
-      "blocked_versions": ["3.3.6"],
+      "blocked_versions": [
+        "3.3.6"
+      ],
       "reason": "Flatmap-stream crypto wallet stealer",
       "date": "2018-11-26"
     },
     "ua-parser-js": {
-      "blocked_versions": ["0.7.29", "0.8.0", "1.0.0"],
+      "blocked_versions": [
+        "0.7.29",
+        "0.8.0",
+        "1.0.0"
+      ],
       "reason": "Supply chain attack - crypto miner and password stealer",
       "date": "2021-10-22"
     },
     "colors": {
-      "blocked_versions": ["1.4.1", "1.4.2"],
+      "blocked_versions": [
+        "1.4.1",
+        "1.4.2"
+      ],
       "reason": "Developer protest - infinite loop DoS (Marak incident)",
       "date": "2022-01-09"
     },
     "faker": {
-      "blocked_versions": ["6.6.6"],
+      "blocked_versions": [
+        "6.6.6"
+      ],
       "reason": "Developer protest - malicious payload (Marak incident)",
       "date": "2022-01-05"
     },
     "node-ipc": {
-      "blocked_versions": ["10.1.1", "10.1.2", "10.1.3"],
+      "blocked_versions": [
+        "10.1.1",
+        "10.1.2",
+        "10.1.3"
+      ],
       "reason": "Peacenotwar malware - file deletion targeting Russian/Belarusian IPs",
       "date": "2022-03-15"
     },
     "coa": {
-      "blocked_versions": ["2.0.3", "2.0.4", "2.1.1", "2.1.3", "3.0.1", "3.1.3"],
+      "blocked_versions": [
+        "2.0.3",
+        "2.0.4",
+        "2.1.1",
+        "2.1.3",
+        "3.0.1",
+        "3.1.3"
+      ],
       "reason": "Compromised maintainer account - credential stealer",
       "date": "2021-11-04"
     },
     "rc": {
-      "blocked_versions": ["1.2.9", "1.3.9", "2.3.9"],
+      "blocked_versions": [
+        "1.2.9",
+        "1.3.9",
+        "2.3.9"
+      ],
       "reason": "Compromised maintainer account - credential stealer",
       "date": "2021-11-04"
     }
