@@ -13,7 +13,7 @@ Linear (`linear.app/minions-lab`) is our issue tracker. Two CLIs and one MCP ser
 
 | Tool | Auth Method | Setup |
 |------|------------|-------|
-| linearis CLI | API token | `LINEAR_API_KEY` env var (set permanently) |
+| linearis CLI | API token | `LINEAR_API_TOKEN` env var (set permanently) |
 | linear CLI | OAuth | `linear auth` (browser login, stores credentials) |
 | Linear MCP | OAuth | Remote HTTP at `https://mcp.linear.app/mcp` |
 

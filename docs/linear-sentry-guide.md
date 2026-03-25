@@ -311,7 +311,7 @@ dave/LIN-100-refactor-api-routes
 
 | Var | Purpose | Where |
 |-----|---------|-------|
-| `LINEAR_API_KEY` | linearis CLI auth | Windows user env |
+| `LINEAR_API_TOKEN` | linearis CLI auth | Windows user env |
 | `SENTRY_AUTH_TOKEN` | sentry-cli auth | Windows user env |
 | `SENTRY_ORG` | Sentry org slug | Windows user env |
 | `SENTRY_DSN` | Per-project error ingestion | Project `.env.local` or deploy platform |
