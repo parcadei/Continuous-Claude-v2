@@ -249,6 +249,129 @@ export function checkMaliciousPackage(
 }
 
 // ---------------------------------------------------------------------------
+// OSV.dev real-time vulnerability check
+// ---------------------------------------------------------------------------
+
+interface OsvResult {
+  blocked: boolean;
+  warning?: string;
+  advisoryId?: string;
+}
+
+export async function checkOsvAdvisory(
+  name: string,
+  version: string | undefined,
+  ecosystem: Exclude<Ecosystem, null>
+): Promise<OsvResult> {
+  // Only check pypi and npm
+  if (ecosystem !== 'pypi' && ecosystem !== 'npm') {
+    return { blocked: false };
+  }
+
+  const osvEcosystem = ecosystem === 'pypi' ? 'PyPI' : 'npm';
+
+  try {
+    const vulns = await queryOsv(name, version, osvEcosystem);
+
+    // Check for MAL- prefixed IDs (confirmed malware from OSSF)
+    const malware = vulns.find((v: any) => v.id?.startsWith('MAL-'));
+    if (malware) {
+      return {
+        blocked: true,
+        advisoryId: malware.id,
+        warning: `OSV.dev reports malware: ${malware.id}. ${malware.summary || malware.details?.slice(0, 200) || 'No details available'}.`,
+      };
+    }
+
+    // Check for CRITICAL severity CVEs
+    const critical = vulns.find((v: any) => {
+      const severity = v.database_specific?.severity ||
+        v.severity?.find((s: any) => s.type === 'CVSS_V3')?.score;
+      if (typeof severity === 'string') return severity === 'CRITICAL';
+      if (typeof severity === 'number') return severity >= 9.0;
+      return false;
+    });
+    if (critical) {
+      return {
+        blocked: true,
+        advisoryId: critical.id,
+        warning: `OSV.dev reports CRITICAL vulnerability: ${critical.id}. ${critical.summary || 'No summary'}.`,
+      };
+    }
+
+    // Check for HIGH severity -- warn but allow
+    const high = vulns.find((v: any) => {
+      const severity = v.database_specific?.severity ||
+        v.severity?.find((s: any) => s.type === 'CVSS_V3')?.score;
+      if (typeof severity === 'string') return severity === 'HIGH';
+      if (typeof severity === 'number') return severity >= 7.0 && severity < 9.0;
+      return false;
+    });
+    if (high) {
+      return {
+        blocked: false,
+        advisoryId: high.id,
+        warning: `OSV.dev reports HIGH severity vulnerability: ${high.id}. ${high.summary || 'No summary'}.`,
+      };
+    }
+
+    return { blocked: false };
+  } catch {
+    // Fail-open on network/API errors
+    return { blocked: false };
+  }
+}
+
+function queryOsv(
+  name: string,
+  version: string | undefined,
+  ecosystem: string
+): Promise<any[]> {
+  return new Promise((resolve) => {
+    const body: any = {
+      package: { name, ecosystem },
+    };
+    if (version) {
+      body.version = version;
+    }
+
+    const postData = JSON.stringify(body);
+    const timer = setTimeout(() => resolve([]), 5000);
+
+    const req = https.request(
+      {
+        hostname: 'api.osv.dev',
+        path: '/v1/query',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData),
+        },
+        timeout: 5000,
+      },
+      (res) => {
+        let data = '';
+        res.on('data', (chunk: Buffer) => { data += chunk.toString(); });
+        res.on('end', () => {
+          clearTimeout(timer);
+          try {
+            const json = JSON.parse(data);
+            resolve(json.vulns || []);
+          } catch {
+            resolve([]);
+          }
+        });
+      }
+    );
+
+    req.on('error', () => { clearTimeout(timer); resolve([]); });
+    req.on('timeout', () => { req.destroy(); clearTimeout(timer); resolve([]); });
+    req.write(postData);
+    req.end();
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Registry age check (PyPI / npm)
 // ---------------------------------------------------------------------------
 
@@ -566,7 +689,21 @@ async function main() {
       }
     }
 
-    // 3. Package age check (pypi and npm only)
+    // 3. OSV.dev real-time vulnerability check (pypi and npm)
+    if (ecosystem === 'pypi' || ecosystem === 'npm') {
+      const osvResult = await checkOsvAdvisory(pkg.name, pkg.version, ecosystem);
+      if (osvResult.blocked) {
+        outputDeny(
+          `PACKAGE SECURITY: ${osvResult.warning} Advisory: ${osvResult.advisoryId}. Package: ${pkg.name}${pkg.version ? '@' + pkg.version : ''}. To override: prefix command with SKIP_PACKAGE_GUARD=1`
+        );
+        return;
+      }
+      if (osvResult.warning) {
+        advisories.push(`OSV ADVISORY: ${osvResult.warning}`);
+      }
+    }
+
+    // 4. Package age check (pypi and npm only)
     if (ecosystem === 'pypi' || ecosystem === 'npm') {
       const ageResult = await checkPackageAge(pkg.name, ecosystem);
       if (ageResult.blocked) {

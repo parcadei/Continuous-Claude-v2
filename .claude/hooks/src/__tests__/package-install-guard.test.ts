@@ -26,6 +26,7 @@ import {
   parseEcosystem,
   checkOverride,
   checkMaliciousPackage,
+  checkOsvAdvisory,
 } from '../package-install-guard.js';
 
 import { checkTyposquat } from '../shared/typosquat-detect.js';
@@ -446,6 +447,61 @@ describe('package-install-guard', () => {
 
     it('allows SKIP_PACKAGE_GUARD=1 anywhere in env prefix', () => {
       expect(checkOverride('FOO=bar SKIP_PACKAGE_GUARD=1 npm install evil-pkg')).toBe(true);
+    });
+  });
+
+  // =========================================================================
+  // OSV.dev Advisory Check
+  // =========================================================================
+  describe('OSV.dev advisory check', () => {
+    it('should be exported from the module', () => {
+      expect(typeof checkOsvAdvisory).toBe('function');
+    });
+
+    it('should return { blocked: false } for cargo ecosystem (unsupported)', async () => {
+      const result = await checkOsvAdvisory('serde', undefined, 'cargo');
+      expect(result.blocked).toBe(false);
+    });
+
+    it('should return { blocked: false } for go ecosystem (unsupported)', async () => {
+      const result = await checkOsvAdvisory('github.com/gin-gonic/gin', undefined, 'go');
+      expect(result.blocked).toBe(false);
+    });
+
+    it('should return { blocked: false } for gem ecosystem (unsupported)', async () => {
+      const result = await checkOsvAdvisory('rails', undefined, 'gem');
+      expect(result.blocked).toBe(false);
+    });
+
+    it('should return { blocked: false } for composer ecosystem (unsupported)', async () => {
+      const result = await checkOsvAdvisory('laravel/framework', undefined, 'composer');
+      expect(result.blocked).toBe(false);
+    });
+
+    it('should accept pypi ecosystem without error', async () => {
+      // This calls the real API (fail-open on network errors)
+      const result = await checkOsvAdvisory('requests', '2.31.0', 'pypi');
+      expect(result).toHaveProperty('blocked');
+      expect(typeof result.blocked).toBe('boolean');
+    });
+
+    it('should accept npm ecosystem without error', async () => {
+      // This calls the real API (fail-open on network errors)
+      const result = await checkOsvAdvisory('express', '4.18.2', 'npm');
+      expect(result).toHaveProperty('blocked');
+      expect(typeof result.blocked).toBe('boolean');
+    });
+
+    it('should return OsvResult shape with optional fields', async () => {
+      const result = await checkOsvAdvisory('some-nonexistent-pkg-xyz', undefined, 'npm');
+      expect(result).toHaveProperty('blocked');
+      // warning and advisoryId are optional
+      if (result.warning) {
+        expect(typeof result.warning).toBe('string');
+      }
+      if (result.advisoryId) {
+        expect(typeof result.advisoryId).toBe('string');
+      }
     });
   });
 });

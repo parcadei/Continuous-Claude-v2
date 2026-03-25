@@ -458,6 +458,102 @@ function checkMaliciousPackage(name, version, ecosystem) {
   }
   return { blocked: false };
 }
+async function checkOsvAdvisory(name, version, ecosystem) {
+  if (ecosystem !== "pypi" && ecosystem !== "npm") {
+    return { blocked: false };
+  }
+  const osvEcosystem = ecosystem === "pypi" ? "PyPI" : "npm";
+  try {
+    const vulns = await queryOsv(name, version, osvEcosystem);
+    const malware = vulns.find((v) => v.id?.startsWith("MAL-"));
+    if (malware) {
+      return {
+        blocked: true,
+        advisoryId: malware.id,
+        warning: `OSV.dev reports malware: ${malware.id}. ${malware.summary || malware.details?.slice(0, 200) || "No details available"}.`
+      };
+    }
+    const critical = vulns.find((v) => {
+      const severity = v.database_specific?.severity || v.severity?.find((s) => s.type === "CVSS_V3")?.score;
+      if (typeof severity === "string") return severity === "CRITICAL";
+      if (typeof severity === "number") return severity >= 9;
+      return false;
+    });
+    if (critical) {
+      return {
+        blocked: true,
+        advisoryId: critical.id,
+        warning: `OSV.dev reports CRITICAL vulnerability: ${critical.id}. ${critical.summary || "No summary"}.`
+      };
+    }
+    const high = vulns.find((v) => {
+      const severity = v.database_specific?.severity || v.severity?.find((s) => s.type === "CVSS_V3")?.score;
+      if (typeof severity === "string") return severity === "HIGH";
+      if (typeof severity === "number") return severity >= 7 && severity < 9;
+      return false;
+    });
+    if (high) {
+      return {
+        blocked: false,
+        advisoryId: high.id,
+        warning: `OSV.dev reports HIGH severity vulnerability: ${high.id}. ${high.summary || "No summary"}.`
+      };
+    }
+    return { blocked: false };
+  } catch {
+    return { blocked: false };
+  }
+}
+function queryOsv(name, version, ecosystem) {
+  return new Promise((resolve) => {
+    const body = {
+      package: { name, ecosystem }
+    };
+    if (version) {
+      body.version = version;
+    }
+    const postData = JSON.stringify(body);
+    const timer = setTimeout(() => resolve([]), 5e3);
+    const req = https.request(
+      {
+        hostname: "api.osv.dev",
+        path: "/v1/query",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Content-Length": Buffer.byteLength(postData)
+        },
+        timeout: 5e3
+      },
+      (res) => {
+        let data = "";
+        res.on("data", (chunk) => {
+          data += chunk.toString();
+        });
+        res.on("end", () => {
+          clearTimeout(timer);
+          try {
+            const json = JSON.parse(data);
+            resolve(json.vulns || []);
+          } catch {
+            resolve([]);
+          }
+        });
+      }
+    );
+    req.on("error", () => {
+      clearTimeout(timer);
+      resolve([]);
+    });
+    req.on("timeout", () => {
+      req.destroy();
+      clearTimeout(timer);
+      resolve([]);
+    });
+    req.write(postData);
+    req.end();
+  });
+}
 async function checkPackageAge(name, ecosystem) {
   if (ecosystem !== "pypi" && ecosystem !== "npm") {
     return { ageHours: null, blocked: false };
@@ -689,6 +785,18 @@ async function main() {
       }
     }
     if (ecosystem === "pypi" || ecosystem === "npm") {
+      const osvResult = await checkOsvAdvisory(pkg.name, pkg.version, ecosystem);
+      if (osvResult.blocked) {
+        outputDeny(
+          `PACKAGE SECURITY: ${osvResult.warning} Advisory: ${osvResult.advisoryId}. Package: ${pkg.name}${pkg.version ? "@" + pkg.version : ""}. To override: prefix command with SKIP_PACKAGE_GUARD=1`
+        );
+        return;
+      }
+      if (osvResult.warning) {
+        advisories.push(`OSV ADVISORY: ${osvResult.warning}`);
+      }
+    }
+    if (ecosystem === "pypi" || ecosystem === "npm") {
       const ageResult = await checkPackageAge(pkg.name, ecosystem);
       if (ageResult.blocked) {
         outputDeny(
@@ -714,6 +822,7 @@ if (!process.env.VITEST) {
 }
 export {
   checkMaliciousPackage,
+  checkOsvAdvisory,
   checkOverride,
   extractPackageNames,
   isPackageInstallCommand,
