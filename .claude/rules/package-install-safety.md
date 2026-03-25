@@ -65,6 +65,19 @@ This fetches from:
 
 Requires `gh` CLI authenticated (`gh auth status`).
 
+### Scheduled (daily at 9am)
+
+A Windows Task Scheduler job runs `scripts/scheduled-blocklist-update.bat` daily at 9am. It:
+1. Fetches latest advisories from GitHub
+2. Updates `malicious-packages.json`
+3. Rebuilds hooks
+4. Commits and pushes to fork if changes found
+5. Syncs to `~/.claude/`
+
+Task name: `CCv3-Blocklist-Update`. Check status: `schtasks /query /tn "CCv3-Blocklist-Update"`
+
+If the machine is off at 9am, it runs when the machine next wakes up (`-StartWhenAvailable`).
+
 ### Manual
 
 When a new supply-chain attack is disclosed:
