@@ -144,7 +144,30 @@ Check for port conflicts with existing entries before assigning.
 
 ---
 
-### Phase 6: Dev Server Cleanup (Conditional, Web Only)
+### Phase 6: Sentry SDK Setup (Conditional)
+
+If the project deploys to Vercel or Railway, offer Sentry instrumentation:
+
+1. **Detect framework**:
+   - Next.js → `npx @sentry/wizard@latest -i nextjs`
+   - Node.js/Express → `npm install @sentry/node @sentry/profiling-node`
+   - Python → `uv add sentry-sdk`
+
+2. **Configure environment** — add to `.env.local`:
+   ```
+   SENTRY_DSN=<from Sentry project settings>
+   NEXT_PUBLIC_SENTRY_DSN=<same DSN for client-side>
+   ```
+
+3. **Verify**: `sentry-cli info` confirms authentication
+
+4. **Skip if**: User declines, project is local-only, or no `SENTRY_AUTH_TOKEN` env var set.
+
+Reference: `.claude/skills/sentry-cli/references/sdk-setup.md` for full per-framework guide.
+
+---
+
+### Phase 7: Dev Server Cleanup (Conditional, Web Only)
 
 If the project has `package.json` with a `dev` script and serves on a port, offer to scaffold the dev server cleanup pattern. Read `references/dev-server-pattern.md` for templates.
 

@@ -95,5 +95,13 @@
       "setup continuous claude"
     ],
     "priority": 95
+  },
+  "linear": {
+    "keywords": ["linear", "issue tracker", "create issue", "linear issue", "LIN-", "linearis"],
+    "priority": 85
+  },
+  "sentry-cli": {
+    "keywords": ["sentry", "error monitoring", "sentry release", "source maps", "error tracking", "sentry-cli"],
+    "priority": 85
   }
 }
