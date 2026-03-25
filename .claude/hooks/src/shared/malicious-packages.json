@@ -1,0 +1,66 @@
+{
+  "pypi": {
+    "litellm": {
+      "blocked_versions": ["1.82.7", "1.82.8"],
+      "reason": "TeamPCP supply chain attack via compromised Trivy CI/CD - credential stealer targeting SSH keys, cloud creds, K8s configs",
+      "date": "2026-03-24",
+      "advisory": "https://futuresearch.ai/blog/litellm-pypi-supply-chain-attack/"
+    },
+    "colourama": {
+      "blocked_all": true,
+      "reason": "Typosquat of colorama - known malware",
+      "date": "2023-01-01"
+    },
+    "python-dateutil": {
+      "blocked_all": false,
+      "note": "Legitimate package - but watch for python_dateutil typosquats"
+    },
+    "jeIlyfish": {
+      "blocked_all": true,
+      "reason": "Typosquat of jellyfish (uses uppercase I instead of lowercase l) - credential stealer",
+      "date": "2019-12-01"
+    },
+    "python3-dateutil": {
+      "blocked_all": true,
+      "reason": "Typosquat of python-dateutil - known malware",
+      "date": "2019-06-01"
+    }
+  },
+  "npm": {
+    "event-stream": {
+      "blocked_versions": ["3.3.6"],
+      "reason": "Flatmap-stream crypto wallet stealer",
+      "date": "2018-11-26"
+    },
+    "ua-parser-js": {
+      "blocked_versions": ["0.7.29", "0.8.0", "1.0.0"],
+      "reason": "Supply chain attack - crypto miner and password stealer",
+      "date": "2021-10-22"
+    },
+    "colors": {
+      "blocked_versions": ["1.4.1", "1.4.2"],
+      "reason": "Developer protest - infinite loop DoS (Marak incident)",
+      "date": "2022-01-09"
+    },
+    "faker": {
+      "blocked_versions": ["6.6.6"],
+      "reason": "Developer protest - malicious payload (Marak incident)",
+      "date": "2022-01-05"
+    },
+    "node-ipc": {
+      "blocked_versions": ["10.1.1", "10.1.2", "10.1.3"],
+      "reason": "Peacenotwar malware - file deletion targeting Russian/Belarusian IPs",
+      "date": "2022-03-15"
+    },
+    "coa": {
+      "blocked_versions": ["2.0.3", "2.0.4", "2.1.1", "2.1.3", "3.0.1", "3.1.3"],
+      "reason": "Compromised maintainer account - credential stealer",
+      "date": "2021-11-04"
+    },
+    "rc": {
+      "blocked_versions": ["1.2.9", "1.3.9", "2.3.9"],
+      "reason": "Compromised maintainer account - credential stealer",
+      "date": "2021-11-04"
+    }
+  }
+}
