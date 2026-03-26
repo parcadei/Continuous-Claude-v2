@@ -312,7 +312,7 @@ cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/knowledge_tree.py 
 | External research | oracle |
 | Debugging | debug-agent |
 | Code review | critic |
-| sentinel | Browser QA, user flow verification, multi-role acceptance testing | sonnet |
+| Browser QA | sentinel |
 
 Full routing details, parallel orchestration, Docker isolation, file locking → `references/agents.md`
 
