@@ -101,6 +101,26 @@ When asked to verify a Railway deployment:
 
 ---
 
+## Command Idempotency Reference
+
+Know which commands are safe to retry (agents retry on failure):
+
+| Command | Idempotent? | Notes |
+|---------|------------|-------|
+| `vercel deploy` | Yes | Same commit = same deployment |
+| `vercel promote` | Yes | Promoting already-promoted = no-op |
+| `railway up` | NO | Creates new deployment each time |
+| `railway redeploy` | NO | Creates new deployment each time |
+| `sentry-cli releases new` | NO | Fails if release exists — use `\|\| true` |
+| `sentry-cli releases set-commits` | Yes | Updates, doesn't duplicate |
+| `sentry-cli releases finalize` | Yes | Finalizing already-finalized = no-op |
+| `sentry-cli deploys new` | NO | Creates duplicate deploy record |
+| `linearis issue update` | Yes | Setting same status = no-op |
+
+**Rule:** For non-idempotent commands, check state before executing (e.g., `sentry-cli releases list` before `releases new`).
+
+---
+
 ## Sentry Release Tracking (Cross-Platform)
 
 When deploying any project with Sentry configured (check for `@sentry/*` in package.json dependencies or `SENTRY_DSN` in environment):

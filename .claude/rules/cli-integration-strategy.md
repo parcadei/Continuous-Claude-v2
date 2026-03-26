@@ -48,11 +48,31 @@ Highest friction, lowest reliability — only for truly GUI-only workflows.
 | Sentry | INTEGRATED — MCP (remote) + sentry-cli + skill + rule + deployer + 3 hooks (2026-03-25) | DONE |
 | CLI-Anything | Not installed — for future desktop software control | LOW |
 
+## Agent Compatibility Checklist
+
+When evaluating a new CLI for CCv3 integration, score it against these criteria:
+
+| Criteria | Required | Nice-to-have |
+|----------|----------|-------------|
+| Non-interactive mode | REQUIRED | — |
+| Per-subcommand --help | REQUIRED | With examples |
+| JSON/structured output | REQUIRED | Default JSON preferred |
+| Flag-based inputs (no positional-only) | REQUIRED | stdin support |
+| Fail-fast on missing args | REQUIRED | With correct invocation shown |
+| Idempotent commands | — | Document which commands are safe to retry |
+| --dry-run for destructive ops | — | Compensate with safety rules if missing |
+| --yes/--force for confirmations | — | Compensate with safety rules if missing |
+| Predictable resource+verb structure | REQUIRED | Matches existing patterns |
+| Structured success output (IDs, URLs) | REQUIRED | Not just "Success!" |
+
+Source: "Building CLIs for agents" by @ericzakariasson
+
 ## Integration Checklist (when adding a new CLI)
 
 1. Install the CLI globally (`npm i -g` or `pip install`)
 2. Verify it works: `<tool> --version` or `<tool> --help`
-3. Create skill at `.claude/skills/<tool-name>/SKILL.md`
-4. Create rule if safety gates needed (deploy, delete, etc.)
-5. Update this inventory table
-6. Sync to `~/.claude/`: `bash scripts/sync-to-active.sh`
+3. Score against Agent Compatibility Checklist above
+4. Create skill at `.claude/skills/<tool-name>/SKILL.md`
+5. Create rule if safety gates needed (deploy, delete, etc.)
+6. Update this inventory table
+7. Sync to `~/.claude/`: `bash scripts/sync-to-active.sh`
