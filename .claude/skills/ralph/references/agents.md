@@ -14,6 +14,8 @@
 | Code review | critic | Task |
 | Refactor/cleanup | strategic-refactorer OR judge | Task |
 | Deploy verification | deployer | Verify preview deployment succeeded after implementation |
+| Browser UI QA | sentinel | Live browser verification with auth-aware multi-role scenarios |
+| Acceptance suite | qa-suite (skill) | Plan-driven test orchestration — spawns sentinel per role |
 | Build log analysis | deployer | Diagnose deployment failures from Vercel build logs |
 | Preview URL check | deployer | Confirm deployed content matches expectations |
 
@@ -80,6 +82,7 @@ When structured output is present, state updates happen immediately without disa
 | RED | arbiter | Write failing tests only. No production code. |
 | GREEN | kraken | Minimal code to pass tests. No extras. |
 | VERIFY | arbiter | Full suite + typecheck + lint. No modifications. |
+| BROWSER | sentinel | Verify UI flows (conditional — skip for backend-only features). |
 
 Task atomicity: max 3-5 files, 1 behavior, 1-3 test cases per slice.
 

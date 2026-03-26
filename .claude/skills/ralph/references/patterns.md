@@ -28,6 +28,11 @@ Verification Checklist:
   PRD Acceptance:
     - [ ] Changes satisfy PRD requirements
     - [ ] Functionality matches specification
+
+  Browser QA:
+    - [ ] Browser QA passed (sentinel) — if feature has UI changes
+    - [ ] Console errors: none (sentinel captures these)
+    - [ ] Accessibility: no critical violations (sentinel runs a11y audit)
 ```
 
 ### Verification Commands by Stack
@@ -170,6 +175,8 @@ The full TDD cycle becomes: RED -> GREEN -> VERIFY -> DEPLOY (if Vercel-linked)
 4. **Fail handling**: If deploy fails, create a follow-up fix task (don't block the current task)
 
 This phase is **skipped** for non-Vercel projects (no `.vercel/project.json`).
+
+Post-deploy: deployer runs e2e/smoke.spec.ts against deploy URL (if e2e/ directory exists)
 
 Template control:
 - `deploy_on_complete: preview` (default for Vercel projects) -- verify preview deploy

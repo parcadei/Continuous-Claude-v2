@@ -103,6 +103,7 @@ uv run python ~/.claude/scripts/ralph/ralph-skill-query.py \
 | Bug fix, <20 lines | spark | Quick targeted fix |
 | Unit/integration tests | arbiter | Testing |
 | E2E tests | atlas | End-to-end testing |
+| Browser QA / acceptance testing | sentinel |
 | Unclear error | debug-agent | Root cause analysis |
 | Codebase exploration | scout | Find patterns/files |
 | External docs | oracle | Research best practices |
@@ -189,6 +190,28 @@ npm run lint
 | Agent succeeded, tests fail | → Spawn arbiter to investigate |
 | Agent failed with error | → See Error Recovery |
 | Agent blocked | → Escalate to user |
+
+---
+
+## Phase 4.1.6: Browser QA Gate (Conditional)
+
+Skip if: feature is backend-only, CLI-only, or has no UI changes.
+Run if: feature adds/modifies pages, components, routes, or auth flows.
+
+**Option A (quick):** Spawn sentinel for key user flows from the PRD
+**Option B (full):** Run `/qa-suite` with the implementation plan for graded report
+
+**Failure handling:**
+- Grade A/A-: proceed to merge
+- Grade B+/B: fix critical failures, re-run sentinel on failures only
+- Grade C or below: block merge, escalate to user
+
+**New task type: `browser_qa`**
+1. sentinel logs in as each required role
+2. sentinel navigates key user flows from the PRD
+3. sentinel captures failures with screenshots + console errors
+4. sentinel generates graded report (A-F)
+5. Grade B+ or above: PASS. Below B+: kraken fixes, sentinel re-verifies (max 3 attempts)
 
 ---
 

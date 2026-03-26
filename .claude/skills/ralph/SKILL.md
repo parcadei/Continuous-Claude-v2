@@ -265,6 +265,8 @@ More tasks → loop to 3.1. All done → Phase 4.
 npm test && npm run typecheck && npm run lint  # or pytest/go test/cargo test
 ```
 
+**Browser QA (conditional):** If the feature has user-facing UI changes, run `/qa-suite` or spawn sentinel for browser QA before merge. Skip for backend-only, CLI, or documentation changes.
+
 ### 4.1.5 Goal Verification [C:8]
 
 Before merging, spawn an independent verifier:
@@ -310,6 +312,7 @@ cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/knowledge_tree.py 
 | External research | oracle |
 | Debugging | debug-agent |
 | Code review | critic |
+| sentinel | Browser QA, user flow verification, multi-role acceptance testing | sonnet |
 
 Full routing details, parallel orchestration, Docker isolation, file locking → `references/agents.md`
 
