@@ -193,6 +193,7 @@ CCv3 initialized for [Project Name]:
   Knowledge tree   -- [Generated / Deferred to next session]
   Serena           -- [Activated / Skipped (no supported files)]
   Registry         -- Added (port [PORT])
+  Sentry SDK       -- [Configured / Skipped (user declined or local-only)]
   Dev server       -- [Scaffolded / Skipped (not a web project)]
 
 Next steps:
