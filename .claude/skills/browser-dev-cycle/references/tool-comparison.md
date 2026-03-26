@@ -17,32 +17,32 @@
 
 ## Detailed Capability Matrix
 
-| Capability | @playwright/mcp | CDP CLI (cdp.mjs) | Playwright-core CDP | agent-browser | Claude-in-Chrome |
-|-----------|:---:|:---:|:---:|:---:|:---:|
-| **Navigation** | Yes | Via eval | Yes | BROKEN | BROKEN |
-| **Click/Type** | Yes | No | Yes | BROKEN | BROKEN |
-| **Screenshots** | Yes | Yes | Yes | BROKEN | BROKEN |
-| **Accessibility tree** | Yes (snapshot) | Yes | Yes | BROKEN | BROKEN |
-| **Form filling** | Yes | No | Yes | BROKEN | BROKEN |
-| **Tab management** | Yes | No | Yes | BROKEN | BROKEN |
-| **JS evaluation** | Yes | Yes | Yes | BROKEN | BROKEN |
-| **Network requests** | No | Yes (detailed) | Yes (route) | BROKEN | BROKEN |
-| **Network mocking** | No | No | Yes (route) | BROKEN | No |
-| **Performance traces** | No | Yes | No | No | No |
-| **CPU/Memory profiling** | No | Yes | No | No | No |
-| **Core Web Vitals** | No | Yes | No | No | No |
-| **Console (source-mapped)** | No | Yes | Yes | BROKEN | BROKEN |
-| **Computed CSS** | No | Yes | Yes | BROKEN | No |
-| **HAR recording** | No | Yes | Yes | BROKEN | No |
-| **Video recording** | No | No | Yes | BROKEN | GIF only |
-| **Trace capture** | Yes (codegen) | Yes | Yes | BROKEN | No |
-| **State save/restore** | No | No | Yes | BROKEN | No |
-| **Viewport control** | Yes (resize) | No | Yes | BROKEN | No |
-| **Dialog handling** | Yes | No | Yes | BROKEN | BROKEN |
-| **PDF generation** | Yes | No | Yes | BROKEN | No |
-| **Headed mode** | Yes (flag) | N/A | Yes | BROKEN | Always |
-| **Connect existing Chrome** | Yes (--cdp-endpoint) | Yes | Yes (CDP) | BROKEN | Extension |
-| **Headless** | Default | N/A | Yes | BROKEN | No |
+| Capability | @playwright/mcp | @playwright/cli | CDP CLI (cdp.mjs) | Playwright-core CDP | agent-browser | Claude-in-Chrome |
+|-----------|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Navigation** | Yes | Yes | Via eval | Yes | BROKEN | BROKEN |
+| **Click/Type** | Yes | Yes | No | Yes | BROKEN | BROKEN |
+| **Screenshots** | Yes | Yes (disk) | Yes | Yes | BROKEN | BROKEN |
+| **Accessibility tree** | Yes (snapshot) | Yes (YAML) | Yes | Yes | BROKEN | BROKEN |
+| **Form filling** | Yes | Yes | No | Yes | BROKEN | BROKEN |
+| **Tab management** | Yes | No | No | Yes | BROKEN | BROKEN |
+| **JS evaluation** | Yes | Yes | Yes | Yes | BROKEN | BROKEN |
+| **Network requests** | No | No | Yes (detailed) | Yes (route) | BROKEN | BROKEN |
+| **Network mocking** | No | No | No | Yes (route) | BROKEN | No |
+| **Performance traces** | No | No | Yes | No | No | No |
+| **CPU/Memory profiling** | No | No | Yes | No | No | No |
+| **Core Web Vitals** | No | No | Yes | No | No | No |
+| **Console (source-mapped)** | No | No | Yes | Yes | BROKEN | BROKEN |
+| **Computed CSS** | No | No | Yes | Yes | BROKEN | No |
+| **HAR recording** | No | No | Yes | Yes | BROKEN | No |
+| **Video recording** | No | No | No | Yes | BROKEN | GIF only |
+| **Trace capture** | Yes (codegen) | No | Yes | Yes | BROKEN | No |
+| **State save/restore** | No | No | No | Yes | BROKEN | No |
+| **Viewport control** | Yes (resize) | Yes (resize) | No | Yes | BROKEN | No |
+| **Dialog handling** | Yes | Yes | No | Yes | BROKEN | BROKEN |
+| **PDF generation** | Yes | No | No | Yes | BROKEN | No |
+| **Headed mode** | Yes (flag) | Yes (flag) | N/A | Yes | BROKEN | Always |
+| **Connect existing Chrome** | Yes (--cdp-endpoint) | No | Yes | Yes (CDP) | BROKEN | Extension |
+| **Headless** | Default | Default | N/A | Yes | BROKEN | No |
 
 ## Decision Matrix
 
@@ -61,12 +61,14 @@
 | Record network traffic | Playwright-core script |
 | Save/restore browser state | Playwright-core script |
 | Run repeatable test suites | Playwright-core script |
+| Token-efficient agent browser tasks | @playwright/cli |
 
 ## Setup Comparison
 
 | Tool | Setup Complexity | Dependencies |
 |------|-----------------|--------------|
 | @playwright/mcp | Low (1 line in .mcp.json) | npx, Node.js |
+| @playwright/cli | Low (npm install -g) | Node.js |
 | CDP CLI (cdp.mjs) | Low (node script, no install) | Node.js, Chrome with CDP |
 | Playwright-core | Medium (npm install + Chrome launch) | playwright-core, Chrome with CDP |
 

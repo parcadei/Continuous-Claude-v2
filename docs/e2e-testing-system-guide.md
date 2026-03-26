@@ -193,7 +193,7 @@ The deployer agent automatically runs `e2e/smoke.spec.ts` against the deploy URL
 
 ---
 
-## For the Fourth Connect Testing Session
+## For the Fourth Workbook Testing Session
 
 
 **Now available (from this work):**
@@ -204,7 +204,7 @@ The deployer agent automatically runs `e2e/smoke.spec.ts` against the deploy URL
 
 **To execute the Phase B test suite:**
 
-1. Ensure dev server is running 
+1. Ensure dev server is running
 2. Ensure database is seeded with test data (admin, editor, viewer users + spaces)
 3. Run: `/qa-suite` and point it to the Phase B plan at `.claude/plans/delightful-kindling-rocket.md`
 4. Or run individual tests: `npx playwright test --project=public` (starts with public pages)

@@ -57,14 +57,15 @@ Agent tool:
   prompt: "Execute the following QA test matrix against <project-url>.
            Credentials: [from project CLAUDE.md]
            Matrix: [the generated matrix]
-           Output to: .claude/cache/agents/sentinel/latest-output.md"
+           Output to: .claude/cache/agents/sentinel/<role>-output.md"
 ```
 
-For large matrices (20+ scenarios), consider splitting by role:
-- Spawn sentinel for admin scenarios
-- Spawn sentinel for editor scenarios
-- Spawn sentinel for viewer scenarios
-- Aggregate results
+For large matrices (20+ scenarios), split by role with distinct output paths:
+- Admin: `.claude/cache/agents/sentinel/admin-output.md`
+- Editor: `.claude/cache/agents/sentinel/editor-output.md`
+- Viewer: `.claude/cache/agents/sentinel/viewer-output.md`
+
+Each sentinel spawn must specify its output path in the prompt. Then aggregate all role outputs into `qa-suite-report.md`.
 
 ### Step 4: Aggregate and Grade
 
@@ -113,6 +114,8 @@ Save the report to:
 | B | 80-89% | Fix critical failures before shipping |
 | C | 70-79% | Do not ship — major issues |
 | F | <70% | Do not ship — critical failures |
+
+**Grade calculation:** Pass rate = PASS / (PASS + FAIL). BLOCKED scenarios are excluded from both numerator and denominator — they are reported separately, not penalized.
 
 ## Pre-Requisites
 

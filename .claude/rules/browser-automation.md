@@ -8,7 +8,7 @@
 | 1.5 | @playwright/cli | AI agent browser automation where token efficiency matters. Disk-based state. |
 | 2 | CDP CLI (`scripts/cdp.mjs`) | Performance metrics, network debugging, a11y audit, Lighthouse, console logs |
 | 3 | Playwright-core (scripting) | Complex multi-step flows, custom logic, when MCP tools are insufficient |
-| 4 | Playwright CLI | E2E test suites (`npx playwright test`), test recording (`npx playwright codegen`) |
+| 4 | Playwright Test Runner (`npx playwright test`) | E2E test suites (`npx playwright test`), test recording (`npx playwright codegen`) |
 
 Load the `browser-dev-cycle` skill for full decision tree and tool reference.
 

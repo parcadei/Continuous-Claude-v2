@@ -46,7 +46,10 @@ Before testing, you need to log in. Read the project's `CLAUDE.md` for credentia
 - Test admin scenarios first (full access baseline)
 - Then editor (write access, restricted scope)
 - Then viewer (read-only, filtered content)
-- Log out between roles: navigate to logout URL or clear cookies
+- **Logging out between roles:**
+  - Option A (navigate): `browser_navigate` to `/logout` or `/auth/signout` — confirm redirect to login page via `browser_snapshot`
+  - Option B (fresh context): `browser_tab_new` to get a clean session with no cookies, then close the previous tab
+  - Do NOT use `browser_evaluate` to clear cookies — HttpOnly session cookies are not accessible to JavaScript
 
 ## Test Execution Pattern
 
@@ -100,6 +103,8 @@ Write results to `.claude/cache/agents/sentinel/latest-output.md`:
 | B | 80-89% | Significant issues found |
 | C | 70-79% | Major issues, do not ship |
 | F | <70% | Critical failures |
+
+**Grade calculation:** Pass rate = PASS / (PASS + FAIL). BLOCKED scenarios are excluded from both numerator and denominator.
 
 ## Rules
 

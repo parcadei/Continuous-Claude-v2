@@ -103,7 +103,7 @@ uv run python ~/.claude/scripts/ralph/ralph-skill-query.py \
 | Bug fix, <20 lines | spark | Quick targeted fix |
 | Unit/integration tests | arbiter | Testing |
 | E2E tests | atlas | End-to-end testing |
-| Browser QA / acceptance testing | sentinel |
+| Browser QA / acceptance testing | sentinel | UI feature verification |
 | Unclear error | debug-agent | Root cause analysis |
 | Codebase exploration | scout | Find patterns/files |
 | External docs | oracle | Research best practices |
@@ -203,7 +203,8 @@ Run if: feature adds/modifies pages, components, routes, or auth flows.
 
 **Failure handling:**
 - Grade A/A-: proceed to merge
-- Grade B+/B: fix critical failures, re-run sentinel on failures only
+- Grade B+: proceed (with optional re-run of failed scenarios)
+- Grade B: fix failures, re-run sentinel (max 3 attempts)
 - Grade C or below: block merge, escalate to user
 
 **New task type: `browser_qa`**
