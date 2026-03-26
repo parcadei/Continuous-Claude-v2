@@ -1,12 +1,14 @@
 # Browser Automation Tool Comparison
 
-## Status Overview (Feb 2026)
+## Status Overview (March 2026)
 
 | Tool | Status | Windows | MCP | Use Case |
 |------|--------|---------|-----|----------|
 | **@playwright/mcp** | ACTIVE - PRIMARY | Yes | Yes (70+ tools) | Navigate, click, type, screenshot, forms |
+| **@playwright/cli** | ACTIVE - AI AGENTS | Yes | No (shell) | Token-efficient browser automation, disk-based snapshots |
 | **CDP CLI (cdp.mjs)** | ACTIVE - DEBUGGING | No (connects to existing) | 12 commands | Perf traces, network, console |
 | **Playwright-core (CDP)** | ACTIVE - SCRIPTING | Yes | No (scripts) | Network mock, recording, viewport matrix |
+| **Playwright CLI** | ACTIVE - TESTING | Yes | No (CLI) | E2E test suites, codegen, traces, reports |
 | agent-browser CLI (`ab`) | BROKEN | No (daemon) | No | Deprecated - Unix socket dependency |
 | Claude-in-Chrome | BROKEN | Partial | Built-in | Deprecated - 6+ Windows 11 bugs |
 | Puppeteer MCP | BROKEN | No | Deprecated | Abandoned - ESM errors |

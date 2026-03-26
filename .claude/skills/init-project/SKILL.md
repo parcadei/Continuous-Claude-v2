@@ -21,7 +21,8 @@ Set up a project with the complete Continuous Claude v3 infrastructure. This goe
 | `.serena/project.yml` | LSP code intelligence activation | 4 (conditional) |
 | Registry entry | `~/.claude/project-registry.json` updated | 5 (auto) |
 | Sentry SDK | Per-framework error monitoring setup | 6 (conditional) |
-| Dev server scripts | `scripts/dev-start.mjs` + `dev-cleanup.mjs` | 7 (conditional, web only) |
+| E2E test scaffold | `e2e/smoke.spec.ts` + `playwright.config.ts` | 7 (conditional, web only) |
+| Dev server scripts | `scripts/dev-start.mjs` + `dev-cleanup.mjs` | 8 (conditional, web only) |
 
 ## Execution Flow
 
@@ -168,7 +169,30 @@ Reference: `.claude/skills/sentry-cli/references/sdk-setup.md` for full per-fram
 
 ---
 
-### Phase 7: Dev Server Setup (Conditional, Web Only)
+### Phase 7: E2E Test Scaffolding (Conditional, Web Only)
+
+If the project has `package.json` with a `dev` script and serves on a port, offer to scaffold E2E tests.
+
+Ask the user: "Want me to set up E2E testing with Playwright? This adds a smoke test that verifies your app loads correctly."
+
+If yes:
+1. Verify `@playwright/test` is installed (or install it: `npm install -D @playwright/test`)
+2. Verify Chromium browser: `npx playwright install chromium`
+3. Create `e2e/smoke.spec.ts` with project-specific baseURL from registry
+4. Verify `playwright.config.ts` exists (or create minimal config)
+5. Add npm scripts if missing: `test:e2e`, `test:e2e:headed`, `test:e2e:codegen`
+6. Run the smoke test to verify: `npx playwright test e2e/smoke.spec.ts`
+
+The smoke test should check:
+- Homepage loads (200 response)
+- No console errors
+- Key elements are visible (heading, navigation)
+
+Skip entirely for non-web projects (libraries, CLI tools, scripts).
+
+---
+
+### Phase 8: Dev Server Setup (Conditional, Web Only)
 
 If the project has `package.json` with a `dev` script and serves on a port, offer to scaffold the dev server cleanup pattern. Read `references/dev-server-pattern.md` for templates.
 
@@ -182,7 +206,7 @@ If yes:
 
 ---
 
-### Phase 8: Summary
+### Phase 9: Summary
 
 Present a completion summary:
 
@@ -194,6 +218,7 @@ CCv3 initialized for [Project Name]:
   Serena           -- [Activated / Skipped (no supported files)]
   Registry         -- Added (port [PORT])
   Sentry SDK       -- [Configured / Skipped (user declined or local-only)]
+  E2E tests        -- [Scaffolded / Skipped (not a web project)]
   Dev server       -- [Scaffolded / Skipped (not a web project)]
 
 Next steps:

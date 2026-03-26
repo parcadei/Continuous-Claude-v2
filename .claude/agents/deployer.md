@@ -146,6 +146,17 @@ After deployment completes, wait 60 seconds then:
 2. If new errors found: report issue URLs and titles to user
 3. If no new errors: report clean deploy status
 
+### Post-Deploy E2E Smoke Test (Conditional)
+
+If the project has an `e2e/` directory with test files:
+1. Run smoke test against deploy URL: `BASE_URL=<deploy-url> npx playwright test e2e/smoke.spec.ts --reporter=json`
+2. If tests pass: include "E2E smoke: PASSED" in deploy report
+3. If tests fail: include failure details and trace file path
+4. Skip if no `e2e/` directory exists
+
+For Vercel previews, use the preview URL as BASE_URL.
+For Railway, use the service's public domain.
+
 ### Environment Mapping
 
 | Deploy Target | Sentry Environment | Version Source |

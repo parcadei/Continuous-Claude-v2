@@ -29,11 +29,11 @@ Pattern: single file, JSON output to stdout, subcommand interface.
 Use **browser automation** (Playwright MCP) as last resort.
 Highest friction, lowest reliability — only for truly GUI-only workflows.
 
-## Current CLI Inventory (20 tools)
+## Current CLI Inventory (21 tools)
 
 | Pattern | Tools |
 |---------|-------|
-| Direct Bash + Skill + Rule | tldr, opencli, gh, vercel, railway, neonctl, qlty, git, playwright, cdp.mjs, linearis, sentry-cli |
+| Direct Bash + Skill + Rule | tldr, opencli, gh, vercel, railway, neonctl, qlty, git, playwright, playwright-cli, cdp.mjs, linearis, sentry-cli |
 | Python harness via uv run | ast-grep, morph, braintrust, github-search |
 | MCP server | Serena, Playwright MCP, Notion, Paper, Exa, Neon, Vercel Cloud, Linear, Sentry |
 | Agent delegation | deployer (Vercel + Railway + Sentry + Linear), arbiter/atlas (tests) |

@@ -1,9 +1,9 @@
 ---
 name: browser-dev-cycle
-description: Full development cycle browser automation for viewing, debugging, testing, and visual inspection of web apps. Four-tier strategy: @playwright/mcp (interaction), CDP CLI (`scripts/cdp.mjs`) (performance), Playwright-core (scripting), and Playwright CLI (e2e test suites). Use when users need to browse, take screenshots, debug network/performance, run e2e tests, record tests with codegen, or do visual QA. Triggers on "browser", "screenshot", "viewport", "performance trace", "network debug", "visual QA", "responsive test", "e2e test", "playwright test", "codegen", "test suite".
+description: Full development cycle browser automation for viewing, debugging, testing, and visual inspection of web apps. Five-tier strategy: @playwright/mcp (interaction), @playwright/cli (AI agent disk-based), CDP CLI (`scripts/cdp.mjs`) (performance), Playwright-core (scripting), and Playwright CLI (e2e test suites). Use when users need to browse, take screenshots, debug network/performance, run e2e tests, record tests with codegen, or do visual QA. Triggers on "browser", "screenshot", "viewport", "performance trace", "network debug", "visual QA", "responsive test", "e2e test", "playwright test", "codegen", "test suite".
 ---
 
-# Browser Dev Cycle: Four-Tier Automation Strategy
+# Browser Dev Cycle: Five-Tier Automation Strategy
 
 Comprehensive browser automation covering interaction, performance analysis, and scripted testing. Use the lightest tier that gets the job done.
 
@@ -15,6 +15,8 @@ Comprehensive browser automation covering interaction, performance analysis, and
 |------|------|------|
 | Navigate, click, fill forms, screenshot | Tier 1 | @playwright/mcp |
 | Accessibility snapshot | Tier 1 | `browser_snapshot` |
+| AI agent browser tasks (token-efficient) | Tier 1.5 | @playwright/cli |
+| Disk-based YAML snapshots for agents | Tier 1.5 | @playwright/cli |
 | Performance trace / profiling | Tier 2 | CDP CLI (`scripts/cdp.mjs`) |
 | Core Web Vitals | Tier 2 | CDP CLI (`scripts/cdp.mjs`) |
 | Network HAR detail / response bodies | Tier 2 | CDP CLI (`scripts/cdp.mjs`) |
@@ -26,7 +28,8 @@ Comprehensive browser automation covering interaction, performance analysis, and
 | State save / restore | Tier 3 | Playwright-core scripts |
 | Multi-page orchestration | Tier 3 | Playwright-core scripts |
 | Visual regression | Tier 1 + Tier 3 | Screenshot compare |
-| Write/run E2E test suites | Tier 4 | Playwright CLI |
+| Write/run E2E test suites | Tier 4 | Playwright CLI (`npx playwright test`) |
+| Record test from user actions | Tier 4 | Codegen (`npx playwright codegen`) |
 
 ### ASCII Decision Tree
 
@@ -36,6 +39,10 @@ What do you need?
 +-- Basic interaction (nav, click, type, screenshot)
 |   +-> Tier 1: @playwright/mcp
 |       Direct MCP tool calls. No scripting needed.
+|
++-- AI agent browser tasks (token-efficient, disk-based)
+|   +-> Tier 1.5: @playwright/cli
+|       Shell commands. YAML snapshots saved to disk. 4x fewer tokens than MCP.
 |
 +-- Performance profiling / network analysis
 |   +-> Tier 2: CDP CLI (`scripts/cdp.mjs`)
@@ -56,6 +63,7 @@ What do you need?
 ### Selection Rules
 
 - **Start with Tier 1** for any interactive task — covers 80% of browser automation needs.
+- **Use Tier 1.5** when an AI agent needs token-efficient browser automation with disk-based state (YAML snapshots, screenshots on disk — 4x fewer tokens than MCP).
 - **Escalate to Tier 2** when you need performance metrics, network bodies, or computed CSS.
 - **Escalate to Tier 3** when you need programmatic control (loops, conditionals, mocking, recording).
 - **Escalate to Tier 4** when you need repeatable test suites, codegen recording, trace capture, or cross-browser testing.
@@ -94,6 +102,51 @@ Primary tool for browser interaction. Tools are called directly from Claude via 
 **Key tools:** `browser_navigate`, `browser_snapshot`, `browser_click`, `browser_type`, `browser_select_option`, `browser_press_key`, `browser_hover`, `browser_wait_for`, `browser_evaluate`, `browser_tab_new/select/close`, `browser_take_screenshot` (vision mode), `browser_handle_dialog`
 
 Full tool reference with all parameters: `references/tier1-playwright-mcp.md`
+
+---
+
+## 2.5. TIER 1.5: @playwright/cli (AI Agent Browser CLI)
+
+Token-efficient browser automation for AI coding agents. Saves state to disk (YAML snapshots, screenshots) instead of streaming into context — ~4x fewer tokens than MCP per task.
+
+**Install:** `npm install -g @playwright/cli@latest`
+
+**Key difference from MCP:** State lives on disk, not in context. Agent reads snapshots selectively via `Read` tool.
+
+**Core commands:**
+| Command | Purpose |
+|---------|---------|
+| `playwright-cli open [url]` | Open browser and navigate |
+| `playwright-cli snapshot` | Save YAML accessibility snapshot to disk |
+| `playwright-cli screenshot` | Save screenshot to disk |
+| `playwright-cli click REF` | Click element by ref from snapshot |
+| `playwright-cli fill REF TEXT` | Fill input field |
+| `playwright-cli type TEXT` | Type text |
+| `playwright-cli select REF VAL` | Select dropdown option |
+| `playwright-cli eval EXPR` | Evaluate JavaScript |
+| `playwright-cli close` | Close page |
+
+**Workflow:**
+```
+1. playwright-cli open <url>          # Open browser
+2. playwright-cli snapshot            # Save YAML to disk
+3. Read the YAML file                 # Agent reads selectively (low tokens)
+4. playwright-cli click <ref>         # Interact using refs from snapshot
+5. playwright-cli snapshot            # Re-snapshot after DOM changes
+```
+
+**Options:** `--headed` (show browser), `--persistent` (save profile)
+
+**When to use Tier 1.5 over Tier 1:**
+- Agent-driven automation where token budget matters
+- Long multi-step flows (token savings compound)
+- When you need snapshots persisted to disk for later analysis
+- Batch operations across multiple pages
+
+**When to use Tier 1 (MCP) instead:**
+- Interactive development (faster feedback loop)
+- One-off inspections
+- When you need the full 70+ MCP tool set (file upload, PDF, drag-drop)
 
 ---
 
