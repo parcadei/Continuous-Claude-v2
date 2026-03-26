@@ -1,6 +1,6 @@
 ---
 name: deployer
-description: Deployment management for Vercel and Railway -- deploy, monitor, verify, and debug deployments using CLI tools and Cloud MCP
+description: Deployment management for Vercel and Railway with Sentry release tracking and Linear issue updates -- deploy, monitor, verify, and debug using CLI tools and Cloud MCP
 model: sonnet
 tools:
   - Bash
@@ -98,6 +98,71 @@ When asked to verify a Railway deployment:
 3. `railway logs -n 20` -- check runtime logs for errors
 4. If errors: `railway logs --filter "@level:error" -n 50` -- get error details
 5. Report: service name, environment, status, any errors found
+
+---
+
+## Sentry Release Tracking (Cross-Platform)
+
+When deploying any project with Sentry configured (check for `@sentry/*` in package.json dependencies or `SENTRY_DSN` in environment):
+
+### Detection
+1. Check `package.json` for `@sentry/nextjs`, `@sentry/node`, or `sentry-sdk` in dependencies
+2. Check for `SENTRY_DSN` environment variable
+3. If neither found, skip Sentry steps
+
+### Post-Deploy Release Creation
+After confirming deployment succeeded:
+1. Get version: `VERSION=$(git rev-parse HEAD)`
+2. Create release: `sentry-cli releases new $VERSION`
+3. Associate commits: `sentry-cli releases set-commits $VERSION --auto`
+4. Record deploy: `sentry-cli deploys new -e <environment> -r $VERSION`
+5. Finalize: `sentry-cli releases finalize $VERSION`
+
+For Vercel projects with the native Sentry integration, releases are created automatically — skip manual release creation.
+
+### Post-Deploy Health Check
+After deployment completes, wait 60 seconds then:
+1. Query recent errors: `sentry-cli issues list --query "firstSeen:>now-5m" -o json`
+2. If new errors found: report issue URLs and titles to user
+3. If no new errors: report clean deploy status
+
+### Environment Mapping
+
+| Deploy Target | Sentry Environment | Version Source |
+|--------------|-------------------|---------------|
+| Vercel Preview | `preview` | Deploy URL hash |
+| Vercel Production | `production` | `git rev-parse HEAD` |
+| Railway | `production` | `RAILWAY_GIT_COMMIT_SHA` or `git rev-parse HEAD` |
+
+---
+
+## Linear Issue Update (Conditional)
+
+When the current git branch contains a Linear issue identifier (LIN-XXX pattern):
+
+### Detection
+Extract issue ID from branch name:
+```bash
+BRANCH=$(git branch --show-current)
+ISSUE_ID=$(echo "$BRANCH" | sed -n 's/.*\(LIN-[0-9]*\).*/\1/p' | head -1)
+```
+
+If no LIN-XXX found in branch name, skip Linear steps.
+
+### Post-Deploy Update
+1. Show the user: "Branch $BRANCH is linked to Linear issue $ISSUE_ID"
+2. Suggest status update: "Update $ISSUE_ID to 'Done'?"
+3. **Wait for user confirmation** (per linear-safety rule)
+4. If approved: `linearis issue update $ISSUE_ID --status "Done" --json`
+5. Add deploy URL as comment (if supported by CLI)
+
+### Routing
+
+| Task | Tool |
+|------|------|
+| Update issue status | `linearis` CLI (JSON, scripted) |
+| Add detailed comment | Linear MCP `update_issue` |
+| Search related issues | Linear MCP `search_issues` |
 
 ---
 

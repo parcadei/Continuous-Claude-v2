@@ -20,7 +20,8 @@ Set up a project with the complete Continuous Claude v3 infrastructure. This goe
 | `.claude/knowledge-tree.json` | Project navigation map | 3 (auto) |
 | `.serena/project.yml` | LSP code intelligence activation | 4 (conditional) |
 | Registry entry | `~/.claude/project-registry.json` updated | 5 (auto) |
-| Dev server scripts | `scripts/dev-start.mjs` + `dev-cleanup.mjs` | 6 (conditional, web only) |
+| Sentry SDK | Per-framework error monitoring setup | 6 (conditional) |
+| Dev server scripts | `scripts/dev-start.mjs` + `dev-cleanup.mjs` | 7 (conditional, web only) |
 
 ## Execution Flow
 
@@ -144,7 +145,30 @@ Check for port conflicts with existing entries before assigning.
 
 ---
 
-### Phase 6: Dev Server Cleanup (Conditional, Web Only)
+### Phase 6: Sentry SDK Setup (Conditional)
+
+If the project deploys to Vercel or Railway, offer Sentry instrumentation:
+
+1. **Detect framework**:
+   - Next.js → `npx @sentry/wizard@latest -i nextjs`
+   - Node.js/Express → `npm install @sentry/node @sentry/profiling-node`
+   - Python → `uv add sentry-sdk`
+
+2. **Configure environment** — add to `.env.local`:
+   ```
+   SENTRY_DSN=<from Sentry project settings>
+   NEXT_PUBLIC_SENTRY_DSN=<same DSN for client-side>
+   ```
+
+3. **Verify**: `sentry-cli info` confirms authentication
+
+4. **Skip if**: User declines, project is local-only, or no `SENTRY_AUTH_TOKEN` env var set.
+
+Reference: `.claude/skills/sentry-cli/references/sdk-setup.md` for full per-framework guide.
+
+---
+
+### Phase 7: Dev Server Setup (Conditional, Web Only)
 
 If the project has `package.json` with a `dev` script and serves on a port, offer to scaffold the dev server cleanup pattern. Read `references/dev-server-pattern.md` for templates.
 
@@ -158,7 +182,7 @@ If yes:
 
 ---
 
-### Phase 7: Summary
+### Phase 8: Summary
 
 Present a completion summary:
 
@@ -169,6 +193,7 @@ CCv3 initialized for [Project Name]:
   Knowledge tree   -- [Generated / Deferred to next session]
   Serena           -- [Activated / Skipped (no supported files)]
   Registry         -- Added (port [PORT])
+  Sentry SDK       -- [Configured / Skipped (user declined or local-only)]
   Dev server       -- [Scaffolded / Skipped (not a web project)]
 
 Next steps:

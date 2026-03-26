@@ -16,7 +16,10 @@
       "Read(//c/Users/david.hayes/.claude/skills/skill-forge/**)",
       "Bash(python -m scripts.quick_validate C:/Users/david.hayes/continuous-claude/.claude/skills/serena)",
       "Bash(python -m scripts.run_loop --eval-set auto --skill-path C:/Users/david.hayes/continuous-claude/.claude/skills/serena --model claude-opus-4-6 --max-iterations 5 --verbose)",
-      "Bash(python -m scripts.run_loop --eval-set C:/Users/david.hayes/continuous-claude/.claude/skills/serena/evals/trigger-eval.json --skill-path C:/Users/david.hayes/continuous-claude/.claude/skills/serena --model claude-opus-4-6 --max-iterations 5 --verbose)"
+      "Bash(python -m scripts.run_loop --eval-set C:/Users/david.hayes/continuous-claude/.claude/skills/serena/evals/trigger-eval.json --skill-path C:/Users/david.hayes/continuous-claude/.claude/skills/serena --model claude-opus-4-6 --max-iterations 5 --verbose)",
+      "Bash(npm run:*)",
+      "Bash(npx vitest:*)",
+      "Bash(bash scripts/sync-to-active.sh)"
     ]
   },
   "enableAllProjectMcpServers": true,

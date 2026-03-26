@@ -34,49 +34,58 @@ const REBUILD = args.includes('--rebuild');
 // GitHub Advisory API queries
 // ---------------------------------------------------------------------------
 
-function ghApi(endpoint) {
-  try {
-    const result = execSync(`gh api "${endpoint}" --paginate`, {
-      encoding: 'utf-8',
-      maxBuffer: 10 * 1024 * 1024, // 10MB
-      timeout: 30000,
-    });
-    // gh --paginate concatenates JSON arrays, need to handle
-    // It outputs one JSON array per page, concatenated. Parse carefully.
-    const trimmed = result.trim();
-    if (!trimmed) return [];
+function ghApiPaginated(endpoint, { retries = 3, timeoutMs = 60000 } = {}) {
+  // Fetch page-by-page to avoid ENOBUFS on large datasets (npm malware = 100+ pages)
+  const allResults = [];
+  let page = 1;
+  const perPage = endpoint.includes('per_page=') ? '' : '&per_page=100';
+  const separator = endpoint.includes('?') ? '&' : '?';
 
-    // gh --paginate for arrays outputs multiple JSON arrays concatenated
-    // e.g., [{...}]\n[{...}]\n — we need to merge them
-    try {
-      return JSON.parse(trimmed);
-    } catch {
-      // Try splitting by ]\n[ and merging
-      const merged = '[' + trimmed.replace(/\]\s*\[/g, ',') + ']';
+  while (true) {
+    const url = `${endpoint}${perPage}${separator}page=${page}`;
+    let pageData = null;
+
+    for (let attempt = 1; attempt <= retries; attempt++) {
       try {
-        // If it was already wrapped in outer [], unwrap one level
-        const parsed = JSON.parse(merged);
-        return Array.isArray(parsed[0]) ? parsed.flat() : parsed;
-      } catch {
-        console.error('Failed to parse gh api output');
-        return [];
+        const result = execSync(`gh api "${url}"`, {
+          encoding: 'utf-8',
+          maxBuffer: 50 * 1024 * 1024, // 50MB per page
+          timeout: timeoutMs,
+        });
+        const trimmed = result.trim();
+        if (!trimmed) { pageData = []; break; }
+        pageData = JSON.parse(trimmed);
+        break;
+      } catch (err) {
+        const isBuffer = err.message?.includes('ENOBUFS') || err.message?.includes('maxBuffer');
+        const isTimeout = err.message?.includes('ETIMEDOUT') || err.killed;
+        const reason = isBuffer ? 'BUFFER_OVERFLOW' : isTimeout ? 'TIMEOUT' : err.message?.slice(0, 80);
+        console.error(`  Page ${page} attempt ${attempt}/${retries}: ${reason}`);
+        if (attempt < retries) {
+          execSync(`sleep ${attempt * 3}`, { encoding: 'utf-8' });
+        }
       }
     }
-  } catch (err) {
-    console.error(`gh api failed for ${endpoint}:`, err.message);
-    return [];
+
+    if (pageData === null) {
+      console.error(`  Giving up on page ${page} after ${retries} attempts. Returning ${allResults.length} results so far.`);
+      break;
+    }
+
+    if (!Array.isArray(pageData) || pageData.length === 0) break;
+
+    allResults.push(...pageData);
+    process.stdout.write(`  Page ${page}: +${pageData.length} (total: ${allResults.length})\r`);
+
+    if (pageData.length < 100) break; // last page
+    page++;
   }
+
+  console.log(`  Fetched ${allResults.length} advisories across ${page} pages`);
+  return allResults;
 }
 
-function fetchNpmMalware() {
-  console.log('Fetching npm malware advisories from GitHub...');
-  return ghApi('/advisories?type=malware&ecosystem=npm&per_page=100');
-}
-
-function fetchPypiCritical() {
-  console.log('Fetching PyPI critical advisories from GitHub...');
-  return ghApi('/advisories?type=reviewed&ecosystem=pip&severity=critical&per_page=100');
-}
+// fetchNpmMalware and fetchPypiCritical removed — ghApiPaginated called directly in main()
 
 // ---------------------------------------------------------------------------
 // Parse advisories into blocklist entries
@@ -96,6 +105,10 @@ function parseAdvisory(advisory, ecosystem) {
   for (const vuln of vulnerabilities) {
     const pkg = vuln.package;
     if (!pkg) continue;
+
+    // Skip packages from other ecosystems (multi-ecosystem advisories include all)
+    const pkgEcosystem = (pkg.ecosystem || '').toLowerCase();
+    if (pkgEcosystem && pkgEcosystem !== ecosystem) continue;
 
     const name = pkg.name;
     if (!name) continue;
@@ -197,8 +210,8 @@ async function main() {
   console.log(`Current blocklist: ${existingNpm} npm + ${existingPypi} PyPI = ${existingNpm + existingPypi} packages\n`);
 
   // Fetch advisories
-  const npmAdvisories = fetchNpmMalware();
-  const pypiAdvisories = fetchPypiCritical();
+  const npmAdvisories = ghApiPaginated('/advisories?type=malware&ecosystem=npm&per_page=100');
+  const pypiAdvisories = ghApiPaginated('/advisories?type=reviewed&ecosystem=pip&severity=critical&per_page=100');
 
   console.log(`  npm malware advisories found: ${npmAdvisories.length}`);
   console.log(`  PyPI critical advisories found: ${pypiAdvisories.length}\n`);

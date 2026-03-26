@@ -14,7 +14,9 @@
       "port": null,
       "url": null,
       "devCommand": null,
-      "status": "active"
+      "status": "active",
+      "sentryProject": "",
+      "linearTeam": "the-lab"
     },
     {
       "name": "NorthStar Transformation",
@@ -30,7 +32,9 @@
       "port": 3002,
       "url": "https://northstar.localhost/",
       "devCommand": "npm run dev",
-      "status": "active"
+      "status": "active",
+      "sentryProject": "",
+      "linearTeam": "the-lab"
     },
     {
       "name": "Fourth Connect",
@@ -44,7 +48,9 @@
       "port": 3000,
       "url": "https://fourth-connect.localhost/",
       "devCommand": "npm run dev",
-      "status": "active"
+      "status": "active",
+      "sentryProject": "",
+      "linearTeam": "the-lab"
     },
     {
       "name": "agent-factory",
@@ -59,7 +65,9 @@
       "port": 3001,
       "url": null,
       "devCommand": "npm run dev",
-      "status": "active"
+      "status": "active",
+      "sentryProject": "",
+      "linearTeam": "the-lab"
     },
     {
       "name": "ECG Lead Reactivation Engine",
@@ -76,7 +84,9 @@
       "port": 3003,
       "url": "https://ecg.localhost/",
       "devCommand": "npm run dev",
-      "status": "active"
+      "status": "active",
+      "sentryProject": "",
+      "linearTeam": "the-lab"
     },
     {
       "name": "LinkMap",
@@ -89,7 +99,9 @@
       "port": null,
       "url": null,
       "devCommand": null,
-      "status": "inactive"
+      "status": "inactive",
+      "sentryProject": "",
+      "linearTeam": ""
     }
   ]
 }
