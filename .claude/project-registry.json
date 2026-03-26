@@ -99,7 +99,9 @@
       "port": null,
       "url": null,
       "devCommand": null,
-      "status": "inactive"
+      "status": "inactive",
+      "sentryProject": "",
+      "linearTeam": ""
     }
   ]
 }

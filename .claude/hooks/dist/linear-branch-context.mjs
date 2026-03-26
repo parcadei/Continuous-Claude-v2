@@ -1,14 +1,15 @@
 // src/linear-branch-context.ts
 import { readFileSync } from "fs";
-var BRANCH_CREATE = /(?:git\s+(?:checkout\s+-b|switch\s+-c))\s+\S*(?:LIN|lin|Lin)-(\d+)/i;
+var BRANCH_CREATE = /(?:git\s+(?:checkout\s+-b|switch\s+-c))\s+\S*LIN-(\d+)/i;
 function extractLinearIssue(command) {
   if (typeof command !== "string" || command.length === 0) return null;
   const match = command.match(BRANCH_CREATE);
   return match ? match[1] : null;
 }
 function buildBranchContext(issueNumber) {
+  const workspace = process.env.LINEAR_WORKSPACE ?? "minions-lab";
   return `[Linear] Branch linked to issue LIN-${issueNumber}.
-View: https://linear.app/minions-lab/issue/LIN-${issueNumber}
+View: https://linear.app/${workspace}/issue/LIN-${issueNumber}
 Consider updating issue status to "In Progress":
   linearis issue update LIN-${issueNumber} --status "In Progress" --json`;
 }

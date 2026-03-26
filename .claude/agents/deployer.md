@@ -144,7 +144,7 @@ When the current git branch contains a Linear issue identifier (LIN-XXX pattern)
 Extract issue ID from branch name:
 ```bash
 BRANCH=$(git branch --show-current)
-ISSUE_ID=$(echo "$BRANCH" | grep -oP 'LIN-\d+' | head -1)
+ISSUE_ID=$(echo "$BRANCH" | sed -n 's/.*\(LIN-[0-9]*\).*/\1/p' | head -1)
 ```
 
 If no LIN-XXX found in branch name, skip Linear steps.

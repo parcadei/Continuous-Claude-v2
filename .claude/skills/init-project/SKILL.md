@@ -20,7 +20,8 @@ Set up a project with the complete Continuous Claude v3 infrastructure. This goe
 | `.claude/knowledge-tree.json` | Project navigation map | 3 (auto) |
 | `.serena/project.yml` | LSP code intelligence activation | 4 (conditional) |
 | Registry entry | `~/.claude/project-registry.json` updated | 5 (auto) |
-| Dev server scripts | `scripts/dev-start.mjs` + `dev-cleanup.mjs` | 6 (conditional, web only) |
+| Sentry SDK | Per-framework error monitoring setup | 6 (conditional) |
+| Dev server scripts | `scripts/dev-start.mjs` + `dev-cleanup.mjs` | 7 (conditional, web only) |
 
 ## Execution Flow
 
@@ -167,7 +168,7 @@ Reference: `.claude/skills/sentry-cli/references/sdk-setup.md` for full per-fram
 
 ---
 
-### Phase 7: Dev Server Cleanup (Conditional, Web Only)
+### Phase 7: Dev Server Setup (Conditional, Web Only)
 
 If the project has `package.json` with a `dev` script and serves on a port, offer to scaffold the dev server cleanup pattern. Read `references/dev-server-pattern.md` for templates.
 
@@ -181,7 +182,7 @@ If yes:
 
 ---
 
-### Phase 7: Summary
+### Phase 8: Summary
 
 Present a completion summary:
 

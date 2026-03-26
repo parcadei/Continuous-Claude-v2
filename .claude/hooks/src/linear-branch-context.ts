@@ -35,7 +35,7 @@ interface HookOutput {
 // BRANCH_CREATE: matches git checkout -b or git switch -c with LIN-XXX
 // ---------------------------------------------------------------------------
 
-const BRANCH_CREATE = /(?:git\s+(?:checkout\s+-b|switch\s+-c))\s+\S*(?:LIN|lin|Lin)-(\d+)/i;
+const BRANCH_CREATE = /(?:git\s+(?:checkout\s+-b|switch\s+-c))\s+\S*LIN-(\d+)/i;
 
 // ---------------------------------------------------------------------------
 // Exported functions (testable units)
@@ -55,8 +55,9 @@ export function extractLinearIssue(command: unknown): string | null {
  * Build the Linear branch context string for a given issue number.
  */
 export function buildBranchContext(issueNumber: string): string {
+  const workspace = process.env.LINEAR_WORKSPACE ?? 'minions-lab';
   return `[Linear] Branch linked to issue LIN-${issueNumber}.
-View: https://linear.app/minions-lab/issue/LIN-${issueNumber}
+View: https://linear.app/${workspace}/issue/LIN-${issueNumber}
 Consider updating issue status to "In Progress":
   linearis issue update LIN-${issueNumber} --status "In Progress" --json`;
 }

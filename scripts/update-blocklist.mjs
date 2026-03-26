@@ -106,6 +106,10 @@ function parseAdvisory(advisory, ecosystem) {
     const pkg = vuln.package;
     if (!pkg) continue;
 
+    // Skip packages from other ecosystems (multi-ecosystem advisories include all)
+    const pkgEcosystem = (pkg.ecosystem || '').toLowerCase();
+    if (pkgEcosystem && pkgEcosystem !== ecosystem) continue;
+
     const name = pkg.name;
     if (!name) continue;
 

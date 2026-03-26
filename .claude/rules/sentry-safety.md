@@ -25,6 +25,7 @@ Before running ANY of these, explain what it does and wait for explicit user app
 - `sentry-cli deploys new` (records a deployment event)
 - `sentry-cli projects create` (creates a new project in the org)
 - `sentry-cli releases files <VERSION> delete` (deletes uploaded artifacts)
+- `sentry-cli monitors delete` (permanently deletes a cron monitor)
 - Any Sentry MCP write operations (autofix apply, issue resolve, etc.)
 
 ## Pre-Flight Checks
