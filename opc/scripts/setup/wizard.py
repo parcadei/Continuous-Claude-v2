@@ -990,8 +990,98 @@ async def run_setup_wizard() -> None:
         console.print("  Skipped math features")
         console.print("  [dim]Install later with: uv sync --extra math[/dim]")
 
-    # Step 9: TLDR Code Analysis Tool
-    console.print("\n[bold]Step 10/13: TLDR Code Analysis Tool[/bold]")
+    # Step 11: qlty CLI (Universal Code Quality)
+    console.print("\n[bold]Step 11/15: qlty Code Quality Tool[/bold]")
+    console.print(
+        "  qlty is a universal code quality tool supporting 70+ linters for 40+ languages."
+    )
+    console.print("  Unlocks: qlty-check, qlty-during-development, fix (deps scope) skills.")
+    console.print("")
+    console.print("  [dim]Free and open source - no API key needed.[/dim]")
+
+    if Confirm.ask("\nInstall qlty code quality tool?", default=True):
+        console.print("  Installing qlty...")
+        try:
+            result = subprocess.run(
+                ["uv", "tool", "install", "qlty"],
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+            if result.returncode == 0:
+                console.print("  [green]OK[/green] qlty installed via uv")
+            else:
+                # Fallback to curl install
+                result = subprocess.run(
+                    ["curl", "-fsSL", "https://qlty.sh/install.sh"],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                )
+                if result.returncode == 0:
+                    install_result = subprocess.run(
+                        result.stdout.strip(),
+                        shell=True,
+                        capture_output=True,
+                        text=True,
+                        timeout=60,
+                    )
+                    if install_result.returncode == 0:
+                        console.print("  [green]OK[/green] qlty installed")
+                    else:
+                        console.print("  [yellow]WARN[/yellow] qlty install had issues")
+                else:
+                    console.print("  [yellow]WARN[/yellow] Could not install qlty")
+        except subprocess.TimeoutExpired:
+            console.print("  [yellow]WARN[/yellow] Installation timed out")
+        except Exception as e:
+            console.print(f"  [yellow]WARN[/yellow] {e}")
+    else:
+        console.print("  Skipped qlty installation")
+        console.print("  [dim]Install later with: uv tool install qlty[/dim]")
+
+    # Step 12: ast-grep (AST-based Code Search)
+    console.print("\n[bold]Step 12/15: ast-grep Code Analysis Tool[/bold]")
+    console.print("  ast-grep performs AST-based structural code search and refactoring.")
+    console.print("  Unlocks: ast-grep-find, search-router, search-tools skills.")
+    console.print("")
+    console.print("  [dim]Free and open source - no API key needed.[/dim]")
+
+    if Confirm.ask("\nInstall ast-grep code analysis tool?", default=True):
+        console.print("  Installing ast-grep...")
+        try:
+            result = subprocess.run(
+                ["cargo", "install", "ast-grep"],
+                capture_output=True,
+                text=True,
+                timeout=300,
+            )
+            if result.returncode == 0:
+                console.print("  [green]OK[/green] ast-grep installed via cargo")
+            else:
+                result = subprocess.run(
+                    ["npm", "install", "-g", "ast-grep"],
+                    capture_output=True,
+                    text=True,
+                    timeout=120,
+                )
+                if result.returncode == 0:
+                    console.print("  [green]OK[/green] ast-grep installed via npm")
+                else:
+                    console.print("  [yellow]WARN[/yellow] Could not install ast-grep")
+                    console.print("  Try: cargo install ast-grep")
+        except subprocess.TimeoutExpired:
+            console.print(
+                "  [yellow]WARN[/yellow] Installation timed out (cargo builds from source)"
+            )
+        except Exception as e:
+            console.print(f"  [yellow]WARN[/yellow] {e}")
+    else:
+        console.print("  Skipped ast-grep installation")
+        console.print("  [dim]Install later with: cargo install ast-grep[/dim]")
+
+    # Step 13: TLDR Code Analysis Tool
+    console.print("\n[bold]Step 13/15: TLDR Code Analysis Tool[/bold]")
     console.print("  TLDR provides token-efficient code analysis for LLMs:")
     console.print("    - 95% token savings vs reading raw files")
     console.print("    - 155x faster queries with daemon mode")
@@ -1172,7 +1262,7 @@ async def run_setup_wizard() -> None:
                     console.print("  [green]OK[/green] TLDR hooks disabled")
 
     # Step 10: Diagnostics Tools (Shift-Left Feedback)
-    console.print("\n[bold]Step 11/13: Diagnostics Tools (Shift-Left Feedback)[/bold]")
+    console.print("\n[bold]Step 14/15: Diagnostics Tools (Shift-Left Feedback)[/bold]")
     console.print("  Claude gets immediate type/lint feedback after editing files.")
     console.print("  This catches errors before tests run (shift-left).")
     console.print("")
@@ -1210,7 +1300,7 @@ async def run_setup_wizard() -> None:
     console.print("  [dim]TypeScript, Go, Rust coming soon.[/dim]")
 
     # Step 11: Loogle (Lean 4 type search for /prove skill)
-    console.print("\n[bold]Step 12/13: Loogle (Lean 4 Type Search)[/bold]")
+    console.print("\n[bold]Step 15/15: Loogle (Lean 4 Type Search)[/bold]")
     console.print("  Loogle enables type-aware search of Mathlib theorems:")
     console.print("    - Used by /prove skill for theorem proving")
     console.print("    - Search by type signature (e.g., 'Nontrivial _ ↔ _')")
