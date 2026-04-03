@@ -1263,38 +1263,11 @@ async def run_setup_wizard() -> None:
                             f"  [green]OK[/green] Semantic search enabled (threshold: {threshold})"
                         )
 
-                        # Offer to pre-download embedding model
-                        # Note: We only download the model here, not index any directory.
-                        # Indexing happens per-project when user runs `tldr semantic index .`
-                        if Confirm.ask("\n  Pre-download embedding model now?", default=False):
-                            console.print(f"  Downloading {model} embedding model...")
-                            try:
-                                # Just load the model to trigger download (no indexing)
-                                download_result = subprocess.run(
-                                    [
-                                        sys.executable,
-                                        "-c",
-                                        f"from tldr.semantic import get_model; get_model('{model}')",
-                                    ],
-                                    capture_output=True,
-                                    text=True,
-                                    timeout=timeout,
-                                    env={**os.environ, "TLDR_AUTO_DOWNLOAD": "1"},
-                                )
-                                if download_result.returncode == 0:
-                                    console.print("  [green]OK[/green] Embedding model downloaded")
-                                else:
-                                    console.print("  [yellow]WARN[/yellow] Download had issues")
-                                    if download_result.stderr:
-                                        console.print(f"       {download_result.stderr[:200]}")
-                            except subprocess.TimeoutExpired:
-                                console.print("  [yellow]WARN[/yellow] Download timed out")
-                            except Exception as e:
-                                console.print(f"  [yellow]WARN[/yellow] {e}")
-                        else:
-                            console.print(
-                                "  [dim]Model downloads on first use of: tldr semantic index .[/dim]"
-                            )
+                        # Note: Model download happens automatically on first use
+                        # User can trigger manually with: tldr semantic index .
+                        console.print(
+                            "  [dim]Embedding model downloads on first use: tldr semantic index .[/dim]"
+                        )
                     else:
                         console.print("  Semantic search disabled")
                         console.print("  [dim]Enable later in .claude/settings.json[/dim]")
