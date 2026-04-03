@@ -230,6 +230,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "node $HOME/.claude/hooks/dist/mcp-directory-guard.mjs",
+            "timeout": 5
+          },
+          {
+            "type": "command",
             "command": "node $HOME/.claude/hooks/dist/import-error-detector.mjs",
             "timeout": 5
           }
