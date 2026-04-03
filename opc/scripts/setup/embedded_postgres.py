@@ -34,9 +34,9 @@ def start_embedded_postgres(pgdata: Path, venv_path: Path | None = None) -> dict
             - server: PostgresServer instance (for cleanup)
     """
     import sys
+    from pathlib import Path as Pathlib
 
     pgserver = None
-    python_exe = None
 
     # Try direct import first
     try:
@@ -44,48 +44,25 @@ def start_embedded_postgres(pgdata: Path, venv_path: Path | None = None) -> dict
     except ImportError:
         pass
 
-    # If import failed and venv_path provided, use venv Python
+    # If import failed and venv_path provided, add venv site-packages to sys.path
     if pgserver is None and venv_path is not None:
+        # Add venv site-packages to sys.path so we can import pgserver
         if sys.platform == "win32":
-            python_exe = venv_path / "Scripts" / "python.exe"
+            site_packages = venv_path / "Lib" / "site-packages"
         else:
-            python_exe = venv_path / "bin" / "python"
-
-        if python_exe.exists():
-            # Use subprocess to run pgserver from venv
-            import subprocess
-            import time
-
-            proc = subprocess.Popen(
-                [str(python_exe), "-m", "pgserver", str(pgdata)],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+            site_packages = (
+                venv_path
+                / "lib"
+                / f"python{'.'.join(map(str, sys.version_info[:2]))}"
+                / "site-packages"
             )
 
-            # Wait for server to start
-            time.sleep(3)
-
-            # Check if process is still running
-            if proc.poll() is not None:
-                stderr = proc.stderr.read().decode() if proc.stderr else ""
-                return {
-                    "success": False,
-                    "error": f"pgserver failed to start: {stderr[:200]}",
-                }
-
-            # Default URI - pgserver uses port 28814 by default
-            uri = "postgresql://postgres:@127.0.0.1:28814/postgres"
-
-            return {
-                "success": True,
-                "uri": uri,
-                "process": proc,
-            }
-        else:
-            return {
-                "success": False,
-                "error": f"Python not found at {python_exe}",
-            }
+        if site_packages.exists():
+            sys.path.insert(0, str(site_packages))
+            try:
+                import pgserver
+            except ImportError:
+                pass
 
     if pgserver is None:
         return {
