@@ -8,21 +8,22 @@ Instead of manually coordinating multiple agents, simply describe your goal and 
 
 ## Available Workflows
 
-| Workflow | Purpose | Agent Pipeline | When to Use |
-|----------|---------|----------------|-------------|
-| [/fix](#fix) | Quick bug fixes | scout → spark → arbiter | Known issue, clear symptoms |
-| [/debug](#debug) | Deep investigation | sleuth → debug-agent → profiler? → spark | Complex bugs, unclear cause |
-| [/build](#build) | Feature implementation | oracle? → plan-agent → kraken → arbiter → scribe | New features from scratch |
-| [/tdd](#tdd) | Test-driven development | plan-agent → arbiter → kraken → arbiter | Features needing strong test coverage |
-| [/refactor](#refactor) | Code restructuring | phoenix → plan-agent → kraken → plan-reviewer → arbiter | Technical debt, architecture improvements |
-| [/explore](#explore) | Codebase discovery | scout ‖ tldr-explorer ‖ pathfinder | Understanding unfamiliar code |
-| [/review](#review) | Code review | critic ‖ plan-reviewer ‖ plan-reviewer → review-agent | PR review, quality gates |
-| [/test](#test) | Comprehensive testing | arbiter ‖ arbiter → atlas | Full test suite execution |
-| [/security](#security) | Security audit | aegis → arbiter | Vulnerability scanning, auth review |
-| [/release](#release) | Release preparation | aegis → atlas → review-agent → herald → scribe | Production deployment readiness |
-| [/migrate](#migrate) | Framework/version migration | oracle → phoenix → plan-agent → kraken → surveyor | Upgrades, migrations |
+| Workflow               | Purpose                     | Agent Pipeline                                          | When to Use                               |
+| ---------------------- | --------------------------- | ------------------------------------------------------- | ----------------------------------------- |
+| [/fix](#fix)           | Quick bug fixes             | scout → spark → arbiter                                 | Known issue, clear symptoms               |
+| [/debug](#debug)       | Deep investigation          | sleuth → debug-agent → profiler? → spark                | Complex bugs, unclear cause               |
+| [/build](#build)       | Feature implementation      | oracle? → plan-agent → kraken → arbiter → scribe        | New features from scratch                 |
+| [/tdd](#tdd)           | Test-driven development     | plan-agent → arbiter → kraken → arbiter                 | Features needing strong test coverage     |
+| [/refactor](#refactor) | Code restructuring          | phoenix → plan-agent → kraken → plan-reviewer → arbiter | Technical debt, architecture improvements |
+| [/explore](#explore)   | Codebase discovery          | scout ‖ tldr-explorer ‖ pathfinder                      | Understanding unfamiliar code             |
+| [/review](#review)     | Code review                 | critic ‖ plan-reviewer ‖ plan-reviewer → review-agent   | PR review, quality gates                  |
+| [/test](#test)         | Comprehensive testing       | arbiter ‖ arbiter → atlas                               | Full test suite execution                 |
+| [/security](#security) | Security audit              | aegis → arbiter                                         | Vulnerability scanning, auth review       |
+| [/release](#release)   | Release preparation         | aegis → atlas → review-agent → herald → scribe          | Production deployment readiness           |
+| [/migrate](#migrate)   | Framework/version migration | oracle → phoenix → plan-agent → kraken → surveyor       | Upgrades, migrations                      |
 
 **Legend:**
+
 - `→` Sequential execution
 - `‖` Parallel execution
 - `?` Optional phase
@@ -53,11 +54,11 @@ See [/premortem skill]($CLAUDE_PROJECT_DIR/.claude/skills/premortem/SKILL.md) fo
 
 Streamlined from 41 agents to 31 by consolidating overlapping roles:
 
-| Old Agents | New Agent | Purpose |
-|------------|-----------|---------|
-| `codebase-locator`, `codebase-analyzer`, `codebase-pattern-finder` | `scout` | All code discovery |
-| `research-agent` | `oracle` | External research |
-| `repo-research-analyst` | `pathfinder` | Repository conventions |
+| Old Agents                                                         | New Agent    | Purpose                |
+| ------------------------------------------------------------------ | ------------ | ---------------------- |
+| `codebase-locator`, `codebase-analyzer`, `codebase-pattern-finder` | `scout`      | All code discovery     |
+| `research-agent`                                                   | `oracle`     | External research      |
+| `repo-research-analyst`                                            | `pathfinder` | Repository conventions |
 
 This reduces cognitive overhead and makes agent selection clearer.
 
@@ -65,10 +66,10 @@ This reduces cognitive overhead and makes agent selection clearer.
 
 Agents now use TLDR-code for 95% token savings on code context:
 
-| Approach | Tokens | Savings |
-|----------|--------|---------|
-| Read raw files | 23,314 | 0% |
-| TLDR all layers | 1,189 | **95%** |
+| Approach        | Tokens | Savings |
+| --------------- | ------ | ------- |
+| Read raw files  | 23,314 | 0%      |
+| TLDR all layers | 1,189  | **95%** |
 
 **How it works:** Call graphs navigate to relevant code, then structured summaries replace reading entire files. Available via `tldr` CLI (see [TLDR documentation]($CLAUDE_PROJECT_DIR/docs/tools/tldr.md)).
 
@@ -101,6 +102,7 @@ Or invoke directly if you know what you want:
 **Purpose:** Quick fixes for known bugs with clear symptoms.
 
 **Pipeline:**
+
 ```
 ┌─────────┐    ┌──────────┐    ┌─────────┐    ┌───────────┐
 │  scout  │───▶│premortem │───▶│  spark  │───▶│ arbiter  │
@@ -110,17 +112,20 @@ Or invoke directly if you know what you want:
 ```
 
 **When to use:**
+
 - Simple, localized bugs
 - Clear error messages
 - Failing tests
 - UI glitches
 
 **When NOT to use:**
+
 - Root cause unclear → use `/debug`
 - Spans multiple systems → use `/debug`
 - Performance issues → use `/debug`
 
 **Example:**
+
 ```
 User: /fix The login button isn't submitting the form
 
@@ -140,6 +145,7 @@ Fix complete!
 ```
 
 **Agents:**
+
 - **scout** (Sonnet): Locates bug using grep, TLDR-code structure, stack traces
 - **premortem** (skill): Quick risk assessment (5 core questions)
 - **spark** (Opus): Applies minimal fix, adds regression test
@@ -152,6 +158,7 @@ Fix complete!
 **Purpose:** Deep investigation of complex bugs with unclear root causes.
 
 **Pipeline:**
+
 ```
 ┌──────────┐    ┌────────────┐    ┌───────────┐    ┌─────────┐
 │  sleuth  │───▶│  debug-    │───▶│ profiler? │───▶│  spark  │
@@ -161,6 +168,7 @@ Fix complete!
 ```
 
 **When to use:**
+
 - Root cause unclear
 - Intermittent failures
 - Performance problems
@@ -168,6 +176,7 @@ Fix complete!
 - System-wide issues
 
 **Example:**
+
 ```
 User: /debug API responses are intermittently slow
 
@@ -186,6 +195,7 @@ Result: 4.8s → 0.1s response time
 ```
 
 **Agents:**
+
 - **sleuth** (Sonnet): Initial triage, gather symptoms, logs, stack traces
 - **debug-agent** (Opus): Deep analysis, root cause identification
 - **profiler** (Sonnet): Optional performance measurement for slow code
@@ -198,6 +208,7 @@ Result: 4.8s → 0.1s response time
 **Purpose:** Complete feature implementation from planning to documentation.
 
 **Pipeline:**
+
 ```
 ┌──────────────┐    ┌────────────┐    ┌──────────┐    ┌───────────┐    ┌─────────┐
 │  oracle?     │───▶│   plan-    │───▶│  kraken  │───▶│ arbiter  │───▶│  scribe │
@@ -207,15 +218,18 @@ Result: 4.8s → 0.1s response time
 ```
 
 **When to use:**
+
 - New features from scratch
 - Complex multi-file implementations
 - Features requiring external API/library research
 
 **Skip phases:**
+
 - `--no-research`: If you know what library to use
 - `--no-docs`: For quick iterations
 
 **Example:**
+
 ```
 User: /build Add user authentication with JWT tokens
 
@@ -242,6 +256,7 @@ Build complete!
 ```
 
 **Agents:**
+
 - **oracle** (Sonnet): Optional external research for APIs, libraries, best practices
 - **plan-agent** (Opus): Creates detailed implementation plan with phases
 - **kraken** (Opus): TDD implementation - tests first, then code (uses TLDR-code for 95% token savings)
@@ -255,6 +270,7 @@ Build complete!
 **Purpose:** Strict test-driven development - tests first, then implementation.
 
 **Pipeline:**
+
 ```
 ┌────────────┐    ┌──────────┐    ┌──────────┐    ┌───────────┐
 │   plan-    │───▶│ arbiter  │───▶│  kraken  │───▶│ arbiter  │
@@ -267,11 +283,13 @@ Build complete!
 **Core principle:** No production code without a failing test first.
 
 **When to use:**
+
 - Critical features requiring strong test coverage
 - Bug fixes that need regression tests
 - When quality is paramount
 
 **Example:**
+
 ```
 User: /tdd Add email validation to signup form
 
@@ -292,6 +310,7 @@ TDD workflow complete!
 ```
 
 **Agents:**
+
 - **plan-agent** (Opus): Designs test cases and approach (no implementation)
 - **arbiter** (Sonnet): Writes failing tests (RED phase)
 - **kraken** (Opus): Writes minimal code to pass tests (GREEN phase)
@@ -304,6 +323,7 @@ TDD workflow complete!
 **Purpose:** Safe code restructuring with review gates.
 
 **Pipeline:**
+
 ```
 ┌──────────┐    ┌────────────┐    ┌──────────┐    ┌──────────────┐    ┌───────────┐
 │ phoenix  │───▶│   plan-    │───▶│  kraken  │───▶│plan-reviewer │───▶│ arbiter  │
@@ -313,18 +333,21 @@ TDD workflow complete!
 ```
 
 **Principles:**
+
 1. Tests first - ensure adequate coverage before refactoring
 2. Small steps - each change independently verifiable
 3. Behavior preserved - no functional changes
 4. Reviewable - changes easy to review
 
 **When to use:**
+
 - Extract module/function
 - Improve architecture
 - Remove duplication
 - Technical debt reduction
 
 **Example:**
+
 ```
 User: /refactor Extract validation logic into separate module
 
@@ -352,6 +375,7 @@ Refactoring complete!
 ```
 
 **Agents:**
+
 - **phoenix** (Opus): Analyzes current code using TLDR-code, identifies improvement areas
 - **plan-agent** (Opus): Creates safe refactoring plan with small steps
 - **kraken** (Opus): Implements refactoring following plan exactly
@@ -365,6 +389,7 @@ Refactoring complete!
 **Purpose:** Codebase discovery through parallel specialized searches.
 
 **Pipeline:**
+
 ```
          ┌─────────┐
          │  scout  │ ─┐
@@ -386,17 +411,20 @@ Refactoring complete!
 ```
 
 **Why three perspectives?**
+
 - **scout**: "What files contain X?" - Pattern matching
 - **tldr-explorer**: "How is X connected?" - Code structure (95% token savings)
 - **pathfinder**: "What patterns exist?" - High-level understanding
 
 **When to use:**
+
 - Onboarding to new codebase
 - Understanding unfamiliar code
 - "How does X work?"
 - "Find where Y is implemented"
 
 **Example:**
+
 ```
 User: /explore How does the payment system work?
 
@@ -434,6 +462,7 @@ pathfinder findings:
 ```
 
 **Agents:**
+
 - **scout** (Sonnet): Text search, grep patterns, file discovery
 - **tldr-explorer** (general-purpose): Symbol index, call graphs via TLDR-code
 - **pathfinder** (Sonnet): Patterns, conventions, documentation
@@ -447,6 +476,7 @@ pathfinder findings:
 **Purpose:** Multi-perspective code review with parallel specialists.
 
 **Pipeline:**
+
 ```
          ┌──────────┐
          │  critic  │ ─┐
@@ -468,17 +498,20 @@ pathfinder findings:
 ```
 
 **Review perspectives:**
+
 - **critic**: Is this good code? (Style, patterns, readability)
 - **plan-reviewer**: Does this match the design? (Architecture, plan adherence)
 - **plan-reviewer**: Is this change safe? (Risk, impact, regressions)
 - **review-agent**: Overall assessment and recommendations
 
 **When to use:**
+
 - PR review
 - Before merging significant changes
 - Quality gates
 
 **Example:**
+
 ```
 User: /review the authentication changes
 
@@ -520,11 +553,13 @@ Phase 2: Synthesizing...
 ```
 
 **Verdicts:**
+
 - **APPROVE**: Ready to merge, all issues are minor
 - **REQUEST_CHANGES**: Blocking issues must be fixed
 - **NEEDS_DISCUSSION**: Architectural decisions need input
 
 **Agents:**
+
 - **critic** (Opus): Code quality, style, patterns, readability
 - **plan-reviewer** (Opus): Architecture alignment with plan
 - **plan-reviewer** (Opus): Change impact and risk assessment
@@ -537,6 +572,7 @@ Phase 2: Synthesizing...
 **Purpose:** Comprehensive test suite execution with parallel fast tests.
 
 **Pipeline:**
+
 ```
          ┌───────────┐
          │ arbiter   │ ─┐
@@ -553,16 +589,19 @@ Phase 2: Synthesizing...
 ```
 
 **Why this order?**
+
 1. Fast feedback - unit tests fail fast
 2. Parallel efficiency - no dependency between unit and integration
 3. E2E gating - only run slow E2E tests if faster tests pass
 
 **When to use:**
+
 - Before releases or merges
 - After major changes
 - Full system verification
 
 **Example:**
+
 ```
 User: /test the new payment feature
 
@@ -593,6 +632,7 @@ All tests passing! ✅
 ```
 
 **Agents:**
+
 - **arbiter** (Sonnet): Runs unit tests, type checks, linting (parallel)
 - **arbiter** (Sonnet): Runs integration tests (parallel)
 - **atlas** (Opus): Runs E2E/acceptance tests (after fast tests pass)
@@ -604,6 +644,7 @@ All tests passing! ✅
 **Purpose:** Dedicated security vulnerability analysis.
 
 **Pipeline:**
+
 ```
 ┌─────────┐    ┌───────────┐
 │  aegis  │───▶│ arbiter   │
@@ -613,12 +654,14 @@ All tests passing! ✅
 ```
 
 **When to use:**
+
 - Before handling auth, payments, user data
 - Security-sensitive features
 - Before releases
 - Vulnerability scanning
 
 **Scans for:**
+
 - SQL injection, XSS, CSRF
 - Broken authentication/authorization
 - Sensitive data exposure, hardcoded secrets
@@ -626,6 +669,7 @@ All tests passing! ✅
 - Vulnerable dependencies
 
 **Example:**
+
 ```
 User: /security the payment processing code
 
@@ -662,6 +706,7 @@ Fix the issues, then run: /security --verify
 ```
 
 **Agents:**
+
 - **aegis** (Opus): Comprehensive security scan, OWASP Top 10 coverage
 - **arbiter** (Sonnet): Verifies fixes, runs security tests
 
@@ -672,6 +717,7 @@ Fix the issues, then run: /security --verify
 **Purpose:** Structured release preparation with safety gates.
 
 **Pipeline:**
+
 ```
 ┌─────────┐    ┌─────────┐    ┌──────────────┐    ┌──────────┐    ┌─────────┐
 │  aegis  │───▶│  atlas  │───▶│ review-agent │───▶│  herald  │───▶│  scribe │
@@ -681,6 +727,7 @@ Fix the issues, then run: /security --verify
 ```
 
 **Why this order?**
+
 1. Security first - catch vulnerabilities before they ship
 2. E2E tests - verify full system works
 3. Final review - human-in-the-loop approval
@@ -688,16 +735,19 @@ Fix the issues, then run: /security --verify
 5. Documentation - ship with proper release notes
 
 **Blockers:**
+
 - Critical security vulnerability
 - E2E tests failing
 - Review verdict is RELEASE_BLOCKED
 
 **When to use:**
+
 - Before any production deployment
 - Preparing releases
 - Shipping to users
 
 **Example:**
+
 ```
 User: /release v2.0.0
 
@@ -738,6 +788,7 @@ Phase 5: Release notes...
 ```
 
 **Agents:**
+
 - **aegis** (Opus): Security vulnerability scan
 - **atlas** (Opus): Full E2E test suite
 - **review-agent** (Opus): Final release review, approval/blocking decision
@@ -751,6 +802,7 @@ Phase 5: Release notes...
 **Purpose:** Safe framework, language, or infrastructure migrations.
 
 **Pipeline:**
+
 ```
 ┌──────────┐    ┌──────────┐    ┌────────────┐    ┌──────────┐    ┌───────────┐
 │  oracle  │───▶│ phoenix  │───▶│   plan-    │───▶│  kraken  │───▶│ surveyor  │
@@ -762,6 +814,7 @@ Phase 5: Release notes...
 **Why extra gates?**
 
 Migrations are high-risk:
+
 - Breaking changes between versions
 - Dependency conflicts
 - Data format changes
@@ -770,12 +823,14 @@ Migrations are high-risk:
 Extra research and review phases catch issues early.
 
 **When to use:**
+
 - Framework upgrades (React 17 → 18)
 - Language version (Python 3.9 → 3.12)
 - Database migration (MongoDB → PostgreSQL)
 - Infrastructure changes (AWS → GCP)
 
 **Example:**
+
 ```
 User: /migrate from Express to Fastify
 
@@ -837,6 +892,7 @@ Migration complete! Express → Fastify
 ```
 
 **Agents:**
+
 - **oracle** (Sonnet): Research target framework/version, breaking changes
 - **phoenix** (Opus): Analyze current codebase for migration impact (uses TLDR-code)
 - **plan-agent** (Opus): Create phased migration plan with rollback strategy
@@ -849,84 +905,96 @@ Migration complete! Express → Fastify
 
 ### Execution Agents
 
-| Agent | Model | Role | Typical Usage |
-|-------|-------|------|---------------|
-| **kraken** | Opus | TDD implementation | Heavy lifting, complex features, follows plans |
-| **spark** | Opus | Quick fixes | Fast turnaround, minimal changes |
-| **arbiter** | Sonnet | Test runner | Unit/integration tests, verification |
-| **atlas** | Opus | E2E tests | End-to-end flows, acceptance tests |
+| Agent       | Model  | Role               | Typical Usage                                  |
+| ----------- | ------ | ------------------ | ---------------------------------------------- |
+| **kraken**  | Opus   | TDD implementation | Heavy lifting, complex features, follows plans |
+| **spark**   | Opus   | Quick fixes        | Fast turnaround, minimal changes               |
+| **arbiter** | Sonnet | Test runner        | Unit/integration tests, verification           |
+| **atlas**   | Opus   | E2E tests          | End-to-end flows, acceptance tests             |
 
 ### Investigation Agents
 
-| Agent | Model | Role | Typical Usage |
-|-------|-------|------|---------------|
-| **scout** | Sonnet | Code search | Grep, glob, file discovery, TLDR-code navigation |
-| **sleuth** | Sonnet | Bug triage | Initial investigation, symptom gathering |
-| **debug-agent** | Opus | Root cause analysis | Deep debugging, complex issues |
-| **profiler** | Sonnet | Performance analysis | CPU/memory profiling, bottleneck detection |
-| **pathfinder** | Sonnet | Pattern discovery | Conventions, architectural patterns |
+| Agent           | Model  | Role                 | Typical Usage                                    |
+| --------------- | ------ | -------------------- | ------------------------------------------------ |
+| **scout**       | Sonnet | Code search          | Grep, glob, file discovery, TLDR-code navigation |
+| **sleuth**      | Sonnet | Bug triage           | Initial investigation, symptom gathering         |
+| **debug-agent** | Opus   | Root cause analysis  | Deep debugging, complex issues                   |
+| **profiler**    | Sonnet | Performance analysis | CPU/memory profiling, bottleneck detection       |
+| **pathfinder**  | Sonnet | Pattern discovery    | Conventions, architectural patterns              |
 
 ### Analysis Agents
 
-| Agent | Model | Role | Typical Usage |
-|-------|-------|------|---------------|
-| **phoenix** | Opus | Code analysis | Refactoring prep, impact analysis (uses TLDR-code) |
-| **oracle** | Sonnet | External research | API docs, best practices, external knowledge |
-| **tldr-explorer** | General | Symbol exploration | Call graphs, dependencies (via TLDR-code) |
+| Agent             | Model   | Role               | Typical Usage                                      |
+| ----------------- | ------- | ------------------ | -------------------------------------------------- |
+| **phoenix**       | Opus    | Code analysis      | Refactoring prep, impact analysis (uses TLDR-code) |
+| **oracle**        | Sonnet  | External research  | API docs, best practices, external knowledge       |
+| **tldr-explorer** | General | Symbol exploration | Call graphs, dependencies (via TLDR-code)          |
 
 ### Review Agents
 
-| Agent | Model | Role | Typical Usage |
-|-------|-------|------|---------------|
-| **critic** | Opus | Code quality review | Style, readability, patterns |
-| **plan-reviewer** | Opus | Architecture review | Plan adherence, design consistency |
-| **review-agent** | Opus | Review synthesis | Merge multiple perspectives, final verdict |
-| **surveyor** | Opus | Migration review | Migration completeness, regression check |
+| Agent             | Model | Role                | Typical Usage                              |
+| ----------------- | ----- | ------------------- | ------------------------------------------ |
+| **critic**        | Opus  | Code quality review | Style, readability, patterns               |
+| **plan-reviewer** | Opus  | Architecture review | Plan adherence, design consistency         |
+| **review-agent**  | Opus  | Review synthesis    | Merge multiple perspectives, final verdict |
+| **surveyor**      | Opus  | Migration review    | Migration completeness, regression check   |
 
 ### Planning Agents
 
-| Agent | Model | Role | Typical Usage |
-|-------|-------|------|---------------|
-| **plan-agent** | Opus | Implementation planning | Create detailed plans with phases |
+| Agent          | Model | Role                    | Typical Usage                     |
+| -------------- | ----- | ----------------------- | --------------------------------- |
+| **plan-agent** | Opus  | Implementation planning | Create detailed plans with phases |
 
 ### Coordination Agents
 
-| Agent | Model | Role | Typical Usage |
-|-------|-------|------|---------------|
-| **aegis** | Opus | Security audit | Vulnerability scanning, OWASP Top 10 |
-| **herald** | Sonnet | Release coordination | Version bumps, changelog generation |
-| **scribe** | Sonnet | Documentation | Release notes, handoffs, docs updates |
+| Agent      | Model  | Role                 | Typical Usage                         |
+| ---------- | ------ | -------------------- | ------------------------------------- |
+| **aegis**  | Opus   | Security audit       | Vulnerability scanning, OWASP Top 10  |
+| **herald** | Sonnet | Release coordination | Version bumps, changelog generation   |
+| **scribe** | Sonnet | Documentation        | Release notes, handoffs, docs updates |
 
 ## Workflow Composition Patterns
 
 ### Sequential Pattern
+
 Used when each phase depends on the previous:
+
 ```
 agent1 → agent2 → agent3
 ```
+
 Example: /fix (scout → premortem → spark → arbiter)
 
 ### Parallel Pattern
+
 Used when agents can work independently:
+
 ```
      agent1 ─┐
      agent2 ─┼──▶ merge
      agent3 ─┘
 ```
+
 Example: /explore (scout ‖ tldr-explorer ‖ pathfinder)
 
 ### Gated Pattern
+
 Used when approval is needed before proceeding:
+
 ```
 agent1 → gate → agent2 → agent3
 ```
+
 Example: /release (aegis → atlas → review-agent → herald → scribe)
 
 ### Phased Pattern
+
 Used for large tasks broken into incremental phases:
+
 ```
 [phase1: agents] → [phase2: agents] → [phase3: agents]
 ```
+
 Example: /migrate (each phase can be run independently)
 
 ## Best Practices
@@ -977,6 +1045,7 @@ thoughts/shared/handoffs/
 ```
 
 Use handoffs to:
+
 - Resume work across sessions
 - Share context with team
 - Track decisions and progress
@@ -1003,23 +1072,28 @@ See existing workflows for patterns and conventions.
 ## Troubleshooting
 
 ### Workflow not activating?
+
 - Be specific about your goal
 - Or invoke explicitly: `/fix`, `/build`, etc.
 
 ### Agent failing?
+
 - Check if the right model is available (Opus/Sonnet)
 - Review agent logs in `.claude/cache/agents/`
 
 ### Tests not running?
+
 - Ensure test commands are configured in project
 - Check arbiter/atlas agent definitions
 
 ### Slow workflows?
+
 - Use parallel patterns where possible
 - Skip optional phases (research, docs)
 - Use `--quick` flags for faster iteration
 
 ### Context too large?
+
 - Workflows now use TLDR-code for 95% token savings
 - See [TLDR documentation]($CLAUDE_PROJECT_DIR/docs/tools/tldr.md)
 

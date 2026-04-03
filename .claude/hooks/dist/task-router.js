@@ -92,8 +92,8 @@ except Exception as e:
       // 30 second timeout
       env: {
         ...process.env,
-        PYTHONPATH: process.env.CLAUDE_PROJECT_DIR || process.cwd()
-      }
+        PYTHONPATH: process.env.CLAUDE_PROJECT_DIR || process.cwd(),
+      },
     });
     if (result.error) {
       console.error("[task-router] Failed to spawn Python:", result.error);
@@ -123,7 +123,7 @@ function isSimpleTask(prompt) {
     "simple task",
     "just do",
     "single file",
-    "one liner"
+    "one liner",
   ];
   const lowerPrompt = prompt.toLowerCase();
   return simpleKeywords.some((keyword) => lowerPrompt.includes(keyword));
@@ -154,7 +154,8 @@ async function main() {
     console.log(JSON.stringify({ result: "continue" }));
     return;
   }
-  const sessionId = input.session_id || process.env.CLAUDE_SESSION_ID || "default";
+  const sessionId =
+    input.session_id || process.env.CLAUDE_SESSION_ID || "default";
   const gateResult = callUnifiedGate(prompt, sessionId);
   if (!gateResult) {
     console.log(JSON.stringify({ result: "continue" }));
@@ -167,19 +168,19 @@ async function main() {
       case "ClarificationRequired":
         output = {
           result: "block",
-          reason: `Task requires clarification before proceeding. Unknown items: ${failure.unknowns?.join(", ") || "unspecified"}. Please provide more details about these aspects.`
+          reason: `Task requires clarification before proceeding. Unknown items: ${failure.unknowns?.join(", ") || "unspecified"}. Please provide more details about these aspects.`,
         };
         break;
       case "ResourcesInsufficient":
         output = {
           result: "block",
-          reason: `Insufficient resources: ${failure.bottleneck} is the bottleneck. Suggestion: ${failure.suggestion || "Reduce agent count or simplify the task."}`
+          reason: `Insufficient resources: ${failure.bottleneck} is the bottleneck. Suggestion: ${failure.suggestion || "Reduce agent count or simplify the task."}`,
         };
         break;
       case "CompositionInvalid":
         output = {
           result: "block",
-          reason: `Invalid pattern composition: ${failure.errors?.join("; ") || "composition rules violated"}. Please restructure the task.`
+          reason: `Invalid pattern composition: ${failure.errors?.join("; ") || "composition rules violated"}. Please restructure the task.`,
         };
         break;
       default:
@@ -202,7 +203,7 @@ async function main() {
 uv run python scripts/agentica_dispatch.py --prompt '${escapedPrompt}' --pattern ${patternArg}
 \`\`\`
 
-The unified gate validated this task for pattern-based orchestration.`
+The unified gate validated this task for pattern-based orchestration.`,
     };
     console.log(JSON.stringify(output));
     return;

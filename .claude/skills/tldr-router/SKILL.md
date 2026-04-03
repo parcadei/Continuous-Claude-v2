@@ -7,44 +7,60 @@ description: Maps questions to the optimal tldr command. Use this to pick the ri
 
 Maps questions to the optimal tldr command. Use this to pick the right layer.
 
+## When to Use
+
+This skill is invoked when routing questions to the optimal TLDR command. User-invocable via /tldr-router.
+
 ## Question → Command Mapping
 
 ### "What files/functions exist?"
+
 ```bash
 tldr tree . --ext .py          # File overview
 tldr structure src/ --lang python  # Function/class overview
 ```
+
 **Use:** Starting exploration, orientation
 
 ### "What does X call / who calls X?"
+
 ```bash
 tldr context <function> --project . --depth 2
 tldr calls src/
 ```
+
 **Use:** Understanding architecture, finding entry points
 
 ### "How complex is X?"
+
 ```bash
 tldr cfg <file> <function>
 ```
+
 **Use:** Identifying refactoring candidates, understanding difficulty
 
 ### "Where does variable Y come from?"
+
 ```bash
 tldr dfg <file> <function>
 ```
+
 **Use:** Debugging, understanding data flow
 
 ### "What affects line Z?"
+
 ```bash
 tldr slice <file> <function> <line>
 ```
+
 **Use:** Impact analysis, safe refactoring
 
 ### "Search for pattern P"
+
 ```bash
 tldr search "pattern" src/
 ```
+
 **Use:** Finding code, structural search
 
 ## Decision Tree
@@ -67,18 +83,19 @@ START
 
 ## Intent Detection Keywords
 
-| Intent | Keywords | Layer |
-|--------|----------|-------|
-| Navigation | "what", "where", "find", "exists" | tree, structure, search |
-| Architecture | "calls", "uses", "connects", "depends" | context, calls |
-| Complexity | "complex", "refactor", "branches", "paths" | cfg |
-| Data Flow | "variable", "value", "assigned", "comes from" | dfg |
-| Impact | "affects", "changes", "slice", "dependencies" | slice/pdg |
-| Debug | "bug", "error", "investigate", "broken" | cfg + dfg + context |
+| Intent       | Keywords                                      | Layer                   |
+| ------------ | --------------------------------------------- | ----------------------- |
+| Navigation   | "what", "where", "find", "exists"             | tree, structure, search |
+| Architecture | "calls", "uses", "connects", "depends"        | context, calls          |
+| Complexity   | "complex", "refactor", "branches", "paths"    | cfg                     |
+| Data Flow    | "variable", "value", "assigned", "comes from" | dfg                     |
+| Impact       | "affects", "changes", "slice", "dependencies" | slice/pdg               |
+| Debug        | "bug", "error", "investigate", "broken"       | cfg + dfg + context     |
 
 ## Automatic Hook Integration
 
 The `tldr-read-enforcer` and `tldr-context-inject` hooks automatically:
+
 1. Detect intent from your messages
 2. Route to appropriate layers
 3. Inject context into tool calls

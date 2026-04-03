@@ -179,11 +179,13 @@ class ResearchCoordinator:
 ## Step 5: Write Output
 
 **ALWAYS write your implementation to:**
+
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/agentica-agent/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/agentica-agent/output-{timestamp}.md
 ```
 
 Include:
+
 1. The complete Python code
 2. Usage example
 3. Required dependencies
@@ -191,8 +193,9 @@ Include:
 
 ## Output Format
 
-```markdown
+````markdown
 # Agentica Agent: [Name]
+
 Generated: [timestamp]
 
 ## Implementation
@@ -200,6 +203,7 @@ Generated: [timestamp]
 ```python
 [Complete, runnable code]
 ```
+````
 
 ## Dependencies
 
@@ -222,7 +226,9 @@ uv add agentica
 ```
 
 ## Notes
+
 [Any implementation notes, limitations, or considerations]
+
 ```
 
 ## Rules
@@ -234,3 +240,4 @@ uv add agentica
 5. **Handle errors** - use try/except with Agentica's error types
 6. **Test your code** - include runnable test examples
 7. **Write complete code** - no placeholders or TODOs
+```

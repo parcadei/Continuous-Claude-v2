@@ -15,18 +15,18 @@
  * - CLAUDE_PROJECT_DIR: Project directory for DB path
  */
 
-import { existsSync } from 'fs';
+import { existsSync } from "fs";
 
 // Import shared utilities
-import { getDbPath, runPythonQuery, isValidId } from '../shared/db-utils.js';
+import { getDbPath, runPythonQuery, isValidId } from "../shared/db-utils.js";
 import type {
   SubagentStartInput,
   SubagentStopInput,
   PreToolUseInput,
   PostToolUseInput,
   StopInput,
-  HookOutput
-} from '../shared/types.js';
+  HookOutput,
+} from "../shared/types.js";
 
 // Re-export types for convenience
 export type {
@@ -35,7 +35,7 @@ export type {
   PreToolUseInput,
   PostToolUseInput,
   StopInput,
-  HookOutput
+  HookOutput,
 };
 
 // =============================================================================
@@ -47,40 +47,42 @@ export type {
  * Registers subscriber with event types in database.
  * Always returns 'continue' - never blocks agent start.
  */
-export async function onSubagentStart(input: SubagentStartInput): Promise<HookOutput> {
+export async function onSubagentStart(
+  input: SubagentStartInput,
+): Promise<HookOutput> {
   const busId = process.env.EVENT_BUS_ID;
 
   // If no EVENT_BUS_ID, continue silently (not in an event-driven pattern)
   if (!busId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate EVENT_BUS_ID format
   if (!isValidId(busId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   const agentRole = process.env.AGENT_ROLE;
-  const agentId = input.agent_id ?? 'unknown';
+  const agentId = input.agent_id ?? "unknown";
 
   // Validate agent_id format
   if (!isValidId(agentId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Only register subscriptions for subscriber agents
-  if (agentRole !== 'subscriber') {
-    return { result: 'continue' };
+  if (agentRole !== "subscriber") {
+    return { result: "continue" };
   }
 
   const eventTypesJson = process.env.SUBSCRIBER_EVENT_TYPES;
   if (!eventTypesJson) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   const dbPath = getDbPath();
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
@@ -125,11 +127,16 @@ conn.close()
 print(json.dumps({'subscription_id': subscription_id}))
 `;
 
-    const result = runPythonQuery(query, [dbPath, busId, agentId, eventTypesJson]);
+    const result = runPythonQuery(query, [
+      dbPath,
+      busId,
+      agentId,
+      eventTypesJson,
+    ]);
 
     if (!result.success) {
-      console.error('SubagentStart Python error:', result.stderr);
-      return { result: 'continue' };
+      console.error("SubagentStart Python error:", result.stderr);
+      return { result: "continue" };
     }
 
     // Parse event types for display
@@ -140,15 +147,17 @@ print(json.dumps({'subscription_id': subscription_id}))
       eventTypes = [];
     }
 
-    console.error(`[event-driven] Subscribed agent ${agentId} to events: ${eventTypes.join(', ')}`);
+    console.error(
+      `[event-driven] Subscribed agent ${agentId} to events: ${eventTypes.join(", ")}`,
+    );
 
     return {
-      result: 'continue',
-      message: `Subscribed to event types: ${eventTypes.join(', ')}`
+      result: "continue",
+      message: `Subscribed to event types: ${eventTypes.join(", ")}`,
     };
   } catch (err) {
-    console.error('SubagentStart hook error:', err);
-    return { result: 'continue' };
+    console.error("SubagentStart hook error:", err);
+    return { result: "continue" };
   }
 }
 
@@ -160,35 +169,37 @@ print(json.dumps({'subscription_id': subscription_id}))
  * Handles SubagentStop hook for event-driven pattern.
  * Removes subscription from database.
  */
-export async function onSubagentStop(input: SubagentStopInput): Promise<HookOutput> {
+export async function onSubagentStop(
+  input: SubagentStopInput,
+): Promise<HookOutput> {
   const busId = process.env.EVENT_BUS_ID;
 
   // If no EVENT_BUS_ID, continue silently
   if (!busId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate EVENT_BUS_ID format
   if (!isValidId(busId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   const agentRole = process.env.AGENT_ROLE;
-  const agentId = input.agent_id ?? 'unknown';
+  const agentId = input.agent_id ?? "unknown";
 
   // Validate agent_id format
   if (!isValidId(agentId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Only remove subscriptions for subscriber agents
-  if (agentRole !== 'subscriber') {
-    return { result: 'continue' };
+  if (agentRole !== "subscriber") {
+    return { result: "continue" };
   }
 
   const dbPath = getDbPath();
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
@@ -223,16 +234,16 @@ print(json.dumps({'deleted': deleted}))
     const result = runPythonQuery(query, [dbPath, busId, agentId]);
 
     if (!result.success) {
-      console.error('SubagentStop Python error:', result.stderr);
-      return { result: 'continue' };
+      console.error("SubagentStop Python error:", result.stderr);
+      return { result: "continue" };
     }
 
     console.error(`[event-driven] Unsubscribed agent ${agentId}`);
 
-    return { result: 'continue' };
+    return { result: "continue" };
   } catch (err) {
-    console.error('SubagentStop hook error:', err);
-    return { result: 'continue' };
+    console.error("SubagentStop hook error:", err);
+    return { result: "continue" };
   }
 }
 
@@ -244,34 +255,36 @@ print(json.dumps({'deleted': deleted}))
  * Handles PreToolUse hook for event-driven pattern.
  * Injects pending events that match subscriber's event types.
  */
-export async function onPreToolUse(input: PreToolUseInput): Promise<HookOutput> {
+export async function onPreToolUse(
+  input: PreToolUseInput,
+): Promise<HookOutput> {
   const busId = process.env.EVENT_BUS_ID;
 
   // If no EVENT_BUS_ID, continue silently
   if (!busId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate EVENT_BUS_ID format
   if (!isValidId(busId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   const agentRole = process.env.AGENT_ROLE;
 
   // Only inject events for subscriber agents
-  if (agentRole !== 'subscriber') {
-    return { result: 'continue' };
+  if (agentRole !== "subscriber") {
+    return { result: "continue" };
   }
 
   const eventTypesJson = process.env.SUBSCRIBER_EVENT_TYPES;
   if (!eventTypesJson) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   const dbPath = getDbPath();
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
@@ -331,20 +344,28 @@ print(json.dumps({'events': events, 'count': len(events)}))
     const result = runPythonQuery(query, [dbPath, busId, eventTypesJson]);
 
     if (!result.success) {
-      console.error('PreToolUse Python error:', result.stderr);
-      return { result: 'continue' };
+      console.error("PreToolUse Python error:", result.stderr);
+      return { result: "continue" };
     }
 
     // Parse Python output
-    let data: { events: Array<{ type: string; payload: any; published_by: string; created_at: string }>; count: number };
+    let data: {
+      events: Array<{
+        type: string;
+        payload: any;
+        published_by: string;
+        created_at: string;
+      }>;
+      count: number;
+    };
     try {
       data = JSON.parse(result.stdout);
     } catch (parseErr) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     if (data.count === 0) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // Inject pending events as context
@@ -355,15 +376,15 @@ print(json.dumps({'events': events, 'count': len(events)}))
       message += `Published by: ${evt.published_by}\n`;
       message += `Time: ${evt.created_at}\n\n`;
     }
-    message += 'Process these events according to your subscription.';
+    message += "Process these events according to your subscription.";
 
     return {
-      result: 'continue',
-      message
+      result: "continue",
+      message,
     };
   } catch (err) {
-    console.error('PreToolUse hook error:', err);
-    return { result: 'continue' };
+    console.error("PreToolUse hook error:", err);
+    return { result: "continue" };
   }
 }
 
@@ -378,9 +399,11 @@ print(json.dumps({'events': events, 'count': len(events)}))
  * NOTE: Currently a no-op. Event publishing should be done explicitly
  * by the pattern implementation, not inferred from tool usage.
  */
-export async function onPostToolUse(input: PostToolUseInput): Promise<HookOutput> {
+export async function onPostToolUse(
+  input: PostToolUseInput,
+): Promise<HookOutput> {
   // No automatic event capture - events should be published explicitly
-  return { result: 'continue' };
+  return { result: "continue" };
 }
 
 // =============================================================================
@@ -394,23 +417,23 @@ export async function onPostToolUse(input: PostToolUseInput): Promise<HookOutput
 export async function onStop(input: StopInput): Promise<HookOutput> {
   // Prevent infinite loops - if we're already in a stop hook, continue
   if (input.stop_hook_active) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   const busId = process.env.EVENT_BUS_ID;
 
   if (!busId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate EVENT_BUS_ID format
   if (!isValidId(busId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   const dbPath = getDbPath();
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
@@ -460,15 +483,19 @@ print(json.dumps({
     const result = runPythonQuery(query, [dbPath, busId]);
 
     if (!result.success) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // Parse Python output
-    let data: { subscriptions: number; pending_events: number; event_types: Array<{ type: string; count: number }> };
+    let data: {
+      subscriptions: number;
+      pending_events: number;
+      event_types: Array<{ type: string; count: number }>;
+    };
     try {
       data = JSON.parse(result.stdout);
     } catch (parseErr) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // Provide event bus summary
@@ -477,18 +504,18 @@ print(json.dumps({
     message += `Pending Events: ${data.pending_events}\n\n`;
 
     if (data.event_types.length > 0) {
-      message += 'Event Type Distribution:\n';
+      message += "Event Type Distribution:\n";
       for (const et of data.event_types) {
         message += `- ${et.type}: ${et.count} event(s)\n`;
       }
     }
 
     return {
-      result: 'continue',
-      message
+      result: "continue",
+      message,
     };
   } catch (err) {
-    console.error('Stop hook error:', err);
-    return { result: 'continue' };
+    console.error("Stop hook error:", err);
+    return { result: "continue" };
   }
 }

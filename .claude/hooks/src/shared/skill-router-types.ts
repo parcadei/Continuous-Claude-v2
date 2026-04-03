@@ -35,7 +35,7 @@ export interface SkillRouterInput {
  * Returns continue/block with optional system message.
  */
 export interface SkillRouterOutput {
-  result: 'continue' | 'block';
+  result: "continue" | "block";
   message?: string;
 }
 
@@ -57,22 +57,22 @@ export interface SkillLookupResult {
   /** Confidence score 0-1 (higher = better match) */
   confidence: number;
   /** Source of the match: 'keyword', 'intent', 'memory', 'jit' */
-  source?: 'keyword' | 'intent' | 'memory' | 'jit';
+  source?: "keyword" | "intent" | "memory" | "jit";
 
   // NEW: Enhanced lookup result fields
   /** Prerequisite resolution result */
   prerequisites?: {
     suggest: string[];
     require: string[];
-    loadOrder: string[];  // Topologically sorted
+    loadOrder: string[]; // Topologically sorted
   };
   /** Co-activation resolution result */
   coActivation?: {
     peers: string[];
-    mode: 'all' | 'any';
+    mode: "all" | "any";
   };
   /** Loading mode for this skill */
-  loading?: 'lazy' | 'eager' | 'eager-prerequisites';
+  loading?: "lazy" | "eager" | "eager-prerequisites";
 }
 
 // =============================================================================
@@ -84,8 +84,8 @@ export interface SkillLookupResult {
  */
 export class CircularDependencyError extends Error {
   constructor(public readonly cyclePath: string[]) {
-    super(`Circular dependency detected: ${cyclePath.join(' -> ')}`);
-    this.name = 'CircularDependencyError';
+    super(`Circular dependency detected: ${cyclePath.join(" -> ")}`);
+    this.name = "CircularDependencyError";
   }
 }
 
@@ -106,25 +106,35 @@ export interface SkillTrigger {
  * Single skill entry in skill-rules.json.
  */
 export interface SkillRule {
-  type?: 'domain' | 'workflow' | 'meta' | 'process' | 'exploration' | 'research' | 'planning' | 'validation' | 'debugging' | 'development';
-  enforcement?: 'suggest' | 'require' | 'auto' | 'block' | 'warn';
-  priority?: 'low' | 'medium' | 'high' | 'critical';
+  type?:
+    | "domain"
+    | "workflow"
+    | "meta"
+    | "process"
+    | "exploration"
+    | "research"
+    | "planning"
+    | "validation"
+    | "debugging"
+    | "development";
+  enforcement?: "suggest" | "require" | "auto" | "block" | "warn";
+  priority?: "low" | "medium" | "high" | "critical";
   description?: string;
   promptTriggers?: SkillTrigger;
   reminder?: string;
 
   // NEW: Prerequisites (vertical chain)
   prerequisites?: {
-    suggest?: string[];   // Suggest before loading this skill
-    require?: string[];   // Must be loaded before this skill
+    suggest?: string[]; // Suggest before loading this skill
+    require?: string[]; // Must be loaded before this skill
   };
 
   // NEW: Co-activation (horizontal chain)
-  coActivate?: string[];          // Peers to activate together
-  coActivateMode?: 'all' | 'any'; // all = activate all peers, any = suggest peers
+  coActivate?: string[]; // Peers to activate together
+  coActivateMode?: "all" | "any"; // all = activate all peers, any = suggest peers
 
   // NEW: Loading mode
-  loading?: 'lazy' | 'eager' | 'eager-prerequisites';
+  loading?: "lazy" | "eager" | "eager-prerequisites";
 }
 
 /**

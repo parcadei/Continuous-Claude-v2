@@ -5,8 +5,8 @@ Converts MCP tool schemas (JSON Schema format) to Pydantic model definitions.
 Uses dispatch tables to reduce cyclomatic complexity.
 """
 
-from typing import Any, Callable
-
+from collections.abc import Callable
+from typing import Any
 
 # ===========================================================================
 # Dispatch Table: Maps JSON Schema types to Python type strings

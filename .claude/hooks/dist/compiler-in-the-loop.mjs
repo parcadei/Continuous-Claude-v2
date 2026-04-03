@@ -3,13 +3,17 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { execSync } from "child_process";
 import { join } from "path";
 import { tmpdir } from "os";
-var LMSTUDIO_BASE_URL = process.env.LMSTUDIO_BASE_URL || "http://127.0.0.1:1234";
-var LMSTUDIO_ENDPOINT = process.env.LMSTUDIO_ENDPOINT || `${LMSTUDIO_BASE_URL}/v1/completions`;
+var LMSTUDIO_BASE_URL =
+  process.env.LMSTUDIO_BASE_URL || "http://127.0.0.1:1234";
+var LMSTUDIO_ENDPOINT =
+  process.env.LMSTUDIO_ENDPOINT || `${LMSTUDIO_BASE_URL}/v1/completions`;
 var GOEDEL_ENABLED = process.env.GOEDEL_ENABLED !== "false";
 var lmStudioAvailable = null;
 var lmStudioCheckedAt = 0;
 var AVAILABILITY_CACHE_MS = 6e4;
-var STATE_DIR = process.env.CLAUDE_PROJECT_DIR ? join(process.env.CLAUDE_PROJECT_DIR, ".claude", "cache", "lean") : join(tmpdir(), "claude-lean");
+var STATE_DIR = process.env.CLAUDE_PROJECT_DIR
+  ? join(process.env.CLAUDE_PROJECT_DIR, ".claude", "cache", "lean")
+  : join(tmpdir(), "claude-lean");
 var STATE_FILE = join(STATE_DIR, "compiler-state.json");
 function readStdin() {
   return readFileSync(0, "utf-8");
@@ -28,16 +32,22 @@ function runLeanCompiler(filePath, cwd) {
   const elanBin = join(home, ".elan", "bin");
   const pathWithElan = `${elanBin}:${process.env.PATH}`;
   try {
-    const hasLakefile = existsSync(join(cwd, "lakefile.lean")) || existsSync(join(cwd, "lakefile.toml"));
-    const cmd = hasLakefile ? `cd "${cwd}" && lake build 2>&1` : `lean "${filePath}" 2>&1`;
+    const hasLakefile =
+      existsSync(join(cwd, "lakefile.lean")) ||
+      existsSync(join(cwd, "lakefile.toml"));
+    const cmd = hasLakefile
+      ? `cd "${cwd}" && lake build 2>&1`
+      : `lean "${filePath}" 2>&1`;
     const output = execSync(cmd, {
       encoding: "utf-8",
       timeout: 6e4,
       maxBuffer: 1024 * 1024,
-      env: { ...process.env, PATH: pathWithElan }
+      env: { ...process.env, PATH: pathWithElan },
     });
     const sorries = [];
-    const fileContent = existsSync(filePath) ? readFileSync(filePath, "utf-8") : "";
+    const fileContent = existsSync(filePath)
+      ? readFileSync(filePath, "utf-8")
+      : "";
     const sorryMatches = fileContent.match(/sorry/g);
     if (sorryMatches) {
       const lines = fileContent.split("\n");
@@ -67,13 +77,16 @@ function extractSorries(filePath) {
 }
 async function checkLMStudioAvailable() {
   const now = Date.now();
-  if (lmStudioAvailable !== null && now - lmStudioCheckedAt < AVAILABILITY_CACHE_MS) {
+  if (
+    lmStudioAvailable !== null &&
+    now - lmStudioCheckedAt < AVAILABILITY_CACHE_MS
+  ) {
     return lmStudioAvailable;
   }
   try {
     const response = await fetch(`${LMSTUDIO_BASE_URL}/v1/models`, {
       method: "GET",
-      signal: AbortSignal.timeout(2e3)
+      signal: AbortSignal.timeout(2e3),
       // 2s timeout - fail fast
     });
     lmStudioAvailable = response.ok;
@@ -99,7 +112,10 @@ async function getGoedelSuggestions(leanCode, errors, sorries) {
   }
   const isAvailable = await checkLMStudioAvailable();
   if (!isAvailable) {
-    return { suggestion: null, unavailableMessage: getLMStudioUnavailableMessage() };
+    return {
+      suggestion: null,
+      unavailableMessage: getLMStudioUnavailableMessage(),
+    };
   }
   try {
     const prompt = buildGoedelPrompt(leanCode, errors, sorries);
@@ -110,9 +126,9 @@ async function getGoedelSuggestions(leanCode, errors, sorries) {
         prompt,
         max_tokens: 4096,
         temperature: 0.6,
-        stop: ["```", "\n\n\n"]
+        stop: ["```", "\n\n\n"],
       }),
-      signal: AbortSignal.timeout(3e4)
+      signal: AbortSignal.timeout(3e4),
       // 30s timeout for actual inference
     });
     if (!response.ok) {
@@ -172,7 +188,8 @@ async function main() {
     console.log("{}");
     return;
   }
-  const filePath = input.tool_input?.file_path || input.tool_response?.filePath || "";
+  const filePath =
+    input.tool_input?.file_path || input.tool_response?.filePath || "";
   if (!filePath.endsWith(".lean")) {
     console.log("{}");
     return;
@@ -185,12 +202,14 @@ async function main() {
     has_errors: !result.success || sorries.length > 0,
     errors: result.output,
     sorries,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
   saveState(state);
   let goedelResult = { suggestion: null, unavailableMessage: null };
   if (!result.success || sorries.length > 0) {
-    const leanCode = existsSync(filePath) ? readFileSync(filePath, "utf-8") : "";
+    const leanCode = existsSync(filePath)
+      ? readFileSync(filePath, "utf-8")
+      : "";
     goedelResult = await getGoedelSuggestions(leanCode, result.output, sorries);
   }
   let goedelBlock = "";
@@ -204,38 +223,45 @@ ${goedelResult.suggestion}
     goedelBlock = goedelResult.unavailableMessage;
   }
   if (!result.success) {
-    console.log(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: "PostToolUse",
-        additionalContext: `
+    console.log(
+      JSON.stringify({
+        hookSpecificOutput: {
+          hookEventName: "PostToolUse",
+          additionalContext: `
 \u26A0\uFE0F LEAN COMPILER ERRORS:
 
 ${result.output}
 ${goedelBlock}
 APOLLO Pattern: Use 'sorry' to mark failing sub-lemmas, then fix each one.
-`
-      }
-    }));
+`,
+        },
+      }),
+    );
   } else if (sorries.length > 0) {
-    console.log(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: "PostToolUse",
-        additionalContext: `
+    console.log(
+      JSON.stringify({
+        hookSpecificOutput: {
+          hookEventName: "PostToolUse",
+          additionalContext: `
 \u26A0\uFE0F LEAN PROOF INCOMPLETE - ${sorries.length} sorry placeholder(s):
 
 ${sorries.join("\n")}
 ${goedelBlock}
 Fix each 'sorry' with a valid proof term or tactic.
-`
-      }
-    }));
+`,
+        },
+      }),
+    );
   } else {
-    console.log(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: "PostToolUse",
-        additionalContext: "\u2713 Lean proof compiles successfully with no sorries!"
-      }
-    }));
+    console.log(
+      JSON.stringify({
+        hookSpecificOutput: {
+          hookEventName: "PostToolUse",
+          additionalContext:
+            "\u2713 Lean proof compiles successfully with no sorries!",
+        },
+      }),
+    );
   }
 }
 main().catch((err) => {

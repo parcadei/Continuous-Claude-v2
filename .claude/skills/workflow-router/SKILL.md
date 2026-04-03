@@ -10,6 +10,7 @@ You are a goal-based workflow orchestrator. Your job is to understand what the u
 ## When to Use
 
 Use this skill when:
+
 - User wants to start a new task but hasn't specified a workflow
 - User asks "how should I approach this?"
 - User mentions wanting to explore, plan, build, or fix something
@@ -46,6 +47,7 @@ ls thoughts/shared/plans/*.md 2>/dev/null
 ```
 
 If plans exist:
+
 - For **Build** goal: Ask if they want to implement an existing plan
 - For **Plan** goal: Mention existing plans to avoid duplication
 - For **Research/Fix**: Proceed as normal
@@ -74,12 +76,12 @@ Default to **Balanced** if not specified or if user selects Auto.
 
 Route to the appropriate specialist based on goal:
 
-| Goal | Primary Agent | Alias | Description |
-|------|---------------|-------|-------------|
-| **Research** | oracle | Librarian | Comprehensive research using MCP tools (nia, perplexity, repoprompt, firecrawl) |
-| **Plan** | plan-agent | Oracle | Create implementation plans with phased approach |
-| **Build** | kraken | Kraken | Implementation agent - handles coding tasks via Task tool |
-| **Fix** | debug-agent | Sentinel | Investigate issues using codebase exploration and logs |
+| Goal         | Primary Agent | Alias     | Description                                                                     |
+| ------------ | ------------- | --------- | ------------------------------------------------------------------------------- |
+| **Research** | oracle        | Librarian | Comprehensive research using MCP tools (nia, perplexity, repoprompt, firecrawl) |
+| **Plan**     | plan-agent    | Oracle    | Create implementation plans with phased approach                                |
+| **Build**    | kraken        | Kraken    | Implementation agent - handles coding tasks via Task tool                       |
+| **Fix**      | debug-agent   | Sentinel  | Investigate issues using codebase exploration and logs                          |
 
 **Fix workflow special case:** For Fix goals, first spawn debug-agent (Sentinel) to investigate. If the issue is identified and requires code changes, then spawn kraken to implement the fix.
 
@@ -120,6 +122,7 @@ Wait for user confirmation before spawning agents. If user selects "Adjust setti
 ## Agent Spawn Examples
 
 ### Research (Librarian)
+
 ```
 Task(
   subagent_type="oracle",
@@ -133,6 +136,7 @@ Task(
 ```
 
 ### Plan (Oracle)
+
 ```
 Task(
   subagent_type="plan-agent",
@@ -148,6 +152,7 @@ Task(
 ### Build (Kraken)
 
 **If plan exists:** Run pre-mortem before implementation:
+
 ```
 /premortem deep <plan-path>
 ```
@@ -155,6 +160,7 @@ Task(
 This identifies risks and blocks if HIGH severity issues found. User can accept, mitigate, or research solutions.
 
 **After premortem passes:**
+
 ```
 Task(
   subagent_type="kraken",
@@ -168,6 +174,7 @@ Task(
 ```
 
 ### Fix (Sentinel then Kraken)
+
 ```
 # Step 1: Investigate
 Task(

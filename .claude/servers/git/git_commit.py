@@ -1,6 +1,5 @@
-from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field
-from typing import Literal
+from typing import Any, Dict
+from pydantic import BaseModel
 
 class GitCommitParams(BaseModel):
     """Parameters for git_commit"""

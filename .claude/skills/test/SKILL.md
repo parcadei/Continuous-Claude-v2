@@ -35,11 +35,11 @@ Run comprehensive test suite with parallel execution.
 
 ## Agent Sequence
 
-| # | Agent | Role | Execution |
-|---|-------|------|-----------|
-| 1 | **arbiter** | Unit tests, type checks, linting | Parallel |
-| 1 | **arbiter** | Integration tests | Parallel |
-| 2 | **atlas** | E2E/acceptance tests | After 1 passes |
+| #   | Agent       | Role                             | Execution      |
+| --- | ----------- | -------------------------------- | -------------- |
+| 1   | **arbiter** | Unit tests, type checks, linting | Parallel       |
+| 1   | **arbiter** | Integration tests                | Parallel       |
+| 2   | **atlas**   | E2E/acceptance tests             | After 1 passes |
 
 ## Why This Order?
 
@@ -58,6 +58,7 @@ tldr diagnostics . --project --format text 2>/dev/null | grep "^E " | head -10
 ```
 
 **Why diagnostics first?**
+
 - Type check is instant (~1s), tests take longer
 - Diagnostics show ROOT CAUSE, tests show symptoms
 - "Expected int, got str" is clearer than "AttributeError at line 50"
@@ -138,18 +139,21 @@ Task(
 ## Test Scopes
 
 ### Full Suite
+
 ```
 User: /test
 → All unit + integration + E2E tests
 ```
 
 ### Feature Scope
+
 ```
 User: /test authentication
 → Only auth-related tests
 ```
 
 ### Quick Check
+
 ```
 User: /test --quick
 → Only unit tests (skip integration and E2E)
@@ -216,6 +220,7 @@ Phase 1: Running parallel tests...
 ## Failure Handling
 
 If Phase 1 fails:
+
 ```
 arbiter: ❌ 43/45 tests passing
 

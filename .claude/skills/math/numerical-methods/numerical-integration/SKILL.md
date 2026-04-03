@@ -12,7 +12,6 @@ Use this skill when working on numerical-integration problems in numerical metho
 
 ## Decision Tree
 
-
 1. **Identify Integral Type**
    - Definite integral over finite interval?
    - Improper integral (infinite bounds or singularities)?
@@ -39,27 +38,29 @@ Use this skill when working on numerical-integration problems in numerical metho
    - Check convergence by refining tolerance
    - `sympy_compute.py integrate "f(x)" --var x --from a --to b`
 
-
 ## Tool Commands
 
 ### Scipy_Quad
+
 ```bash
 uv run python -c "from scipy.integrate import quad; import numpy as np; result, err = quad(lambda x: np.sin(x), 0, np.pi); print('Integral:', result, 'Error:', err)"
 ```
 
 ### Scipy_Dblquad
+
 ```bash
 uv run python -c "from scipy.integrate import dblquad; result, err = dblquad(lambda y, x: x*y, 0, 1, 0, 1); print('Integral:', result)"
 ```
 
 ### Sympy_Integrate
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py integrate "sin(x)" --var x --from 0 --to "pi"
 ```
 
 ## Key Techniques
 
-*From indexed textbooks:*
+_From indexed textbooks:_
 
 - [An Introduction to Numerical Analysis... (Z-Library)] Even though the topic of numerical integration is one of the oldest in numerical analysis and there is a very large literature, new papers continue to appear at a fairly high rate. Many of these results give methods for special classes of problems, for example, oscillatory integrals, and others are a response to changes in computers, for example, the use of vector pipeline architectures. The best survey of numerical integration is the large and detailed work of Davis and Rabinowitz (1984).
 - [An Introduction to Numerical Analysis... (Z-Library)] Automatic computation of improper integrals over a bounded or unbounded planar region, Computing 27, 253-284. Approximate Calculation of Multiple Integrals. Prentice-Hall, Englewood Cliffs, N.

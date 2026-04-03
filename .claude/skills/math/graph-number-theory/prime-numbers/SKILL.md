@@ -12,7 +12,6 @@ Use this skill when working on prime-numbers problems in graph number theory.
 
 ## Decision Tree
 
-
 1. **Primality testing hierarchy**
    - Trial division: O(sqrt(n)), exact
    - Miller-Rabin: O(k log^3 n), probabilistic
@@ -26,7 +25,7 @@ Use this skill when working on prime-numbers problems in graph number theory.
 
 3. **Prime distribution**
    - Prime Number Theorem: pi(x) ~ x/ln(x)
-   - Prime gaps: p_{n+1} - p_n
+   - Prime gaps: p\_{n+1} - p_n
    - `sympy_compute.py limit "pi(x) * ln(x) / x"`
 
 4. **Fermat's Little Theorem**
@@ -37,33 +36,35 @@ Use this skill when working on prime-numbers problems in graph number theory.
 5. **Wilson's Theorem**
    - (p-1)! = -1 (mod p) iff p is prime
 
-
 ## Tool Commands
 
 ### Sympy_Factor
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py factor "n"
 ```
 
 ### Z3_Primality
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "no_divisor_between_1_and_sqrt_n"
 ```
 
 ### Sympy_Prime_Count
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py simplify "pi(x) ~ x/ln(x)"
 ```
 
 ### Z3_Fermat_Little
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "a**(p-1) == 1 mod p"
 ```
 
 ## Key Techniques
 
-*From indexed textbooks:*
-
+_From indexed textbooks:_
 
 ## Cognitive Tools Reference
 

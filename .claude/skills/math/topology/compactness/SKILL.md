@@ -12,7 +12,6 @@ Use this skill when working on compactness problems in topology.
 
 ## Decision Tree
 
-
 1. **Is X compact?**
    - If X subset R^n: Is X closed AND bounded? (Heine-Borel)
    - If X is metric: Does every sequence have convergent subsequence?
@@ -33,27 +32,29 @@ Use this skill when working on compactness problems in topology.
    - Continuous real function on compact attains max/min
    - `sympy_compute.py maximum "f(x)" --var x --domain "[a,b]"`
 
-
 ## Tool Commands
 
 ### Z3_Bounded_Closed
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "bounded_and_closed"
 ```
 
 ### Sympy_Limit
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py limit "a_n" --var n --at oo
 ```
 
 ### Sympy_Maximum
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py maximum "f(x)" --var x --domain "[a,b]"
 ```
 
 ## Key Techniques
 
-*From indexed textbooks:*
+_From indexed textbooks:_
 
 - [Topology (Munkres, James Raymond) (Z-Library)] CompactSpaces163 164ConnectednessandCompactnessCh. Itisnotasnaturalorintuitiveastheformer;somefamiliaritywithitisneededbeforeitsusefulnessbecomesapparent. AcollectionAofsubsetsofaspaceXissaidtocoverX,ortobeacoveringofX,iftheunionoftheelementsofAisequaltoX.
 - [Real Analysis (Halsey L. Royden, Patr... (Z-Library)] If X contains more than one point, show that the only possible extreme points of B have norm 1. If X = Lp[a, b], 1 < p < ∞, show that every unit vector in B is an extreme point of B. If X = L∞[a, b], show that the extreme points of B are those functions f ∈ B such that |f | = 1 almost everywhere on [a, b].

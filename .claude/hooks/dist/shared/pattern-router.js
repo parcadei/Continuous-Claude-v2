@@ -12,17 +12,17 @@
  * All supported orchestration patterns.
  */
 export const SUPPORTED_PATTERNS = [
-    'swarm',
-    'jury',
-    'pipeline',
-    'generator_critic',
-    'hierarchical',
-    'map_reduce',
-    'blackboard',
-    'circuit_breaker',
-    'chain_of_responsibility',
-    'adversarial',
-    'event_driven',
+  "swarm",
+  "jury",
+  "pipeline",
+  "generator_critic",
+  "hierarchical",
+  "map_reduce",
+  "blackboard",
+  "circuit_breaker",
+  "chain_of_responsibility",
+  "adversarial",
+  "event_driven",
 ];
 /**
  * Detect the current pattern type from environment variable.
@@ -40,10 +40,9 @@ export const SUPPORTED_PATTERNS = [
  * detectPattern() // returns null
  */
 export function detectPattern() {
-    const pattern = process.env.PATTERN_TYPE;
-    if (!pattern)
-        return null;
-    return pattern;
+  const pattern = process.env.PATTERN_TYPE;
+  if (!pattern) return null;
+  return pattern;
 }
 /**
  * Safe ID pattern: alphanumeric, underscore, hyphen, 1-64 characters.
@@ -69,5 +68,5 @@ export const SAFE_ID_PATTERN = /^[a-zA-Z0-9_-]{1,64}$/;
  * @returns true if the ID is safe, false otherwise
  */
 export function isValidId(id) {
-    return SAFE_ID_PATTERN.test(id);
+  return SAFE_ID_PATTERN.test(id);
 }

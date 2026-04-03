@@ -8,6 +8,7 @@ description: Develops mathematical understanding through examples, visualization
 ## When to Use
 
 Trigger on phrases like:
+
 - "help me understand"
 - "build intuition for"
 - "what does this mean geometrically"
@@ -23,37 +24,49 @@ Use before computation to establish understanding (Polya's "understand the probl
 Guide through Mason's specializing-generalizing cycle:
 
 ### 1. Restate in own words
+
 **Ask:** "Can you state the problem in your own words?"
+
 - Forces re-processing
 - Catches misunderstandings early
 - Verifies shared understanding
 
 ### 2. Try concrete examples
+
 **Ask:** "What would a concrete example look like?"
+
 - Specialize: try N=3, x=2, simple case
 - Ground abstract concepts in specifics
 - Use computation tools to verify examples
 
 ### 3. Anticipate the answer
+
 **Ask:** "What form should the answer take?"
+
 - Work backwards from expected result
 - Constrain solution space
 - Check dimensional consistency
 
 ### 4. Visualize
+
 **Ask:** "Can you draw a picture or diagram?"
+
 - Multiple representations matter
 - Algebraic <-> geometric <-> numeric
 - ASCII diagrams for quick sketches
 
 ### 5. Simplify
+
 **Ask:** "What's a simpler version of this problem?"
+
 - Reduce dimension
 - Remove terms
 - Special cases reveal structure
 
 ### 6. Find analogies
+
 **Ask:** "Does this remind you of anything you've solved before?"
+
 - Pattern matching across domains
 - Transfer solution strategies
 
@@ -152,6 +165,7 @@ Ready to Proceed:
 ## Co-activates
 
 Suggest alongside:
+
 - **math-model-selector** - if framework unclear
 - **math-mode** - for concrete computations
 - **math-progress-monitor** - during problem solving

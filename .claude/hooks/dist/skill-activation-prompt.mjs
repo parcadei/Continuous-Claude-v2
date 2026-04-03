@@ -14,7 +14,7 @@ var DEFAULT_RESOURCE_STATE = {
   freeMemMB: 4096,
   activeAgents: 0,
   maxAgents: 10,
-  contextPct: 0
+  contextPct: 0,
 };
 function getSessionId() {
   return process.env.CLAUDE_SESSION_ID || String(process.ppid || process.pid);
@@ -32,10 +32,22 @@ function readResourceState() {
     const content = readFileSync(resourceFile, "utf-8");
     const data = JSON.parse(content);
     return {
-      freeMemMB: typeof data.freeMemMB === "number" ? data.freeMemMB : DEFAULT_RESOURCE_STATE.freeMemMB,
-      activeAgents: typeof data.activeAgents === "number" ? data.activeAgents : DEFAULT_RESOURCE_STATE.activeAgents,
-      maxAgents: typeof data.maxAgents === "number" ? data.maxAgents : DEFAULT_RESOURCE_STATE.maxAgents,
-      contextPct: typeof data.contextPct === "number" ? data.contextPct : DEFAULT_RESOURCE_STATE.contextPct
+      freeMemMB:
+        typeof data.freeMemMB === "number"
+          ? data.freeMemMB
+          : DEFAULT_RESOURCE_STATE.freeMemMB,
+      activeAgents:
+        typeof data.activeAgents === "number"
+          ? data.activeAgents
+          : DEFAULT_RESOURCE_STATE.activeAgents,
+      maxAgents:
+        typeof data.maxAgents === "number"
+          ? data.maxAgents
+          : DEFAULT_RESOURCE_STATE.maxAgents,
+      contextPct:
+        typeof data.contextPct === "number"
+          ? data.contextPct
+          : DEFAULT_RESOURCE_STATE.contextPct,
     };
   } catch {
     return null;
@@ -64,7 +76,7 @@ var AMBIGUOUS_KEYWORDS = /* @__PURE__ */ new Set([
   "analyze",
   "document",
   "refactor",
-  "optimize"
+  "optimize",
 ]);
 var SPECIFIC_TECHNICAL_TERMS = /* @__PURE__ */ new Set([
   "sympy",
@@ -81,30 +93,98 @@ var SPECIFIC_TECHNICAL_TERMS = /* @__PURE__ */ new Set([
   "mathlib",
   "z3",
   "shapely",
-  "pint"
+  "pint",
 ]);
 var TECHNICAL_CONTEXT_INDICATORS = {
-  commit: ["git", "changes", "files", "message", "push", "repository", "branch", "staged"],
+  commit: [
+    "git",
+    "changes",
+    "files",
+    "message",
+    "push",
+    "repository",
+    "branch",
+    "staged",
+  ],
   push: ["git", "remote", "origin", "branch", "repository", "upstream"],
   pull: ["git", "remote", "origin", "branch", "merge", "rebase", "request"],
   merge: ["git", "branch", "conflict", "pull request", "pr"],
   branch: ["git", "checkout", "create", "switch", "feature"],
   checkout: ["git", "branch", "file", "commit", "HEAD"],
-  debug: ["error", "bug", "issue", "logs", "stack trace", "exception", "crash", "breakpoint"],
-  build: ["npm", "yarn", "cargo", "make", "compile", "webpack", "bundle", "project"],
-  implement: ["code", "feature", "function", "class", "method", "api", "interface", "module"],
-  plan: ["implementation", "phase", "architecture", "design", "roadmap", "milestone"],
-  research: ["api", "library", "documentation", "docs", "best practices", "pattern", "codebase"],
-  deploy: ["server", "production", "staging", "kubernetes", "docker", "cloud", "ci/cd"],
+  debug: [
+    "error",
+    "bug",
+    "issue",
+    "logs",
+    "stack trace",
+    "exception",
+    "crash",
+    "breakpoint",
+  ],
+  build: [
+    "npm",
+    "yarn",
+    "cargo",
+    "make",
+    "compile",
+    "webpack",
+    "bundle",
+    "project",
+  ],
+  implement: [
+    "code",
+    "feature",
+    "function",
+    "class",
+    "method",
+    "api",
+    "interface",
+    "module",
+  ],
+  plan: [
+    "implementation",
+    "phase",
+    "architecture",
+    "design",
+    "roadmap",
+    "milestone",
+  ],
+  research: [
+    "api",
+    "library",
+    "documentation",
+    "docs",
+    "best practices",
+    "pattern",
+    "codebase",
+  ],
+  deploy: [
+    "server",
+    "production",
+    "staging",
+    "kubernetes",
+    "docker",
+    "cloud",
+    "ci/cd",
+  ],
   release: ["version", "tag", "changelog", "npm", "package", "publish"],
   fix: ["bug", "error", "issue", "broken", "failing", "test", "regression"],
-  test: ["unit", "integration", "e2e", "coverage", "spec", "jest", "pytest", "vitest"],
+  test: [
+    "unit",
+    "integration",
+    "e2e",
+    "coverage",
+    "spec",
+    "jest",
+    "pytest",
+    "vitest",
+  ],
   validate: ["input", "schema", "data", "form", "field", "type"],
   review: ["code", "pr", "pull request", "changes", "diff"],
   analyze: ["code", "codebase", "performance", "metrics", "logs"],
   document: ["api", "readme", "docs", "jsdoc", "docstring", "comments"],
   refactor: ["code", "function", "class", "module", "clean up", "simplify"],
-  optimize: ["performance", "speed", "memory", "query", "algorithm"]
+  optimize: ["performance", "speed", "memory", "query", "algorithm"],
 };
 function shouldValidateWithLLM(match) {
   if (match.matchType === "explicit") {
@@ -136,21 +216,26 @@ function shouldValidateWithLLM(match) {
 
 // src/skill-activation-prompt.ts
 var PATTERN_AGENT_MAP = {
-  "swarm": "research-agent",
-  "hierarchical": "kraken",
-  "pipeline": "kraken",
-  "generator_critic": "review-agent",
-  "adversarial": "validate-agent",
-  "map_reduce": "kraken",
-  "jury": "validate-agent",
-  "blackboard": "maestro",
-  "circuit_breaker": "kraken",
-  "chain_of_responsibility": "maestro",
-  "event_driven": "kraken"
+  swarm: "research-agent",
+  hierarchical: "kraken",
+  pipeline: "kraken",
+  generator_critic: "review-agent",
+  adversarial: "validate-agent",
+  map_reduce: "kraken",
+  jury: "validate-agent",
+  blackboard: "maestro",
+  circuit_breaker: "kraken",
+  chain_of_responsibility: "maestro",
+  event_driven: "kraken",
 };
 function runPatternInference(prompt, projectDir) {
   try {
-    const scriptPath = join2(projectDir, "scripts", "agentica_patterns", "pattern_inference.py");
+    const scriptPath = join2(
+      projectDir,
+      "scripts",
+      "agentica_patterns",
+      "pattern_inference.py",
+    );
     if (!existsSync2(scriptPath)) {
       return null;
     }
@@ -177,7 +262,7 @@ print(json.dumps(output))
       encoding: "utf-8",
       timeout: 5e3,
       cwd: projectDir,
-      stdio: ["pipe", "pipe", "pipe"]
+      stdio: ["pipe", "pipe", "pipe"],
     });
     if (result.status !== 0 || !result.stdout) {
       return null;
@@ -207,7 +292,8 @@ function generateAgenticaOutput(inference, prompt) {
     output += "ACTION: Use AskUserQuestion to confirm before spawning:\n";
     output += `  "I'll use ${suggestedAgent} to ${inference.work_breakdown}. Proceed?"
 `;
-    output += "  Options: [Yes, proceed] [Different approach] [Let me explain more]\n";
+    output +=
+      "  Options: [Yes, proceed] [Different approach] [Let me explain more]\n";
     if (inference.alternatives.length > 0) {
       output += `
 Alternative approaches available: ${inference.alternatives.join(", ")}
@@ -236,7 +322,7 @@ function detectSemanticQuery(prompt) {
     /^(how|what|where|why|when|which)\s/i,
     /\?$/,
     /^(find|show|list|get|explain)\s+(all|the|every|any)/i,
-    /^.*\s+(implementation|architecture|flow|pattern|logic|system)$/i
+    /^.*\s+(implementation|architecture|flow|pattern|logic|system)$/i,
   ];
   const isSemanticQuery = semanticPatterns.some((p) => p.test(prompt.trim()));
   if (!isSemanticQuery) {
@@ -271,8 +357,18 @@ async function main() {
     const prompt = data.prompt.toLowerCase();
     const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
     const homeDir = process.env.HOME || process.env.USERPROFILE || "";
-    const projectRulesPath = join2(projectDir, ".claude", "skills", "skill-rules.json");
-    const globalRulesPath = join2(homeDir, ".claude", "skills", "skill-rules.json");
+    const projectRulesPath = join2(
+      projectDir,
+      ".claude",
+      "skills",
+      "skill-rules.json",
+    );
+    const globalRulesPath = join2(
+      homeDir,
+      ".claude",
+      "skills",
+      "skill-rules.json",
+    );
     let rulesPath = "";
     if (existsSync2(projectRulesPath)) {
       rulesPath = projectRulesPath;
@@ -291,8 +387,8 @@ async function main() {
         continue;
       }
       if (triggers.keywords) {
-        const matchedKeyword = triggers.keywords.find(
-          (kw) => prompt.includes(kw.toLowerCase())
+        const matchedKeyword = triggers.keywords.find((kw) =>
+          prompt.includes(kw.toLowerCase()),
         );
         if (matchedKeyword) {
           const skillMatchForValidation = {
@@ -302,15 +398,17 @@ async function main() {
             prompt: data.prompt,
             // Use original prompt (not lowercased)
             skillDescription: config.description,
-            enforcement: config.enforcement
+            enforcement: config.enforcement,
           };
-          const needsValidation = shouldValidateWithLLM(skillMatchForValidation);
+          const needsValidation = shouldValidateWithLLM(
+            skillMatchForValidation,
+          );
           matchedSkills.push({
             name: skillName,
             matchType: "keyword",
             matchedTerm: matchedKeyword,
             config,
-            needsValidation
+            needsValidation,
           });
           continue;
         }
@@ -329,7 +427,7 @@ async function main() {
             name: skillName,
             matchType: "intent",
             config,
-            needsValidation: false
+            needsValidation: false,
           });
         }
       }
@@ -342,8 +440,8 @@ async function main() {
           continue;
         }
         if (triggers.keywords) {
-          const matchedKeyword = triggers.keywords.find(
-            (kw) => prompt.includes(kw.toLowerCase())
+          const matchedKeyword = triggers.keywords.find((kw) =>
+            prompt.includes(kw.toLowerCase()),
           );
           if (matchedKeyword) {
             const skillMatchForValidation = {
@@ -352,16 +450,18 @@ async function main() {
               matchedTerm: matchedKeyword,
               prompt: data.prompt,
               skillDescription: config.description,
-              enforcement: config.enforcement
+              enforcement: config.enforcement,
             };
-            const needsValidation = shouldValidateWithLLM(skillMatchForValidation);
+            const needsValidation = shouldValidateWithLLM(
+              skillMatchForValidation,
+            );
             matchedAgents.push({
               name: agentName,
               matchType: "keyword",
               matchedTerm: matchedKeyword,
               config,
               isAgent: true,
-              needsValidation
+              needsValidation,
             });
             continue;
           }
@@ -381,16 +481,28 @@ async function main() {
               matchType: "intent",
               config,
               isAgent: true,
-              needsValidation: false
+              needsValidation: false,
             });
           }
         }
       }
     }
-    if (matchedSkills.length > 0 || matchedAgents.length > 0 || patternInference || semanticQuery.isSemanticQuery) {
-      const skillsNeedingValidation = matchedSkills.filter((s) => s.needsValidation);
-      const agentsNeedingValidation = matchedAgents.filter((a) => a.needsValidation);
-      const allNeedingValidation = [...skillsNeedingValidation, ...agentsNeedingValidation];
+    if (
+      matchedSkills.length > 0 ||
+      matchedAgents.length > 0 ||
+      patternInference ||
+      semanticQuery.isSemanticQuery
+    ) {
+      const skillsNeedingValidation = matchedSkills.filter(
+        (s) => s.needsValidation,
+      );
+      const agentsNeedingValidation = matchedAgents.filter(
+        (a) => a.needsValidation,
+      );
+      const allNeedingValidation = [
+        ...skillsNeedingValidation,
+        ...agentsNeedingValidation,
+      ];
       const confirmedSkills = matchedSkills.filter((s) => !s.needsValidation);
       const confirmedAgents = matchedAgents.filter((a) => !a.needsValidation);
       let output = "";
@@ -403,13 +515,17 @@ async function main() {
         output += "\n";
       }
       if (matchedSkills.length > 0 || matchedAgents.length > 0) {
-        output += "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n";
+        output +=
+          "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n";
         output += "\u{1F3AF} SKILL ACTIVATION CHECK\n";
-        output += "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n";
+        output +=
+          "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n";
         if (allNeedingValidation.length > 0) {
           output += "\u2753 AMBIGUOUS MATCHES (validate before activating):\n";
-          output += "   The following skills matched on keywords that may be used\n";
-          output += "   in a non-technical context. Consider if they're needed:\n\n";
+          output +=
+            "   The following skills matched on keywords that may be used\n";
+          output +=
+            "   in a non-technical context. Consider if they're needed:\n\n";
           for (const item of allNeedingValidation) {
             const isAgent = item.isAgent ? " [agent]" : "";
             output += `   \u2022 ${item.name}${isAgent}
@@ -429,38 +545,59 @@ async function main() {
 `;
           output += '    using the word in everyday language?"\n\n';
         }
-        const critical = confirmedSkills.filter((s) => s.config.priority === "critical");
-        const high = confirmedSkills.filter((s) => s.config.priority === "high");
-        const medium = confirmedSkills.filter((s) => s.config.priority === "medium");
+        const critical = confirmedSkills.filter(
+          (s) => s.config.priority === "critical",
+        );
+        const high = confirmedSkills.filter(
+          (s) => s.config.priority === "high",
+        );
+        const medium = confirmedSkills.filter(
+          (s) => s.config.priority === "medium",
+        );
         const low = confirmedSkills.filter((s) => s.config.priority === "low");
         if (critical.length > 0) {
           output += "\u26A0\uFE0F CRITICAL SKILLS (REQUIRED):\n";
-          critical.forEach((s) => output += `  \u2192 ${s.name}
-`);
+          critical.forEach(
+            (s) =>
+              (output += `  \u2192 ${s.name}
+`),
+          );
           output += "\n";
         }
         if (high.length > 0) {
           output += "\u{1F4DA} RECOMMENDED SKILLS:\n";
-          high.forEach((s) => output += `  \u2192 ${s.name}
-`);
+          high.forEach(
+            (s) =>
+              (output += `  \u2192 ${s.name}
+`),
+          );
           output += "\n";
         }
         if (medium.length > 0) {
           output += "\u{1F4A1} SUGGESTED SKILLS:\n";
-          medium.forEach((s) => output += `  \u2192 ${s.name}
-`);
+          medium.forEach(
+            (s) =>
+              (output += `  \u2192 ${s.name}
+`),
+          );
           output += "\n";
         }
         if (low.length > 0) {
           output += "\u{1F4CC} OPTIONAL SKILLS:\n";
-          low.forEach((s) => output += `  \u2192 ${s.name}
-`);
+          low.forEach(
+            (s) =>
+              (output += `  \u2192 ${s.name}
+`),
+          );
           output += "\n";
         }
         if (confirmedAgents.length > 0) {
           output += "\u{1F916} RECOMMENDED AGENTS (token-efficient):\n";
-          confirmedAgents.forEach((a) => output += `  \u2192 ${a.name}
-`);
+          confirmedAgents.forEach(
+            (a) =>
+              (output += `  \u2192 ${a.name}
+`),
+          );
           output += "\n";
         }
         if (confirmedSkills.length > 0) {
@@ -469,20 +606,33 @@ async function main() {
         if (confirmedAgents.length > 0) {
           output += "ACTION: Use Task tool with agent for exploration\n";
         }
-        output += "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n";
-        const blockingSkills = matchedSkills.filter((s) => s.config.enforcement === "block");
+        output +=
+          "\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n";
+        const blockingSkills = matchedSkills.filter(
+          (s) => s.config.enforcement === "block",
+        );
         if (blockingSkills.length > 0) {
-          const blockMessage = output + "\n\u26D4 BLOCKING: You MUST invoke " + blockingSkills.map((s) => s.name).join(", ") + " skill(s) before generating ANY response.";
-          console.log(JSON.stringify({
-            result: "block",
-            reason: blockMessage
-          }));
+          const blockMessage =
+            output +
+            "\n\u26D4 BLOCKING: You MUST invoke " +
+            blockingSkills.map((s) => s.name).join(", ") +
+            " skill(s) before generating ANY response.";
+          console.log(
+            JSON.stringify({
+              result: "block",
+              reason: blockMessage,
+            }),
+          );
           process.exit(0);
         }
       }
       console.log(output);
     }
-    const rawSessionId = data.session_id || process.env.CLAUDE_SESSION_ID || process.env.CLAUDE_PPID || "default";
+    const rawSessionId =
+      data.session_id ||
+      process.env.CLAUDE_SESSION_ID ||
+      process.env.CLAUDE_PPID ||
+      "default";
     const sessionId = rawSessionId.slice(0, 8);
     const contextFile = join2(tmpdir2(), `claude-context-pct-${sessionId}.txt`);
     if (existsSync2(contextFile)) {
@@ -490,27 +640,55 @@ async function main() {
         const pct = parseInt(readFileSync2(contextFile, "utf-8").trim(), 10);
         let contextWarning = "";
         if (pct >= 90) {
-          contextWarning = "\n" + "=".repeat(50) + "\n  CONTEXT CRITICAL: " + pct + "%\n  Run /create_handoff NOW before auto-compact!\n" + "=".repeat(50) + "\n";
+          contextWarning =
+            "\n" +
+            "=".repeat(50) +
+            "\n  CONTEXT CRITICAL: " +
+            pct +
+            "%\n  Run /create_handoff NOW before auto-compact!\n" +
+            "=".repeat(50) +
+            "\n";
         } else if (pct >= 80) {
-          contextWarning = "\nCONTEXT WARNING: " + pct + "%\nRecommend: /create_handoff then /clear soon\n";
+          contextWarning =
+            "\nCONTEXT WARNING: " +
+            pct +
+            "%\nRecommend: /create_handoff then /clear soon\n";
         } else if (pct >= 70) {
-          contextWarning = "\nContext at " + pct + "%. Consider handoff when you reach a stopping point.\n";
+          contextWarning =
+            "\nContext at " +
+            pct +
+            "%. Consider handoff when you reach a stopping point.\n";
         }
         if (contextWarning) {
           console.log(contextWarning);
         }
-      } catch {
-      }
+      } catch {}
     }
     const resources = readResourceState();
     if (resources && resources.maxAgents > 0) {
       const utilization = resources.activeAgents / resources.maxAgents;
       let resourceWarning = "";
       if (utilization >= 1) {
-        resourceWarning = "\n" + "=".repeat(50) + "\nRESOURCE CRITICAL: At limit (" + resources.activeAgents + "/" + resources.maxAgents + " agents)\nDo NOT spawn new agents until existing ones complete.\n" + "=".repeat(50) + "\n";
+        resourceWarning =
+          "\n" +
+          "=".repeat(50) +
+          "\nRESOURCE CRITICAL: At limit (" +
+          resources.activeAgents +
+          "/" +
+          resources.maxAgents +
+          " agents)\nDo NOT spawn new agents until existing ones complete.\n" +
+          "=".repeat(50) +
+          "\n";
       } else if (utilization >= 0.8) {
         const remaining = resources.maxAgents - resources.activeAgents;
-        resourceWarning = "\nRESOURCE WARNING: Near limit (" + resources.activeAgents + "/" + resources.maxAgents + " agents)\nOnly " + remaining + " agent slot(s) remaining. Limit spawning.\n";
+        resourceWarning =
+          "\nRESOURCE WARNING: Near limit (" +
+          resources.activeAgents +
+          "/" +
+          resources.maxAgents +
+          " agents)\nOnly " +
+          remaining +
+          " agent slot(s) remaining. Limit spawning.\n";
       }
       if (resourceWarning) {
         console.log(resourceWarning);

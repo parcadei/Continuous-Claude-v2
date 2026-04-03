@@ -29,8 +29,8 @@ Alternatives by task:
 - Bug investigation \u2192 sleuth
 - File location \u2192 codebase-locator
 
-Re-run the Task tool with subagent_type="scout" and the same prompt.`
-    }
+Re-run the Task tool with subagent_type="scout" and the same prompt.`,
+    },
   };
   console.log(JSON.stringify(output));
 }

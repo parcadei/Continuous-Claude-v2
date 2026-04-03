@@ -22,7 +22,8 @@ var MemoryClient = class {
     this.sessionId = options.sessionId || "default";
     this.agentId = options.agentId || null;
     this.timeoutMs = options.timeoutMs || 5e3;
-    this.projectDir = options.projectDir || process.env.CLAUDE_PROJECT_DIR || process.cwd();
+    this.projectDir =
+      options.projectDir || process.env.CLAUDE_PROJECT_DIR || process.cwd();
   }
   /**
    * Search for similar content in memory.
@@ -72,11 +73,7 @@ var MemoryClient = class {
       return null;
     }
     const pythonScript = this.buildStoreScript();
-    const args = [
-      content,
-      JSON.stringify(metadata),
-      this.sessionId
-    ];
+    const args = [content, JSON.stringify(metadata), this.sessionId];
     if (this.agentId) {
       args.push(this.agentId);
     }
@@ -221,19 +218,19 @@ asyncio.run(store())
         cwd: this.projectDir,
         env: {
           ...process.env,
-          CLAUDE_PROJECT_DIR: this.projectDir
-        }
+          CLAUDE_PROJECT_DIR: this.projectDir,
+        },
       });
       return {
         success: result.status === 0,
         stdout: result.stdout?.trim() || "",
-        stderr: result.stderr || ""
+        stderr: result.stderr || "",
       };
     } catch (err) {
       return {
         success: false,
         stdout: "",
-        stderr: String(err)
+        stderr: String(err),
       };
     }
   }
@@ -244,7 +241,7 @@ asyncio.run(store())
     return {
       content: String(raw.content || ""),
       similarity: typeof raw.similarity === "number" ? raw.similarity : 0,
-      metadata: raw.metadata || {}
+      metadata: raw.metadata || {},
     };
   }
 };
@@ -259,43 +256,173 @@ function isMemoryAvailable(options = {}) {
 
 // src/shared/task-detector.ts
 var IMPLEMENTATION_INDICATORS = [
-  { pattern: /\bimplement\b/i, keyword: "implement", type: "implementation", weight: 0.9 },
-  { pattern: /\bbuild\b/i, keyword: "build", type: "implementation", weight: 0.9 },
-  { pattern: /\bcreate\b/i, keyword: "create", type: "implementation", weight: 0.8 },
-  { pattern: /\badd\s+(a\s+)?feature/i, keyword: "add feature", type: "implementation", weight: 0.85 },
-  { pattern: /\bwrite\s+(a\s+)?(function|class|method|component|module)/i, keyword: "write", type: "implementation", weight: 0.85 },
-  { pattern: /\bdevelop\b/i, keyword: "develop", type: "implementation", weight: 0.8 },
-  { pattern: /\bset\s*up\b/i, keyword: "set up", type: "implementation", weight: 0.7 },
-  { pattern: /\bconfigure\b/i, keyword: "configure", type: "implementation", weight: 0.7 },
-  { pattern: /\brefactor\b/i, keyword: "refactor", type: "implementation", weight: 0.8 },
-  { pattern: /\bmigrate\b/i, keyword: "migrate", type: "implementation", weight: 0.75 }
+  {
+    pattern: /\bimplement\b/i,
+    keyword: "implement",
+    type: "implementation",
+    weight: 0.9,
+  },
+  {
+    pattern: /\bbuild\b/i,
+    keyword: "build",
+    type: "implementation",
+    weight: 0.9,
+  },
+  {
+    pattern: /\bcreate\b/i,
+    keyword: "create",
+    type: "implementation",
+    weight: 0.8,
+  },
+  {
+    pattern: /\badd\s+(a\s+)?feature/i,
+    keyword: "add feature",
+    type: "implementation",
+    weight: 0.85,
+  },
+  {
+    pattern: /\bwrite\s+(a\s+)?(function|class|method|component|module)/i,
+    keyword: "write",
+    type: "implementation",
+    weight: 0.85,
+  },
+  {
+    pattern: /\bdevelop\b/i,
+    keyword: "develop",
+    type: "implementation",
+    weight: 0.8,
+  },
+  {
+    pattern: /\bset\s*up\b/i,
+    keyword: "set up",
+    type: "implementation",
+    weight: 0.7,
+  },
+  {
+    pattern: /\bconfigure\b/i,
+    keyword: "configure",
+    type: "implementation",
+    weight: 0.7,
+  },
+  {
+    pattern: /\brefactor\b/i,
+    keyword: "refactor",
+    type: "implementation",
+    weight: 0.8,
+  },
+  {
+    pattern: /\bmigrate\b/i,
+    keyword: "migrate",
+    type: "implementation",
+    weight: 0.75,
+  },
 ];
 var DEBUG_INDICATORS = [
   { pattern: /\bdebug\b/i, keyword: "debug", type: "debug", weight: 0.9 },
-  { pattern: /\bfix\s+(the\s+)?(bug|issue|error|problem)/i, keyword: "fix bug", type: "debug", weight: 0.9 },
-  { pattern: /\binvestigate\b/i, keyword: "investigate", type: "debug", weight: 0.85 },
-  { pattern: /\btroubleshoot\b/i, keyword: "troubleshoot", type: "debug", weight: 0.85 },
+  {
+    pattern: /\bfix\s+(the\s+)?(bug|issue|error|problem)/i,
+    keyword: "fix bug",
+    type: "debug",
+    weight: 0.9,
+  },
+  {
+    pattern: /\binvestigate\b/i,
+    keyword: "investigate",
+    type: "debug",
+    weight: 0.85,
+  },
+  {
+    pattern: /\btroubleshoot\b/i,
+    keyword: "troubleshoot",
+    type: "debug",
+    weight: 0.85,
+  },
   { pattern: /\bdiagnose\b/i, keyword: "diagnose", type: "debug", weight: 0.8 },
-  { pattern: /\bwhy\s+is\s+.*\b(failing|broken|not\s+working)/i, keyword: "why failing", type: "debug", weight: 0.75 },
-  { pattern: /\bfix\b/i, keyword: "fix", type: "debug", weight: 0.6 }
+  {
+    pattern: /\bwhy\s+is\s+.*\b(failing|broken|not\s+working)/i,
+    keyword: "why failing",
+    type: "debug",
+    weight: 0.75,
+  },
+  { pattern: /\bfix\b/i, keyword: "fix", type: "debug", weight: 0.6 },
 ];
 var RESEARCH_INDICATORS = [
-  { pattern: /\bhow\s+do\s+I\b/i, keyword: "how do I", type: "research", weight: 0.85 },
-  { pattern: /\bfind\s+out\b/i, keyword: "find out", type: "research", weight: 0.8 },
-  { pattern: /\bresearch\b/i, keyword: "research", type: "research", weight: 0.85 },
-  { pattern: /\blook\s+into\b/i, keyword: "look into", type: "research", weight: 0.8 },
-  { pattern: /\bexplore\s+(the\s+)?(options|possibilities|approaches)/i, keyword: "explore", type: "research", weight: 0.75 },
-  { pattern: /\bwhat\s+are\s+(the\s+)?(best\s+practices|options|ways)/i, keyword: "best practices", type: "research", weight: 0.7 },
-  { pattern: /\blearn\s+about\b/i, keyword: "learn about", type: "research", weight: 0.7 }
+  {
+    pattern: /\bhow\s+do\s+I\b/i,
+    keyword: "how do I",
+    type: "research",
+    weight: 0.85,
+  },
+  {
+    pattern: /\bfind\s+out\b/i,
+    keyword: "find out",
+    type: "research",
+    weight: 0.8,
+  },
+  {
+    pattern: /\bresearch\b/i,
+    keyword: "research",
+    type: "research",
+    weight: 0.85,
+  },
+  {
+    pattern: /\blook\s+into\b/i,
+    keyword: "look into",
+    type: "research",
+    weight: 0.8,
+  },
+  {
+    pattern: /\bexplore\s+(the\s+)?(options|possibilities|approaches)/i,
+    keyword: "explore",
+    type: "research",
+    weight: 0.75,
+  },
+  {
+    pattern: /\bwhat\s+are\s+(the\s+)?(best\s+practices|options|ways)/i,
+    keyword: "best practices",
+    type: "research",
+    weight: 0.7,
+  },
+  {
+    pattern: /\blearn\s+about\b/i,
+    keyword: "learn about",
+    type: "research",
+    weight: 0.7,
+  },
 ];
 var PLANNING_INDICATORS = [
   { pattern: /\bplan\b/i, keyword: "plan", type: "planning", weight: 0.85 },
   { pattern: /\bdesign\b/i, keyword: "design", type: "planning", weight: 0.85 },
-  { pattern: /\barchitect\b/i, keyword: "architect", type: "planning", weight: 0.9 },
-  { pattern: /\boutline\b/i, keyword: "outline", type: "planning", weight: 0.75 },
-  { pattern: /\bstrateg(y|ize)\b/i, keyword: "strategy", type: "planning", weight: 0.8 },
-  { pattern: /\bpropose\b/i, keyword: "propose", type: "planning", weight: 0.7 },
-  { pattern: /\bstructure\b/i, keyword: "structure", type: "planning", weight: 0.65 }
+  {
+    pattern: /\barchitect\b/i,
+    keyword: "architect",
+    type: "planning",
+    weight: 0.9,
+  },
+  {
+    pattern: /\boutline\b/i,
+    keyword: "outline",
+    type: "planning",
+    weight: 0.75,
+  },
+  {
+    pattern: /\bstrateg(y|ize)\b/i,
+    keyword: "strategy",
+    type: "planning",
+    weight: 0.8,
+  },
+  {
+    pattern: /\bpropose\b/i,
+    keyword: "propose",
+    type: "planning",
+    weight: 0.7,
+  },
+  {
+    pattern: /\bstructure\b/i,
+    keyword: "structure",
+    type: "planning",
+    weight: 0.65,
+  },
 ];
 var CONVERSATIONAL_PATTERNS = [
   /\bwhat\s+is\b/i,
@@ -316,24 +443,26 @@ var CONVERSATIONAL_PATTERNS = [
   /\bgreat\b/i,
   /\bnice\b/i,
   /\bgood\s+job\b/i,
-  /\bwhat\s+happened\b/i
+  /\bwhat\s+happened\b/i,
 ];
 var ALL_TASK_INDICATORS = [
   ...IMPLEMENTATION_INDICATORS,
   ...DEBUG_INDICATORS,
   ...RESEARCH_INDICATORS,
-  ...PLANNING_INDICATORS
+  ...PLANNING_INDICATORS,
 ];
 function detectTask(prompt) {
   if (!prompt?.trim()) {
     return {
       isTask: false,
       confidence: 0,
-      triggers: []
+      triggers: [],
     };
   }
   const promptLower = prompt.toLowerCase();
-  const conversationalMatches = CONVERSATIONAL_PATTERNS.filter((p) => p.test(promptLower));
+  const conversationalMatches = CONVERSATIONAL_PATTERNS.filter((p) =>
+    p.test(promptLower),
+  );
   const matches = [];
   for (const indicator of ALL_TASK_INDICATORS) {
     if (indicator.pattern.test(promptLower)) {
@@ -344,7 +473,7 @@ function detectTask(prompt) {
     return {
       isTask: false,
       confidence: 0,
-      triggers: []
+      triggers: [],
     };
   }
   let totalWeight = 0;
@@ -366,12 +495,12 @@ function detectTask(prompt) {
     return {
       isTask: false,
       confidence: Math.max(0, confidence),
-      triggers: []
+      triggers: [],
     };
   }
   confidence = Math.min(1, Math.max(0, confidence));
   const sortedMatches = [...matches].sort(
-    (a, b) => b.indicator.weight - a.indicator.weight
+    (a, b) => b.indicator.weight - a.indicator.weight,
   );
   const primaryType = sortedMatches[0].indicator.type;
   const triggers = [...new Set(matches.map((m) => m.keyword))];
@@ -379,7 +508,7 @@ function detectTask(prompt) {
     isTask: true,
     taskType: primaryType,
     confidence,
-    triggers
+    triggers,
   };
 }
 
@@ -388,7 +517,7 @@ var PRIORITY_VALUES = {
   critical: 4,
   high: 3,
   medium: 2,
-  low: 1
+  low: 1,
 };
 var MEMORY_SIMILARITY_THRESHOLD = 0.7;
 var cachedSkillRules = null;
@@ -404,8 +533,8 @@ function topologicalSort(skillName, rules) {
     inProgress.add(name);
     const rule = rules.skills?.[name];
     const deps = [
-      ...rule?.prerequisites?.require || [],
-      ...rule?.prerequisites?.suggest || []
+      ...(rule?.prerequisites?.require || []),
+      ...(rule?.prerequisites?.suggest || []),
     ];
     for (const dep of deps) {
       visit(dep, [...path, name]);
@@ -417,7 +546,13 @@ function topologicalSort(skillName, rules) {
   visit(skillName);
   return result;
 }
-function detectCircularDependency(skillName, rules, visited = /* @__PURE__ */ new Set(), stack = /* @__PURE__ */ new Set(), path = []) {
+function detectCircularDependency(
+  skillName,
+  rules,
+  visited = /* @__PURE__ */ new Set(),
+  stack = /* @__PURE__ */ new Set(),
+  path = [],
+) {
   if (stack.has(skillName)) {
     return [...path, skillName];
   }
@@ -429,11 +564,13 @@ function detectCircularDependency(skillName, rules, visited = /* @__PURE__ */ ne
   path.push(skillName);
   const rule = rules.skills?.[skillName];
   const deps = [
-    ...rule?.prerequisites?.require || [],
-    ...rule?.prerequisites?.suggest || []
+    ...(rule?.prerequisites?.require || []),
+    ...(rule?.prerequisites?.suggest || []),
   ];
   for (const dep of deps) {
-    const cycle = detectCircularDependency(dep, rules, visited, stack, [...path]);
+    const cycle = detectCircularDependency(dep, rules, visited, stack, [
+      ...path,
+    ]);
     if (cycle) return cycle;
   }
   stack.delete(skillName);
@@ -452,7 +589,7 @@ function resolvePrerequisites(skillName, rules) {
   return {
     suggest: rule.prerequisites.suggest || [],
     require: rule.prerequisites.require || [],
-    loadOrder
+    loadOrder,
   };
 }
 function resolveCoActivation(skillName, rules) {
@@ -468,17 +605,23 @@ function resolveCoActivation(skillName, rules) {
   }
   return {
     peers,
-    mode: rule.coActivateMode || "any"
+    mode: rule.coActivateMode || "any",
   };
 }
 function getLoadingMode(skillName, rules) {
   const rule = rules.skills?.[skillName];
   const loading = rule?.loading;
   if (!loading) return "lazy";
-  if (loading === "lazy" || loading === "eager" || loading === "eager-prerequisites") {
+  if (
+    loading === "lazy" ||
+    loading === "eager" ||
+    loading === "eager-prerequisites"
+  ) {
     return loading;
   }
-  console.warn(`Invalid loading mode "${loading}" for skill "${skillName}", defaulting to lazy`);
+  console.warn(
+    `Invalid loading mode "${loading}" for skill "${skillName}", defaulting to lazy`,
+  );
   return "lazy";
 }
 function buildEnhancedLookupResult(match, rules) {
@@ -486,16 +629,28 @@ function buildEnhancedLookupResult(match, rules) {
   const result = {
     found: true,
     skillName: match.skillName,
-    skillPath: join(projectDir, ".claude", "skills", match.skillName, "SKILL.md"),
+    skillPath: join(
+      projectDir,
+      ".claude",
+      "skills",
+      match.skillName,
+      "SKILL.md",
+    ),
     confidence: match.priorityValue / 4,
-    source: match.source
+    source: match.source,
   };
   try {
     result.prerequisites = resolvePrerequisites(match.skillName, rules);
   } catch (error) {
     if (error instanceof CircularDependencyError) {
-      console.error(`Circular dependency in ${match.skillName}: ${error.message}`);
-      result.prerequisites = { suggest: [], require: [], loadOrder: [match.skillName] };
+      console.error(
+        `Circular dependency in ${match.skillName}: ${error.message}`,
+      );
+      result.prerequisites = {
+        suggest: [],
+        require: [],
+        loadOrder: [match.skillName],
+      };
     } else {
       throw error;
     }
@@ -507,7 +662,7 @@ function buildEnhancedLookupResult(match, rules) {
 async function readStdin() {
   return new Promise((resolve) => {
     let data = "";
-    process.stdin.on("data", (chunk) => data += chunk);
+    process.stdin.on("data", (chunk) => (data += chunk));
     process.stdin.on("end", () => resolve(data));
   });
 }
@@ -518,7 +673,7 @@ function loadSkillRules() {
   const projectDir = process.env.CLAUDE_PROJECT_DIR ?? process.cwd();
   const possiblePaths = [
     join(projectDir, ".claude", "skills", "skill-rules.json"),
-    join(process.env.HOME ?? "", ".claude", "skills", "skill-rules.json")
+    join(process.env.HOME ?? "", ".claude", "skills", "skill-rules.json"),
   ];
   for (const rulesPath of possiblePaths) {
     try {
@@ -542,8 +697,7 @@ function matchesIntentPattern(prompt, patterns) {
       if (new RegExp(pattern, "i").test(prompt)) {
         return true;
       }
-    } catch {
-    }
+    } catch {}
   }
   return false;
 }
@@ -560,15 +714,21 @@ function buildLookupResult(match) {
   return {
     found: true,
     skillName: match.skillName,
-    skillPath: join(projectDir, ".claude", "skills", match.skillName, "SKILL.md"),
+    skillPath: join(
+      projectDir,
+      ".claude",
+      "skills",
+      match.skillName,
+      "SKILL.md",
+    ),
     confidence: match.priorityValue / 4,
-    source: match.source
+    source: match.source,
   };
 }
 function matchSkillByKeyword(prompt, rules) {
   const promptLower = prompt.toLowerCase();
   const matches = [];
-  const allSkills = { ...rules.skills, ...rules.agents ?? {} };
+  const allSkills = { ...rules.skills, ...(rules.agents ?? {}) };
   for (const [skillName, rule] of Object.entries(allSkills)) {
     const triggers = rule.promptTriggers;
     if (!triggers) continue;
@@ -577,7 +737,10 @@ function matchSkillByKeyword(prompt, rules) {
       matches.push({ skillName, source: "keyword", priorityValue });
       continue;
     }
-    if (triggers.intentPatterns && matchesIntentPattern(prompt, triggers.intentPatterns)) {
+    if (
+      triggers.intentPatterns &&
+      matchesIntentPattern(prompt, triggers.intentPatterns)
+    ) {
       matches.push({ skillName, source: "intent", priorityValue });
     }
   }
@@ -593,13 +756,13 @@ function lookupSkillInMemory(prompt) {
   }
   const results = searchMemory(prompt, 3);
   const validResults = results.filter(
-    (r) => r.similarity >= MEMORY_SIMILARITY_THRESHOLD
+    (r) => r.similarity >= MEMORY_SIMILARITY_THRESHOLD,
   );
   if (validResults.length === 0) {
     return { found: false, confidence: 0 };
   }
   const skillResult = validResults.find(
-    (r) => r.metadata?.type === "skill" || r.metadata?.skillName !== void 0
+    (r) => r.metadata?.type === "skill" || r.metadata?.skillName !== void 0,
   );
   if (skillResult?.metadata?.skillName) {
     const projectDir = process.env.CLAUDE_PROJECT_DIR ?? process.cwd();
@@ -609,7 +772,7 @@ function lookupSkillInMemory(prompt) {
       skillName,
       skillPath: join(projectDir, ".claude", "skills", skillName, "SKILL.md"),
       confidence: skillResult.similarity,
-      source: "memory"
+      source: "memory",
     };
   }
   const topResult = validResults[0];
@@ -617,7 +780,7 @@ function lookupSkillInMemory(prompt) {
     found: true,
     skillName: void 0,
     confidence: topResult.similarity,
-    source: "memory"
+    source: "memory",
   };
 }
 async function lookupSkill(prompt) {
@@ -629,7 +792,7 @@ async function lookupSkill(prompt) {
     }
     return {
       found: false,
-      confidence: 0
+      confidence: 0,
     };
   }
   const keywordResult = matchSkillByKeyword(prompt, rules);
@@ -654,7 +817,7 @@ async function main() {
   const prompt = input.prompt ?? "";
   const lookupResult = await lookupSkill(prompt);
   const output = {
-    result: "continue"
+    result: "continue",
   };
   if (lookupResult.found && lookupResult.skillName) {
     const source = lookupResult.source ?? "unknown";
@@ -664,8 +827,13 @@ async function main() {
   } else {
     const taskResult = detectTask(prompt);
     if (taskResult.isTask) {
-      const taskTypeMsg = taskResult.taskType ? ` (${taskResult.taskType})` : "";
-      const triggersMsg = taskResult.triggers.length > 0 ? ` Triggers: ${taskResult.triggers.join(", ")}.` : "";
+      const taskTypeMsg = taskResult.taskType
+        ? ` (${taskResult.taskType})`
+        : "";
+      const triggersMsg =
+        taskResult.triggers.length > 0
+          ? ` Triggers: ${taskResult.triggers.join(", ")}.`
+          : "";
       output.message = `Novel task detected${taskTypeMsg} with confidence ${taskResult.confidence.toFixed(2)}.${triggersMsg} No existing skill matches. JIT skill generation available in future phases.`;
     }
   }
@@ -682,5 +850,5 @@ export {
   getLoadingMode,
   resolveCoActivation,
   resolvePrerequisites,
-  topologicalSort
+  topologicalSort,
 };

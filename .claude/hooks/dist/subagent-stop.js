@@ -23,25 +23,25 @@ function getDbPath() {
     ".claude",
     "cache",
     "agentica-coordination",
-    "coordination.db"
+    "coordination.db",
   );
 }
 function runPythonQuery(script, args) {
   try {
     const result = spawnSync("python3", ["-c", script, ...args], {
       encoding: "utf-8",
-      maxBuffer: 1024 * 1024
+      maxBuffer: 1024 * 1024,
     });
     return {
       success: result.status === 0,
       stdout: result.stdout?.trim() || "",
-      stderr: result.stderr || ""
+      stderr: result.stderr || "",
     };
   } catch (err) {
     return {
       success: false,
       stdout: "",
-      stderr: String(err)
+      stderr: String(err),
     };
   }
 }
@@ -91,17 +91,12 @@ except Exception as e:
     print(f"error: {e}")
     sys.exit(1)
 `;
-  const args = [
-    dbPath,
-    agentId,
-    status,
-    errorMessage || "null"
-  ];
+  const args = [dbPath, agentId, status, errorMessage || "null"];
   const result = runPythonQuery(pythonScript, args);
   if (!result.success || result.stdout !== "ok") {
     return {
       success: false,
-      error: result.stderr || result.stdout || "Unknown error"
+      error: result.stderr || result.stdout || "Unknown error",
     };
   }
   return { success: true };
@@ -180,11 +175,14 @@ print(json.dumps({'done': done_count, 'total': total_count}))
     } catch (parseErr) {
       return { result: "continue" };
     }
-    console.error(`[subagent-stop] Agent ${agentId} done. Progress: ${counts.done}/${counts.total}`);
+    console.error(
+      `[subagent-stop] Agent ${agentId} done. Progress: ${counts.done}/${counts.total}`,
+    );
     if (counts.done >= counts.total && counts.total > 0) {
       return {
         result: "continue",
-        message: "All agents complete. Consider synthesizing findings into final report."
+        message:
+          "All agents complete. Consider synthesizing findings into final report.",
       };
     }
     return { result: "continue" };
@@ -278,11 +276,14 @@ print(json.dumps({'completed': completed_count}))
     } catch (parseErr) {
       return { result: "continue" };
     }
-    console.error(`[jury] Juror ${jurorId} done. Progress: ${counts.completed}/${totalJurors}`);
+    console.error(
+      `[jury] Juror ${jurorId} done. Progress: ${counts.completed}/${totalJurors}`,
+    );
     if (counts.completed >= totalJurors && totalJurors > 0) {
       return {
         result: "continue",
-        message: "All jurors have completed their deliberations. Review the votes and provide your final verdict."
+        message:
+          "All jurors have completed their deliberations. Review the votes and provide your final verdict.",
       };
     }
     return { result: "continue" };
@@ -385,7 +386,7 @@ print(json.dumps({'completed': completed_count, 'total': total_count}))
       hierarchyId,
       agentId,
       coordinatorId || "",
-      hierarchyLevel.toString()
+      hierarchyLevel.toString(),
     ]);
     if (!result.success) {
       console.error("SubagentStop Python error:", result.stderr);
@@ -397,17 +398,19 @@ print(json.dumps({'completed': completed_count, 'total': total_count}))
     } catch (parseErr) {
       return { result: "continue" };
     }
-    console.error(`[hierarchical] Specialist ${agentId} done. Progress: ${counts.completed}/${counts.total}`);
+    console.error(
+      `[hierarchical] Specialist ${agentId} done. Progress: ${counts.completed}/${counts.total}`,
+    );
     if (counts.completed >= counts.total && counts.total > 0) {
       return {
         result: "continue",
-        message: `All ${counts.total} specialists have completed their subtasks. Ready for synthesis.`
+        message: `All ${counts.total} specialists have completed their subtasks. Ready for synthesis.`,
       };
     } else {
       const remaining = counts.total - counts.completed;
       return {
         result: "continue",
-        message: `Specialist completed. Waiting for ${remaining} more specialist(s) to finish.`
+        message: `Specialist completed. Waiting for ${remaining} more specialist(s) to finish.`,
       };
     }
   } catch (err) {
@@ -502,7 +505,12 @@ conn.close()
 
 print(json.dumps({'success': True}))
 `;
-    const result = runPythonQuery(query, [dbPath, gcId, iteration.toString(), role]);
+    const result = runPythonQuery(query, [
+      dbPath,
+      gcId,
+      iteration.toString(),
+      role,
+    ]);
     if (!result.success) {
       console.error("SubagentStop Python error:", result.stderr);
       return { result: "continue" };
@@ -659,7 +667,9 @@ print(json.dumps({'state': state, 'failure_count': failure_count}))
     } catch (parseErr) {
       return { result: "continue" };
     }
-    console.error(`[circuit-breaker] Agent ${agentId} (${role}) completed. Circuit state: ${state.state} (failures: ${state.failure_count})`);
+    console.error(
+      `[circuit-breaker] Agent ${agentId} (${role}) completed. Circuit state: ${state.state} (failures: ${state.failure_count})`,
+    );
     return { result: "continue" };
   } catch (err) {
     console.error("SubagentStop hook error:", err);
@@ -744,7 +754,12 @@ completed_count = cursor.fetchone()[0]
 conn.close()
 print(json.dumps({'completed': completed_count}))
 `;
-    const result = runPythonQuery(query, [dbPath, mrId, mapperId, mapperIndex.toString()]);
+    const result = runPythonQuery(query, [
+      dbPath,
+      mrId,
+      mapperId,
+      mapperIndex.toString(),
+    ]);
     if (!result.success) {
       console.error("SubagentStop Python error:", result.stderr);
       return { result: "continue" };
@@ -755,11 +770,13 @@ print(json.dumps({'completed': completed_count}))
     } catch (parseErr) {
       return { result: "continue" };
     }
-    console.error(`[map-reduce] Mapper ${mapperId} done. Progress: ${counts.completed}/${totalMappers}`);
+    console.error(
+      `[map-reduce] Mapper ${mapperId} done. Progress: ${counts.completed}/${totalMappers}`,
+    );
     if (counts.completed >= totalMappers && totalMappers > 0) {
       return {
         result: "continue",
-        message: "All mappers have completed. Proceeding to reduce phase."
+        message: "All mappers have completed. Proceeding to reduce phase.",
       };
     }
     return { result: "continue" };
@@ -844,14 +861,16 @@ print(json.dumps({'success': True, 'handled': handled, 'escalated': escalated}))
       corId,
       handlerId,
       handlerPriority.toString(),
-      escalate ? "true" : "false"
+      escalate ? "true" : "false",
     ]);
     if (!result.success) {
       console.error("SubagentStop Python error:", result.stderr);
       return { result: "continue" };
     }
     const action = escalate ? "escalated" : "handled";
-    console.error(`[chain-of-responsibility] Handler ${handlerPriority} ${action} request`);
+    console.error(
+      `[chain-of-responsibility] Handler ${handlerPriority} ${action} request`,
+    );
     return { result: "continue" };
   } catch (err) {
     console.error("SubagentStop hook error:", err);
@@ -937,12 +956,12 @@ async function onSubagentStop10(input) {
   if (round < maxRounds) {
     return {
       result: "continue",
-      message: `Round ${round} of ${maxRounds} complete. Prepare for next round of debate.`
+      message: `Round ${round} of ${maxRounds} complete. Prepare for next round of debate.`,
     };
   } else if (round === maxRounds && role !== "judge") {
     return {
       result: "continue",
-      message: `All ${maxRounds} debate rounds complete. Ready for judge's verdict.`
+      message: `All ${maxRounds} debate rounds complete. Ready for judge's verdict.`,
     };
   }
   return { result: "continue" };
@@ -954,7 +973,7 @@ function handlePipeline(input) {
   const totalStages = process.env.PIPELINE_TOTAL_STAGES;
   const pipelineId = process.env.PATTERN_ID;
   console.error(
-    `[pipeline] Stage ${stageIndex} of ${totalStages} completed for pipeline ${pipelineId}`
+    `[pipeline] Stage ${stageIndex} of ${totalStages} completed for pipeline ${pipelineId}`,
   );
   return { result: "continue" };
 }
@@ -975,7 +994,9 @@ async function main() {
   if (agentId) {
     const result = completeAgent(agentId, "completed");
     if (!result.success) {
-      console.error(`[subagent-stop] Failed to complete agent: ${result.error}`);
+      console.error(
+        `[subagent-stop] Failed to complete agent: ${result.error}`,
+      );
     }
   }
   const pattern = detectPattern();

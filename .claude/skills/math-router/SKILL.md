@@ -1,7 +1,18 @@
 ---
 name: math-router
 description: Deterministic router for math cognitive stack - maps user intent to exact CLI commands
-triggers: ["math", "calculate", "compute", "solve", "integrate", "derivative", "plot", "convert", "prove"]
+triggers:
+  [
+    "math",
+    "calculate",
+    "compute",
+    "solve",
+    "integrate",
+    "derivative",
+    "plot",
+    "convert",
+    "prove",
+  ]
 priority: high
 user-invocable: false
 ---
@@ -11,6 +22,10 @@ user-invocable: false
 **ALWAYS use this router first for math requests.**
 
 Instead of reading individual skill documentation, call the router to get the exact command:
+
+## When to Use
+
+This skill is invoked when routing math requests to the correct CLI command. Not user-invocable directly.
 
 ## Usage
 
@@ -42,15 +57,15 @@ uv run python scripts/cc_math/math_router.py route "<user's math request>"
 
 ## Available Routes
 
-| Category | Commands |
-|----------|----------|
-| sympy | integrate, diff, solve, simplify, limit, det, eigenvalues, inv, expand, factor, series, laplace, fourier |
-| pint | convert, check |
-| shapely | create, measure, pred, op |
-| z3 | prove, sat, optimize |
-| scratchpad | verify, explain |
-| tutor | hint, steps, generate |
-| plot | plot2d, plot3d, latex |
+| Category   | Commands                                                                                                 |
+| ---------- | -------------------------------------------------------------------------------------------------------- |
+| sympy      | integrate, diff, solve, simplify, limit, det, eigenvalues, inv, expand, factor, series, laplace, fourier |
+| pint       | convert, check                                                                                           |
+| shapely    | create, measure, pred, op                                                                                |
+| z3         | prove, sat, optimize                                                                                     |
+| scratchpad | verify, explain                                                                                          |
+| tutor      | hint, steps, generate                                                                                    |
+| plot       | plot2d, plot3d, latex                                                                                    |
 
 ## List All Commands
 
@@ -65,5 +80,6 @@ uv run python scripts/cc_math/math_router.py list --category sympy
 ## Fallback
 
 If the router returns `{"command": null}`, the intent wasn't recognized. Then:
+
 1. Ask user to clarify
 2. Or use individual skills: /sympy-compute, /z3-solve, /pint-compute, etc.

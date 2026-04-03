@@ -5,9 +5,9 @@
  * Implements the APOLLO recursive repair pattern.
  */
 
-import { readFileSync, existsSync, unlinkSync } from 'fs';
-import { join } from 'path';
-import { tmpdir } from 'os';
+import { readFileSync, existsSync, unlinkSync } from "fs";
+import { join } from "path";
+import { tmpdir } from "os";
 
 interface StopHookInput {
   session_id: string;
@@ -26,23 +26,23 @@ interface CompilerState {
 }
 
 const STATE_DIR = process.env.CLAUDE_PROJECT_DIR
-  ? join(process.env.CLAUDE_PROJECT_DIR, '.claude', 'cache', 'lean')
-  : join(tmpdir(), 'claude-lean');
+  ? join(process.env.CLAUDE_PROJECT_DIR, ".claude", "cache", "lean")
+  : join(tmpdir(), "claude-lean");
 
-const STATE_FILE = join(STATE_DIR, 'compiler-state.json');
+const STATE_FILE = join(STATE_DIR, "compiler-state.json");
 
 // Max age for state (5 minutes) - ignore stale state
 const MAX_STATE_AGE_MS = 5 * 60 * 1000;
 
 function readStdin(): string {
-  return readFileSync(0, 'utf-8');
+  return readFileSync(0, "utf-8");
 }
 
 function loadState(): CompilerState | null {
   if (!existsSync(STATE_FILE)) return null;
 
   try {
-    const state: CompilerState = JSON.parse(readFileSync(STATE_FILE, 'utf-8'));
+    const state: CompilerState = JSON.parse(readFileSync(STATE_FILE, "utf-8"));
 
     // Check if state is stale
     if (Date.now() - state.timestamp > MAX_STATE_AGE_MS) {
@@ -67,7 +67,7 @@ async function main() {
 
   // CRITICAL: Prevent infinite loops
   if (input.stop_hook_active) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
@@ -75,14 +75,14 @@ async function main() {
 
   // No Lean state or no errors - allow stop
   if (!state || !state.has_errors) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
   // Check if state is for current session
   if (state.session_id !== input.session_id) {
     clearState();
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
@@ -97,7 +97,7 @@ File: ${state.file_path}
 
 The proof has ${state.sorries.length} incomplete part(s):
 
-${state.sorries.join('\n')}
+${state.sorries.join("\n")}
 
 **Your task:**
 1. Pick ONE sorry to fix (start with the simplest)
@@ -129,13 +129,15 @@ Fix the errors and re-write the file.
   }
 
   // Block stop, inject repair prompt
-  console.log(JSON.stringify({
-    decision: 'block',
-    reason: repairPrompt
-  }));
+  console.log(
+    JSON.stringify({
+      decision: "block",
+      reason: repairPrompt,
+    }),
+  );
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error(err.message);
   process.exit(1);
 });

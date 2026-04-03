@@ -8,6 +8,16 @@ allowed-tools: [Read, Grep, Glob, Task, AskUserQuestion, TodoWrite]
 
 Identify failure modes before they occur by systematically questioning plans, designs, and implementations. Based on Gary Klein's technique, popularized by Shreyas Doshi (Stripe).
 
+## When to Use
+
+Activate when:
+
+- User says "/premortem"
+- User says "what could go wrong?" or "identify risks"
+- Before starting implementation of a new feature or plan
+- User says "run premortem on this plan"
+- After a plan is created and before implementation starts
+
 ## Usage
 
 ```
@@ -23,11 +33,11 @@ Identify failure modes before they occur by systematically questioning plans, de
 
 ## Risk Categories (Shreyas Framework)
 
-| Category | Symbol | Meaning |
-|----------|--------|---------|
-| **Tiger** | `[TIGER]` | Clear threat that will hurt us if not addressed |
-| **Paper Tiger** | `[PAPER]` | Looks threatening but probably fine |
-| **Elephant** | `[ELEPHANT]` | Thing nobody wants to talk about |
+| Category        | Symbol       | Meaning                                         |
+| --------------- | ------------ | ----------------------------------------------- |
+| **Tiger**       | `[TIGER]`    | Clear threat that will hurt us if not addressed |
+| **Paper Tiger** | `[PAPER]`    | Looks threatening but probably fine             |
+| **Elephant**    | `[ELEPHANT]` | Thing nobody wants to talk about                |
 
 ## CRITICAL: Verify Before Flagging
 
@@ -36,6 +46,7 @@ Identify failure modes before they occur by systematically questioning plans, de
 ### The False Positive Problem
 
 Common mistakes that create false tigers:
+
 - Seeing a hardcoded path without checking for `if exists():` fallback
 - Finding missing feature X without asking "is X in scope?"
 - Flagging code at line N without reading lines N±20 for context
@@ -50,10 +61,10 @@ potential_finding:
   what: "Hardcoded path at line 42"
 
 verification:
-  context_read: true    # Did I read ±20 lines around the finding?
-  fallback_check: true  # Is there try/except, if exists(), or else branch?
-  scope_check: true     # Is this even in scope for this code?
-  dev_only_check: true  # Is this in __main__, tests/, or dev-only code?
+  context_read: true # Did I read ±20 lines around the finding?
+  fallback_check: true # Is there try/except, if exists(), or else branch?
+  scope_check: true # Is this even in scope for this code?
+  dev_only_check: true # Is this in __main__, tests/, or dev-only code?
 
 result: tiger | paper_tiger | false_alarm
 ```
@@ -106,6 +117,7 @@ else:
 Run through these mentally, note any that apply:
 
 **Core Questions:**
+
 1. What's the single biggest thing that could go wrong?
 2. Any external dependencies that could fail?
 3. Is rollback possible if this breaks?
@@ -113,13 +125,14 @@ Run through these mentally, note any that apply:
 5. Unclear requirements that could cause rework?
 
 **Output Format:**
+
 ```yaml
 premortem:
   mode: quick
   context: "<plan/PR being analyzed>"
 
   # Two-pass process: first gather potential risks, then verify each one
-  potential_risks:  # Pass 1: Pattern-matching findings
+  potential_risks: # Pass 1: Pattern-matching findings
     - "hardcoded path at line 42"
     - "missing error handling for X"
 
@@ -129,7 +142,7 @@ premortem:
       location: "file.py:42"
       severity: high|medium
       category: dependency|integration|requirements|testing
-      mitigation_checked: "<what was NOT found>"  # REQUIRED
+      mitigation_checked: "<what was NOT found>" # REQUIRED
 
   elephants:
     - risk: "<unspoken concern>"
@@ -138,9 +151,9 @@ premortem:
   paper_tigers:
     - risk: "<looks scary but ok>"
       reason: "<why it's fine - what mitigation EXISTS>"
-      location: "file.py:42-48"  # Show the mitigation location
+      location: "file.py:42-48" # Show the mitigation location
 
-  false_alarms:  # Findings that turned out to be nothing
+  false_alarms: # Findings that turned out to be nothing
     - finding: "<what was initially flagged>"
       reason: "<why it's not a risk>"
 ```
@@ -150,6 +163,7 @@ premortem:
 Work through each category systematically:
 
 **Technical Risks:**
+
 - [ ] Scalability: Works at 10x/100x current load?
 - [ ] Dependencies: External services + fallbacks defined?
 - [ ] Data: Availability, consistency, migrations clear?
@@ -158,31 +172,35 @@ Work through each category systematically:
 - [ ] Error handling: All failure modes covered?
 
 **Integration Risks:**
+
 - [ ] Breaking changes identified?
 - [ ] Migration path defined?
 - [ ] Rollback strategy exists?
 - [ ] Feature flags needed?
 
 **Process Risks:**
+
 - [ ] Requirements clear and complete?
 - [ ] All stakeholder input gathered?
 - [ ] Tech debt being tracked?
 - [ ] Maintenance burden understood?
 
 **Testing Risks:**
+
 - [ ] Coverage gaps identified?
 - [ ] Integration test plan exists?
 - [ ] Load testing needed?
 - [ ] Manual testing plan defined?
 
 **Output Format:**
+
 ```yaml
 premortem:
   mode: deep
   context: "<implementation being analyzed>"
 
   # Two-pass process
-  potential_risks:  # Pass 1: Initial scan findings
+  potential_risks: # Pass 1: Initial scan findings
     - "no circuit breaker for external API"
     - "hardcoded timeout value"
 
@@ -253,6 +271,7 @@ How would you like to proceed?""",
 ### Step 4: Handle User Response
 
 #### If "Accept risks and proceed"
+
 ```python
 # Log acceptance for audit trail
 print("Risks acknowledged. Proceeding with implementation.")
@@ -260,6 +279,7 @@ print("Risks acknowledged. Proceeding with implementation.")
 ```
 
 #### If "Add mitigations to plan"
+
 ```python
 # User provides mitigation approach
 # Update plan file with mitigations section
@@ -267,6 +287,7 @@ print("Risks acknowledged. Proceeding with implementation.")
 ```
 
 #### If "Research mitigation options"
+
 ```python
 # Spawn parallel research for each HIGH severity tiger
 for tiger in high_severity_tigers:
@@ -306,6 +327,7 @@ for tiger in high_severity_tigers:
 ```
 
 #### If "Discuss specific risks"
+
 ```python
 # Ask which risk to discuss
 AskUserQuestion(
@@ -324,14 +346,17 @@ If user added mitigations, append to the plan:
 ## Risk Mitigations (Pre-Mortem)
 
 ### Tigers Addressed:
+
 1. **{risk}** (severity: {severity})
    - Mitigation: {user_or_researched_mitigation}
    - Added to phase: {phase_number}
 
 ### Accepted Risks:
+
 1. **{risk}** - Accepted because: {reason}
 
 ### Pre-Mortem Run:
+
 - Date: {timestamp}
 - Mode: {quick|deep}
 - Tigers: {count}
@@ -372,11 +397,11 @@ After plan structure is approved, before ExitPlanMode:
 
 ## Severity Thresholds
 
-| Severity | Blocking? | Action Required |
-|----------|-----------|-----------------|
-| HIGH | Yes | Must address or explicitly accept |
-| MEDIUM | No | Inform user, recommend addressing |
-| LOW | No | Note for awareness |
+| Severity | Blocking? | Action Required                   |
+| -------- | --------- | --------------------------------- |
+| HIGH     | Yes       | Must address or explicitly accept |
+| MEDIUM   | No        | Inform user, recommend addressing |
+| LOW      | No        | Note for awareness                |
 
 ## Example Session
 

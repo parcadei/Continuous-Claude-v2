@@ -17,14 +17,14 @@
  * - Error handling
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { existsSync, mkdirSync, writeFileSync, rmSync } from 'fs';
-import { join } from 'path';
-import * as crypto from 'crypto';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { existsSync, mkdirSync, writeFileSync, rmSync } from "fs";
+import { join } from "path";
+import * as crypto from "crypto";
 
 // Test fixtures
-const TEST_PROJECT_DIR = '/tmp/hooks-daemon-migration-test';
-const TLDR_DIR = join(TEST_PROJECT_DIR, '.tldr');
+const TEST_PROJECT_DIR = "/tmp/hooks-daemon-migration-test";
+const TLDR_DIR = join(TEST_PROJECT_DIR, ".tldr");
 
 function setupTestEnv(): void {
   if (!existsSync(TLDR_DIR)) {
@@ -41,7 +41,11 @@ function cleanupTestEnv(): void {
 }
 
 function computeSocketPath(projectDir: string): string {
-  const hash = crypto.createHash('md5').update(projectDir).digest('hex').substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(projectDir)
+    .digest("hex")
+    .substring(0, 8);
   return `/tmp/tldr-${hash}.sock`;
 }
 
@@ -49,7 +53,7 @@ function computeSocketPath(projectDir: string): string {
 // Test 1: smart-search-router daemon migration
 // =============================================================================
 
-describe('smart-search-router daemon migration', () => {
+describe("smart-search-router daemon migration", () => {
   beforeEach(() => {
     setupTestEnv();
   });
@@ -58,17 +62,15 @@ describe('smart-search-router daemon migration', () => {
     cleanupTestEnv();
   });
 
-  describe('tldrSearch migration', () => {
-    it('should parse daemon search response correctly', () => {
+  describe("tldrSearch migration", () => {
+    it("should parse daemon search response correctly", () => {
       const daemonResponse = {
-        status: 'ok',
-        results: [
-          { file: 'test.py', line: 10, content: 'def process_data()' },
-        ],
+        status: "ok",
+        results: [{ file: "test.py", line: 10, content: "def process_data()" }],
       };
 
       const parseSearchResults = (response: typeof daemonResponse) => {
-        if (response.status !== 'ok' || !response.results) {
+        if (response.status !== "ok" || !response.results) {
           return [];
         }
         return response.results;
@@ -76,23 +78,23 @@ describe('smart-search-router daemon migration', () => {
 
       const results = parseSearchResults(daemonResponse);
       expect(results).toHaveLength(1);
-      expect(results[0].file).toBe('test.py');
+      expect(results[0].file).toBe("test.py");
     });
 
-    it('should fall back to ripgrep when daemon returns indexing', () => {
-      writeFileSync(join(TLDR_DIR, 'status'), 'indexing');
+    it("should fall back to ripgrep when daemon returns indexing", () => {
+      writeFileSync(join(TLDR_DIR, "status"), "indexing");
 
       const fallbackToRipgrep = (response: { indexing?: boolean }): boolean => {
         return response.indexing === true;
       };
 
-      const response = { indexing: true, status: 'indexing' };
+      const response = { indexing: true, status: "indexing" };
       expect(fallbackToRipgrep(response)).toBe(true);
     });
 
-    it('should construct correct ripgrep fallback command', () => {
-      const pattern = 'process_data';
-      const dir = '/path/to/project';
+    it("should construct correct ripgrep fallback command", () => {
+      const pattern = "process_data";
+      const dir = "/path/to/project";
 
       const constructRipgrepCmd = (p: string, d: string) => {
         const escaped = p.replace(/"/g, '\\"');
@@ -103,11 +105,11 @@ describe('smart-search-router daemon migration', () => {
       expect(cmd).toBe('rg "process_data" "/path/to/project" --json -l');
     });
 
-    it('should handle empty results from daemon', () => {
-      const daemonResponse = { status: 'ok', results: [] };
+    it("should handle empty results from daemon", () => {
+      const daemonResponse = { status: "ok", results: [] };
 
       const parseSearchResults = (response: typeof daemonResponse) => {
-        if (response.status !== 'ok' || !response.results) {
+        if (response.status !== "ok" || !response.results) {
           return [];
         }
         return response.results;
@@ -117,18 +119,18 @@ describe('smart-search-router daemon migration', () => {
     });
   });
 
-  describe('tldrImpact migration', () => {
-    it('should parse daemon impact response correctly', () => {
+  describe("tldrImpact migration", () => {
+    it("should parse daemon impact response correctly", () => {
       const daemonResponse = {
-        status: 'ok',
+        status: "ok",
         callers: [
-          { file: 'main.py', function: 'run', line: 15 },
-          { file: 'test.py', function: 'test_process', line: 8 },
+          { file: "main.py", function: "run", line: 15 },
+          { file: "test.py", function: "test_process", line: 8 },
         ],
       };
 
       const parseCallers = (response: typeof daemonResponse): string[] => {
-        if (response.status !== 'ok' || !response.callers) {
+        if (response.status !== "ok" || !response.callers) {
           return [];
         }
         return response.callers.map((c) => `${c.file}:${c.line}`);
@@ -136,18 +138,21 @@ describe('smart-search-router daemon migration', () => {
 
       const callers = parseCallers(daemonResponse);
       expect(callers).toHaveLength(2);
-      expect(callers[0]).toBe('main.py:15');
+      expect(callers[0]).toBe("main.py:15");
     });
 
-    it('should return empty callers when daemon unavailable', () => {
-      const handleUnavailable = (response: { status?: string; callers?: any[] }): string[] => {
-        if (response.status === 'unavailable' || !response.callers) {
+    it("should return empty callers when daemon unavailable", () => {
+      const handleUnavailable = (response: {
+        status?: string;
+        callers?: any[];
+      }): string[] => {
+        if (response.status === "unavailable" || !response.callers) {
           return [];
         }
         return response.callers.map((c: any) => `${c.file}:${c.line}`);
       };
 
-      const result = handleUnavailable({ status: 'unavailable' });
+      const result = handleUnavailable({ status: "unavailable" });
       expect(result).toEqual([]);
     });
   });
@@ -157,7 +162,7 @@ describe('smart-search-router daemon migration', () => {
 // Test 2: signature-helper daemon migration
 // =============================================================================
 
-describe('signature-helper daemon migration', () => {
+describe("signature-helper daemon migration", () => {
   beforeEach(() => {
     setupTestEnv();
   });
@@ -166,31 +171,48 @@ describe('signature-helper daemon migration', () => {
     cleanupTestEnv();
   });
 
-  describe('findFunctionFile migration', () => {
-    it('should parse search response to find function file', () => {
+  describe("findFunctionFile migration", () => {
+    it("should parse search response to find function file", () => {
       const daemonResponse = {
-        status: 'ok',
+        status: "ok",
         results: [
-          { file: 'processor.py', line: 25, content: 'def process_data(x, y):' },
+          {
+            file: "processor.py",
+            line: 25,
+            content: "def process_data(x, y):",
+          },
         ],
       };
 
-      const findFunctionFile = (response: typeof daemonResponse, projectDir: string): string | null => {
-        if (response.status !== 'ok' || !response.results || response.results.length === 0) {
+      const findFunctionFile = (
+        response: typeof daemonResponse,
+        projectDir: string,
+      ): string | null => {
+        if (
+          response.status !== "ok" ||
+          !response.results ||
+          response.results.length === 0
+        ) {
           return null;
         }
         return `${projectDir}/${response.results[0].file}`;
       };
 
-      const file = findFunctionFile(daemonResponse, '/path/to/project');
-      expect(file).toBe('/path/to/project/processor.py');
+      const file = findFunctionFile(daemonResponse, "/path/to/project");
+      expect(file).toBe("/path/to/project/processor.py");
     });
 
-    it('should return null when function not found', () => {
-      const daemonResponse = { status: 'ok', results: [] };
+    it("should return null when function not found", () => {
+      const daemonResponse = { status: "ok", results: [] };
 
-      const findFunctionFile = (response: typeof daemonResponse): string | null => {
-        if (response.status !== 'ok' || !response.results || response.results.length === 0) {
+      const findFunctionFile = (
+        response: typeof daemonResponse,
+      ): string | null => {
+        if (
+          response.status !== "ok" ||
+          !response.results ||
+          response.results.length === 0
+        ) {
           return null;
         }
         return response.results[0].file;
@@ -200,64 +222,76 @@ describe('signature-helper daemon migration', () => {
     });
   });
 
-  describe('getSignatureFromTLDR migration', () => {
-    it('should extract signature from daemon extract response', () => {
+  describe("getSignatureFromTLDR migration", () => {
+    it("should extract signature from daemon extract response", () => {
       const daemonResponse = {
-        status: 'ok',
+        status: "ok",
         result: {
-          file_path: '/path/to/processor.py',
+          file_path: "/path/to/processor.py",
           functions: [
             {
-              name: 'process_data',
-              signature: 'def process_data(x: int, y: str) -> bool:',
-              params: ['x: int', 'y: str'],
+              name: "process_data",
+              signature: "def process_data(x: int, y: str) -> bool:",
+              params: ["x: int", "y: str"],
             },
             {
-              name: 'other_func',
-              signature: 'def other_func():',
+              name: "other_func",
+              signature: "def other_func():",
               params: [],
             },
           ],
         },
       };
 
-      const findSignature = (funcName: string, response: typeof daemonResponse): string | null => {
-        if (response.status !== 'ok' || !response.result?.functions) {
+      const findSignature = (
+        funcName: string,
+        response: typeof daemonResponse,
+      ): string | null => {
+        if (response.status !== "ok" || !response.result?.functions) {
           return null;
         }
-        const func = response.result.functions.find((f) =>
-          f.name === funcName || f.name === `async ${funcName}`
+        const func = response.result.functions.find(
+          (f) => f.name === funcName || f.name === `async ${funcName}`,
         );
         return func?.signature || null;
       };
 
-      expect(findSignature('process_data', daemonResponse)).toBe('def process_data(x: int, y: str) -> bool:');
-      expect(findSignature('other_func', daemonResponse)).toBe('def other_func():');
-      expect(findSignature('nonexistent', daemonResponse)).toBeNull();
+      expect(findSignature("process_data", daemonResponse)).toBe(
+        "def process_data(x: int, y: str) -> bool:",
+      );
+      expect(findSignature("other_func", daemonResponse)).toBe(
+        "def other_func():",
+      );
+      expect(findSignature("nonexistent", daemonResponse)).toBeNull();
     });
 
-    it('should handle missing result gracefully', () => {
-      const daemonResponse = { status: 'ok', result: { functions: [] } };
+    it("should handle missing result gracefully", () => {
+      const daemonResponse = { status: "ok", result: { functions: [] } };
 
-      const findSignature = (funcName: string, response: typeof daemonResponse): string | null => {
+      const findSignature = (
+        funcName: string,
+        response: typeof daemonResponse,
+      ): string | null => {
         const funcs = response?.result?.functions || [];
         const func = funcs.find((f: any) => f.name === funcName);
         return func?.signature || null;
       };
 
-      expect(findSignature('nonexistent', daemonResponse)).toBeNull();
+      expect(findSignature("nonexistent", daemonResponse)).toBeNull();
     });
   });
 
-  describe('fallback behavior', () => {
-    it('should skip signature lookup when daemon unavailable', () => {
-      const shouldSkipSignatureLookup = (response: { status?: string }): boolean => {
-        return response.status === 'unavailable' || response.status === 'error';
+  describe("fallback behavior", () => {
+    it("should skip signature lookup when daemon unavailable", () => {
+      const shouldSkipSignatureLookup = (response: {
+        status?: string;
+      }): boolean => {
+        return response.status === "unavailable" || response.status === "error";
       };
 
-      expect(shouldSkipSignatureLookup({ status: 'unavailable' })).toBe(true);
-      expect(shouldSkipSignatureLookup({ status: 'error' })).toBe(true);
-      expect(shouldSkipSignatureLookup({ status: 'ok' })).toBe(false);
+      expect(shouldSkipSignatureLookup({ status: "unavailable" })).toBe(true);
+      expect(shouldSkipSignatureLookup({ status: "error" })).toBe(true);
+      expect(shouldSkipSignatureLookup({ status: "ok" })).toBe(false);
     });
   });
 });
@@ -266,7 +300,7 @@ describe('signature-helper daemon migration', () => {
 // Test 3: import-validator daemon migration
 // =============================================================================
 
-describe('import-validator daemon migration', () => {
+describe("import-validator daemon migration", () => {
   beforeEach(() => {
     setupTestEnv();
   });
@@ -275,17 +309,27 @@ describe('import-validator daemon migration', () => {
     cleanupTestEnv();
   });
 
-  describe('checkSymbolExists migration', () => {
-    it('should parse search result to check symbol existence', () => {
+  describe("checkSymbolExists migration", () => {
+    it("should parse search result to check symbol existence", () => {
       const funcResponse = {
-        status: 'ok',
+        status: "ok",
         results: [
-          { file: 'utils/processor.py', line: 42, content: 'def process_data():' },
+          {
+            file: "utils/processor.py",
+            line: 42,
+            content: "def process_data():",
+          },
         ],
       };
 
-      const checkExists = (response: typeof funcResponse): { exists: boolean; location?: string } => {
-        if (response.status !== 'ok' || !response.results || response.results.length === 0) {
+      const checkExists = (
+        response: typeof funcResponse,
+      ): { exists: boolean; location?: string } => {
+        if (
+          response.status !== "ok" ||
+          !response.results ||
+          response.results.length === 0
+        ) {
           return { exists: false };
         }
         const r = response.results[0];
@@ -294,49 +338,61 @@ describe('import-validator daemon migration', () => {
 
       const check = checkExists(funcResponse);
       expect(check.exists).toBe(true);
-      expect(check.location).toBe('utils/processor.py:42');
+      expect(check.location).toBe("utils/processor.py:42");
     });
 
-    it('should check both function and class definitions', () => {
+    it("should check both function and class definitions", () => {
       const checkSymbol = (
         funcResults: Array<{ file: string; line: number }>,
-        classResults: Array<{ file: string; line: number }>
+        classResults: Array<{ file: string; line: number }>,
       ): { exists: boolean; location?: string } => {
         if (funcResults.length > 0) {
-          return { exists: true, location: `${funcResults[0].file}:${funcResults[0].line}` };
+          return {
+            exists: true,
+            location: `${funcResults[0].file}:${funcResults[0].line}`,
+          };
         }
         if (classResults.length > 0) {
-          return { exists: true, location: `${classResults[0].file}:${classResults[0].line}` };
+          return {
+            exists: true,
+            location: `${classResults[0].file}:${classResults[0].line}`,
+          };
         }
         return { exists: false };
       };
 
       // Function found
-      expect(checkSymbol([{ file: 'utils.py', line: 10 }], [])).toEqual({
+      expect(checkSymbol([{ file: "utils.py", line: 10 }], [])).toEqual({
         exists: true,
-        location: 'utils.py:10',
+        location: "utils.py:10",
       });
 
       // Class found (no function)
-      expect(checkSymbol([], [{ file: 'models.py', line: 5 }])).toEqual({
+      expect(checkSymbol([], [{ file: "models.py", line: 5 }])).toEqual({
         exists: true,
-        location: 'models.py:5',
+        location: "models.py:5",
       });
 
       // Neither found
       expect(checkSymbol([], [])).toEqual({ exists: false });
     });
 
-    it('should return not exists when both searches fail', () => {
+    it("should return not exists when both searches fail", () => {
       const checkSymbol = (
         funcResults: any[],
-        classResults: any[]
+        classResults: any[],
       ): { exists: boolean; location?: string } => {
         if (funcResults.length > 0) {
-          return { exists: true, location: `${funcResults[0].file}:${funcResults[0].line}` };
+          return {
+            exists: true,
+            location: `${funcResults[0].file}:${funcResults[0].line}`,
+          };
         }
         if (classResults.length > 0) {
-          return { exists: true, location: `${classResults[0].file}:${classResults[0].line}` };
+          return {
+            exists: true,
+            location: `${classResults[0].file}:${classResults[0].line}`,
+          };
         }
         return { exists: false };
       };
@@ -345,17 +401,20 @@ describe('import-validator daemon migration', () => {
     });
   });
 
-  describe('fallback on indexing', () => {
-    it('should skip import validation when daemon is indexing', () => {
-      writeFileSync(join(TLDR_DIR, 'status'), 'indexing');
+  describe("fallback on indexing", () => {
+    it("should skip import validation when daemon is indexing", () => {
+      writeFileSync(join(TLDR_DIR, "status"), "indexing");
 
-      const shouldSkipValidation = (response: { indexing?: boolean; status?: string }): boolean => {
-        return response.indexing === true || response.status === 'unavailable';
+      const shouldSkipValidation = (response: {
+        indexing?: boolean;
+        status?: string;
+      }): boolean => {
+        return response.indexing === true || response.status === "unavailable";
       };
 
       expect(shouldSkipValidation({ indexing: true })).toBe(true);
-      expect(shouldSkipValidation({ status: 'unavailable' })).toBe(true);
-      expect(shouldSkipValidation({ status: 'ok' })).toBe(false);
+      expect(shouldSkipValidation({ status: "unavailable" })).toBe(true);
+      expect(shouldSkipValidation({ status: "ok" })).toBe(false);
     });
   });
 });
@@ -364,7 +423,7 @@ describe('import-validator daemon migration', () => {
 // Test 4: edit-context-inject daemon migration
 // =============================================================================
 
-describe('edit-context-inject daemon migration', () => {
+describe("edit-context-inject daemon migration", () => {
   beforeEach(() => {
     setupTestEnv();
   });
@@ -373,24 +432,32 @@ describe('edit-context-inject daemon migration', () => {
     cleanupTestEnv();
   });
 
-  describe('getTLDRExtract migration', () => {
-    it('should parse daemon extract response for file structure', () => {
+  describe("getTLDRExtract migration", () => {
+    it("should parse daemon extract response for file structure", () => {
       const daemonResponse = {
-        status: 'ok',
+        status: "ok",
         result: {
-          file_path: '/path/to/service.py',
-          language: 'python',
-          classes: [{ name: 'UserService' }],
+          file_path: "/path/to/service.py",
+          language: "python",
+          classes: [{ name: "UserService" }],
           functions: [
-            { name: 'get_user', signature: 'def get_user(id: int):', params: ['id: int'] },
-            { name: 'create_user', signature: 'def create_user(data: dict):', params: ['data: dict'] },
+            {
+              name: "get_user",
+              signature: "def get_user(id: int):",
+              params: ["id: int"],
+            },
+            {
+              name: "create_user",
+              signature: "def create_user(data: dict):",
+              params: ["data: dict"],
+            },
           ],
-          imports: ['from typing import Dict', 'import json'],
+          imports: ["from typing import Dict", "import json"],
         },
       };
 
       const parseExtract = (response: typeof daemonResponse) => {
-        if (response.status !== 'ok' || !response.result) {
+        if (response.status !== "ok" || !response.result) {
           return null;
         }
         return response.result;
@@ -400,16 +467,16 @@ describe('edit-context-inject daemon migration', () => {
       expect(extract).not.toBeNull();
       expect(extract!.classes).toHaveLength(1);
       expect(extract!.functions).toHaveLength(2);
-      expect(extract!.language).toBe('python');
+      expect(extract!.language).toBe("python");
     });
 
-    it('should format extract result as context message', () => {
+    it("should format extract result as context message", () => {
       const extract = {
-        classes: [{ name: 'UserService' }, { name: 'AuthService' }],
+        classes: [{ name: "UserService" }, { name: "AuthService" }],
         functions: [
-          { name: 'get_user', params: ['id'] },
-          { name: 'create_user', params: ['data', 'options'] },
-          { name: 'delete_user', params: [] },
+          { name: "get_user", params: ["id"] },
+          { name: "create_user", params: ["data", "options"] },
+          { name: "delete_user", params: [] },
         ],
       };
 
@@ -421,7 +488,7 @@ describe('edit-context-inject daemon migration', () => {
 
         if (classCount > 0) {
           const classNames = ext.classes.map((c) => c.name).slice(0, 10);
-          parts.push(`Classes: ${classNames.join(', ')}`);
+          parts.push(`Classes: ${classNames.join(", ")}`);
         }
 
         if (funcCount > 0) {
@@ -429,25 +496,25 @@ describe('edit-context-inject daemon migration', () => {
             const paramCount = f.params?.length || 0;
             return paramCount > 0 ? `${f.name}(${paramCount})` : f.name;
           });
-          parts.push(`Functions: ${funcSummaries.join(', ')}`);
+          parts.push(`Functions: ${funcSummaries.join(", ")}`);
         }
 
-        return `[Edit context: ${filename} has ${total} symbols]\n${parts.join('\n')}`;
+        return `[Edit context: ${filename} has ${total} symbols]\n${parts.join("\n")}`;
       };
 
-      const context = formatContext(extract, 'service.py');
-      expect(context).toContain('service.py has 5 symbols');
-      expect(context).toContain('Classes: UserService, AuthService');
-      expect(context).toContain('get_user(1)');
-      expect(context).toContain('create_user(2)');
-      expect(context).toContain('delete_user');
+      const context = formatContext(extract, "service.py");
+      expect(context).toContain("service.py has 5 symbols");
+      expect(context).toContain("Classes: UserService, AuthService");
+      expect(context).toContain("get_user(1)");
+      expect(context).toContain("create_user(2)");
+      expect(context).toContain("delete_user");
     });
 
-    it('should handle null result gracefully', () => {
-      const daemonResponse = { status: 'error', error: 'File not found' };
+    it("should handle null result gracefully", () => {
+      const daemonResponse = { status: "error", error: "File not found" };
 
       const parseExtract = (response: { status: string; result?: any }) => {
-        if (response.status !== 'ok' || !response.result) {
+        if (response.status !== "ok" || !response.result) {
           return null;
         }
         return response.result;
@@ -457,25 +524,27 @@ describe('edit-context-inject daemon migration', () => {
     });
   });
 
-  describe('fallback behavior', () => {
-    it('should return empty output when daemon unavailable', () => {
-      const handleDaemonUnavailable = (response: { status?: string }): boolean => {
-        return response.status === 'unavailable' || response.status === 'error';
+  describe("fallback behavior", () => {
+    it("should return empty output when daemon unavailable", () => {
+      const handleDaemonUnavailable = (response: {
+        status?: string;
+      }): boolean => {
+        return response.status === "unavailable" || response.status === "error";
       };
 
-      expect(handleDaemonUnavailable({ status: 'unavailable' })).toBe(true);
+      expect(handleDaemonUnavailable({ status: "unavailable" })).toBe(true);
     });
 
-    it('should return empty output for unsupported file types', () => {
+    it("should return empty output for unsupported file types", () => {
       const isSupportedFile = (filePath: string): boolean => {
-        const supported = ['.py', '.ts', '.tsx', '.js', '.jsx', '.go', '.rs'];
+        const supported = [".py", ".ts", ".tsx", ".js", ".jsx", ".go", ".rs"];
         return supported.some((ext) => filePath.endsWith(ext));
       };
 
-      expect(isSupportedFile('/path/to/file.py')).toBe(true);
-      expect(isSupportedFile('/path/to/file.ts')).toBe(true);
-      expect(isSupportedFile('/path/to/file.md')).toBe(false);
-      expect(isSupportedFile('/path/to/file.json')).toBe(false);
+      expect(isSupportedFile("/path/to/file.py")).toBe(true);
+      expect(isSupportedFile("/path/to/file.ts")).toBe(true);
+      expect(isSupportedFile("/path/to/file.md")).toBe(false);
+      expect(isSupportedFile("/path/to/file.json")).toBe(false);
     });
   });
 });
@@ -484,7 +553,7 @@ describe('edit-context-inject daemon migration', () => {
 // Test 5: Common patterns across all hooks
 // =============================================================================
 
-describe('Common daemon migration patterns', () => {
+describe("Common daemon migration patterns", () => {
   beforeEach(() => {
     setupTestEnv();
   });
@@ -493,34 +562,31 @@ describe('Common daemon migration patterns', () => {
     cleanupTestEnv();
   });
 
-  describe('project directory resolution', () => {
-    it('should use CLAUDE_PROJECT_DIR when available', () => {
-      process.env.CLAUDE_PROJECT_DIR = '/custom/project';
+  describe("project directory resolution", () => {
+    it("should use CLAUDE_PROJECT_DIR when available", () => {
+      process.env.CLAUDE_PROJECT_DIR = "/custom/project";
 
       const getProjectDir = (): string => {
         return process.env.CLAUDE_PROJECT_DIR || process.cwd();
       };
 
-      expect(getProjectDir()).toBe('/custom/project');
+      expect(getProjectDir()).toBe("/custom/project");
     });
 
-    it('should fall back to cwd when env not set', () => {
+    it("should fall back to cwd when env not set", () => {
       delete process.env.CLAUDE_PROJECT_DIR;
 
       const getProjectDir = (): string => {
-        return process.env.CLAUDE_PROJECT_DIR || '/fallback/dir';
+        return process.env.CLAUDE_PROJECT_DIR || "/fallback/dir";
       };
 
-      expect(getProjectDir()).toBe('/fallback/dir');
+      expect(getProjectDir()).toBe("/fallback/dir");
     });
   });
 
-  describe('error handling wrapper', () => {
-    it('should wrap daemon calls with try-catch', () => {
-      const safeDaemonCall = <T>(
-        fn: () => T,
-        fallback: T
-      ): T => {
+  describe("error handling wrapper", () => {
+    it("should wrap daemon calls with try-catch", () => {
+      const safeDaemonCall = <T>(fn: () => T, fallback: T): T => {
         try {
           return fn();
         } catch {
@@ -529,52 +595,52 @@ describe('Common daemon migration patterns', () => {
       };
 
       const result = safeDaemonCall(() => {
-        throw new Error('connection failed');
+        throw new Error("connection failed");
       }, []);
 
       expect(result).toEqual([]);
     });
   });
 
-  describe('timeout handling', () => {
-    it('should have reasonable timeout for hook context', () => {
+  describe("timeout handling", () => {
+    it("should have reasonable timeout for hook context", () => {
       // Hooks need to be fast - 3 second timeout is reasonable
       const DAEMON_TIMEOUT = 3000;
       expect(DAEMON_TIMEOUT).toBeLessThanOrEqual(5000);
     });
   });
 
-  describe('ripgrep fallback pattern', () => {
-    it('should construct valid ripgrep command for search fallback', () => {
-      const pattern = 'def process_data';
-      const projectDir = '/path/to/project';
+  describe("ripgrep fallback pattern", () => {
+    it("should construct valid ripgrep command for search fallback", () => {
+      const pattern = "def process_data";
+      const projectDir = "/path/to/project";
 
       const ripgrepFallback = (p: string, dir: string): string => {
-        const escaped = p.replace(/"/g, '\\"').replace(/\$/g, '\\$');
+        const escaped = p.replace(/"/g, '\\"').replace(/\$/g, "\\$");
         return `rg "${escaped}" "${dir}" --type py -l 2>/dev/null`;
       };
 
       const cmd = ripgrepFallback(pattern, projectDir);
       expect(cmd).toContain('rg "def process_data"');
-      expect(cmd).toContain('--type py');
-      expect(cmd).toContain('-l');
+      expect(cmd).toContain("--type py");
+      expect(cmd).toContain("-l");
     });
 
-    it('should parse ripgrep output to match daemon format', () => {
+    it("should parse ripgrep output to match daemon format", () => {
       // Ripgrep -l output is just file paths
-      const rgOutput = '/path/to/file1.py\n/path/to/file2.py\n';
+      const rgOutput = "/path/to/file1.py\n/path/to/file2.py\n";
 
       const parseRgFiles = (output: string): Array<{ file: string }> => {
         return output
           .trim()
-          .split('\n')
+          .split("\n")
           .filter((l) => l.length > 0)
           .map((file) => ({ file }));
       };
 
       const parsed = parseRgFiles(rgOutput);
       expect(parsed).toHaveLength(2);
-      expect(parsed[0].file).toBe('/path/to/file1.py');
+      expect(parsed[0].file).toBe("/path/to/file1.py");
     });
   });
 });

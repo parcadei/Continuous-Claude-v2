@@ -5,7 +5,7 @@
  * high-signal data for use by PreCompact hooks and auto-handoff generation.
  */
 
-import * as fs from 'fs';
+import * as fs from "fs";
 
 // ============================================================================
 // Type Definitions
@@ -14,7 +14,7 @@ import * as fs from 'fs';
 export interface TodoItem {
   id: string;
   content: string;
-  status: 'pending' | 'in_progress' | 'completed';
+  status: "pending" | "in_progress" | "completed";
 }
 
 export interface ToolCall {
@@ -82,71 +82,82 @@ export function parseTranscript(transcriptPath: string): TranscriptSummary {
   const summary: TranscriptSummary = {
     lastTodos: [],
     recentToolCalls: [],
-    lastAssistantMessage: '',
+    lastAssistantMessage: "",
     filesModified: [],
-    errorsEncountered: []
+    errorsEncountered: [],
   };
 
   if (!fs.existsSync(transcriptPath)) {
     return summary;
   }
 
-  const content = fs.readFileSync(transcriptPath, 'utf-8');
-  const lines = content.split('\n').filter(line => line.trim());
+  const content = fs.readFileSync(transcriptPath, "utf-8");
+  const lines = content.split("\n").filter((line) => line.trim());
 
   const allToolCalls: ToolCall[] = [];
   const modifiedFiles = new Set<string>();
   const errors: string[] = [];
   let lastTodoState: TodoItem[] = [];
-  let lastAssistant = '';
+  let lastAssistant = "";
 
   for (const line of lines) {
     try {
       const entry: TranscriptEntry = JSON.parse(line);
 
       // Extract last assistant message
-      if (entry.role === 'assistant' && typeof entry.content === 'string') {
+      if (entry.role === "assistant" && typeof entry.content === "string") {
         lastAssistant = entry.content;
-      } else if (entry.type === 'assistant' && typeof entry.content === 'string') {
+      } else if (
+        entry.type === "assistant" &&
+        typeof entry.content === "string"
+      ) {
         lastAssistant = entry.content;
       }
 
       // Extract tool calls
-      if (entry.tool_name || entry.type === 'tool_use') {
-        const toolName = entry.tool_name || (entry as Record<string, unknown>).name as string;
+      if (entry.tool_name || entry.type === "tool_use") {
+        const toolName =
+          entry.tool_name ||
+          ((entry as Record<string, unknown>).name as string);
         if (toolName) {
           const toolCall: ToolCall = {
             name: toolName,
             timestamp: entry.timestamp,
             input: entry.tool_input,
-            success: true // Will be updated by result
+            success: true, // Will be updated by result
           };
 
           // Check for TodoWrite to capture state
-          if (toolName === 'TodoWrite' || toolName.toLowerCase().includes('todowrite')) {
+          if (
+            toolName === "TodoWrite" ||
+            toolName.toLowerCase().includes("todowrite")
+          ) {
             const input = entry.tool_input as TodoWriteInput | undefined;
             if (input?.todos) {
               lastTodoState = input.todos.map((t, idx) => ({
                 id: t.id || `todo-${idx}`,
-                content: t.content || '',
-                status: (t.status as TodoItem['status']) || 'pending'
+                content: t.content || "",
+                status: (t.status as TodoItem["status"]) || "pending",
               }));
             }
           }
 
           // Track file modifications from Edit/Write tools
-          if (toolName === 'Edit' || toolName === 'Write' ||
-              toolName.toLowerCase().includes('edit') ||
-              toolName.toLowerCase().includes('write')) {
+          if (
+            toolName === "Edit" ||
+            toolName === "Write" ||
+            toolName.toLowerCase().includes("edit") ||
+            toolName.toLowerCase().includes("write")
+          ) {
             const input = entry.tool_input as EditWriteInput | undefined;
             const filePath = input?.file_path || input?.path;
-            if (filePath && typeof filePath === 'string') {
+            if (filePath && typeof filePath === "string") {
               modifiedFiles.add(filePath);
             }
           }
 
           // Track Bash commands for potential errors
-          if (toolName === 'Bash' || toolName.toLowerCase().includes('bash')) {
+          if (toolName === "Bash" || toolName.toLowerCase().includes("bash")) {
             const input = entry.tool_input as BashInput | undefined;
             if (input?.command) {
               toolCall.input = { command: input.command };
@@ -158,7 +169,7 @@ export function parseTranscript(transcriptPath: string): TranscriptSummary {
       }
 
       // Extract tool results and check for failures
-      if (entry.type === 'tool_result' || entry.tool_result !== undefined) {
+      if (entry.type === "tool_result" || entry.tool_result !== undefined) {
         const result = entry.tool_result as BashResult | undefined;
 
         // Check for Bash failures
@@ -171,9 +182,10 @@ export function parseTranscript(transcriptPath: string): TranscriptSummary {
             }
 
             // Extract error message
-            const errorMsg = result.stderr || result.error || 'Command failed';
+            const errorMsg = result.stderr || result.error || "Command failed";
             const lastTool = allToolCalls[allToolCalls.length - 1];
-            const command = (lastTool?.input as BashInput)?.command || 'unknown command';
+            const command =
+              (lastTool?.input as BashInput)?.command || "unknown command";
             errors.push(`${command}: ${errorMsg.substring(0, 200)}`);
           }
         }
@@ -186,7 +198,6 @@ export function parseTranscript(transcriptPath: string): TranscriptSummary {
           }
         }
       }
-
     } catch {
       // Skip malformed JSON lines
       continue;
@@ -215,130 +226,147 @@ export function parseTranscript(transcriptPath: string): TranscriptSummary {
  * @param sessionName - Name of the session for metadata
  * @returns YAML string suitable for writing to a handoff file
  */
-export function generateAutoHandoff(summary: TranscriptSummary, sessionName: string): string {
+export function generateAutoHandoff(
+  summary: TranscriptSummary,
+  sessionName: string,
+): string {
   const timestamp = new Date().toISOString();
-  const dateOnly = timestamp.split('T')[0];
+  const dateOnly = timestamp.split("T")[0];
   const lines: string[] = [];
 
   // Extract goal and now from todos
-  const inProgress = summary.lastTodos.filter(t => t.status === 'in_progress');
-  const pending = summary.lastTodos.filter(t => t.status === 'pending');
-  const completed = summary.lastTodos.filter(t => t.status === 'completed');
+  const inProgress = summary.lastTodos.filter(
+    (t) => t.status === "in_progress",
+  );
+  const pending = summary.lastTodos.filter((t) => t.status === "pending");
+  const completed = summary.lastTodos.filter((t) => t.status === "completed");
 
-  const currentTask = inProgress[0]?.content || pending[0]?.content || 'Continue from auto-compact';
-  const goalSummary = completed.length > 0
-    ? `Completed ${completed.length} task(s) before auto-compact`
-    : 'Session auto-compacted';
+  const currentTask =
+    inProgress[0]?.content ||
+    pending[0]?.content ||
+    "Continue from auto-compact";
+  const goalSummary =
+    completed.length > 0
+      ? `Completed ${completed.length} task(s) before auto-compact`
+      : "Session auto-compacted";
 
   // YAML frontmatter
-  lines.push('---');
+  lines.push("---");
   lines.push(`session: ${sessionName}`);
   lines.push(`date: ${dateOnly}`);
-  lines.push('status: partial');
-  lines.push('outcome: PARTIAL_PLUS');
-  lines.push('---');
-  lines.push('');
+  lines.push("status: partial");
+  lines.push("outcome: PARTIAL_PLUS");
+  lines.push("---");
+  lines.push("");
 
   // Required fields for statusline
   lines.push(`goal: ${goalSummary}`);
   lines.push(`now: ${currentTask}`);
-  lines.push('test: # No test command captured');
-  lines.push('');
+  lines.push("test: # No test command captured");
+  lines.push("");
 
   // Done this session
-  lines.push('done_this_session:');
+  lines.push("done_this_session:");
   if (completed.length > 0) {
-    completed.forEach(t => {
+    completed.forEach((t) => {
       lines.push(`  - task: "${t.content.replace(/"/g, '\\"')}"`);
-      lines.push('    files: []');
+      lines.push("    files: []");
     });
   } else {
     lines.push('  - task: "Session started"');
-    lines.push('    files: []');
+    lines.push("    files: []");
   }
-  lines.push('');
+  lines.push("");
 
   // Blockers (from errors)
-  lines.push('blockers:');
+  lines.push("blockers:");
   if (summary.errorsEncountered.length > 0) {
-    summary.errorsEncountered.slice(0, 3).forEach(e => {
+    summary.errorsEncountered.slice(0, 3).forEach((e) => {
       const safeError = e.replace(/"/g, '\\"').substring(0, 100);
       lines.push(`  - "${safeError}"`);
     });
   } else {
-    lines.push('  []');
+    lines.push("  []");
   }
-  lines.push('');
+  lines.push("");
 
   // Questions (pending tasks as questions)
-  lines.push('questions:');
+  lines.push("questions:");
   if (pending.length > 0) {
-    pending.slice(0, 3).forEach(t => {
+    pending.slice(0, 3).forEach((t) => {
       lines.push(`  - "Resume: ${t.content.replace(/"/g, '\\"')}"`);
     });
   } else {
-    lines.push('  []');
+    lines.push("  []");
   }
-  lines.push('');
+  lines.push("");
 
   // Decisions
-  lines.push('decisions:');
+  lines.push("decisions:");
   lines.push('  - auto_compact: "Context limit reached, auto-compacted"');
-  lines.push('');
+  lines.push("");
 
   // Findings
-  lines.push('findings:');
-  lines.push(`  - tool_calls: "${summary.recentToolCalls.length} recent tool calls"`);
-  lines.push(`  - files_modified: "${summary.filesModified.length} files changed"`);
-  lines.push('');
+  lines.push("findings:");
+  lines.push(
+    `  - tool_calls: "${summary.recentToolCalls.length} recent tool calls"`,
+  );
+  lines.push(
+    `  - files_modified: "${summary.filesModified.length} files changed"`,
+  );
+  lines.push("");
 
   // Worked/Failed
-  lines.push('worked:');
-  const successfulTools = summary.recentToolCalls.filter(t => t.success);
+  lines.push("worked:");
+  const successfulTools = summary.recentToolCalls.filter((t) => t.success);
   if (successfulTools.length > 0) {
-    lines.push(`  - "${successfulTools.map(t => t.name).join(', ')} completed successfully"`);
+    lines.push(
+      `  - "${successfulTools.map((t) => t.name).join(", ")} completed successfully"`,
+    );
   } else {
-    lines.push('  []');
+    lines.push("  []");
   }
-  lines.push('');
+  lines.push("");
 
-  lines.push('failed:');
-  const failedTools = summary.recentToolCalls.filter(t => !t.success);
+  lines.push("failed:");
+  const failedTools = summary.recentToolCalls.filter((t) => !t.success);
   if (failedTools.length > 0) {
-    lines.push(`  - "${failedTools.map(t => t.name).join(', ')} encountered errors"`);
+    lines.push(
+      `  - "${failedTools.map((t) => t.name).join(", ")} encountered errors"`,
+    );
   } else {
-    lines.push('  []');
+    lines.push("  []");
   }
-  lines.push('');
+  lines.push("");
 
   // Next steps
-  lines.push('next:');
+  lines.push("next:");
   if (inProgress.length > 0) {
     lines.push(`  - "Continue: ${inProgress[0].content.replace(/"/g, '\\"')}"`);
   }
   if (pending.length > 0) {
-    pending.slice(0, 2).forEach(t => {
+    pending.slice(0, 2).forEach((t) => {
       lines.push(`  - "${t.content.replace(/"/g, '\\"')}"`);
     });
   }
   if (inProgress.length === 0 && pending.length === 0) {
     lines.push('  - "Review session state and continue"');
   }
-  lines.push('');
+  lines.push("");
 
   // Files
-  lines.push('files:');
-  lines.push('  created: []');
-  lines.push('  modified:');
+  lines.push("files:");
+  lines.push("  created: []");
+  lines.push("  modified:");
   if (summary.filesModified.length > 0) {
-    summary.filesModified.slice(0, 10).forEach(f => {
+    summary.filesModified.slice(0, 10).forEach((f) => {
       lines.push(`    - "${f}"`);
     });
   } else {
-    lines.push('    []');
+    lines.push("    []");
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 // ============================================================================
@@ -352,19 +380,21 @@ const isMainModule = import.meta.url === `file://${process.argv[1]}`;
 if (isMainModule) {
   const args = process.argv.slice(2);
   if (args.length === 0) {
-    console.log('Usage: npx tsx transcript-parser.ts <transcript-path> [session-name]');
+    console.log(
+      "Usage: npx tsx transcript-parser.ts <transcript-path> [session-name]",
+    );
     process.exit(1);
   }
 
   const transcriptPath = args[0];
-  const sessionName = args[1] || 'test-session';
+  const sessionName = args[1] || "test-session";
 
   console.log(`Parsing transcript: ${transcriptPath}`);
   const summary = parseTranscript(transcriptPath);
 
-  console.log('\n--- Summary ---');
+  console.log("\n--- Summary ---");
   console.log(JSON.stringify(summary, null, 2));
 
-  console.log('\n--- Auto-Handoff ---');
+  console.log("\n--- Auto-Handoff ---");
   console.log(generateAutoHandoff(summary, sessionName));
 }

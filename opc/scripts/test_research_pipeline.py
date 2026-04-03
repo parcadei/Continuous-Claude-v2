@@ -26,14 +26,11 @@ Test Cases:
 
 import argparse
 import asyncio
-import json
-import os
 import shutil
 import sys
 import tempfile
 from pathlib import Path
 from typing import Any
-
 
 # Test configurations
 TEST_CASES = {
@@ -212,15 +209,15 @@ async def run_pipeline(topic: str, target_dir: str, verbose: bool = False) -> di
         Pipeline result dictionary
     """
     # Import here to avoid circular deps
+    from runtime.mcp_client import ConnectionState, get_mcp_client_manager
     from scripts.research_implement_pipeline import (
         PipelineContext,
-        step_research_nia,
         step_find_patterns_ast_grep,
+        step_research_nia,
         step_search_morph,
-        step_validate_qlty,
         step_stage_git,
+        step_validate_qlty,
     )
-    from runtime.mcp_client import get_mcp_client_manager, ConnectionState
 
     # Get MCP client (harness already initializes it)
     manager = get_mcp_client_manager()

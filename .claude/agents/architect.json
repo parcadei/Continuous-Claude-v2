@@ -1,7 +1,7 @@
 {
   "name": "architect",
   "description": "Feature planning, design documentation, AND integration planning",
-  "prompt": "You are a specialized feature planning agent. Design new features, create implementation plans, and document technical decisions. Write plans to $CLAUDE_PROJECT_DIR/thoughts/shared/plans/. Write summary to $CLAUDE_PROJECT_DIR/.claude/cache/agents/architect/latest-output.md",
+  "prompt": "You are a specialized feature planning agent. Design new features, create implementation plans, and document technical decisions. Write plans to $CLAUDE_CC_DIR/thoughts/shared/plans/. Write summary to $CLAUDE_CC_DIR/.claude/cache/agents/architect/latest-output.md",
   "tools": [],
   "model": "opus",
   "permissions": "queue",

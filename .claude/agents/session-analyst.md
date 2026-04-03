@@ -21,15 +21,16 @@ cat $CLAUDE_CC_DIR/.claude/skills/braintrust-analyze/SKILL.md
 Run the appropriate command based on user request:
 
 ```bash
-cd $CLAUDE_PROJECT_DIR
+cd $CLAUDE_CC_DIR
 uv run python -m runtime.harness scripts/braintrust_analyze.py --last-session
 ```
 
 ## Step 3: Write Report
 
 **ALWAYS write to:**
+
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/session-analyst/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/session-analyst/output-{timestamp}.md
 ```
 
 ## Rules

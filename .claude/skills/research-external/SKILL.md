@@ -11,6 +11,10 @@ Research external sources (documentation, web, APIs) for libraries, best practic
 
 > **Note:** The current year is 2025. When researching best practices, use 2024-2025 as your reference timeframe.
 
+## When to Use
+
+This skill is invoked when the user wants external research on libraries, best practices, or general topics. User-invocable via /research-external.
+
 ## Invocation
 
 ```
@@ -38,6 +42,7 @@ options:
 ```
 
 **Mapping:**
+
 - "How to use library" → library focus
 - "Best practices" → best-practices focus
 - "General topic" → general focus
@@ -48,10 +53,11 @@ options:
 ```yaml
 question: "What specifically do you want to research?"
 header: "Topic"
-options: []  # Free text input
+options: [] # Free text input
 ```
 
 Examples of good answers:
+
 - "How to use Prisma ORM with TypeScript"
 - "Best practices for error handling in Python"
 - "React vs Vue vs Svelte for dashboards"
@@ -89,6 +95,7 @@ options:
 ```
 
 **Mapping:**
+
 - "Quick answer" → --depth shallow
 - "Thorough" → --depth thorough
 
@@ -107,6 +114,7 @@ options:
 ```
 
 **Mapping:**
+
 - "Research document" → --output doc
 - "Handoff" → --output handoff
 
@@ -126,27 +134,28 @@ Proceed? [Yes / Adjust settings]
 
 ## Focus Modes (First Argument)
 
-| Focus | Primary Tool | Purpose |
-|-------|--------------|---------|
-| `library` | nia-docs | API docs, usage patterns, code examples |
+| Focus            | Primary Tool      | Purpose                                       |
+| ---------------- | ----------------- | --------------------------------------------- |
+| `library`        | nia-docs          | API docs, usage patterns, code examples       |
 | `best-practices` | perplexity-search | Recommended approaches, patterns, comparisons |
-| `general` | All MCP tools | Comprehensive multi-source research |
+| `general`        | All MCP tools     | Comprehensive multi-source research           |
 
 ## Options
 
-| Option | Values | Description |
-|--------|--------|-------------|
-| `--topic` | `"string"` | **Required.** The topic/library/concept to research |
-| `--depth` | `shallow`, `thorough` | Search depth (default: shallow) |
-| `--output` | `handoff`, `doc` | Output format (default: doc) |
-| `--library` | `"name"` | For `library` focus: specific package name |
-| `--registry` | `npm`, `py_pi`, `crates`, `go_modules` | For `library` focus: package registry |
+| Option       | Values                                 | Description                                         |
+| ------------ | -------------------------------------- | --------------------------------------------------- |
+| `--topic`    | `"string"`                             | **Required.** The topic/library/concept to research |
+| `--depth`    | `shallow`, `thorough`                  | Search depth (default: shallow)                     |
+| `--output`   | `handoff`, `doc`                       | Output format (default: doc)                        |
+| `--library`  | `"name"`                               | For `library` focus: specific package name          |
+| `--registry` | `npm`, `py_pi`, `crates`, `go_modules` | For `library` focus: package registry               |
 
 ## Workflow
 
 ### Step 1: Parse Arguments
 
 Extract from user input:
+
 ```
 FOCUS=$1           # library | best-practices | general
 TOPIC="..."        # from --topic
@@ -182,6 +191,7 @@ Primary tool: **nia-docs** - Find API documentation, usage patterns, code exampl
 ```
 
 **Thorough depth additions:**
+
 - Multiple semantic queries with variations
 - Grep for specific function/class names
 - Scrape official documentation pages
@@ -201,6 +211,7 @@ Primary tool: **perplexity-search** - Find recommended approaches, patterns, ant
 ```
 
 **Thorough depth additions:**
+
 ```bash
 # Chain-of-thought for complex decisions
 (cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
@@ -221,18 +232,21 @@ Primary tool: **perplexity-search** - Find recommended approaches, patterns, ant
 Use ALL available MCP tools - comprehensive multi-source research.
 
 **Step 2a: Library documentation (nia-docs)**
+
 ```bash
 (cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/nia_docs.py \
   --search "$TOPIC")
 ```
 
 **Step 2b: Web research (perplexity)**
+
 ```bash
 (cd $CLAUDE_OPC_DIR && uv run python scripts/mcp/perplexity_search.py \
   --research "$TOPIC")
 ```
 
 **Step 2c: Specific documentation (firecrawl)**
+
 ```bash
 # Scrape relevant documentation pages found in perplexity results
 (cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/mcp/firecrawl_scrape.py \
@@ -241,6 +255,7 @@ Use ALL available MCP tools - comprehensive multi-source research.
 ```
 
 **Thorough depth additions:**
+
 - Run all three tools with expanded queries
 - Cross-reference findings between sources
 - Follow links from initial results for deeper context
@@ -262,12 +277,12 @@ Combine results from all sources:
 
 Write to: `thoughts/shared/research/YYYY-MM-DD-{topic-slug}.md`
 
-```markdown
+````markdown
 ---
-date: {ISO timestamp}
+date: { ISO timestamp }
 type: external-research
 topic: "{topic}"
-focus: {focus}
+focus: { focus }
 sources: [nia, perplexity, firecrawl]
 status: complete
 ---
@@ -275,38 +290,48 @@ status: complete
 # Research: {Topic}
 
 ## Summary
+
 {2-3 sentence summary of findings}
 
 ## Key Findings
 
 ### Library Documentation
+
 {From nia-docs - API references, usage patterns}
 
 ### Best Practices (2024-2025)
+
 {From perplexity - recommended approaches}
 
 ### Code Examples
+
 ```{language}
 // Working examples found
 ```
+````
 
 ## Recommendations
+
 - {Recommendation 1}
 - {Recommendation 2}
 
 ## Pitfalls to Avoid
+
 - {Pitfall 1}
 - {Pitfall 2}
 
 ## Alternatives Considered
-| Option | Pros | Cons |
-|--------|------|------|
-| {Option 1} | ... | ... |
+
+| Option     | Pros | Cons |
+| ---------- | ---- | ---- |
+| {Option 1} | ...  | ...  |
 
 ## Sources
+
 - [{Source 1}]({url1})
 - [{Source 2}]({url2})
-```
+
+````
 
 #### Output: `handoff`
 
@@ -356,7 +381,7 @@ for_plan_agent: |
   2. {Step 2}
   Key libraries: {lib1}, {lib2}
   Avoid: {pitfall1}
-```
+````
 
 ### Step 5: Return Summary
 
@@ -383,6 +408,7 @@ Ready for plan-agent to continue.
 If an MCP tool fails (API key missing, rate limited, etc.):
 
 1. **Log the failure** in output:
+
    ```yaml
    tool_status:
      nia: success
@@ -400,39 +426,44 @@ If an MCP tool fails (API key missing, rate limited, etc.):
 4. **Note gaps** in findings:
    ```markdown
    ## Gaps
+
    - Perplexity unavailable - best practices section limited to nia results
    ```
 
 ## Examples
 
 ### Library Research (Shallow)
+
 ```
 /research-external library --topic "dependency injection" --library fastapi --registry py_pi
 ```
 
 ### Best Practices (Thorough)
+
 ```
 /research-external best-practices --topic "error handling in Python async" --depth thorough
 ```
 
 ### General Research for Handoff
+
 ```
 /research-external general --topic "OAuth2 PKCE flow implementation" --depth thorough --output handoff
 ```
 
 ### Quick Library Lookup
+
 ```
 /research-external library --topic "useEffect cleanup" --library react
 ```
 
 ## Integration with Other Skills
 
-| After Research | Use Skill | For |
-|----------------|-----------|-----|
-| `--output handoff` | `plan-agent` | Create implementation plan |
-| Code examples found | `implement_task` | Direct implementation |
-| Architecture decision | `create_plan` | Detailed planning |
-| Library comparison | Present to user | Decision making |
+| After Research        | Use Skill        | For                        |
+| --------------------- | ---------------- | -------------------------- |
+| `--output handoff`    | `plan-agent`     | Create implementation plan |
+| Code examples found   | `implement_task` | Direct implementation      |
+| Architecture decision | `create_plan`    | Detailed planning          |
+| Library comparison    | Present to user  | Decision making            |
 
 ## Required Environment
 

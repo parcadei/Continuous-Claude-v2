@@ -21,16 +21,16 @@ export const MAX_QUESTIONS_TOTAL = 4;
  * These trigger immediate termination with defaults applied.
  */
 const USE_DEFAULTS_PATTERNS = [
-    /\bjust\s+use\s+defaults?\b/i,
-    /\bgo\s+with\s+defaults?\b/i,
-    /\buse\s+(the\s+)?default\s+values?\b/i,
-    /\bpick\s+for\s+me\b/i,
-    /\byou\s+decide\b/i,
-    /\bwhatever\s+works\b/i,
-    /\byour\s+choice\b/i,
-    /\byou\s+choose\b/i,
-    /\bdefaults?\s+(are\s+)?fine\b/i,
-    /\bi\s+don'?t\s+care\b/i,
+  /\bjust\s+use\s+defaults?\b/i,
+  /\bgo\s+with\s+defaults?\b/i,
+  /\buse\s+(the\s+)?default\s+values?\b/i,
+  /\bpick\s+for\s+me\b/i,
+  /\byou\s+decide\b/i,
+  /\bwhatever\s+works\b/i,
+  /\byour\s+choice\b/i,
+  /\byou\s+choose\b/i,
+  /\bdefaults?\s+(are\s+)?fine\b/i,
+  /\bi\s+don'?t\s+care\b/i,
 ];
 // =============================================================================
 // Functions
@@ -42,8 +42,8 @@ const USE_DEFAULTS_PATTERNS = [
  * @returns true if user wants to use defaults
  */
 export function detectDefaultsIntent(response) {
-    const text = response.toLowerCase().trim();
-    return USE_DEFAULTS_PATTERNS.some(pattern => pattern.test(text));
+  const text = response.toLowerCase().trim();
+  return USE_DEFAULTS_PATTERNS.some((pattern) => pattern.test(text));
 }
 /**
  * Apply default values to unresolved Q-heuristics.
@@ -54,16 +54,16 @@ export function detectDefaultsIntent(response) {
  * @returns New object with all values (resolved + defaults)
  */
 export function applyDefaults(resolved, unresolved) {
-    // Create a new object (don't mutate input)
-    const result = { ...resolved };
-    // Apply defaults for unresolved questions
-    for (const q of unresolved) {
-        // Only apply default if not already resolved
-        if (!(q.id in result)) {
-            result[q.id] = q.default ?? '';
-        }
+  // Create a new object (don't mutate input)
+  const result = { ...resolved };
+  // Apply defaults for unresolved questions
+  for (const q of unresolved) {
+    // Only apply default if not already resolved
+    if (!(q.id in result)) {
+      result[q.id] = q.default ?? "";
     }
-    return result;
+  }
+  return result;
 }
 /**
  * Check if the erotetic loop should terminate.
@@ -78,35 +78,35 @@ export function applyDefaults(resolved, unresolved) {
  * @returns Termination result with reason and final resolution
  */
 export function checkTermination(state) {
-    const { resolved, unresolved, questionsAsked, userRequestedDefaults } = state;
-    // Priority 1: All Q-heuristics resolved
-    if (unresolved.length === 0) {
-        return {
-            shouldTerminate: true,
-            reason: 'all_resolved',
-            finalResolution: { ...resolved },
-        };
-    }
-    // Priority 2: User explicitly requested defaults
-    if (userRequestedDefaults) {
-        return {
-            shouldTerminate: true,
-            reason: 'defaults_requested',
-            finalResolution: applyDefaults(resolved, unresolved),
-        };
-    }
-    // Priority 3: Max questions reached
-    if (questionsAsked >= MAX_QUESTIONS_TOTAL) {
-        return {
-            shouldTerminate: true,
-            reason: 'max_questions',
-            finalResolution: applyDefaults(resolved, unresolved),
-        };
-    }
-    // Default: Continue asking questions
+  const { resolved, unresolved, questionsAsked, userRequestedDefaults } = state;
+  // Priority 1: All Q-heuristics resolved
+  if (unresolved.length === 0) {
     return {
-        shouldTerminate: false,
-        reason: 'continue',
-        finalResolution: { ...resolved }, // Return current state
+      shouldTerminate: true,
+      reason: "all_resolved",
+      finalResolution: { ...resolved },
     };
+  }
+  // Priority 2: User explicitly requested defaults
+  if (userRequestedDefaults) {
+    return {
+      shouldTerminate: true,
+      reason: "defaults_requested",
+      finalResolution: applyDefaults(resolved, unresolved),
+    };
+  }
+  // Priority 3: Max questions reached
+  if (questionsAsked >= MAX_QUESTIONS_TOTAL) {
+    return {
+      shouldTerminate: true,
+      reason: "max_questions",
+      finalResolution: applyDefaults(resolved, unresolved),
+    };
+  }
+  // Default: Continue asking questions
+  return {
+    shouldTerminate: false,
+    reason: "continue",
+    finalResolution: { ...resolved }, // Return current state
+  };
 }

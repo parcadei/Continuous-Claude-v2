@@ -64,6 +64,7 @@ grep -r "main\|entry" --include="*.json" . 2>/dev/null | head -10
 ### Step 3: Detect Tech Stack
 
 Look for and summarize:
+
 - **Language**: package.json (JS/TS), pyproject.toml (Python), Cargo.toml (Rust), go.mod (Go)
 - **Framework**: Next.js, Django, Rails, FastAPI, etc.
 - **Database**: prisma/, migrations/, .env references
@@ -85,6 +86,7 @@ Options:
 ```
 
 Then ask:
+
 ```
 Question: "Any specific constraints or patterns I should follow?"
 Options:
@@ -103,12 +105,15 @@ Use this template:
 
 ```markdown
 # Session: <session-name>
+
 Updated: <ISO timestamp>
 
 ## Goal
+
 <User's stated goal from Step 4>
 
 ## Constraints
+
 - Tech Stack: <detected>
 - Framework: <detected>
 - Build: <detected build command>
@@ -116,28 +121,34 @@ Updated: <ISO timestamp>
 - Patterns: <from CONTRIBUTING.md or user input>
 
 ## Key Decisions
+
 (None yet - will be populated as decisions are made)
 
 ## State
+
 - Now: [→] Initial exploration
 - Next: <based on goal>
 
 ## Working Set
+
 - Key files: <detected entry points>
 - Test command: <detected, e.g., npm test, pytest>
 - Build command: <detected, e.g., npm run build>
 - Dev command: <detected, e.g., npm run dev>
 
 ## Open Questions
+
 - UNCONFIRMED: <any uncertainties from analysis>
 
 ## Codebase Summary
+
 <Brief summary from analysis - architecture, main components, entry points>
 ```
 
 ### Step 6: Confirm with User
 
 Show the generated ledger summary and ask:
+
 - "Does this look accurate?"
 - "Anything to add or correct?"
 

@@ -27,25 +27,25 @@ function getDbPath() {
     ".claude",
     "cache",
     "agentica-coordination",
-    "coordination.db"
+    "coordination.db",
   );
 }
 function runPythonQuery(script, args) {
   try {
     const result = spawnSync("python3", ["-c", script, ...args], {
       encoding: "utf-8",
-      maxBuffer: 1024 * 1024
+      maxBuffer: 1024 * 1024,
     });
     return {
       success: result.status === 0,
       stdout: result.stdout?.trim() || "",
-      stderr: result.stderr || ""
+      stderr: result.stderr || "",
     };
   } catch (err) {
     return {
       success: false,
       stdout: "",
-      stderr: String(err)
+      stderr: String(err),
     };
   }
 }
@@ -71,7 +71,11 @@ async function onPostToolUse(input) {
     let agentId = "unknown";
     if (response && typeof response === "object" && "agent_id" in response) {
       const rawAgentId = response.agent_id;
-      if (typeof rawAgentId === "string" && rawAgentId.length > 0 && isValidId(rawAgentId)) {
+      if (
+        typeof rawAgentId === "string" &&
+        rawAgentId.length > 0 &&
+        isValidId(rawAgentId)
+      ) {
         agentId = rawAgentId;
       }
     }
@@ -134,7 +138,11 @@ async function onPostToolUse5(input) {
   const agentRole = process.env.AGENT_ROLE;
   const coordinatorId = process.env.AGENT_ID || process.env.COORDINATOR_ID;
   const hierarchyLevel = parseInt(process.env.HIERARCHY_LEVEL || "0", 10);
-  if (!hierarchyId || agentRole !== "coordinator" || input.tool_name !== "Task") {
+  if (
+    !hierarchyId ||
+    agentRole !== "coordinator" ||
+    input.tool_name !== "Task"
+  ) {
     return { result: "continue" };
   }
   if (!isValidId(hierarchyId)) {
@@ -202,7 +210,7 @@ print('ok')
       hierarchyId,
       spawnedAgentId,
       coordinatorId || "",
-      (hierarchyLevel + 1).toString()
+      (hierarchyLevel + 1).toString(),
       // Specialist is one level below coordinator
     ]);
     if (!result.success) {
@@ -308,7 +316,7 @@ print(json.dumps({'completed': completed_count, 'total': total_mappers}))
       mapperIndex.toString(),
       agentId,
       outputContent,
-      totalMappers.toString()
+      totalMappers.toString(),
     ]);
     if (!result.success) {
       console.error("PostToolUse Python error:", result.stderr);
@@ -320,11 +328,14 @@ print(json.dumps({'completed': completed_count, 'total': total_mappers}))
     } catch (parseErr) {
       return { result: "continue" };
     }
-    console.error(`[map-reduce] Mapper ${mapperIndex} output recorded. Progress: ${counts.completed}/${counts.total}`);
+    console.error(
+      `[map-reduce] Mapper ${mapperIndex} output recorded. Progress: ${counts.completed}/${counts.total}`,
+    );
     if (counts.completed >= counts.total && counts.total > 0) {
       return {
         result: "continue",
-        message: "All mappers have completed their outputs. Proceeding to reduce phase."
+        message:
+          "All mappers have completed their outputs. Proceeding to reduce phase.",
       };
     }
     return { result: "continue" };
@@ -341,7 +352,9 @@ function extractBlackboardKey(filePath) {
   if (!filePath || typeof filePath !== "string") {
     return null;
   }
-  const blackboardMatch = filePath.match(/\/blackboard\/([^\/]+?)(?:\.[^\/]*)?$/);
+  const blackboardMatch = filePath.match(
+    /\/blackboard\/([^\/]+?)(?:\.[^\/]*)?$/,
+  );
   if (!blackboardMatch) {
     return null;
   }
@@ -375,9 +388,14 @@ async function onPostToolUse7(input) {
     return { result: "continue" };
   }
   const writesTo = process.env.BLACKBOARD_WRITES_TO || "";
-  const allowedKeys = writesTo.split(",").map((k) => k.trim()).filter((k) => k);
+  const allowedKeys = writesTo
+    .split(",")
+    .map((k) => k.trim())
+    .filter((k) => k);
   if (allowedKeys.length > 0 && !allowedKeys.includes(key)) {
-    console.error(`[blackboard] Write to key '${key}' not allowed. Allowed: ${allowedKeys.join(", ")}`);
+    console.error(
+      `[blackboard] Write to key '${key}' not allowed. Allowed: ${allowedKeys.join(", ")}`,
+    );
     return { result: "continue" };
   }
   const agentId = process.env.AGENT_ID || "unknown";
@@ -428,7 +446,13 @@ conn.execute('''
 conn.commit()
 conn.close()
 `;
-    const result = runPythonQuery(query, [dbPath, blackboardId, key, value, agentId]);
+    const result = runPythonQuery(query, [
+      dbPath,
+      blackboardId,
+      key,
+      value,
+      agentId,
+    ]);
     if (!result.success) {
       console.error("[blackboard] PostToolUse Python error:", result.stderr);
       return { result: "continue" };
@@ -548,7 +572,9 @@ print(json.dumps({'state': new_state, 'failure_count': new_failure_count}))
         console.error("PostToolUse Python error:", result.stderr);
         return { result: "continue" };
       }
-      console.error(`[circuit-breaker] Detected ${toolName} failure for cb_id=${cbId}`);
+      console.error(
+        `[circuit-breaker] Detected ${toolName} failure for cb_id=${cbId}`,
+      );
     } else {
       const successQuery = `
 import sqlite3
@@ -612,10 +638,11 @@ conn.close()
       try {
         const data = JSON.parse(result.stdout);
         if (data.reset) {
-          console.error(`[circuit-breaker] Reset failure count for cb_id=${cbId} after successful ${toolName}`);
+          console.error(
+            `[circuit-breaker] Reset failure count for cb_id=${cbId} after successful ${toolName}`,
+          );
         }
-      } catch {
-      }
+      } catch {}
     }
     return { result: "continue" };
   } catch (err) {
@@ -646,12 +673,15 @@ async function onPostToolUse9(input) {
     toolResponse = input.tool_response;
   }
   const toolName = input.tool_name || "";
-  const responseStatus = typeof toolResponse.status === "string" ? toolResponse.status : "";
-  const escalationReason = typeof toolResponse.reason === "string" ? toolResponse.reason : "";
+  const responseStatus =
+    typeof toolResponse.status === "string" ? toolResponse.status : "";
+  const escalationReason =
+    typeof toolResponse.reason === "string" ? toolResponse.reason : "";
   const resolutionTools = ["Task", "Write", "Edit", "Bash"];
   const isResolutionTool = resolutionTools.includes(toolName);
   const isEscalation = corEscalate || responseStatus === "escalate";
-  const isResolution = corResolved || toolName === "Task" && responseStatus === "success";
+  const isResolution =
+    corResolved || (toolName === "Task" && responseStatus === "success");
   if (!isResolutionTool && !corResolved && !corEscalate) {
     return { result: "continue" };
   }
@@ -731,14 +761,20 @@ print(json.dumps({'success': True, 'handled': handled, 'escalated': escalated}))
       isResolution ? "true" : "false",
       isEscalation ? "true" : "false",
       toolName,
-      escalationReason
+      escalationReason,
     ]);
     if (!result.success) {
       console.error("PostToolUse Python error:", result.stderr);
       return { result: "continue" };
     }
-    const action = isResolution ? "resolved" : isEscalation ? "escalated" : "processed";
-    console.error(`[chain-of-responsibility] Handler ${handlerPriority} ${action} via ${toolName}`);
+    const action = isResolution
+      ? "resolved"
+      : isEscalation
+        ? "escalated"
+        : "processed";
+    console.error(
+      `[chain-of-responsibility] Handler ${handlerPriority} ${action} via ${toolName}`,
+    );
     return { result: "continue" };
   } catch (err) {
     console.error("PostToolUse hook error:", err);

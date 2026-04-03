@@ -35,6 +35,7 @@ class ConsensusMode(Enum):
 ### Consensus
 
 **Constructor:**
+
 ```python
 Consensus(
     mode: ConsensusMode,
@@ -43,9 +44,11 @@ Consensus(
 ```
 
 **Methods:**
+
 - `.decide(votes: list[Any], weights: list[float]? = None, key: Callable[[Any], Any]? = None) -> Any` - Decide consensus from votes
 
 **Exceptions:**
+
 - `ConsensusNotReachedError` - Raised when consensus cannot be reached
 
 ### AggregateMode (Enum)
@@ -60,6 +63,7 @@ class AggregateMode(Enum):
 ### Aggregator
 
 **Constructor:**
+
 ```python
 Aggregator(
     mode: AggregateMode,
@@ -69,11 +73,13 @@ Aggregator(
 ```
 
 **Methods:**
+
 - `.aggregate(results: list[Any]) -> Any` - Aggregate multiple results into one
 
 ### HandoffState
 
 **Constructor:**
+
 ```python
 HandoffState(
     context: str,                                    # Current situation
@@ -84,6 +90,7 @@ HandoffState(
 ```
 
 **Methods:**
+
 - `.to_dict() -> dict[str, Any]` - Serialize to dictionary
 - `.from_dict(data: dict[str, Any]) -> HandoffState` (classmethod)
 - `.add_artifact(key: str, value: Any) -> None` - Add artifact to state
@@ -196,6 +203,7 @@ class OrphanCandidate:
 ### CoordinationDB
 
 **Constructor:**
+
 ```python
 CoordinationDB(
     db_path: Path | None = None,      # Default: .claude/cache/agentica-coordination/coordination.db
@@ -204,6 +212,7 @@ CoordinationDB(
 ```
 
 **Agent Methods:**
+
 - `.register_agent(agent_id: str, premise?: str, model?: str, scope_keys?: list[str], pattern?: str, parent_agent_id?: str, pid?: int, ppid?: int) -> AgentRecord`
 - `.complete_agent(agent_id: str, status: str = "completed", error_message?: str) -> None`
 - `.get_running_agents(pattern?: str) -> list[AgentRecord]` - Current session only
@@ -211,19 +220,23 @@ CoordinationDB(
 - `.get_global_running_count() -> int` - Count across all sessions
 
 **Session Methods:**
+
 - `.get_all_sessions() -> list[str]` - List unique session IDs
 - `.get_all_sessions_summary() -> dict[str, Any]` - Statistics across sessions
 - `.get_session_summary() -> dict[str, Any]` - Current session statistics
 
 **Task Methods:**
+
 - `.record_task(agent_id: str, input_text: str, output: Any, duration_ms: int, pattern?: str, artifacts?: dict[str, Any]) -> TaskRecord`
 - `.get_completed_tasks(agent_id?: str, limit: int = 20) -> list[TaskRecord]`
 
 **Orphan Detection:**
+
 - `.find_orphans() -> list[OrphanCandidate]` - Three-tier orphan detection
 - `.get_orphan_candidates() -> list[OrphanCandidate]` - Alias for find_orphans
 
 **Broadcast Methods:**
+
 - `.create_broadcast(swarm_id: str, sender_agent: str, broadcast_type: BroadcastType, payload: dict[str, Any]) -> BroadcastRecord`
 - `.get_broadcasts(swarm_id: str, since?: datetime, exclude_sender?: str, broadcast_types?: list[BroadcastType]) -> list[BroadcastRecord]`
 
@@ -236,9 +249,11 @@ CoordinationDB(
 ### TrackedAgent (dataclass)
 
 **Properties:**
+
 - `.agent_id: str` - Unique agent identifier
 
 **Methods:**
+
 - `.call(return_type: type[T], prompt: str, **kwargs) -> T` - Call agent with tracking
 - `.close() -> None` - Close agent and mark completed
 
@@ -288,6 +303,7 @@ class Choice:
 ```
 
 **Methods:**
+
 - `.to_dict() -> dict[str, Any]`
 - `.from_dict(data: dict[str, Any]) -> Choice` (classmethod)
 
@@ -317,14 +333,17 @@ class Question:
 ```
 
 **Properties:**
+
 - `.is_resolved: bool` - True if answered
 
 **Methods:**
+
 - `.resolve(value: Any) -> None` - Mark resolved
 
 ### HandoffAtom (dataclass)
 
 **Constructor:**
+
 ```python
 HandoffAtom(
     agent_id: str,                        # Required
@@ -344,11 +363,13 @@ HandoffAtom(
 ```
 
 **Properties:**
+
 - `.e_is_empty: bool` - True if all questions resolved
 - `.q_remaining_count: int` - Number of unresolved questions
 - `.q_remaining_high: list[Question]` - HIGH priority unresolved
 
 **Methods:**
+
 - `.record_morphism(source: str, target: str, via: str = "spawn", preserves?: list[str], transforms?: dict[str, str]) -> None`
 - `.compose(other: HandoffAtom) -> HandoffAtom` - Category-theoretic composition
 - `.record_decision(choice: Choice) -> None`
@@ -462,6 +483,7 @@ class SharedContextEntry:
 ```
 
 **Methods:**
+
 - `.to_dict() -> dict[str, Any]`
 - `.from_dict(data: dict[str, Any]) -> SharedContextEntry` (classmethod)
 - `.to_system_reminder() -> str` - Compact format for hook injection
@@ -469,6 +491,7 @@ class SharedContextEntry:
 ### BlackboardCache
 
 **Constructor:**
+
 ```python
 BlackboardCache(
     project_id: str,
@@ -477,6 +500,7 @@ BlackboardCache(
 ```
 
 **Methods:**
+
 - `.push(entry: SharedContextEntry) -> None` - Add entry (FIFO with max size)
 - `.poll(agent_id?: str, pattern_id?: str, since_timestamp?: str, types?: list[MessageType], scope?: ScopeLevel) -> list[SharedContextEntry]`
 - `.clear() -> None` - Clear all entries
@@ -544,6 +568,7 @@ class SharedContext:
 ```
 
 **Methods:**
+
 - `.get_cached(path: str) -> ClaudeResult | None`
 - `.set_cached(path: str, result: ClaudeResult) -> None`
 - `.invalidate(path: str) -> None`
@@ -602,6 +627,7 @@ class ArchivalFact:
 ### MemoryService
 
 **Constructor:**
+
 ```python
 MemoryService(
     session_id: str = "default",
@@ -610,10 +636,12 @@ MemoryService(
 ```
 
 **Connection Methods:**
+
 - `async .connect() -> None` - Initialize (idempotent)
 - `async .close() -> None` - Close connection (idempotent)
 
 **Core Memory (Key-Value):**
+
 - `async .set_core(key: str, value: str) -> None`
 - `async .get_core(key: str) -> str | None`
 - `async .list_core_keys() -> list[str]`
@@ -621,11 +649,13 @@ MemoryService(
 - `async .get_all_core() -> dict[str, str]`
 
 **Archival Memory (FTS5):**
+
 - `async .store(content: str, metadata?: dict[str, Any], embedding?: list[float]) -> str` - Returns memory_id
 - `async .search(query: str, limit: int = 10, threshold: float = 0.0) -> list[dict[str, Any]]`
 - `async .delete_archival(memory_id: str) -> None`
 
 **Recall (Cross-Source):**
+
 - `async .recall(query: str, include_core: bool = True, limit: int = 5) -> str`
 - `async .to_context(max_archival: int = 10) -> str` - Generate prompt context
 
@@ -655,6 +685,7 @@ Swarm(
 ```
 
 **Methods:**
+
 - `async .execute(query: str, return_type: type? = None) -> Any`
 
 ### Pipeline
@@ -668,6 +699,7 @@ Pipeline(
 ```
 
 **Methods:**
+
 - `async .run(initial_state: HandoffState) -> HandoffState`
 
 ### Hierarchical
@@ -692,6 +724,7 @@ Hierarchical(
 ```
 
 **Methods:**
+
 - `async .execute(task: str) -> Any`
 
 ### Jury
@@ -717,9 +750,11 @@ Jury(
 ```
 
 **Methods:**
+
 - `async .decide(return_type: type, question: str) -> Any`
 
 **Debug Properties:**
+
 - `.last_votes: list` - When debug=True
 
 ### GeneratorCritic
@@ -741,6 +776,7 @@ GeneratorCritic(
 ```
 
 **Methods:**
+
 - `async .run(task: str) -> HandoffState`
 
 ### CircuitBreaker
@@ -763,9 +799,11 @@ CircuitBreaker(
 ```
 
 **Methods:**
+
 - `async .execute(query: str) -> Any`
 
 **State Properties:**
+
 - `.state: CircuitState` - CLOSED, OPEN, or HALF_OPEN
 - `.failure_count: int`
 
@@ -799,6 +837,7 @@ Adversarial(
 ```
 
 **Methods:**
+
 - `async .debate(question: str) -> dict[str, Any]` - Returns debate history
 - `async .resolve(question: str) -> dict[str, Any] | str` - Debate with judge verdict
 
@@ -827,6 +866,7 @@ class Handler:
 ```
 
 **Methods:**
+
 - `async .process(query: str) -> Any`
 
 ### MapReduce
@@ -849,6 +889,7 @@ MapReduce(
 ```
 
 **Methods:**
+
 - `async .execute(query: str, chunks: list[Any]) -> Any`
 
 ### Blackboard (Pattern)
@@ -886,6 +927,7 @@ class BlackboardState:
 ```
 
 **Methods:**
+
 - `.__getitem__(key: str) -> Any`
 - `.__setitem__(key: str, value: Any) -> None`
 - `.__contains__(key: str) -> bool`
@@ -905,6 +947,7 @@ class BlackboardResult:
 ```
 
 **Methods:**
+
 - `async .solve(query: str) -> BlackboardResult`
 
 ### EventDriven
@@ -941,6 +984,7 @@ class Subscriber:
 ```
 
 **Methods:**
+
 - `async .publish(event: Event) -> list[Any]` - Notify matching subscribers
 
 ---

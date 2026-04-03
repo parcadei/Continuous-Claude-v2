@@ -9,9 +9,7 @@ Requires: qlty CLI installed (https://github.com/qltysh/qlty)
 """
 
 import asyncio
-import json
 import subprocess
-import sys
 from typing import Any
 
 from mcp.server import Server

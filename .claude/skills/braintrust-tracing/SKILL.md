@@ -8,6 +8,10 @@ user-invocable: false
 
 Comprehensive guide to tracing Claude Code sessions in Braintrust, including sub-agent correlation.
 
+## When to Use
+
+This skill is invoked when setting up or debugging Braintrust tracing. Not user-invocable directly.
+
 ## Architecture Overview
 
 ```
@@ -43,15 +47,15 @@ Comprehensive guide to tracing Claude Code sessions in Braintrust, including sub
 
 ## Hook Event Flow
 
-| Hook | Trigger | Creates | Key Fields |
-|------|---------|---------|------------|
-| **SessionStart** | Session begins | Root span | `session_id`, `root_span_id` |
-| **UserPromptSubmit** | User sends prompt | Turn span | `prompt`, `turn_number` |
-| **PreToolUse** | Before tool runs | (modifies Task prompts) | `tool_input.prompt` |
-| **PostToolUse** | After tool runs | Tool span | `tool_name`, `input`, `output` |
-| **Stop** | Turn completes | LLM spans | `model`, `tokens`, `tool_calls` |
-| **SubagentStop** | Sub-agent finishes | (no span) | `session_id` of sub-agent |
-| **SessionEnd** | Session ends | (finalizes root) | `turn_count`, `tool_count` |
+| Hook                 | Trigger            | Creates                 | Key Fields                      |
+| -------------------- | ------------------ | ----------------------- | ------------------------------- |
+| **SessionStart**     | Session begins     | Root span               | `session_id`, `root_span_id`    |
+| **UserPromptSubmit** | User sends prompt  | Turn span               | `prompt`, `turn_number`         |
+| **PreToolUse**       | Before tool runs   | (modifies Task prompts) | `tool_input.prompt`             |
+| **PostToolUse**      | After tool runs    | Tool span               | `tool_name`, `input`, `output`  |
+| **Stop**             | Turn completes     | LLM spans               | `model`, `tokens`, `tool_calls` |
+| **SubagentStop**     | Sub-agent finishes | (no span)               | `session_id` of sub-agent       |
+| **SessionEnd**       | Session ends       | (finalizes root)        | `turn_count`, `tool_count`      |
 
 ## Trace Hierarchy
 
@@ -94,6 +98,7 @@ But SessionStart only receives session metadata, not the modified prompt. The in
 ### What DOES Work
 
 **Task spans in parent session contain everything:**
+
 - `agentId` - identifier for the sub-agent run
 - `totalTokens`, `totalToolUseCount` - metrics
 - `content` - full agent response/summary
@@ -101,6 +106,7 @@ But SessionStart only receives session metadata, not the modified prompt. The in
 - `tool_input.subagent_type` - agent type (e.g., "oracle")
 
 **SubagentStop hook receives the sub-agent's `session_id`:**
+
 - This equals the sub-agent's orphaned trace `root_span_id`
 - Allows correlation between parent Task span and child trace
 
@@ -109,11 +115,13 @@ But SessionStart only receives session metadata, not the modified prompt. The in
 **Current state:** Sub-agents create orphaned traces (new `root_span_id`).
 
 **Correlation method:**
+
 1. Query parent session's Task spans for agent metadata
 2. Match `agentId` or timing with orphaned traces
 3. Sub-agent's `session_id` = its trace's `root_span_id`
 
 **Future solution (not yet implemented):**
+
 ```
 SubagentStop fires -> writes session_id to temp file
 PostToolUse (Task) -> reads temp file -> adds child_session_id to Task span metadata
@@ -131,6 +139,7 @@ This would link: `Task.agentId` + `Task.child_session_id` -> orphaned trace `roo
 ```
 
 Each session file contains:
+
 ```json
 {
   "root_span_id": "abc-123",
@@ -145,6 +154,7 @@ Each session file contains:
 ```
 
 ### Global State
+
 ```
 ~/.claude/state/braintrust_global.json   # Cached project_id
 ~/.claude/state/braintrust_hook.log      # Debug log
@@ -153,6 +163,7 @@ Each session file contains:
 ## Debugging Commands
 
 ### Check if Tracing is Active
+
 ```bash
 # View hook logs in real-time
 tail -f ~/.claude/state/braintrust_hook.log
@@ -166,6 +177,7 @@ echo "BRAINTRUST_API_KEY=${BRAINTRUST_API_KEY:+set}"
 ```
 
 ### Query Braintrust Directly
+
 ```bash
 # List recent sessions
 uv run python -m runtime.harness scripts/braintrust_analyze.py --sessions 5
@@ -181,17 +193,18 @@ uv run python -m runtime.harness scripts/braintrust_analyze.py --agent-stats
 ```
 
 ### Debug Hook Execution
+
 ```bash
 # Enable verbose logging
 export BRAINTRUST_CC_DEBUG=true
 
 # Test hooks manually
 echo '{"session_id":"test-123","type":"resume"}' | \
-  bash "$CLAUDE_PROJECT_DIR/.claude/plugins/braintrust-tracing/hooks/session_start.sh"
+  bash "$CLAUDE_CC_DIR/.claude/plugins/braintrust-tracing/hooks/session_start.sh"
 
 # Test PreToolUse (Task injection)
 echo '{"session_id":"test-123","tool_name":"Task","tool_input":{"prompt":"test"}}' | \
-  bash "$CLAUDE_PROJECT_DIR/.claude/plugins/braintrust-tracing/hooks/pre_tool_use.sh"
+  bash "$CLAUDE_CC_DIR/.claude/plugins/braintrust-tracing/hooks/pre_tool_use.sh"
 ```
 
 ### Troubleshooting Checklist
@@ -217,28 +230,28 @@ echo '{"session_id":"test-123","tool_name":"Task","tool_input":{"prompt":"test"}
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `.claude/plugins/braintrust-tracing/hooks/common.sh` | Shared utilities, API, state management |
-| `.claude/plugins/braintrust-tracing/hooks/session_start.sh` | Creates root span, handles sub-agent context |
-| `.claude/plugins/braintrust-tracing/hooks/user_prompt_submit.sh` | Creates Turn spans per user message |
-| `.claude/plugins/braintrust-tracing/hooks/pre_tool_use.sh` | Injects trace context into Task prompts |
-| `.claude/plugins/braintrust-tracing/hooks/post_tool_use.sh` | Creates tool spans, captures agent/skill metadata |
-| `.claude/plugins/braintrust-tracing/hooks/stop_hook.sh` | Creates LLM spans, finalizes Turns |
-| `.claude/plugins/braintrust-tracing/hooks/session_end.sh` | Finalizes session, triggers learning extraction |
-| `scripts/braintrust_analyze.py` | Query and analyze traced sessions |
-| `~/.claude/state/braintrust_sessions/` | Per-session state files |
-| `~/.claude/state/braintrust_hook.log` | Debug log |
+| File                                                             | Purpose                                           |
+| ---------------------------------------------------------------- | ------------------------------------------------- |
+| `.claude/plugins/braintrust-tracing/hooks/common.sh`             | Shared utilities, API, state management           |
+| `.claude/plugins/braintrust-tracing/hooks/session_start.sh`      | Creates root span, handles sub-agent context      |
+| `.claude/plugins/braintrust-tracing/hooks/user_prompt_submit.sh` | Creates Turn spans per user message               |
+| `.claude/plugins/braintrust-tracing/hooks/pre_tool_use.sh`       | Injects trace context into Task prompts           |
+| `.claude/plugins/braintrust-tracing/hooks/post_tool_use.sh`      | Creates tool spans, captures agent/skill metadata |
+| `.claude/plugins/braintrust-tracing/hooks/stop_hook.sh`          | Creates LLM spans, finalizes Turns                |
+| `.claude/plugins/braintrust-tracing/hooks/session_end.sh`        | Finalizes session, triggers learning extraction   |
+| `scripts/braintrust_analyze.py`                                  | Query and analyze traced sessions                 |
+| `~/.claude/state/braintrust_sessions/`                           | Per-session state files                           |
+| `~/.claude/state/braintrust_hook.log`                            | Debug log                                         |
 
 ## Environment Variables
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `TRACE_TO_BRAINTRUST` | Yes | - | Set to `"true"` to enable |
-| `BRAINTRUST_API_KEY` | Yes | - | API key for Braintrust |
-| `BRAINTRUST_CC_PROJECT` | No | `claude-code` | Project name |
-| `BRAINTRUST_CC_DEBUG` | No | `false` | Verbose logging |
-| `BRAINTRUST_API_URL` | No | `https://api.braintrust.dev` | API endpoint |
+| Variable                | Required | Default                      | Description               |
+| ----------------------- | -------- | ---------------------------- | ------------------------- |
+| `TRACE_TO_BRAINTRUST`   | Yes      | -                            | Set to `"true"` to enable |
+| `BRAINTRUST_API_KEY`    | Yes      | -                            | API key for Braintrust    |
+| `BRAINTRUST_CC_PROJECT` | No       | `claude-code`                | Project name              |
+| `BRAINTRUST_CC_DEBUG`   | No       | `false`                      | Verbose logging           |
+| `BRAINTRUST_API_URL`    | No       | `https://api.braintrust.dev` | API endpoint              |
 
 ## Session Learnings
 
@@ -249,12 +262,14 @@ echo '{"session_id":"test-123","tool_name":"Task","tool_input":{"prompt":"test"}
 **Result:** Failed - SessionStart only receives session metadata, not the prompt.
 
 **Discovery:** Task spans already contain rich sub-agent data:
+
 - `metadata.agent_type` - agent type from `subagent_type`
 - `metadata.skill_name` - skill from Skill tool
 - `tool_input` - full prompt sent to agent
 - `tool_output` - agent response
 
 **Current correlation path:**
+
 1. Parent session Task span has `agentId` and timing
 2. Sub-agent creates orphaned trace with `root_span_id = session_id`
 3. SubagentStop provides the sub-agent's `session_id`
@@ -277,6 +292,7 @@ echo '{"session_id":"test-123","tool_name":"Task","tool_input":{"prompt":"test"}
 SessionStart hook only receives session metadata (`session_id`, `type`, `cwd`), NOT the prompt. Injected trace context is never seen.
 
 The hook receives:
+
 ```json
 {
   "session_id": "...",
@@ -291,6 +307,7 @@ No prompt field exists - context injection is impossible at SessionStart.
 **2. SubagentStop → PostToolUse file handoff**
 
 Race condition. These are independent async hooks with no timing guarantees:
+
 - SubagentStop fires when sub-agent session ends
 - PostToolUse (Task) fires when Task tool completes
 - No ordering guarantee between them
@@ -305,6 +322,7 @@ SessionStart can't access the `task_span_id` because it has no context about whi
 **Post-hoc matching for dataset building:**
 
 Parent session Task spans contain:
+
 - `agentId` - identifier for the sub-agent run
 - `totalTokens`, `totalToolUseCount` - aggregated metrics
 - `content` - full agent response/summary
@@ -313,11 +331,13 @@ Parent session Task spans contain:
 - Start/end timestamps
 
 Sub-agent sessions contain:
+
 - `session_id` (equals orphaned trace `root_span_id`)
 - Start/end timestamps
 - All internal spans and tool calls
 
 **Correlation strategy:**
+
 1. Export parent session traces (query parent `root_span_id`)
 2. Export sub-agent traces (query all sessions created within parent's time window)
 3. Match by:
@@ -351,6 +371,7 @@ For building agent run datasets with sub-agent correlation:
 4. **Don't try real-time linking:** Hooks don't have necessary context
 
 Example script pattern:
+
 ```bash
 # 1. Export parent session
 braintrust_analyze.py --replay <parent-session-id> > parent_traces.json

@@ -7,8 +7,8 @@
  * 3. Gracefully degrading if neither exists
  */
 
-import { existsSync } from 'fs';
-import { join } from 'path';
+import { existsSync } from "fs";
+import { join } from "path";
 
 /**
  * Get the OPC directory path, or null if not available.
@@ -30,17 +30,17 @@ export function getOpcDir(): string | null {
 
   // 2. Try project-relative path
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-  const localOpc = join(projectDir, 'opc');
+  const localOpc = join(projectDir, "opc");
   if (existsSync(localOpc)) {
     return localOpc;
   }
 
   // 3. Try global ~/.claude (where wizard installs scripts)
   // Scripts are at ~/.claude/scripts/core/, so we use ~/.claude as base
-  const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+  const homeDir = process.env.HOME || process.env.USERPROFILE || "";
   if (homeDir) {
-    const globalClaude = join(homeDir, '.claude');
-    const globalScripts = join(globalClaude, 'scripts', 'core');
+    const globalClaude = join(homeDir, ".claude");
+    const globalScripts = join(globalClaude, "scripts", "core");
     if (existsSync(globalScripts)) {
       return globalClaude;
     }

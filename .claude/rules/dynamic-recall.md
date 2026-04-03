@@ -5,6 +5,7 @@ You have access to a semantic memory system that stores learnings, decisions, an
 ## When to Use Recall
 
 Query memory proactively when:
+
 - Starting work on something you may have done before
 - Encountering an error or tricky situation
 - Making architectural or design decisions
@@ -36,26 +37,27 @@ Query memory proactively when:
 
 ## Backend Architecture
 
-| Backend | Location | Status |
-|---------|----------|--------|
-| **PostgreSQL** (primary) | Via DATABASE_URL | Has 100+ real learnings with BGE embeddings |
-| SQLite (fallback) | ~/.claude/cache/memory.db | May be empty - don't rely on it |
+| Backend                  | Location                  | Status                                      |
+| ------------------------ | ------------------------- | ------------------------------------------- |
+| **PostgreSQL** (primary) | Via DATABASE_URL          | Has 100+ real learnings with BGE embeddings |
+| SQLite (fallback)        | ~/.claude/cache/memory.db | May be empty - don't rely on it             |
 
 **DO NOT manually inspect databases** - just use the recall script. It auto-selects the correct backend.
 
 ## Understanding Scores
 
-| Search Mode | Score Range | Interpretation |
-|-------------|-------------|----------------|
-| Hybrid RRF (default) | 0.01-0.03 | Normal - RRF combines rankings |
-| Pure vector | 0.4-0.6 | Cosine similarity |
-| Text search | 0.01-0.05 | BM25 normalized |
+| Search Mode          | Score Range | Interpretation                 |
+| -------------------- | ----------- | ------------------------------ |
+| Hybrid RRF (default) | 0.01-0.03   | Normal - RRF combines rankings |
+| Pure vector          | 0.4-0.6     | Cosine similarity              |
+| Text search          | 0.01-0.05   | BM25 normalized                |
 
 Low RRF scores (0.02) are **good results** - don't confuse with low relevance.
 
 ## What's Stored
 
 The memory contains session learnings from `archival_memory` table:
+
 - **What worked**: Successful approaches and solutions
 - **What failed**: Pitfalls to avoid
 - **Decisions**: Architectural choices and rationale
@@ -91,15 +93,15 @@ cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/store_learning.py 
 
 ### Learning Types
 
-| Type | Use For |
-|------|---------|
+| Type                     | Use For                                    |
+| ------------------------ | ------------------------------------------ |
 | `ARCHITECTURAL_DECISION` | Design choices, system structure decisions |
-| `WORKING_SOLUTION` | Fixes, solutions that worked |
-| `CODEBASE_PATTERN` | Patterns discovered in code |
-| `FAILED_APPROACH` | What didn't work (avoid repeating) |
-| `ERROR_FIX` | How specific errors were resolved |
-| `USER_PREFERENCE` | User's preferred approaches |
-| `OPEN_THREAD` | Incomplete work to resume later |
+| `WORKING_SOLUTION`       | Fixes, solutions that worked               |
+| `CODEBASE_PATTERN`       | Patterns discovered in code                |
+| `FAILED_APPROACH`        | What didn't work (avoid repeating)         |
+| `ERROR_FIX`              | How specific errors were resolved          |
+| `USER_PREFERENCE`        | User's preferred approaches                |
+| `OPEN_THREAD`            | Incomplete work to resume later            |
 
 ### Example
 
@@ -116,6 +118,7 @@ cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/store_learning.py 
 ### When to Store
 
 Store learnings when you:
+
 - Solve a tricky problem (so you don't re-solve it)
 - Make an architectural decision (capture the rationale)
 - Discover a codebase pattern (document it)

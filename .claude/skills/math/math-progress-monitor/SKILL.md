@@ -8,6 +8,7 @@ description: Metacognitive check-ins during problem solving - detects when to pi
 ## When to Use
 
 Trigger on phrases like:
+
 - "am I on the right track"
 - "is this approach working"
 - "I'm stuck"
@@ -23,19 +24,25 @@ Use mid-work to assess whether to continue, pivot, or decompose (Schoenfeld's me
 Run a structured progress assessment:
 
 ### 1. Inventory attempts
+
 **Ask:** "What have you tried so far?"
+
 - List each approach
 - Order by when attempted
 - Note time spent
 
 ### 2. Extract learnings
+
 **Ask:** "What did each attempt tell you?"
+
 - Even failures provide information
 - What was ruled out?
 - What patterns emerged?
 
 ### 3. Complexity check
+
 **Ask:** "Is complexity growing faster than expected?"
+
 - Warning signs:
   - More terms than you started with
   - New variables appearing
@@ -43,19 +50,25 @@ Run a structured progress assessment:
 - Normal: complexity stays flat or decreases
 
 ### 4. Spot-check verification
+
 **Ask:** "Can you verify any intermediate results?"
+
 - Run numerical examples
 - Check limiting cases
 - Dimensional analysis
 
 ### 5. Decomposition check
+
 **Ask:** "Is there a simpler sub-problem to solve first?"
+
 - Identify dependencies
 - Find stepping stones
 - Reduce scope
 
 ### 6. Sunk cost assessment
+
 **Ask:** "What would abandoning this approach cost?"
+
 - Time already spent (irrelevant)
 - Insights that transfer (relevant)
 - Probability of success if continue
@@ -145,6 +158,7 @@ Would you like the Beta function approach, or get a numerical answer first to ve
 ## Co-activates
 
 When user is stuck, suggest:
+
 - **math-intuition-builder** - reset understanding
 - **math-model-selector** - if framework was wrong
 - **math-mode** - for verification computations

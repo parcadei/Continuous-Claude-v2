@@ -7,6 +7,15 @@ description: Create git commits with user approval and no Claude attribution
 
 You are tasked with creating git commits for the changes made during this session.
 
+## When to Use
+
+Activate when:
+
+- User says "/commit" or "/git-commit"
+- User says "commit these changes" or "create a commit"
+- After implementing a feature or fix that needs to be committed
+- User says "I'm done, please commit"
+
 ## Process:
 
 1. **Think about what changed:**
@@ -38,6 +47,7 @@ You are tasked with creating git commits for the changes made during this sessio
    - Stored in `.git/claude/commits/<hash>/reasoning.md`
 
 ## Important:
+
 - **NEVER add co-author information or Claude attribution**
 - Commits should be authored solely by the user
 - Do not include any "Generated with Claude" messages
@@ -45,6 +55,7 @@ You are tasked with creating git commits for the changes made during this sessio
 - Write commit messages as if the user wrote them
 
 ## Remember:
+
 - You have the full context of what was done in this session
 - Group related changes together
 - Keep commits focused and atomic when possible

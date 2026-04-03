@@ -61,7 +61,7 @@ def extract_thinking_blocks(jsonl_path: Path, filter_perception: bool = False) -
     """
     blocks = []
 
-    with open(jsonl_path, 'r') as f:
+    with open(jsonl_path) as f:
         for line_num, line in enumerate(f, 1):
             try:
                 data = json.loads(line.strip())

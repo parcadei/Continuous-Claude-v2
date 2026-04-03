@@ -46,13 +46,13 @@ Query Type?
 
 ## Token Efficiency Comparison
 
-| Tool | Output Size | Best For |
-|------|-------------|----------|
-| **TLDR** | **~50-500** | **DEFAULT: Code symbols, call graphs, data flow** |
-| **TLDR Semantic** | **~100-300** | **Conceptual queries (P6, embedding-based)** |
-| AST-grep | ~50 tokens | Function/class definitions, imports, decorators |
-| Grep | ~200-2000 | LAST RESORT: Non-code text, regex |
-| Read | ~1500+ | Full understanding after finding the file |
+| Tool              | Output Size  | Best For                                          |
+| ----------------- | ------------ | ------------------------------------------------- |
+| **TLDR**          | **~50-500**  | **DEFAULT: Code symbols, call graphs, data flow** |
+| **TLDR Semantic** | **~100-300** | **Conceptual queries (P6, embedding-based)**      |
+| AST-grep          | ~50 tokens   | Function/class definitions, imports, decorators   |
+| Grep              | ~200-2000    | LAST RESORT: Non-code text, regex                 |
+| Read              | ~1500+       | Full understanding after finding the file         |
 
 ## Examples
 

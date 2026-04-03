@@ -8,18 +8,33 @@ user-invocable: false
 
 You are tasked with implementing an approved technical plan from `thoughts/shared/plans/`. These plans contain phases with specific changes and success criteria.
 
+## When to Use
+
+Activate when:
+
+- User says "/implement_plan" or similar
+- User provides a path to a plan file
+- After `plan-agent` or `validate-agent` has created a plan that needs implementation
+- User says "implement this plan" or "start implementing"
+
+This skill is typically invoked by other agents or after planning is complete. It is not user-invocable directly.
+
 ## Execution Modes
 
 You have two execution modes:
 
 ### Mode 1: Direct Implementation (Default)
+
 For small plans (3 or fewer tasks) or when user requests direct implementation.
+
 - You implement each phase yourself
 - Context accumulates in main conversation
 - Use this for quick, focused implementations
 
 ### Mode 2: Agent Orchestration (Recommended for larger plans)
+
 For plans with 4+ tasks or when context preservation is critical.
+
 - You act as a thin orchestrator
 - Agents execute each task and create handoffs
 - Compaction-resistant: handoffs persist even if context compacts
@@ -32,6 +47,7 @@ For plans with 4+ tasks or when context preservation is critical.
 ## Getting Started
 
 When given a plan path:
+
 - Read the plan completely and check for any existing checkmarks (- [x])
 - Read the original ticket and all files mentioned in the plan
 - **Read files fully** - never use limit/offset parameters, you need complete context
@@ -47,17 +63,20 @@ Before starting implementation, run a deep pre-mortem:
 ```
 
 This analyzes the plan against comprehensive checklists:
+
 - Technical risks (scalability, dependencies, data, security)
 - Integration risks (breaking changes, migration, rollback)
 - Process risks (unclear requirements, stakeholder input)
 - Testing risks (coverage gaps, load testing needs)
 
 **If HIGH severity risks are identified:**
+
 - The premortem will block via AskUserQuestion
 - User must: accept risks explicitly, add mitigations, or research solutions
 - If mitigations are added, update the plan before proceeding
 
 **Skip premortem if:**
+
 - Plan already has a "## Risks (Pre-Mortem)" section with mitigations
 - User explicitly requests to skip (`--skip-premortem`)
 
@@ -68,6 +87,7 @@ If no plan path provided, ask for one.
 ## Implementation Philosophy
 
 Plans are carefully designed, but reality can be messy. Your job is to:
+
 - Follow the plan's intent while adapting to what you find
 - Implement each phase fully before moving to the next
 - Verify your work makes sense in the broader codebase context
@@ -76,8 +96,10 @@ Plans are carefully designed, but reality can be messy. Your job is to:
 When things don't match the plan exactly, think about why and communicate clearly. The plan is your guide, but your judgment matters too.
 
 If you encounter a mismatch:
+
 - STOP and think deeply about why the plan can't be followed
 - Present the issue clearly:
+
   ```
   Issue in Phase [N]:
   Expected: [what the plan says]
@@ -90,11 +112,13 @@ If you encounter a mismatch:
 ## Verification Approach
 
 After implementing a phase:
+
 - Run the success criteria checks (usually `make check test` covers everything)
 - Fix any issues before proceeding
 - Update your progress in both the plan and your todos
 - Check off completed items in the plan file itself using Edit
 - **Pause for human verification**: After completing all automated verification for a phase, pause and inform the human that the phase is ready for manual testing. Use this format:
+
   ```
   Phase [N] Complete - Ready for Manual Verification
 
@@ -111,10 +135,10 @@ If instructed to execute multiple phases consecutively, skip the pause until the
 
 do not check off items in the manual testing steps until confirmed by the user.
 
-
 ## If You Get Stuck
 
 When something isn't working as expected:
+
 - First, make sure you've read and understood all the relevant code
 - Consider if the codebase has evolved since the plan was written
 - Present the mismatch clearly and ask for guidance
@@ -138,6 +162,7 @@ If the plan was created by `plan-agent`, you may be able to resume it for clarif
 The resumed agent retains its full prior context (research, codebase analysis).
 
 Available agents to resume:
+
 - `plan-agent` - Created the implementation plan
 - `oracle` - Researched best practices
 - `debug-agent` - Investigated issues
@@ -145,6 +170,7 @@ Available agents to resume:
 ## Resuming Work
 
 If the plan has existing checkmarks:
+
 - Trust that completed work is done
 - Pick up from the first unchecked item
 - Verify previous work only if something seems off
@@ -162,6 +188,7 @@ When implementing larger plans (4+ tasks), use agent orchestration to stay compa
 **The Problem:** During long implementations, context accumulates. If auto-compact triggers mid-task, you lose implementation context. Handoffs created at 80% context become stale.
 
 **The Solution:** Delegate implementation to agents. Each agent:
+
 - Starts with fresh context
 - Implements one task
 - Creates a handoff on completion
@@ -172,14 +199,16 @@ Handoffs persist on disk. If compaction happens, you re-read handoffs and contin
 ### Setup
 
 1. **Create handoff directory:**
+
    ```bash
    mkdir -p thoughts/handoffs/<session-name>
    ```
+
    Use the session name from your continuity ledger.
 
 2. **Read the implementation agent skill:**
    ```bash
-   cat .claude/skills/implement_task/SKILL.md
+   cat .claude/skills/implement-task/SKILL.md
    ```
    This defines how agents should behave.
 
@@ -188,11 +217,13 @@ Handoffs persist on disk. If compaction happens, you re-read handoffs and contin
 Before implementing, ensure the plan has been validated using the `validate-agent`. The validation step is separate and should have created a handoff with status VALIDATED.
 
 **Check for validation handoff:**
+
 ```bash
 ls thoughts/handoffs/<session>/validation-*.md
 ```
 
 If no validation exists, suggest running validation first:
+
 ```
 "This plan hasn't been validated yet. Would you like me to spawn validate-agent first?"
 ```
@@ -210,12 +241,13 @@ For each task in the plan:
    - Identify the specific task
 
 2. **Spawn implementation agent:**
+
    ```
    Task(
      subagent_type="general-purpose",
      model="claude-opus-4-5-20251101",
      prompt="""
-     [Paste contents of .claude/skills/implement_task/SKILL.md here]
+     [Paste contents of .claude/skills/implement-task/SKILL.md here]
 
      ---
 
@@ -320,14 +352,14 @@ The chain preserves context even across compactions.
 
 ### When to Use Agent Orchestration
 
-| Scenario | Mode |
-|----------|------|
-| 1-3 simple tasks | Direct implementation |
-| 4+ tasks | Agent orchestration |
-| Critical context to preserve | Agent orchestration |
-| Quick bug fix | Direct implementation |
-| Major feature implementation | Agent orchestration |
-| User explicitly requests | Respect user preference |
+| Scenario                     | Mode                    |
+| ---------------------------- | ----------------------- |
+| 1-3 simple tasks             | Direct implementation   |
+| 4+ tasks                     | Agent orchestration     |
+| Critical context to preserve | Agent orchestration     |
+| Quick bug fix                | Direct implementation   |
+| Major feature implementation | Agent orchestration     |
+| User explicitly requests     | Respect user preference |
 
 ### Tips
 

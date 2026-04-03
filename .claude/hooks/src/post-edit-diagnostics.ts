@@ -6,8 +6,8 @@
  * Provides early feedback before tests run.
  */
 
-import { readFileSync } from 'fs';
-import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
+import { readFileSync } from "fs";
+import { queryDaemonSync, trackHookActivitySync } from "./daemon-client.js";
 
 interface HookInput {
   tool_name: string;
@@ -27,53 +27,66 @@ interface HookOutput {
 }
 
 async function main() {
-  const input: HookInput = JSON.parse(readFileSync(0, 'utf-8'));
+  const input: HookInput = JSON.parse(readFileSync(0, "utf-8"));
 
   // Only run on Edit and Write operations
-  if (input.tool_name !== 'Edit' && input.tool_name !== 'Write') {
-    console.log('{}');
+  if (input.tool_name !== "Edit" && input.tool_name !== "Write") {
+    console.log("{}");
     return;
   }
 
   const filePath = input.tool_input?.file_path;
   if (!filePath) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
   // Code file extensions we care about
   const codeExtensions = [
     // Python (has linters: pyright + ruff)
-    '.py', '.pyx', '.pyi',
+    ".py",
+    ".pyx",
+    ".pyi",
     // TypeScript/JavaScript (TODO: add eslint/tsc)
-    '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs',
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".cjs",
     // Go (TODO: add go vet)
-    '.go',
+    ".go",
     // Rust (TODO: add clippy)
-    '.rs',
+    ".rs",
     // Java
-    '.java',
+    ".java",
     // C/C++
-    '.c', '.h', '.cpp', '.hpp', '.cc', '.cxx', '.hh',
+    ".c",
+    ".h",
+    ".cpp",
+    ".hpp",
+    ".cc",
+    ".cxx",
+    ".hh",
     // Ruby
-    '.rb',
+    ".rb",
     // C#
-    '.cs',
+    ".cs",
   ];
 
-  const ext = filePath.substring(filePath.lastIndexOf('.'));
+  const ext = filePath.substring(filePath.lastIndexOf("."));
 
   // Skip non-code files entirely
   if (!codeExtensions.includes(ext)) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
   // Currently only Python has linters configured in tldr diagnostics
   // Skip other languages until we add their linters
-  const pythonExtensions = ['.py', '.pyx', '.pyi'];
+  const pythonExtensions = [".py", ".pyx", ".pyi"];
   if (!pythonExtensions.includes(ext)) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
@@ -81,13 +94,13 @@ async function main() {
   try {
     const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
     const response = queryDaemonSync(
-      { cmd: 'diagnostics', file: filePath },
-      projectDir
+      { cmd: "diagnostics", file: filePath },
+      projectDir,
     );
 
     // If daemon is unavailable or no errors, silently succeed
-    if (response.status === 'unavailable' || response.error) {
-      console.log('{}');
+    if (response.status === "unavailable" || response.error) {
+      console.log("{}");
       return;
     }
 
@@ -98,7 +111,7 @@ async function main() {
     const errors = response.errors || [];
 
     // Track hook activity (P8) - reuse projectDir from above
-    trackHookActivitySync('post-edit-diagnostics', projectDir, true, {
+    trackHookActivitySync("post-edit-diagnostics", projectDir, true, {
       edits_analyzed: 1,
       type_errors: typeErrors,
       lint_issues: lintIssues,
@@ -106,13 +119,15 @@ async function main() {
 
     // No errors - silent success
     if (typeErrors === 0 && lintIssues === 0) {
-      console.log('{}');
+      console.log("{}");
       return;
     }
 
     // Build error summary
     const lines: string[] = [];
-    lines.push(`⚠️ Diagnostics: ${typeErrors} type errors, ${lintIssues} lint issues`);
+    lines.push(
+      `⚠️ Diagnostics: ${typeErrors} type errors, ${lintIssues} lint issues`,
+    );
 
     // Show up to 5 error previews
     const maxPreviews = 5;
@@ -133,15 +148,15 @@ async function main() {
 
     const output: HookOutput = {
       hookSpecificOutput: {
-        hookEventName: 'PostToolUse',
-        additionalContext: lines.join('\n')
-      }
+        hookEventName: "PostToolUse",
+        additionalContext: lines.join("\n"),
+      },
     };
     console.log(JSON.stringify(output));
   } catch {
     // Daemon error - silently ignore (graceful degradation)
-    console.log('{}');
+    console.log("{}");
   }
 }
 
-main().catch(() => console.log('{}'));
+main().catch(() => console.log("{}"));

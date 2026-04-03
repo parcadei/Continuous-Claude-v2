@@ -8,8 +8,8 @@
  * This gives agents/subagents architectural context for better planning.
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
+import { readFileSync, existsSync } from "fs";
+import { queryDaemonSync, trackHookActivitySync } from "./daemon-client.js";
 
 interface HookInput {
   session_id: string;
@@ -26,7 +26,7 @@ interface HookInput {
 interface HookOutput {
   hookSpecificOutput?: {
     hookEventName: string;
-    permissionDecision: 'allow' | 'deny' | 'ask';
+    permissionDecision: "allow" | "deny" | "ask";
     permissionDecisionReason?: string;
     updatedInput?: Record<string, unknown>;
   };
@@ -60,21 +60,24 @@ const PLANNING_PATTERNS = [
 ];
 
 function readStdin(): string {
-  return readFileSync(0, 'utf-8');
+  return readFileSync(0, "utf-8");
 }
 
 // Detect if prompt mentions planning/architecture
 function hasPlanningIntent(text: string): boolean {
-  return PLANNING_PATTERNS.some(pattern => pattern.test(text));
+  return PLANNING_PATTERNS.some((pattern) => pattern.test(text));
 }
 
 // Query daemon for architecture analysis (fast - uses in-memory indexes)
 function getArchitecture(projectPath: string): ArchResult | null {
   try {
-    const response = queryDaemonSync({ cmd: 'arch', language: 'python' }, projectPath);
+    const response = queryDaemonSync(
+      { cmd: "arch", language: "python" },
+      projectPath,
+    );
 
     // Handle daemon unavailable or errors
-    if (response.status === 'unavailable' || response.status === 'error') {
+    if (response.status === "unavailable" || response.status === "error") {
       return null;
     }
 
@@ -93,21 +96,25 @@ function getArchitecture(projectPath: string): ArchResult | null {
 
     // Entry layer functions
     if (result.entry_layer && Array.isArray(result.entry_layer)) {
-      layers.entry = result.entry_layer.slice(0, 15).map((f: { file: string; function: string }) =>
-        `${f.file}:${f.function}`
-      );
+      layers.entry = result.entry_layer
+        .slice(0, 15)
+        .map(
+          (f: { file: string; function: string }) => `${f.file}:${f.function}`,
+        );
     }
 
     // Leaf layer functions
     if (result.leaf_layer && Array.isArray(result.leaf_layer)) {
-      layers.leaf = result.leaf_layer.slice(0, 15).map((f: { file: string; function: string }) =>
-        `${f.file}:${f.function}`
-      );
+      layers.leaf = result.leaf_layer
+        .slice(0, 15)
+        .map(
+          (f: { file: string; function: string }) => `${f.file}:${f.function}`,
+        );
     }
 
     // Circular dependencies
-    const circular = result.circular_dependencies?.map((c: { a: string; b: string }) =>
-      `${c.a} <-> ${c.b}`
+    const circular = result.circular_dependencies?.map(
+      (c: { a: string; b: string }) => `${c.a} <-> ${c.b}`,
     );
 
     if (Object.keys(layers).length === 0) {
@@ -122,12 +129,12 @@ function getArchitecture(projectPath: string): ArchResult | null {
 
 // Format architecture context for injection
 function formatArchContext(arch: ArchResult): string {
-  const lines: string[] = ['## Architecture Layers'];
+  const lines: string[] = ["## Architecture Layers"];
 
   for (const [layer, files] of Object.entries(arch.layers)) {
     if (!files || files.length === 0) continue;
 
-    lines.push('');
+    lines.push("");
     lines.push(`### ${layer.toUpperCase()}`);
     for (const file of files.slice(0, 10)) {
       lines.push(`- ${file}`);
@@ -138,38 +145,42 @@ function formatArchContext(arch: ArchResult): string {
   }
 
   if (arch.circular && arch.circular.length > 0) {
-    lines.push('');
-    lines.push('### Circular Dependencies (WARNING)');
+    lines.push("");
+    lines.push("### Circular Dependencies (WARNING)");
     for (const dep of arch.circular.slice(0, 5)) {
       lines.push(`- ${dep}`);
     }
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 async function main() {
   const input: HookInput = JSON.parse(readStdin());
 
   // Only intercept Task tool
-  if (input.tool_name !== 'Task') {
-    console.log('{}');
+  if (input.tool_name !== "Task") {
+    console.log("{}");
     return;
   }
 
-  const prompt = input.tool_input.prompt || '';
-  const description = input.tool_input.description || '';
+  const prompt = input.tool_input.prompt || "";
+  const description = input.tool_input.description || "";
   const fullText = `${prompt} ${description}`;
 
   // Skip if no planning intent detected
   if (!hasPlanningIntent(fullText)) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
   // Skip if already has architecture context
-  if (prompt.includes('## Architecture') || prompt.includes('### ENTRY') || prompt.includes('### SERVICE')) {
-    console.log('{}');
+  if (
+    prompt.includes("## Architecture") ||
+    prompt.includes("### ENTRY") ||
+    prompt.includes("### SERVICE")
+  ) {
+    console.log("{}");
     return;
   }
 
@@ -177,7 +188,7 @@ async function main() {
   const projectDir = process.env.CLAUDE_PROJECT_DIR || input.cwd;
 
   if (!projectDir || !existsSync(projectDir)) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
@@ -185,7 +196,7 @@ async function main() {
   const arch = getArchitecture(projectDir);
 
   if (!arch) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
@@ -200,9 +211,10 @@ ${prompt}`;
 
   const output: HookOutput = {
     hookSpecificOutput: {
-      hookEventName: 'PreToolUse',
-      permissionDecision: 'allow',
-      permissionDecisionReason: 'Injected architecture context for planning task',
+      hookEventName: "PreToolUse",
+      permissionDecision: "allow",
+      permissionDecisionReason:
+        "Injected architecture context for planning task",
       updatedInput: {
         ...input.tool_input,
         prompt: enhancedPrompt,
@@ -211,7 +223,7 @@ ${prompt}`;
   };
 
   // Track hook activity for flush threshold
-  trackHookActivitySync('arch-context-inject', projectDir, true, {
+  trackHookActivitySync("arch-context-inject", projectDir, true, {
     tasks_processed: 1,
     arch_injected: 1,
   });
@@ -221,5 +233,5 @@ ${prompt}`;
 
 main().catch(() => {
   // Silent fail - don't block task execution
-  console.log('{}');
+  console.log("{}");
 });

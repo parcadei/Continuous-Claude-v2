@@ -28,7 +28,7 @@ async function main() {
     ".claude",
     "cache",
     "agentica-coordination",
-    "coordination.db"
+    "coordination.db",
   );
   if (!existsSync(dbPath)) {
     console.log(JSON.stringify({ result: "continue" }));
@@ -68,10 +68,14 @@ for row in cursor.fetchall():
 
 print(json.dumps(broadcasts))
 `;
-    const result = spawnSync("python3", ["-c", query, dbPath, swarmId, agentId], {
-      encoding: "utf-8",
-      maxBuffer: 1024 * 1024
-    });
+    const result = spawnSync(
+      "python3",
+      ["-c", query, dbPath, swarmId, agentId],
+      {
+        encoding: "utf-8",
+        maxBuffer: 1024 * 1024,
+      },
+    );
     if (result.status !== 0) {
       console.log(JSON.stringify({ result: "continue" }));
       return;
@@ -86,10 +90,12 @@ print(json.dumps(broadcasts))
 `;
       }
       contextMessage += "------------------------\n";
-      console.log(JSON.stringify({
-        result: "continue",
-        message: contextMessage
-      }));
+      console.log(
+        JSON.stringify({
+          result: "continue",
+          message: contextMessage,
+        }),
+      );
     } else {
       console.log(JSON.stringify({ result: "continue" }));
     }

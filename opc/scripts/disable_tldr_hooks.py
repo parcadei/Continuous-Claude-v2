@@ -18,7 +18,10 @@ if str(_opc_root) not in sys.path:
     sys.path.insert(0, str(_opc_root))
 
 try:
-    from scripts.setup.claude_integration import strip_tldr_hooks_from_settings, get_global_claude_dir
+    from scripts.setup.claude_integration import (
+        get_global_claude_dir,
+        strip_tldr_hooks_from_settings,
+    )
 except ImportError:
     print("❌ Could not import strip_tldr_hooks_from_settings from scripts.setup.claude_integration")
     sys.exit(1)

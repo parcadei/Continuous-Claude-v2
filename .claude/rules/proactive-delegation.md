@@ -6,13 +6,13 @@ Keep main context clean by delegating to agents. Don't wait to be asked.
 
 When user message arrives, detect:
 
-| Pattern | Signal | Action |
-|---------|--------|--------|
-| Multiple tasks | "X and Y", "also", comma-separated | Suggest parallel agents |
-| Research needed | "how does", "what is", "find" | Spawn scout/oracle |
-| Implementation | "add", "implement", "create" | Route to /build workflow |
-| Bug/issue | "fix", "broken", "failing", "debug" | Route to /fix workflow |
-| Exploration | "understand", "explore", "how does X work" | Route to /explore |
+| Pattern         | Signal                                     | Action                   |
+| --------------- | ------------------------------------------ | ------------------------ |
+| Multiple tasks  | "X and Y", "also", comma-separated         | Suggest parallel agents  |
+| Research needed | "how does", "what is", "find"              | Spawn scout/oracle       |
+| Implementation  | "add", "implement", "create"               | Route to /build workflow |
+| Bug/issue       | "fix", "broken", "failing", "debug"        | Route to /fix workflow   |
+| Exploration     | "understand", "explore", "how does X work" | Route to /explore        |
 
 ## Workflow Suggestions
 
@@ -32,6 +32,7 @@ Claude: "I detect a /fix workflow with 2 tasks:
 ## Main Context = Coordination Only
 
 **Delegate to agents:**
+
 - Reading 3+ files → scout
 - External research → oracle
 - Implementation → kraken/spark
@@ -39,6 +40,7 @@ Claude: "I detect a /fix workflow with 2 tasks:
 - Debugging → debug-agent/sleuth
 
 **Keep in main context:**
+
 - Understanding user intent
 - Workflow selection
 - Agent coordination
@@ -60,12 +62,12 @@ User: "Research auth patterns and check performance"
 
 After completing a workflow, suggest the natural next step:
 
-| After | Suggest |
-|-------|---------|
-| /explore | "Ready for /build brownfield?" |
-| /plan | "Run /premortem before implementing?" |
-| /fix | "Create /commit for the fix?" |
-| Research complete | "Create plan from findings?" |
+| After             | Suggest                               |
+| ----------------- | ------------------------------------- |
+| /explore          | "Ready for /build brownfield?"        |
+| /plan             | "Run /premortem before implementing?" |
+| /fix              | "Create /commit for the fix?"         |
+| Research complete | "Create plan from findings?"          |
 
 ## Memory Check
 
@@ -81,6 +83,7 @@ If relevant memory found: "I researched this on [date] - reuse or refresh?"
 ## Don't Over-Delegate
 
 Keep in main context when:
+
 - Single simple question (just answer it)
 - Quick file lookup (1-2 files)
 - User explicitly wants direct response

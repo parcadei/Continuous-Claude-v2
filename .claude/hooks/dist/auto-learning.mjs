@@ -12,7 +12,7 @@ async function storeLearning(learning, sessionId, projectDir) {
     "python",
     "scripts/store_learning.py",
     "--session-id",
-    sessionId
+    sessionId,
   ];
   if (learning.outcome === "success") {
     args.push("--worked", `${learning.what}. ${learning.how}`);
@@ -29,9 +29,9 @@ async function storeLearning(learning, sessionId, projectDir) {
     cwd: opcDir,
     env: {
       ...process.env,
-      PYTHONPATH: opcDir
+      PYTHONPATH: opcDir,
     },
-    timeout: 1e4
+    timeout: 1e4,
   });
   return result.status === 0;
 }
@@ -43,19 +43,24 @@ function extractTestPassLearning(event, recentEdits) {
     /tests? passed/i,
     /ok \(/i,
     /success/i,
-    /\u2713/
+    /\u2713/,
     // checkmark
   ];
   const isPass = passPatterns.some((p) => p.test(output));
   if (!isPass) return null;
-  const editSummary = recentEdits.map((e) => `${e.file}: ${e.description}`).join("; ");
+  const editSummary = recentEdits
+    .map((e) => `${e.file}: ${e.description}`)
+    .join("; ");
   return {
     what: `Tests passed after: ${editSummary || "recent changes"}`,
     why: "Changes addressed the failing tests",
-    how: recentEdits.length > 0 ? `Files modified: ${recentEdits.map((e) => e.file).join(", ")}` : "See recent edit history",
+    how:
+      recentEdits.length > 0
+        ? `Files modified: ${recentEdits.map((e) => e.file).join(", ")}`
+        : "See recent edit history",
     outcome: "success",
     tags: ["test_pass", "fix", "auto_extracted"],
-    context: output.slice(0, 200)
+    context: output.slice(0, 200),
   };
 }
 function extractPeriodicLearning(turnCount, recentActions, sessionGoal) {
@@ -64,7 +69,7 @@ function extractPeriodicLearning(turnCount, recentActions, sessionGoal) {
     why: sessionGoal || "Session progress tracking",
     how: recentActions.join("; ").slice(0, 500),
     outcome: "partial",
-    tags: ["periodic", "progress", "procedural", "auto_extracted"]
+    tags: ["periodic", "progress", "procedural", "auto_extracted"],
   };
 }
 
@@ -75,7 +80,12 @@ function getStateFilePath() {
   if (projectDir) {
     return join2(projectDir, ".claude", "cache", "auto-learning-state.json");
   }
-  return join2(process.env.HOME || "/tmp", ".claude", "cache", "auto-learning-state.json");
+  return join2(
+    process.env.HOME || "/tmp",
+    ".claude",
+    "cache",
+    "auto-learning-state.json",
+  );
 }
 function loadState() {
   const stateFile = getStateFilePath();
@@ -85,10 +95,9 @@ function loadState() {
       return {
         edits: parsed.edits || [],
         turnCount: parsed.turnCount || 0,
-        recentActions: parsed.recentActions || []
+        recentActions: parsed.recentActions || [],
       };
-    } catch {
-    }
+    } catch {}
   }
   return { edits: [], turnCount: 0, recentActions: [] };
 }
@@ -141,12 +150,19 @@ async function main() {
   state.turnCount++;
   const actionDesc = buildActionDescription(input.tool_name, input.tool_input);
   state.recentActions.push(actionDesc);
-  if (state.turnCount % PERIODIC_INTERVAL === 0 && state.recentActions.length > 0) {
+  if (
+    state.turnCount % PERIODIC_INTERVAL === 0 &&
+    state.recentActions.length > 0
+  ) {
     const periodicLearning = extractPeriodicLearning(
       state.turnCount,
-      state.recentActions
+      state.recentActions,
     );
-    const stored = await storeLearning(periodicLearning, input.session_id, projectDir);
+    const stored = await storeLearning(
+      periodicLearning,
+      input.session_id,
+      projectDir,
+    );
     if (stored) {
       state.recentActions = [];
       saveState(state);
@@ -158,8 +174,10 @@ async function main() {
     const newString = String(input.tool_input.new_string || "").slice(0, 50);
     state.edits.push({
       file: filePath.split("/").pop() || filePath,
-      description: oldString ? `${oldString} \u2192 ${newString}` : "New content",
-      timestamp: Date.now()
+      description: oldString
+        ? `${oldString} \u2192 ${newString}`
+        : "New content",
+      timestamp: Date.now(),
     });
     saveState(state);
     return;
@@ -168,7 +186,8 @@ async function main() {
     const command = String(input.tool_input.command || "");
     const output = String(input.tool_response.output || "");
     const exitCode = input.tool_response.exitCode;
-    const isTestCommand = /\b(test|pytest|vitest|jest|npm run test|cargo test)\b/i.test(command);
+    const isTestCommand =
+      /\b(test|pytest|vitest|jest|npm run test|cargo test)\b/i.test(command);
     if (!isTestCommand) {
       saveState(state);
       return;
@@ -178,7 +197,7 @@ async function main() {
       /tests? passed/i,
       /ok \(/i,
       /\bPASS\b/,
-      /\u2713/
+      /\u2713/,
       // checkmark
     ];
     const isPass = exitCode === 0 && passPatterns.some((p) => p.test(output));
@@ -192,31 +211,33 @@ async function main() {
             tool_name: input.tool_name,
             tool_input: input.tool_input,
             tool_response: input.tool_response,
-            session_id: input.session_id
+            session_id: input.session_id,
           },
-          recentEdits
+          recentEdits,
         );
         if (learning) {
-          const stored = await storeLearning(learning, input.session_id, projectDir);
+          const stored = await storeLearning(
+            learning,
+            input.session_id,
+            projectDir,
+          );
           if (stored) {
             state.edits = [];
             saveState(state);
-            console.log(JSON.stringify({
-              hookSpecificOutput: {
-                hookEventName: "PostToolUse",
-                additionalContext: `AUTO-LEARNING: Stored "${learning.what.slice(0, 60)}..." to memory.`
-              }
-            }));
+            console.log(
+              JSON.stringify({
+                hookSpecificOutput: {
+                  hookEventName: "PostToolUse",
+                  additionalContext: `AUTO-LEARNING: Stored "${learning.what.slice(0, 60)}..." to memory.`,
+                },
+              }),
+            );
             return;
           }
         }
       }
     }
-    const failPatterns = [
-      /(\d+) failed/i,
-      /FAIL/,
-      /error/i
-    ];
+    const failPatterns = [/(\d+) failed/i, /FAIL/, /error/i];
     const isFail = exitCode !== 0 || failPatterns.some((p) => p.test(output));
     if (isFail && state.edits.length > 0) {
       const recentEdits = state.edits.slice(-3);
@@ -226,7 +247,7 @@ async function main() {
         how: `Edits: ${recentEdits.map((e) => e.description).join("; ")}`,
         outcome: "failure",
         tags: ["test_fail", "avoid", "auto_extracted"],
-        context: output.slice(0, 200)
+        context: output.slice(0, 200),
       };
       await storeLearning(failLearning, input.session_id, projectDir);
     }

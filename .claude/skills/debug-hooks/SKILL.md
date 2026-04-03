@@ -22,13 +22,13 @@ Systematic workflow for debugging Claude Code hooks.
 
 ```bash
 # Check project cache
-ls -la $CLAUDE_PROJECT_DIR/.claude/cache/
+ls -la $CLAUDE_CC_DIR/.claude/cache/
 
 # Check specific outputs
-ls -la $CLAUDE_PROJECT_DIR/.claude/cache/learnings/
+ls -la $CLAUDE_CC_DIR/.claude/cache/learnings/
 
 # Check for debug logs
-tail $CLAUDE_PROJECT_DIR/.claude/cache/*.log 2>/dev/null
+tail $CLAUDE_CC_DIR/.claude/cache/*.log 2>/dev/null
 
 # Also check global (common mistake: wrong path)
 ls -la ~/.claude/cache/ 2>/dev/null
@@ -38,7 +38,7 @@ ls -la ~/.claude/cache/ 2>/dev/null
 
 ```bash
 # Project settings
-cat $CLAUDE_PROJECT_DIR/.claude/settings.json | grep -A 20 '"SessionEnd"\|"PostToolUse"\|"UserPromptSubmit"'
+cat $CLAUDE_CC_DIR/.claude/settings.json | grep -A 20 '"SessionEnd"\|"PostToolUse"\|"UserPromptSubmit"'
 
 # Global settings (hooks merge from both)
 cat ~/.claude/settings.json | grep -A 20 '"SessionEnd"\|"PostToolUse"\|"UserPromptSubmit"'
@@ -48,10 +48,10 @@ cat ~/.claude/settings.json | grep -A 20 '"SessionEnd"\|"PostToolUse"\|"UserProm
 
 ```bash
 # Shell wrappers
-ls -la $CLAUDE_PROJECT_DIR/.claude/hooks/*.sh
+ls -la $CLAUDE_CC_DIR/.claude/hooks/*.sh
 
 # Compiled bundles (if using TypeScript)
-ls -la $CLAUDE_PROJECT_DIR/.claude/hooks/dist/*.mjs
+ls -la $CLAUDE_CC_DIR/.claude/hooks/dist/*.mjs
 ```
 
 ### 4. Test Hook Manually
@@ -59,11 +59,11 @@ ls -la $CLAUDE_PROJECT_DIR/.claude/hooks/dist/*.mjs
 ```bash
 # SessionEnd hook
 echo '{"session_id": "test-123", "reason": "clear", "transcript_path": "/tmp/test"}' | \
-  $CLAUDE_PROJECT_DIR/.claude/hooks/session-end-cleanup.sh
+  $CLAUDE_CC_DIR/.claude/hooks/session-end-cleanup.sh
 
 # PostToolUse hook (Write tool example)
 echo '{"tool_name": "Write", "tool_input": {"file_path": "test.md"}, "session_id": "test-123"}' | \
-  $CLAUDE_PROJECT_DIR/.claude/hooks/handoff-index.sh
+  $CLAUDE_CC_DIR/.claude/hooks/handoff-index.sh
 ```
 
 ### 5. Check for Silent Failures
@@ -72,16 +72,16 @@ If using detached spawn with `stdio: 'ignore'`:
 
 ```typescript
 // This pattern hides errors!
-spawn(cmd, args, { detached: true, stdio: 'ignore' })
+spawn(cmd, args, { detached: true, stdio: "ignore" });
 ```
 
 **Fix:** Add temporary logging:
 
 ```typescript
-const logFile = fs.openSync('.claude/cache/debug.log', 'a');
+const logFile = fs.openSync(".claude/cache/debug.log", "a");
 spawn(cmd, args, {
   detached: true,
-  stdio: ['ignore', logFile, logFile]  // capture stdout/stderr
+  stdio: ["ignore", logFile, logFile], // capture stdout/stderr
 });
 ```
 
@@ -90,7 +90,7 @@ spawn(cmd, args, {
 If you edited TypeScript source, you MUST rebuild:
 
 ```bash
-cd $CLAUDE_PROJECT_DIR/.claude/hooks
+cd $CLAUDE_CC_DIR/.claude/hooks
 npx esbuild src/session-end-cleanup.ts \
   --bundle --platform=node --format=esm \
   --outfile=dist/session-end-cleanup.mjs
@@ -100,13 +100,13 @@ Source edits alone don't take effect - the shell wrapper runs the bundled `.mjs`
 
 ## Common Issues
 
-| Symptom | Likely Cause | Fix |
-|---------|--------------|-----|
-| Hook never runs | Not registered in settings.json | Add to correct event in settings |
-| Hook runs but no output | Detached spawn hiding errors | Add logging, check manually |
-| Wrong session ID | Using "most recent" query | Pass ID explicitly |
-| Works locally, not in CI | Missing dependencies | Check npx/node availability |
-| Runs twice | Registered in both global + project | Remove duplicate |
+| Symptom                  | Likely Cause                        | Fix                              |
+| ------------------------ | ----------------------------------- | -------------------------------- |
+| Hook never runs          | Not registered in settings.json     | Add to correct event in settings |
+| Hook runs but no output  | Detached spawn hiding errors        | Add logging, check manually      |
+| Wrong session ID         | Using "most recent" query           | Pass ID explicitly               |
+| Works locally, not in CI | Missing dependencies                | Check npx/node availability      |
+| Runs twice               | Registered in both global + project | Remove duplicate                 |
 
 ## Debug Checklist
 
@@ -120,4 +120,5 @@ Source edits alone don't take effect - the shell wrapper runs the bundled `.mjs`
 ## Source Sessions
 
 Derived from 10 sessions (83% of all learnings):
+
 - a541f08a, 1c21e6c8, 6a9f2d7a, a8bd5cea, 2ca1a178, 657ce0b2, 3998f3a2, 2a829f12, 0b46cfd7, 862f6e2c

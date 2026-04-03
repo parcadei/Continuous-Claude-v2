@@ -4,17 +4,17 @@
  * Validates pattern algebra rules before orchestration.
  * Part of the 3-gate system: Erotetic -> Resources -> Composition.
  */
-import { validateComposition, } from './pattern-selector.js';
+import { validateComposition } from "./pattern-selector.js";
 /**
  * Error thrown when pattern composition validation fails.
  */
 export class CompositionInvalidError extends Error {
-    errors;
-    constructor(errors) {
-        super(`Invalid composition: ${errors.join('; ')}`);
-        this.errors = errors;
-        this.name = 'CompositionInvalidError';
-    }
+  errors;
+  constructor(errors) {
+    super(`Invalid composition: ${errors.join("; ")}`);
+    this.errors = errors;
+    this.name = "CompositionInvalidError";
+  }
 }
 /**
  * Gate 3: Composition validation.
@@ -29,12 +29,17 @@ export class CompositionInvalidError extends Error {
  * @returns ValidationResult if valid
  * @throws CompositionInvalidError if invalid
  */
-export function gate3Composition(patternA, patternB, scope = 'handoff', operator = ';') {
-    const result = validateComposition([patternA, patternB], scope, operator);
-    if (!result.valid) {
-        throw new CompositionInvalidError(result.errors);
-    }
-    return result;
+export function gate3Composition(
+  patternA,
+  patternB,
+  scope = "handoff",
+  operator = ";",
+) {
+  const result = validateComposition([patternA, patternB], scope, operator);
+  if (!result.valid) {
+    throw new CompositionInvalidError(result.errors);
+  }
+  return result;
 }
 /**
  * Validate a chain of patterns.
@@ -45,10 +50,14 @@ export function gate3Composition(patternA, patternB, scope = 'handoff', operator
  * @returns ValidationResult if valid
  * @throws CompositionInvalidError if invalid
  */
-export function gate3CompositionChain(patterns, scope = 'handoff', operator = ';') {
-    const result = validateComposition(patterns, scope, operator);
-    if (!result.valid) {
-        throw new CompositionInvalidError(result.errors);
-    }
-    return result;
+export function gate3CompositionChain(
+  patterns,
+  scope = "handoff",
+  operator = ";",
+) {
+  const result = validateComposition(patterns, scope, operator);
+  if (!result.valid) {
+    throw new CompositionInvalidError(result.errors);
+  }
+  return result;
 }

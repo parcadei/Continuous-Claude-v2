@@ -12,7 +12,7 @@ async function storeLearning(learning, sessionId, projectDir) {
     "python",
     "scripts/store_learning.py",
     "--session-id",
-    sessionId
+    sessionId,
   ];
   if (learning.outcome === "success") {
     args.push("--worked", `${learning.what}. ${learning.how}`);
@@ -29,9 +29,9 @@ async function storeLearning(learning, sessionId, projectDir) {
     cwd: opcDir,
     env: {
       ...process.env,
-      PYTHONPATH: opcDir
+      PYTHONPATH: opcDir,
     },
-    timeout: 1e4
+    timeout: 1e4,
   });
   return result.status === 0;
 }
@@ -41,7 +41,7 @@ function extractConfirmationLearning(prompt, recentContext) {
     /\b(good|great|perfect|nice)\b/i,
     /\b(thanks?|thank you)\b/i,
     /\b(yes|yep|yeah)\b/i,
-    /\bthat('s| is) (it|right|correct)\b/i
+    /\bthat('s| is) (it|right|correct)\b/i,
   ];
   const isConfirmation = confirmPatterns.some((p) => p.test(prompt));
   if (!isConfirmation) return null;
@@ -51,7 +51,7 @@ function extractConfirmationLearning(prompt, recentContext) {
     why: "Approach/solution worked for user",
     how: recentContext.slice(0, 300),
     outcome: "success",
-    tags: ["user_confirmed", "solution", "auto_extracted"]
+    tags: ["user_confirmed", "solution", "auto_extracted"],
   };
 }
 
@@ -61,7 +61,12 @@ function getStateFilePath() {
   if (projectDir) {
     return join2(projectDir, ".claude", "cache", "auto-learning-state.json");
   }
-  return join2(process.env.HOME || "/tmp", ".claude", "cache", "auto-learning-state.json");
+  return join2(
+    process.env.HOME || "/tmp",
+    ".claude",
+    "cache",
+    "auto-learning-state.json",
+  );
 }
 var RECENCY_THRESHOLD_MS = 10 * 60 * 1e3;
 function readStdin() {
@@ -75,10 +80,9 @@ function loadState() {
       return {
         edits: parsed.edits || [],
         turnCount: parsed.turnCount || 0,
-        recentActions: parsed.recentActions || []
+        recentActions: parsed.recentActions || [],
       };
-    } catch {
-    }
+    } catch {}
   }
   return { edits: [], turnCount: 0, recentActions: [] };
 }
@@ -100,7 +104,7 @@ function isConfirmationPrompt(prompt) {
     /\b(looks? good)\b/i,
     /\b(nice work|good job|well done)\b/i,
     /\b(fixed|solved|resolved)\b/i,
-    /^[^a-z]*$/i
+    /^[^a-z]*$/i,
     // Just punctuation like "!" or emojis
   ];
   return confirmPatterns.some((p) => p.test(normalizedPrompt));
@@ -108,7 +112,7 @@ function isConfirmationPrompt(prompt) {
 function buildRecentContext(state) {
   const now = Date.now();
   const recentEdits = state.edits.filter(
-    (e) => now - e.timestamp < RECENCY_THRESHOLD_MS
+    (e) => now - e.timestamp < RECENCY_THRESHOLD_MS,
   );
   if (recentEdits.length === 0) {
     return "";
@@ -144,12 +148,14 @@ async function main() {
   const stored = await storeLearning(learning, input.session_id, projectDir);
   if (stored) {
     const learningPreview = learning.what.slice(0, 50);
-    console.log(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: "UserPromptSubmit",
-        additionalContext: `AUTO-LEARNING: Captured user confirmation. Stored: "${learningPreview}..." Recent edits validated as successful approach.`
-      }
-    }));
+    console.log(
+      JSON.stringify({
+        hookSpecificOutput: {
+          hookEventName: "UserPromptSubmit",
+          additionalContext: `AUTO-LEARNING: Captured user confirmation. Stored: "${learningPreview}..." Recent edits validated as successful approach.`,
+        },
+      }),
+    );
   } else {
     console.log("{}");
   }

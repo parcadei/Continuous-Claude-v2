@@ -10,6 +10,15 @@ priority: high
 
 Guide users through the capabilities of this workspace setup.
 
+## When to Use
+
+Activate when:
+
+- User says "/help" or "/?"
+- User says "what can you do?"
+- User asks about available commands or capabilities
+- User says "how do I use this?" or "show me around"
+
 ## Usage
 
 ```
@@ -44,14 +53,14 @@ options:
 
 Based on response, show relevant tools:
 
-| Goal | Show |
-|------|------|
-| Explore codebase | scout agent, tldr CLI, /explore workflow |
-| Fix a bug | /fix workflow, sleuth agent, debug-agent |
-| Build feature | /build workflow, architect agent, kraken agent |
-| Prove math | /prove skill, lean4 skill, Godel-Prover |
-| Research docs | oracle agent, nia-docs, perplexity |
-| Configure workspace | hooks, rules, settings, frontmatter |
+| Goal                | Show                                           |
+| ------------------- | ---------------------------------------------- |
+| Explore codebase    | scout agent, tldr CLI, /explore workflow       |
+| Fix a bug           | /fix workflow, sleuth agent, debug-agent       |
+| Build feature       | /build workflow, architect agent, kraken agent |
+| Prove math          | /prove skill, lean4 skill, Godel-Prover        |
+| Research docs       | oracle agent, nia-docs, perplexity             |
+| Configure workspace | hooks, rules, settings, frontmatter            |
 
 ### /help workflows
 
@@ -62,19 +71,19 @@ Display workflow meta-skills:
 
 Orchestrate multi-agent pipelines for complex tasks.
 
-| Workflow | Purpose | Agents Used |
-|----------|---------|-------------|
-| /fix | Bug investigation → diagnosis → implementation | sleuth → kraken → arbiter |
-| /build | Feature planning → implementation → testing | architect → kraken → arbiter |
-| /debug | Deep investigation of issues | debug-agent, sleuth |
-| /tdd | Test-driven development cycle | arbiter → kraken → arbiter |
-| /refactor | Code transformation with safety | phoenix → kraken → judge |
-| /review | Code review and feedback | critic, judge |
-| /security | Vulnerability analysis | aegis |
-| /explore | Codebase discovery | scout |
-| /test | Test execution and validation | arbiter, atlas |
-| /release | Version bumps, changelog | herald |
-| /migrate | Framework/infrastructure changes | pioneer, phoenix |
+| Workflow  | Purpose                                        | Agents Used                  |
+| --------- | ---------------------------------------------- | ---------------------------- |
+| /fix      | Bug investigation → diagnosis → implementation | sleuth → kraken → arbiter    |
+| /build    | Feature planning → implementation → testing    | architect → kraken → arbiter |
+| /debug    | Deep investigation of issues                   | debug-agent, sleuth          |
+| /tdd      | Test-driven development cycle                  | arbiter → kraken → arbiter   |
+| /refactor | Code transformation with safety                | phoenix → kraken → judge     |
+| /review   | Code review and feedback                       | critic, judge                |
+| /security | Vulnerability analysis                         | aegis                        |
+| /explore  | Codebase discovery                             | scout                        |
+| /test     | Test execution and validation                  | arbiter, atlas               |
+| /release  | Version bumps, changelog                       | herald                       |
+| /migrate  | Framework/infrastructure changes               | pioneer, phoenix             |
 
 **Usage**: Just describe your goal. Claude routes to the right workflow.
 ```
@@ -89,43 +98,49 @@ Display agent catalog:
 Spawn via Task tool with subagent_type.
 
 ### Exploration & Research
-| Agent | Purpose | Model |
-|-------|---------|-------|
-| scout | Codebase exploration, pattern finding | sonnet |
-| oracle | External research (web, docs, APIs) | sonnet |
-| pathfinder | External repository analysis | sonnet |
+
+| Agent      | Purpose                               | Model  |
+| ---------- | ------------------------------------- | ------ |
+| scout      | Codebase exploration, pattern finding | sonnet |
+| oracle     | External research (web, docs, APIs)   | sonnet |
+| pathfinder | External repository analysis          | sonnet |
 
 ### Planning & Architecture
-| Agent | Purpose | Model |
-|-------|---------|-------|
-| architect | Feature planning, design docs | sonnet |
-| plan-agent | Create implementation plans | sonnet |
-| phoenix | Refactoring & migration planning | sonnet |
+
+| Agent      | Purpose                          | Model  |
+| ---------- | -------------------------------- | ------ |
+| architect  | Feature planning, design docs    | sonnet |
+| plan-agent | Create implementation plans      | sonnet |
+| phoenix    | Refactoring & migration planning | sonnet |
 
 ### Implementation
-| Agent | Purpose | Model |
-|-------|---------|-------|
-| kraken | TDD implementation, refactoring | sonnet |
-| spark | Quick fixes, lightweight changes | haiku |
+
+| Agent  | Purpose                          | Model  |
+| ------ | -------------------------------- | ------ |
+| kraken | TDD implementation, refactoring  | sonnet |
+| spark  | Quick fixes, lightweight changes | haiku  |
 
 ### Review & Validation
-| Agent | Purpose | Model |
-|-------|---------|-------|
+
+| Agent   | Purpose                    | Model  |
+| ------- | -------------------------- | ------ |
 | arbiter | Test execution, validation | sonnet |
-| critic | Code review | sonnet |
-| judge | Refactoring review | sonnet |
+| critic  | Code review                | sonnet |
+| judge   | Refactoring review         | sonnet |
 
 ### Investigation
-| Agent | Purpose | Model |
-|-------|---------|-------|
-| sleuth | Bug investigation, root cause | sonnet |
+
+| Agent       | Purpose                       | Model  |
+| ----------- | ----------------------------- | ------ |
+| sleuth      | Bug investigation, root cause | sonnet |
 | debug-agent | Issue investigation with logs | sonnet |
-| profiler | Performance, race conditions | sonnet |
+| profiler    | Performance, race conditions  | sonnet |
 
 ### Documentation & Handoff
-| Agent | Purpose | Model |
-|-------|---------|-------|
-| scribe | Documentation, session summaries | sonnet |
+
+| Agent      | Purpose                               | Model  |
+| ---------- | ------------------------------------- | ------ |
+| scribe     | Documentation, session summaries      | sonnet |
 | chronicler | Session analysis, learning extraction | sonnet |
 ```
 
@@ -133,10 +148,11 @@ Spawn via Task tool with subagent_type.
 
 Display CLI tools and capabilities:
 
-```markdown
+````markdown
 ## Built-in Tools
 
 ### TLDR Code Analysis
+
 Token-efficient code exploration (95% savings vs reading raw files).
 
 ```bash
@@ -149,8 +165,10 @@ tldr impact func src/       # Reverse call graph (who calls this?)
 tldr dead src/              # Find dead code
 tldr arch src/              # Detect architectural layers
 ```
+````
 
 ### /prove - Formal Verification
+
 Machine-verified proofs without learning Lean syntax.
 
 ```
@@ -161,6 +179,7 @@ Machine-verified proofs without learning Lean syntax.
 Requires: LM Studio running Godel-Prover model locally.
 
 ### Memory System
+
 Store and recall learnings across sessions.
 
 ```bash
@@ -172,12 +191,14 @@ Store and recall learnings across sessions.
 ```
 
 ### Premortem Risk Analysis
+
 Identify failure modes before they occur.
 
 ```
 /premortem [plan-file]     # Analyze implementation plan for risks
 ```
-```
+
+````
 
 ### /help hooks
 
@@ -222,16 +243,17 @@ Hooks extend Claude's behavior at key lifecycle points.
 |------|-------|---------|
 | subagent-start | SubagentStart | Initialize agent context |
 | subagent-stop | SubagentStop | Extract learnings from agents |
-```
+````
 
 ### /help advanced
 
 Display advanced customization:
 
-```markdown
+````markdown
 ## Advanced: Customization & Extension
 
 ### Skill Frontmatter
+
 Skills use YAML frontmatter for metadata and tool restrictions:
 
 ```yaml
@@ -241,11 +263,13 @@ description: What it does
 triggers: ["keyword1", "keyword2"]
 allowed-tools: [Bash, Read, Edit]
 priority: high
-skills: [other-skill]  # Auto-load dependencies
+skills: [other-skill] # Auto-load dependencies
 ---
 ```
+````
 
 ### Agent Frontmatter
+
 Agents declare their capabilities:
 
 ```yaml
@@ -258,18 +282,20 @@ tools: [Read, Grep, Glob, Bash]
 ```
 
 ### MCP Servers
+
 External tool integrations:
 
-| Server | Purpose |
-|--------|---------|
-| ast-grep | Structural code search/refactoring |
-| firecrawl | Web scraping |
-| github-search | Search GitHub code/issues |
-| morph | Fast file editing (10k tokens/sec) |
-| nia | Documentation search |
-| perplexity | AI-powered web research |
+| Server        | Purpose                            |
+| ------------- | ---------------------------------- |
+| ast-grep      | Structural code search/refactoring |
+| firecrawl     | Web scraping                       |
+| github-search | Search GitHub code/issues          |
+| morph         | Fast file editing (10k tokens/sec) |
+| nia           | Documentation search               |
+| perplexity    | AI-powered web research            |
 
-### Rules (.claude/rules/*.md)
+### Rules (.claude/rules/\*.md)
+
 Always-on instructions injected into context:
 
 - `claim-verification.md` - Verify before asserting
@@ -277,16 +303,19 @@ Always-on instructions injected into context:
 - `tldr-cli.md` - TLDR usage reference
 
 ### Creating Custom Skills
+
 ```bash
 mkdir -p .claude/skills/my-skill
 # Create .claude/skills/my-skill/SKILL.md with frontmatter
 ```
 
 ### Creating Custom Agents
+
 ```bash
 # Create .claude/agents/my-agent.md with frontmatter
 ```
-```
+
+````
 
 ### /help <specific-name>
 
@@ -314,13 +343,14 @@ done
 for f in .claude/agents/*.md; do
   head -10 "$f" | grep -E "^(name|description):"
 done
-```
+````
 
 ## Example Interaction
 
 **User**: `/help`
 
 **Claude**:
+
 ```
 What are you trying to do?
 
@@ -342,6 +372,7 @@ What are you trying to do?
 **User selects**: "Fix a bug"
 
 **Claude**:
+
 ```
 ## Bug Fixing Tools
 

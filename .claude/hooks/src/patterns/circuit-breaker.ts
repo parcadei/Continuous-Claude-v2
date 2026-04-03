@@ -14,18 +14,18 @@
  * - CLAUDE_PROJECT_DIR: Project directory for DB path
  */
 
-import { existsSync } from 'fs';
+import { existsSync } from "fs";
 
 // Import shared utilities
-import { getDbPath, runPythonQuery, isValidId } from '../shared/db-utils.js';
+import { getDbPath, runPythonQuery, isValidId } from "../shared/db-utils.js";
 import type {
   SubagentStartInput,
   SubagentStopInput,
   PreToolUseInput,
   PostToolUseInput,
   StopInput,
-  HookOutput
-} from '../shared/types.js';
+  HookOutput,
+} from "../shared/types.js";
 
 // Re-export types for convenience
 export type {
@@ -34,7 +34,7 @@ export type {
   PreToolUseInput,
   PostToolUseInput,
   StopInput,
-  HookOutput
+  HookOutput,
 };
 
 // =============================================================================
@@ -46,46 +46,53 @@ export type {
  * Injects primary/fallback role context and circuit state information.
  * Always returns 'continue' - never blocks agent start.
  */
-export async function onSubagentStart(input: SubagentStartInput): Promise<HookOutput> {
+export async function onSubagentStart(
+  input: SubagentStartInput,
+): Promise<HookOutput> {
   const cbId = process.env.CB_ID;
 
   // If no CB_ID, continue silently (not in a circuit breaker)
   if (!cbId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate CB_ID format
   if (!isValidId(cbId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const role = process.env.AGENT_ROLE || 'primary';
-  const circuitState = process.env.CIRCUIT_STATE || 'closed';
+  const role = process.env.AGENT_ROLE || "primary";
+  const circuitState = process.env.CIRCUIT_STATE || "closed";
 
   // Log for debugging - this goes to stderr, not stdout
-  console.error(`[circuit-breaker] Agent role=${role} state=${circuitState} cb_id=${cbId}`);
+  console.error(
+    `[circuit-breaker] Agent role=${role} state=${circuitState} cb_id=${cbId}`,
+  );
 
   // Inject role-specific context message
-  let message = '';
+  let message = "";
 
-  if (role === 'primary') {
+  if (role === "primary") {
     message = `You are the PRIMARY agent in a circuit breaker pattern (circuit state: ${circuitState}).`;
-    message += ' Your execution is monitored for failures.';
+    message += " Your execution is monitored for failures.";
 
-    if (circuitState === 'half_open') {
-      message += ' TESTING MODE: The circuit is testing if you have recovered. A single failure will reopen the circuit.';
-    } else if (circuitState === 'closed') {
-      message += ' Normal operation - consecutive failures will open the circuit and route to fallback.';
+    if (circuitState === "half_open") {
+      message +=
+        " TESTING MODE: The circuit is testing if you have recovered. A single failure will reopen the circuit.";
+    } else if (circuitState === "closed") {
+      message +=
+        " Normal operation - consecutive failures will open the circuit and route to fallback.";
     }
-  } else if (role === 'fallback') {
+  } else if (role === "fallback") {
     message = `You are the FALLBACK agent in a circuit breaker pattern.`;
-    message += ' You are operating in degraded mode as a backup to the primary agent.';
-    message += ' Provide a simpler or safer implementation.';
+    message +=
+      " You are operating in degraded mode as a backup to the primary agent.";
+    message += " Provide a simpler or safer implementation.";
   }
 
   return {
-    result: 'continue',
-    message
+    result: "continue",
+    message,
   };
 }
 
@@ -97,31 +104,33 @@ export async function onSubagentStart(input: SubagentStartInput): Promise<HookOu
  * Handles SubagentStop hook for circuit breaker pattern.
  * Records success/failure in database to track circuit state.
  */
-export async function onSubagentStop(input: SubagentStopInput): Promise<HookOutput> {
+export async function onSubagentStop(
+  input: SubagentStopInput,
+): Promise<HookOutput> {
   const cbId = process.env.CB_ID;
 
   // If no CB_ID, continue silently
   if (!cbId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate CB_ID format
   if (!isValidId(cbId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const agentId = input.agent_id ?? 'unknown';
+  const agentId = input.agent_id ?? "unknown";
 
   // Validate agent_id format
   if (!isValidId(agentId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const role = process.env.AGENT_ROLE || 'primary';
+  const role = process.env.AGENT_ROLE || "primary";
   const dbPath = getDbPath();
 
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
@@ -173,8 +182,8 @@ print(json.dumps({'state': state, 'failure_count': failure_count}))
     const result = runPythonQuery(query, [dbPath, cbId]);
 
     if (!result.success) {
-      console.error('SubagentStop Python error:', result.stderr);
-      return { result: 'continue' };
+      console.error("SubagentStop Python error:", result.stderr);
+      return { result: "continue" };
     }
 
     // Parse Python output
@@ -182,16 +191,18 @@ print(json.dumps({'state': state, 'failure_count': failure_count}))
     try {
       state = JSON.parse(result.stdout);
     } catch (parseErr) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // Log for debugging
-    console.error(`[circuit-breaker] Agent ${agentId} (${role}) completed. Circuit state: ${state.state} (failures: ${state.failure_count})`);
+    console.error(
+      `[circuit-breaker] Agent ${agentId} (${role}) completed. Circuit state: ${state.state} (failures: ${state.failure_count})`,
+    );
 
-    return { result: 'continue' };
+    return { result: "continue" };
   } catch (err) {
-    console.error('SubagentStop hook error:', err);
-    return { result: 'continue' };
+    console.error("SubagentStop hook error:", err);
+    return { result: "continue" };
   }
 }
 
@@ -203,9 +214,11 @@ print(json.dumps({'state': state, 'failure_count': failure_count}))
  * Handles PreToolUse hook for circuit breaker pattern.
  * Currently no-op - circuit breaker doesn't restrict tool usage.
  */
-export async function onPreToolUse(input: PreToolUseInput): Promise<HookOutput> {
+export async function onPreToolUse(
+  input: PreToolUseInput,
+): Promise<HookOutput> {
   // No special handling needed for circuit breaker pattern
-  return { result: 'continue' };
+  return { result: "continue" };
 }
 
 // =============================================================================
@@ -216,24 +229,26 @@ export async function onPreToolUse(input: PreToolUseInput): Promise<HookOutput> 
  * Handles PostToolUse hook for circuit breaker pattern.
  * Detects failures from tool responses (Bash errors, Read failures, etc.).
  */
-export async function onPostToolUse(input: PostToolUseInput): Promise<HookOutput> {
+export async function onPostToolUse(
+  input: PostToolUseInput,
+): Promise<HookOutput> {
   const cbId = process.env.CB_ID;
 
   // If no CB_ID, continue silently
   if (!cbId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate CB_ID format
   if (!isValidId(cbId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const role = process.env.AGENT_ROLE || 'primary';
+  const role = process.env.AGENT_ROLE || "primary";
 
   // Only track primary agent failures (fallback is expected to succeed)
-  if (role !== 'primary') {
-    return { result: 'continue' };
+  if (role !== "primary") {
+    return { result: "continue" };
   }
 
   const toolName = input.tool_name;
@@ -243,15 +258,15 @@ export async function onPostToolUse(input: PostToolUseInput): Promise<HookOutput
   let hasFailure = false;
 
   // Bash failures: non-zero exit code
-  if (toolName === 'Bash' && typeof toolResponse === 'object') {
+  if (toolName === "Bash" && typeof toolResponse === "object") {
     const exitCode = (toolResponse as any).exit_code;
-    if (typeof exitCode === 'number' && exitCode !== 0) {
+    if (typeof exitCode === "number" && exitCode !== 0) {
       hasFailure = true;
     }
   }
 
   // Read failures: error in response
-  if (toolName === 'Read' && typeof toolResponse === 'object') {
+  if (toolName === "Read" && typeof toolResponse === "object") {
     const error = (toolResponse as any).error;
     if (error) {
       hasFailure = true;
@@ -259,7 +274,7 @@ export async function onPostToolUse(input: PostToolUseInput): Promise<HookOutput
   }
 
   // Other tool errors
-  if (typeof toolResponse === 'object' && (toolResponse as any).error) {
+  if (typeof toolResponse === "object" && (toolResponse as any).error) {
     hasFailure = true;
   }
 
@@ -267,7 +282,7 @@ export async function onPostToolUse(input: PostToolUseInput): Promise<HookOutput
   const dbPath = getDbPath();
 
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
@@ -341,12 +356,14 @@ print(json.dumps({'state': new_state, 'failure_count': new_failure_count}))
       const result = runPythonQuery(failureQuery, [dbPath, cbId, toolName]);
 
       if (!result.success) {
-        console.error('PostToolUse Python error:', result.stderr);
-        return { result: 'continue' };
+        console.error("PostToolUse Python error:", result.stderr);
+        return { result: "continue" };
       }
 
       // Log for debugging
-      console.error(`[circuit-breaker] Detected ${toolName} failure for cb_id=${cbId}`);
+      console.error(
+        `[circuit-breaker] Detected ${toolName} failure for cb_id=${cbId}`,
+      );
     } else {
       // Record success - reset failure count to 0
       const successQuery = `
@@ -407,25 +424,27 @@ conn.close()
       const result = runPythonQuery(successQuery, [dbPath, cbId]);
 
       if (!result.success) {
-        console.error('PostToolUse Python error:', result.stderr);
-        return { result: 'continue' };
+        console.error("PostToolUse Python error:", result.stderr);
+        return { result: "continue" };
       }
 
       // Parse result to see if we reset
       try {
         const data = JSON.parse(result.stdout);
         if (data.reset) {
-          console.error(`[circuit-breaker] Reset failure count for cb_id=${cbId} after successful ${toolName}`);
+          console.error(
+            `[circuit-breaker] Reset failure count for cb_id=${cbId} after successful ${toolName}`,
+          );
         }
       } catch {
         // Ignore parse errors, continue anyway
       }
     }
 
-    return { result: 'continue' };
+    return { result: "continue" };
   } catch (err) {
-    console.error('PostToolUse hook error:', err);
-    return { result: 'continue' };
+    console.error("PostToolUse hook error:", err);
+    return { result: "continue" };
   }
 }
 
@@ -440,24 +459,24 @@ conn.close()
 export async function onStop(input: StopInput): Promise<HookOutput> {
   // Prevent infinite loops - if we're already in a stop hook, continue
   if (input.stop_hook_active) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   const cbId = process.env.CB_ID;
 
   if (!cbId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate CB_ID format
   if (!isValidId(cbId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   const dbPath = getDbPath();
 
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
@@ -497,15 +516,19 @@ print(json.dumps({'state': state, 'failure_count': failure_count, 'last_failure_
     const result = runPythonQuery(query, [dbPath, cbId]);
 
     if (!result.success) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // Parse Python output
-    let data: { state: string; failure_count: number; last_failure_at: string | null };
+    let data: {
+      state: string;
+      failure_count: number;
+      last_failure_at: string | null;
+    };
     try {
       data = JSON.parse(result.stdout);
     } catch (parseErr) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // Provide circuit state summary
@@ -513,21 +536,25 @@ print(json.dumps({'state': state, 'failure_count': failure_count, 'last_failure_
     message += `- State: ${data.state.toUpperCase()}\n`;
     message += `- Failure Count: ${data.failure_count}\n`;
 
-    if (data.state === 'open') {
-      message += '\nWARNING: Circuit is OPEN due to repeated failures. Fallback agent is being used.';
-      message += '\nThe circuit will automatically test the primary agent after the reset timeout.';
-    } else if (data.state === 'half_open') {
-      message += '\nINFO: Circuit is in HALF-OPEN state, testing if primary agent has recovered.';
+    if (data.state === "open") {
+      message +=
+        "\nWARNING: Circuit is OPEN due to repeated failures. Fallback agent is being used.";
+      message +=
+        "\nThe circuit will automatically test the primary agent after the reset timeout.";
+    } else if (data.state === "half_open") {
+      message +=
+        "\nINFO: Circuit is in HALF-OPEN state, testing if primary agent has recovered.";
     } else {
-      message += '\nINFO: Circuit is CLOSED, primary agent is operating normally.';
+      message +=
+        "\nINFO: Circuit is CLOSED, primary agent is operating normally.";
     }
 
     return {
-      result: 'continue',
-      message
+      result: "continue",
+      message,
     };
   } catch (err) {
-    console.error('Stop hook error:', err);
-    return { result: 'continue' };
+    console.error("Stop hook error:", err);
+    return { result: "continue" };
   }
 }

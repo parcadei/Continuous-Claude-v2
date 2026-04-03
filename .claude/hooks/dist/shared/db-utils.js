@@ -10,11 +10,11 @@
  * - runPythonQuery(): Alternative that returns success/stdout/stderr object
  * - getActiveAgentCount(): Returns count of running agents (Phase 2: Resource Limits)
  */
-import { spawnSync } from 'child_process';
-import { existsSync } from 'fs';
-import { join } from 'path';
+import { spawnSync } from "child_process";
+import { existsSync } from "fs";
+import { join } from "path";
 // Re-export SAFE_ID_PATTERN and isValidId from pattern-router for convenience
-export { SAFE_ID_PATTERN, isValidId } from './pattern-router.js';
+export { SAFE_ID_PATTERN, isValidId } from "./pattern-router.js";
 /**
  * Get the path to the coordination database.
  *
@@ -24,8 +24,14 @@ export { SAFE_ID_PATTERN, isValidId } from './pattern-router.js';
  * @returns Absolute path to coordination.db
  */
 export function getDbPath() {
-    const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-    return join(projectDir, '.claude', 'cache', 'agentica-coordination', 'coordination.db');
+  const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  return join(
+    projectDir,
+    ".claude",
+    "cache",
+    "agentica-coordination",
+    "coordination.db",
+  );
 }
 /**
  * Execute a Python query against the coordination database.
@@ -39,16 +45,17 @@ export function getDbPath() {
  * @throws Error if Python subprocess fails
  */
 export function queryDb(pythonQuery, args) {
-    // Use spawnSync with argument array to prevent command injection
-    const result = spawnSync('python3', ['-c', pythonQuery, ...args], {
-        encoding: 'utf-8',
-        maxBuffer: 1024 * 1024
-    });
-    if (result.status !== 0) {
-        const errorMsg = result.stderr || `Python exited with code ${result.status}`;
-        throw new Error(`Python query failed: ${errorMsg}`);
-    }
-    return result.stdout.trim();
+  // Use spawnSync with argument array to prevent command injection
+  const result = spawnSync("python3", ["-c", pythonQuery, ...args], {
+    encoding: "utf-8",
+    maxBuffer: 1024 * 1024,
+  });
+  if (result.status !== 0) {
+    const errorMsg =
+      result.stderr || `Python exited with code ${result.status}`;
+    throw new Error(`Python query failed: ${errorMsg}`);
+  }
+  return result.stdout.trim();
 }
 /**
  * Execute a Python query and return structured result.
@@ -61,24 +68,23 @@ export function queryDb(pythonQuery, args) {
  * @returns Object with success boolean, stdout string, and stderr string
  */
 export function runPythonQuery(script, args) {
-    try {
-        const result = spawnSync('python3', ['-c', script, ...args], {
-            encoding: 'utf-8',
-            maxBuffer: 1024 * 1024
-        });
-        return {
-            success: result.status === 0,
-            stdout: result.stdout?.trim() || '',
-            stderr: result.stderr || ''
-        };
-    }
-    catch (err) {
-        return {
-            success: false,
-            stdout: '',
-            stderr: String(err)
-        };
-    }
+  try {
+    const result = spawnSync("python3", ["-c", script, ...args], {
+      encoding: "utf-8",
+      maxBuffer: 1024 * 1024,
+    });
+    return {
+      success: result.status === 0,
+      stdout: result.stdout?.trim() || "",
+      stderr: result.stderr || "",
+    };
+  } catch (err) {
+    return {
+      success: false,
+      stdout: "",
+      stderr: String(err),
+    };
+  }
 }
 /**
  * Register a new agent in the coordination database.
@@ -94,11 +100,11 @@ export function runPythonQuery(script, args) {
  * @returns Object with success boolean and any error message
  */
 export function registerAgent(agentId, sessionId, pattern = null, pid = null) {
-    const dbPath = getDbPath();
-    // Detect source: if AGENTICA_SERVER env var is set, it's from agentica
-    // Otherwise it's from the CLI (Task tool)
-    const source = process.env.AGENTICA_SERVER ? 'agentica' : 'cli';
-    const pythonScript = `
+  const dbPath = getDbPath();
+  // Detect source: if AGENTICA_SERVER env var is set, it's from agentica
+  // Otherwise it's from the CLI (Task tool)
+  const source = process.env.AGENTICA_SERVER ? "agentica" : "cli";
+  const pythonScript = `
 import sqlite3
 import sys
 import os
@@ -164,22 +170,22 @@ except Exception as e:
     print(f"error: {e}")
     sys.exit(1)
 `;
-    const args = [
-        dbPath,
-        agentId,
-        sessionId,
-        pattern || 'null',
-        pid !== null ? String(pid) : 'null',
-        source
-    ];
-    const result = runPythonQuery(pythonScript, args);
-    if (!result.success || result.stdout !== 'ok') {
-        return {
-            success: false,
-            error: result.stderr || result.stdout || 'Unknown error'
-        };
-    }
-    return { success: true };
+  const args = [
+    dbPath,
+    agentId,
+    sessionId,
+    pattern || "null",
+    pid !== null ? String(pid) : "null",
+    source,
+  ];
+  const result = runPythonQuery(pythonScript, args);
+  if (!result.success || result.stdout !== "ok") {
+    return {
+      success: false,
+      error: result.stderr || result.stdout || "Unknown error",
+    };
+  }
+  return { success: true };
 }
 /**
  * Mark an agent as completed in the coordination database.
@@ -191,13 +197,17 @@ except Exception as e:
  * @param errorMessage - Optional error message for failed status
  * @returns Object with success boolean and any error message
  */
-export function completeAgent(agentId, status = 'completed', errorMessage = null) {
-    const dbPath = getDbPath();
-    // Return success if database doesn't exist (nothing to update)
-    if (!existsSync(dbPath)) {
-        return { success: true };
-    }
-    const pythonScript = `
+export function completeAgent(
+  agentId,
+  status = "completed",
+  errorMessage = null,
+) {
+  const dbPath = getDbPath();
+  // Return success if database doesn't exist (nothing to update)
+  if (!existsSync(dbPath)) {
+    return { success: true };
+  }
+  const pythonScript = `
 import sqlite3
 import sys
 from datetime import datetime, timezone
@@ -238,20 +248,15 @@ except Exception as e:
     print(f"error: {e}")
     sys.exit(1)
 `;
-    const args = [
-        dbPath,
-        agentId,
-        status,
-        errorMessage || 'null'
-    ];
-    const result = runPythonQuery(pythonScript, args);
-    if (!result.success || result.stdout !== 'ok') {
-        return {
-            success: false,
-            error: result.stderr || result.stdout || 'Unknown error'
-        };
-    }
-    return { success: true };
+  const args = [dbPath, agentId, status, errorMessage || "null"];
+  const result = runPythonQuery(pythonScript, args);
+  if (!result.success || result.stdout !== "ok") {
+    return {
+      success: false,
+      error: result.stderr || result.stdout || "Unknown error",
+    };
+  }
+  return { success: true };
 }
 /**
  * Detect if this agent is part of a swarm (concurrent spawn pattern).
@@ -266,11 +271,11 @@ except Exception as e:
  * @returns true if swarm pattern was detected and applied
  */
 export function detectAndTagSwarm(sessionId) {
-    const dbPath = getDbPath();
-    if (!existsSync(dbPath)) {
-        return false;
-    }
-    const pythonScript = `
+  const dbPath = getDbPath();
+  if (!existsSync(dbPath)) {
+    return false;
+  }
+  const pythonScript = `
 import sqlite3
 import sys
 from datetime import datetime, timezone, timedelta
@@ -327,11 +332,11 @@ except Exception as e:
     print(f"error: {e}")
     sys.exit(1)
 `;
-    const result = runPythonQuery(pythonScript, [dbPath, sessionId]);
-    if (!result.success) {
-        return false;
-    }
-    return result.stdout.startsWith('swarm:');
+  const result = runPythonQuery(pythonScript, [dbPath, sessionId]);
+  if (!result.success) {
+    return false;
+  }
+  return result.stdout.startsWith("swarm:");
 }
 /**
  * Get the count of active (running) agents across all sessions.
@@ -347,12 +352,12 @@ except Exception as e:
  * @returns Number of running agents, or 0 on any error
  */
 export function getActiveAgentCount() {
-    const dbPath = getDbPath();
-    // Return 0 if database doesn't exist
-    if (!existsSync(dbPath)) {
-        return 0;
-    }
-    const pythonScript = `
+  const dbPath = getDbPath();
+  // Return 0 if database doesn't exist
+  if (!existsSync(dbPath)) {
+    return 0;
+  }
+  const pythonScript = `
 import sqlite3
 import sys
 import os
@@ -388,10 +393,10 @@ try:
 except Exception:
     print("0")
 `;
-    const result = runPythonQuery(pythonScript, [dbPath]);
-    if (!result.success) {
-        return 0;
-    }
-    const count = parseInt(result.stdout, 10);
-    return isNaN(count) ? 0 : count;
+  const result = runPythonQuery(pythonScript, [dbPath]);
+  if (!result.success) {
+    return 0;
+  }
+  const count = parseInt(result.stdout, 10);
+  return isNaN(count) ? 0 : count;
 }

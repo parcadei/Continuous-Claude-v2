@@ -17,18 +17,18 @@
  */
 export interface SkillMatch {
   skillName: string;
-  matchType: 'keyword' | 'intent' | 'explicit';
+  matchType: "keyword" | "intent" | "explicit";
   matchedTerm: string;
   prompt: string;
   skillDescription?: string;
-  enforcement?: 'block' | 'suggest' | 'warn';
+  enforcement?: "block" | "suggest" | "warn";
 }
 
 /**
  * Result from LLM validation
  */
 export interface SkillValidationResult {
-  decision: 'activate' | 'skip';
+  decision: "activate" | "skip";
   confidence: number;
   reason: string;
   parseError?: boolean;
@@ -39,48 +39,48 @@ export interface SkillValidationResult {
  * Keywords that are commonly ambiguous (have both technical and everyday meanings)
  */
 const AMBIGUOUS_KEYWORDS = new Set([
-  'commit',
-  'push',
-  'pull',
-  'merge',
-  'branch',
-  'checkout',
-  'debug',
-  'build',
-  'implement',
-  'plan',
-  'research',
-  'deploy',
-  'release',
-  'fix',
-  'test',
-  'validate',
-  'review',
-  'analyze',
-  'document',
-  'refactor',
-  'optimize',
+  "commit",
+  "push",
+  "pull",
+  "merge",
+  "branch",
+  "checkout",
+  "debug",
+  "build",
+  "implement",
+  "plan",
+  "research",
+  "deploy",
+  "release",
+  "fix",
+  "test",
+  "validate",
+  "review",
+  "analyze",
+  "document",
+  "refactor",
+  "optimize",
 ]);
 
 /**
  * Keywords that are highly specific and unlikely to be false positives
  */
 const SPECIFIC_TECHNICAL_TERMS = new Set([
-  'sympy',
-  'braintrust',
-  'perplexity',
-  'agentica',
-  'firecrawl',
-  'qlty',
-  'repoprompt',
-  'ast-grep',
-  'morph',
-  'ragie',
-  'lean4',
-  'mathlib',
-  'z3',
-  'shapely',
-  'pint',
+  "sympy",
+  "braintrust",
+  "perplexity",
+  "agentica",
+  "firecrawl",
+  "qlty",
+  "repoprompt",
+  "ast-grep",
+  "morph",
+  "ragie",
+  "lean4",
+  "mathlib",
+  "z3",
+  "shapely",
+  "pint",
 ]);
 
 /**
@@ -88,27 +88,95 @@ const SPECIFIC_TECHNICAL_TERMS = new Set([
  * If any of these appear in the prompt, the skill is likely genuinely needed
  */
 const TECHNICAL_CONTEXT_INDICATORS: Record<string, string[]> = {
-  commit: ['git', 'changes', 'files', 'message', 'push', 'repository', 'branch', 'staged'],
-  push: ['git', 'remote', 'origin', 'branch', 'repository', 'upstream'],
-  pull: ['git', 'remote', 'origin', 'branch', 'merge', 'rebase', 'request'],
-  merge: ['git', 'branch', 'conflict', 'pull request', 'pr'],
-  branch: ['git', 'checkout', 'create', 'switch', 'feature'],
-  checkout: ['git', 'branch', 'file', 'commit', 'HEAD'],
-  debug: ['error', 'bug', 'issue', 'logs', 'stack trace', 'exception', 'crash', 'breakpoint'],
-  build: ['npm', 'yarn', 'cargo', 'make', 'compile', 'webpack', 'bundle', 'project'],
-  implement: ['code', 'feature', 'function', 'class', 'method', 'api', 'interface', 'module'],
-  plan: ['implementation', 'phase', 'architecture', 'design', 'roadmap', 'milestone'],
-  research: ['api', 'library', 'documentation', 'docs', 'best practices', 'pattern', 'codebase'],
-  deploy: ['server', 'production', 'staging', 'kubernetes', 'docker', 'cloud', 'ci/cd'],
-  release: ['version', 'tag', 'changelog', 'npm', 'package', 'publish'],
-  fix: ['bug', 'error', 'issue', 'broken', 'failing', 'test', 'regression'],
-  test: ['unit', 'integration', 'e2e', 'coverage', 'spec', 'jest', 'pytest', 'vitest'],
-  validate: ['input', 'schema', 'data', 'form', 'field', 'type'],
-  review: ['code', 'pr', 'pull request', 'changes', 'diff'],
-  analyze: ['code', 'codebase', 'performance', 'metrics', 'logs'],
-  document: ['api', 'readme', 'docs', 'jsdoc', 'docstring', 'comments'],
-  refactor: ['code', 'function', 'class', 'module', 'clean up', 'simplify'],
-  optimize: ['performance', 'speed', 'memory', 'query', 'algorithm'],
+  commit: [
+    "git",
+    "changes",
+    "files",
+    "message",
+    "push",
+    "repository",
+    "branch",
+    "staged",
+  ],
+  push: ["git", "remote", "origin", "branch", "repository", "upstream"],
+  pull: ["git", "remote", "origin", "branch", "merge", "rebase", "request"],
+  merge: ["git", "branch", "conflict", "pull request", "pr"],
+  branch: ["git", "checkout", "create", "switch", "feature"],
+  checkout: ["git", "branch", "file", "commit", "HEAD"],
+  debug: [
+    "error",
+    "bug",
+    "issue",
+    "logs",
+    "stack trace",
+    "exception",
+    "crash",
+    "breakpoint",
+  ],
+  build: [
+    "npm",
+    "yarn",
+    "cargo",
+    "make",
+    "compile",
+    "webpack",
+    "bundle",
+    "project",
+  ],
+  implement: [
+    "code",
+    "feature",
+    "function",
+    "class",
+    "method",
+    "api",
+    "interface",
+    "module",
+  ],
+  plan: [
+    "implementation",
+    "phase",
+    "architecture",
+    "design",
+    "roadmap",
+    "milestone",
+  ],
+  research: [
+    "api",
+    "library",
+    "documentation",
+    "docs",
+    "best practices",
+    "pattern",
+    "codebase",
+  ],
+  deploy: [
+    "server",
+    "production",
+    "staging",
+    "kubernetes",
+    "docker",
+    "cloud",
+    "ci/cd",
+  ],
+  release: ["version", "tag", "changelog", "npm", "package", "publish"],
+  fix: ["bug", "error", "issue", "broken", "failing", "test", "regression"],
+  test: [
+    "unit",
+    "integration",
+    "e2e",
+    "coverage",
+    "spec",
+    "jest",
+    "pytest",
+    "vitest",
+  ],
+  validate: ["input", "schema", "data", "form", "field", "type"],
+  review: ["code", "pr", "pull request", "changes", "diff"],
+  analyze: ["code", "codebase", "performance", "metrics", "logs"],
+  document: ["api", "readme", "docs", "jsdoc", "docstring", "comments"],
+  refactor: ["code", "function", "class", "module", "clean up", "simplify"],
+  optimize: ["performance", "speed", "memory", "query", "algorithm"],
 };
 
 /**
@@ -126,17 +194,17 @@ const TECHNICAL_CONTEXT_INDICATORS: Record<string, string[]> = {
  */
 export function shouldValidateWithLLM(match: SkillMatch): boolean {
   // Never delay explicit invocations
-  if (match.matchType === 'explicit') {
+  if (match.matchType === "explicit") {
     return false;
   }
 
   // Never delay blocking enforcement skills
-  if (match.enforcement === 'block') {
+  if (match.enforcement === "block") {
     return false;
   }
 
   // Intent pattern matches are usually strong signals
-  if (match.matchType === 'intent') {
+  if (match.matchType === "intent") {
     return false;
   }
 
@@ -147,7 +215,7 @@ export function shouldValidateWithLLM(match: SkillMatch): boolean {
   }
 
   // For keyword matches with ambiguous terms
-  if (match.matchType === 'keyword' && AMBIGUOUS_KEYWORDS.has(termLower)) {
+  if (match.matchType === "keyword" && AMBIGUOUS_KEYWORDS.has(termLower)) {
     const promptLower = match.prompt.toLowerCase();
 
     // Check for technical context indicators that suggest genuine usage
@@ -201,12 +269,14 @@ Examples:
 /**
  * Parses the LLM validation response
  */
-export function parseValidationResponse(response: string): SkillValidationResult {
+export function parseValidationResponse(
+  response: string,
+): SkillValidationResult {
   // Default result for parse errors
   const defaultResult: SkillValidationResult = {
-    decision: 'activate', // Fail-open: activate on parse error
+    decision: "activate", // Fail-open: activate on parse error
     confidence: 0.4,
-    reason: 'Failed to parse validation response',
+    reason: "Failed to parse validation response",
     parseError: true,
   };
 
@@ -221,14 +291,18 @@ export function parseValidationResponse(response: string): SkillValidationResult
 
     // Validate required fields
     const decision = parsed.decision;
-    if (decision !== 'activate' && decision !== 'skip') {
+    if (decision !== "activate" && decision !== "skip") {
       return defaultResult;
     }
 
     return {
       decision,
-      confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.5,
-      reason: typeof parsed.reason === 'string' ? parsed.reason : 'No reason provided',
+      confidence:
+        typeof parsed.confidence === "number" ? parsed.confidence : 0.5,
+      reason:
+        typeof parsed.reason === "string"
+          ? parsed.reason
+          : "No reason provided",
     };
   } catch (err) {
     return defaultResult;
@@ -243,7 +317,7 @@ export function parseValidationResponse(response: string): SkillValidationResult
  */
 export async function validateSkillRelevance(
   match: SkillMatch,
-  llmCall: (prompt: string) => Promise<SkillValidationResult>
+  llmCall: (prompt: string) => Promise<SkillValidationResult>,
 ): Promise<SkillValidationResult> {
   try {
     const prompt = buildValidationPrompt(match);
@@ -252,9 +326,9 @@ export async function validateSkillRelevance(
   } catch (err) {
     // On error, fail-open with low confidence
     return {
-      decision: 'activate',
+      decision: "activate",
       confidence: 0.3,
-      reason: `Validation error: ${err instanceof Error ? err.message : 'Unknown error'}`,
+      reason: `Validation error: ${err instanceof Error ? err.message : "Unknown error"}`,
       error: true,
     };
   }
@@ -270,7 +344,7 @@ export async function validateSkillRelevance(
 export function filterValidatedSkills(
   matches: SkillMatch[],
   validationResults: Map<string, SkillValidationResult>,
-  confidenceThreshold = 0.5
+  confidenceThreshold = 0.5,
 ): SkillMatch[] {
   return matches.filter((match) => {
     const result = validationResults.get(match.skillName);
@@ -281,7 +355,7 @@ export function filterValidatedSkills(
     }
 
     // Skip if decision is skip
-    if (result.decision === 'skip') {
+    if (result.decision === "skip") {
       return false;
     }
 

@@ -29,13 +29,13 @@ Safe refactoring with review gates.
 
 ## Agent Sequence
 
-| # | Agent | Role | Output |
-|---|-------|------|--------|
-| 1 | **phoenix** | Analyze current code, identify improvement areas | Analysis report |
-| 2 | **plan-agent** | Create safe refactoring plan | Step-by-step plan |
-| 3 | **kraken** | Implement the refactoring | Code changes |
-| 4 | **plan-reviewer** | Review changes for correctness | Review report |
-| 5 | **arbiter** | Verify all tests still pass | Test report |
+| #   | Agent             | Role                                             | Output            |
+| --- | ----------------- | ------------------------------------------------ | ----------------- |
+| 1   | **phoenix**       | Analyze current code, identify improvement areas | Analysis report   |
+| 2   | **plan-agent**    | Create safe refactoring plan                     | Step-by-step plan |
+| 3   | **kraken**        | Implement the refactoring                        | Code changes      |
+| 4   | **plan-reviewer** | Review changes for correctness                   | Review report     |
+| 5   | **arbiter**       | Verify all tests still pass                      | Test report       |
 
 ## Refactoring Principles
 
@@ -143,16 +143,19 @@ Task(
 ## Refactoring Types
 
 ### Extract Module
+
 ```
 phoenix → plan-agent → kraken → plan-reviewer → arbiter
 ```
 
 ### Rename/Restructure
+
 ```
 phoenix → kraken → arbiter  (simpler, skip detailed planning)
 ```
 
 ### Architecture Change
+
 ```
 phoenix → plan-agent → [kraken → plan-reviewer] × N phases → arbiter
 ```

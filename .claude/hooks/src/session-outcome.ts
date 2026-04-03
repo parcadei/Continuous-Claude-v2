@@ -1,10 +1,10 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 interface SessionEndInput {
   session_id: string;
   transcript_path: string;
-  reason: 'clear' | 'logout' | 'prompt_input_exit' | 'other';
+  reason: "clear" | "logout" | "prompt_input_exit" | "other";
 }
 
 interface HookOutput {
@@ -25,13 +25,19 @@ async function main() {
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 
   // Only prompt on user-initiated session end, not auto-compaction
-  if (input.reason === 'other') {
+  if (input.reason === "other") {
     console.log(JSON.stringify({ result: "continue" }));
     return;
   }
 
   // Check if Artifact Index database exists
-  const dbPath = path.join(projectDir, '.claude', 'cache', 'artifact-index', 'context.db');
+  const dbPath = path.join(
+    projectDir,
+    ".claude",
+    "cache",
+    "artifact-index",
+    "context.db",
+  );
   const dbExists = fs.existsSync(dbPath);
 
   if (!dbExists) {
@@ -40,11 +46,12 @@ async function main() {
   }
 
   // Find most recent handoff to mark
-  const ledgerDir = path.join(projectDir, 'thoughts', 'ledgers');
+  const ledgerDir = path.join(projectDir, "thoughts", "ledgers");
   let ledgerFiles: string[];
   try {
-    ledgerFiles = fs.readdirSync(ledgerDir)
-      .filter(f => f.startsWith('CONTINUITY_CLAUDE-') && f.endsWith('.md'))
+    ledgerFiles = fs
+      .readdirSync(ledgerDir)
+      .filter((f) => f.startsWith("CONTINUITY_CLAUDE-") && f.endsWith(".md"))
       .sort((a, b) => {
         const statA = fs.statSync(path.join(ledgerDir, a));
         const statB = fs.statSync(path.join(ledgerDir, b));
@@ -61,19 +68,26 @@ async function main() {
   }
 
   const sessionName = ledgerFiles[0]
-    .replace('CONTINUITY_CLAUDE-', '')
-    .replace('.md', '');
+    .replace("CONTINUITY_CLAUDE-", "")
+    .replace(".md", "");
 
   // Check for handoffs in this session (thoughts/shared/handoffs is tracked in git)
-  const handoffDir = path.join(projectDir, 'thoughts', 'shared', 'handoffs', sessionName);
+  const handoffDir = path.join(
+    projectDir,
+    "thoughts",
+    "shared",
+    "handoffs",
+    sessionName,
+  );
   if (!fs.existsSync(handoffDir)) {
     console.log(JSON.stringify({ result: "continue" }));
     return;
   }
 
   // Handoff files use date-based naming: YYYY-MM-DD_HH-MM-SS_description.md
-  const handoffFiles = fs.readdirSync(handoffDir)
-    .filter(f => f.endsWith('.md') && /^\d{4}-\d{2}-\d{2}_/.test(f))
+  const handoffFiles = fs
+    .readdirSync(handoffDir)
+    .filter((f) => f.endsWith(".md") && /^\d{4}-\d{2}-\d{2}_/.test(f))
     .sort((a, b) => {
       // Sort by filename (date-based) descending
       return b.localeCompare(a);
@@ -85,7 +99,7 @@ async function main() {
   }
 
   const latestHandoff = handoffFiles[0];
-  const handoffName = latestHandoff.replace('.md', '');
+  const handoffName = latestHandoff.replace(".md", "");
 
   const output: HookOutput = {
     result: "continue",
@@ -112,7 +126,7 @@ Outcome meanings:
   PARTIAL_MINUS  - Some progress, major issues remain
   FAILED         - Task abandoned or blocked
 ─────────────────────────────────────────────────
-`
+`,
   };
 
   console.log(JSON.stringify(output));

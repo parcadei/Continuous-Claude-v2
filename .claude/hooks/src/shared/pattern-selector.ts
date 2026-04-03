@@ -5,27 +5,30 @@
  * Uses Python bridge to call validate_composition.py and pattern_inference.py.
  */
 
-import { callPatternInference, callValidateComposition } from './python-bridge.js';
+import {
+  callPatternInference,
+  callValidateComposition,
+} from "./python-bridge.js";
 
 /**
  * All supported orchestration patterns.
  * Matches Python PATTERNS dict in validate_composition.py
  */
 export const SUPPORTED_PATTERNS = [
-  'swarm',
-  'jury',
-  'pipeline',
-  'generator_critic',
-  'hierarchical',
-  'map_reduce',
-  'blackboard',
-  'circuit_breaker',
-  'chain_of_responsibility',
-  'adversarial',
-  'event_driven',
-  'consensus',
-  'aggregator',
-  'broadcast',
+  "swarm",
+  "jury",
+  "pipeline",
+  "generator_critic",
+  "hierarchical",
+  "map_reduce",
+  "blackboard",
+  "circuit_breaker",
+  "chain_of_responsibility",
+  "adversarial",
+  "event_driven",
+  "consensus",
+  "aggregator",
+  "broadcast",
 ] as const;
 
 export type PatternType = (typeof SUPPORTED_PATTERNS)[number];
@@ -34,13 +37,13 @@ export type PatternType = (typeof SUPPORTED_PATTERNS)[number];
  * State sharing scope types.
  * Matches Python ScopeType enum in validate_composition.py
  */
-export type ScopeType = 'iso' | 'shared' | 'fed' | 'handoff';
+export type ScopeType = "iso" | "shared" | "fed" | "handoff";
 
 /**
  * Composition operators.
  * Matches Python Operator enum in validate_composition.py
  */
-export type OperatorType = ';' | '|' | '+';
+export type OperatorType = ";" | "|" | "+";
 
 /**
  * Result of pattern composition validation.
@@ -77,7 +80,7 @@ export interface PatternSelection {
 
 export interface Task {
   description: string;
-  complexity: 'low' | 'medium' | 'high';
+  complexity: "low" | "medium" | "high";
   parallelizable: boolean;
   requiresValidation: boolean;
 }
@@ -109,13 +112,13 @@ export function selectPattern(task: Task): PatternSelection {
  */
 export function validateComposition(
   patterns: PatternType[] | string[],
-  scope: ScopeType = 'handoff',
-  operator: OperatorType = ';'
+  scope: ScopeType = "handoff",
+  operator: OperatorType = ";",
 ): ValidationResult {
   if (patterns.length === 0) {
     return {
       valid: true,
-      composition: '',
+      composition: "",
       errors: [],
       warnings: [],
       scopeTrace: [],
@@ -142,7 +145,7 @@ export function validateComposition(
       patterns[i],
       patterns[i + 1],
       scope,
-      operator
+      operator,
     );
 
     if (!result.valid) {

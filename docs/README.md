@@ -37,13 +37,16 @@ docs/
 ## What's Included
 
 ### Workflows
+
 Multi-agent pipelines for complex tasks:
+
 - `/fix` - Bug investigation → diagnosis → implementation
 - `/build` - Feature planning → implementation → testing
 - `/tdd` - Test-driven development cycle
 - `/prove` - Formal math proofs with Lean 4
 
 ### Agents (31 specialists)
+
 - **Exploration**: scout, oracle, pathfinder
 - **Planning**: architect, plan-agent, phoenix
 - **Implementation**: kraken (TDD), spark (quick fixes)
@@ -51,11 +54,13 @@ Multi-agent pipelines for complex tasks:
 - **Investigation**: sleuth, debug-agent, profiler
 
 ### Tools
+
 - `tldr` - Token-efficient code analysis (95% savings)
 - Memory system - Store/recall learnings across sessions
 - Premortem - Risk analysis before implementation
 
 ### Hooks (25+ active)
+
 Lifecycle extensions for validation, coordination, and automation.
 
 ## Getting Started

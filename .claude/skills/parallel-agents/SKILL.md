@@ -8,6 +8,10 @@ user-invocable: false
 
 When launching multiple agents in parallel, follow this pattern to avoid context bloat.
 
+## When to Use
+
+This skill is invoked when launching multiple agents in parallel. Not user-invocable directly.
+
 ## Core Principles
 
 1. **No TaskOutput calls** - TaskOutput returns full agent output, bloating context
@@ -18,6 +22,7 @@ When launching multiple agents in parallel, follow this pattern to avoid context
 ## Output Patterns
 
 ### Simple Confirmation (parallel batch work)
+
 For tasks where agents just need to confirm completion:
 
 ```bash
@@ -31,6 +36,7 @@ echo "COMPLETE: <task-name> - $(date)" >> .claude/cache/<batch-name>-status.txt
 - Check with: `cat .claude/cache/<batch-name>-status.txt`
 
 ### Detailed Output (research/exploration)
+
 For tasks requiring detailed findings:
 
 ```
@@ -50,9 +56,11 @@ For tasks requiring detailed findings:
 # Task: <TASK_NAME>
 
 ## Your Mission
+
 <clear objective>
 
 ## Output
+
 When done, write confirmation:
 \`\`\`bash
 echo "COMPLETE: <identifier> - $(date)" >> .claude/cache/<batch>-status.txt
@@ -69,14 +77,14 @@ Task({
   description: "Task 1",
   prompt: "...",
   subagent_type: "general-purpose",
-  run_in_background: true
-})
+  run_in_background: true,
+});
 Task({
   description: "Task 2",
   prompt: "...",
   subagent_type: "general-purpose",
-  run_in_background: true
-})
+  run_in_background: true,
+});
 // ... up to 15 parallel agents
 ```
 
@@ -126,6 +134,7 @@ echo "COMPLETE: openai - Thu Jan 2 12:35:12 2025" >> .claude/cache/provider-back
 ```
 
 Check progress:
+
 ```bash
 cat .claude/cache/provider-backfill-status.txt
 # COMPLETE: anthropic - Thu Jan 2 12:34:56 2025

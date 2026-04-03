@@ -2,7 +2,13 @@
 import { readFileSync as readFileSync2, existsSync as existsSync2 } from "fs";
 
 // src/shared/spec-context.ts
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "fs";
+import {
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+} from "fs";
 import { join, dirname } from "path";
 var SPEC_CONTEXT_VERSION = "1.0";
 var CHECKPOINT_INTERVAL = 5;
@@ -14,8 +20,7 @@ function loadSpecContext(projectDir) {
   if (existsSync(path)) {
     try {
       return JSON.parse(readFileSync(path, "utf-8"));
-    } catch {
-    }
+    } catch {}
   }
   return { version: SPEC_CONTEXT_VERSION, sessions: {} };
 }
@@ -64,11 +69,14 @@ function extractCriteria(content) {
     "## Success Criteria",
     "## Acceptance Criteria",
     "### Success Criteria",
-    "### Acceptance Criteria"
+    "### Acceptance Criteria",
   ];
   const extracted = [];
   for (const section of sections) {
-    const regex = new RegExp(`${section.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=\\n## |\\n### |$)`, "i");
+    const regex = new RegExp(
+      `${section.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=\\n## |\\n### |$)`,
+      "i",
+    );
     const match = content.match(regex);
     if (match) {
       extracted.push(match[0].slice(0, 600));
@@ -76,7 +84,9 @@ function extractCriteria(content) {
   }
   const checkboxes = content.match(/- \[ \] .+/g) || [];
   if (checkboxes.length > 0) {
-    extracted.push("Acceptance Criteria:\n" + checkboxes.slice(0, 10).join("\n"));
+    extracted.push(
+      "Acceptance Criteria:\n" + checkboxes.slice(0, 10).join("\n"),
+    );
   }
   if (extracted.length > 0) {
     return extracted.join("\n\n").slice(0, 1500);
@@ -100,7 +110,10 @@ async function main() {
     console.log("{}");
     return;
   }
-  const { count, needsCheckpoint } = incrementEditCount(projectDir, input.session_id);
+  const { count, needsCheckpoint } = incrementEditCount(
+    projectDir,
+    input.session_id,
+  );
   if (!needsCheckpoint) {
     console.log("{}");
     return;
@@ -110,11 +123,15 @@ async function main() {
     return;
   }
   const specContent = readFileSync2(session.active_spec, "utf-8");
-  const requirements = extractSpecRequirements(specContent, session.current_phase ?? void 0);
+  const requirements = extractSpecRequirements(
+    specContent,
+    session.current_phase ?? void 0,
+  );
   const phase = session.current_phase ? ` (${session.current_phase})` : "";
-  console.log(JSON.stringify({
-    decision: "block",
-    reason: `\u{1F50D} DRIFT CHECK - ${count} edits made${phase}
+  console.log(
+    JSON.stringify({
+      decision: "block",
+      reason: `\u{1F50D} DRIFT CHECK - ${count} edits made${phase}
 
 Before continuing, verify alignment with spec:
 
@@ -125,7 +142,8 @@ ${requirements}
 2. Any unintended side effects or deviations?
 3. Should anything be adjusted?
 
-Then continue with your work.`
-  }));
+Then continue with your work.`,
+    }),
+  );
 }
 main().catch(() => console.log("{}"));

@@ -26,6 +26,7 @@ hooks/
 ## What Are Hooks?
 
 Hooks are scripts that run at specific points in Claude's workflow:
+
 - **UserPromptSubmit**: When user submits a prompt
 - **PreToolUse**: Before a tool executes
 - **PostToolUse**: After a tool completes
@@ -45,6 +46,7 @@ Hooks are scripts that run at specific points in Claude's workflow:
 **Purpose:** Automatically suggests relevant skills based on user prompts and file context
 
 **How it works:**
+
 1. Reads `skill-rules.json`
 2. Matches user prompt against trigger patterns
 3. Checks which files user is working with
@@ -53,6 +55,7 @@ Hooks are scripts that run at specific points in Claude's workflow:
 **Why it's essential:** This is THE hook that makes skills auto-activate.
 
 **Integration:**
+
 ```bash
 # Just copy - no npm install needed!
 cp -r .claude/hooks your-project/.claude/
@@ -62,6 +65,7 @@ chmod +x your-project/.claude/hooks/*.sh
 ```
 
 **Add to settings.json:**
+
 ```json
 {
   "hooks": {
@@ -86,6 +90,7 @@ chmod +x your-project/.claude/hooks/*.sh
 **Purpose:** Tracks file changes and build attempts for context management
 
 **How it works:**
+
 1. Monitors Edit/Write/Bash tool calls
 2. Records which files were modified
 3. Captures build/test pass/fail for reasoning
@@ -94,6 +99,7 @@ chmod +x your-project/.claude/hooks/*.sh
 **Why it's essential:** Helps Claude understand what parts of your codebase are active.
 
 **Add to settings.json:**
+
 ```json
 {
   "hooks": {

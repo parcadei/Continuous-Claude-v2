@@ -8,6 +8,16 @@ allowed-tools: [Bash, Read, Grep, Write, Edit, Task]
 
 Workflow orchestrator for bug investigation and resolution. Chains specialized skills based on issue scope.
 
+## When to Use
+
+Activate when:
+
+- User says "/fix"
+- User says "fix this bug" or "debug this issue"
+- User says "something is broken" or "not working"
+- User says "error in X" or "bug in Y"
+- User reports a failing test or exception
+
 ## Usage
 
 ```
@@ -37,6 +47,7 @@ options:
 ```
 
 **Mapping:**
+
 - "Help me choose" → Continue to Phase 1-4 questions
 - "Bug" → Set scope=bug, skip to Phase 2 (issue details)
 - "Hook" → Set scope=hook, skip to Phase 2 (issue details)
@@ -44,6 +55,7 @@ options:
 - "PR Comments" → Set scope=pr-comments, skip to Phase 2 (issue details)
 
 **If Answer is Unclear (via "Other"):**
+
 ```yaml
 question: "I want to understand what kind of fix you need. Did you mean..."
 header: "Clarify"
@@ -75,6 +87,7 @@ options:
 ```
 
 **Mapping:**
+
 - "Something broken" → bug scope
 - "Hook not firing" → hook scope
 - "Import errors" → deps scope
@@ -85,7 +98,7 @@ options:
 ```yaml
 question: "Can you describe the issue?"
 header: "Details"
-options: []  # Free text - user describes the problem
+options: [] # Free text - user describes the problem
 ```
 
 Capture the error message, unexpected behavior, or PR link.
@@ -105,6 +118,7 @@ options:
 ```
 
 **Mapping:**
+
 - "Diagnose only" → --dry-run
 - "Quick fix" → skip investigation, go straight to spark agent
 
@@ -124,6 +138,7 @@ options:
 ```
 
 **Mapping:**
+
 - No "regression test" → --no-test
 - No "commit" → --no-commit
 
@@ -142,20 +157,20 @@ Proceed? [Yes / Adjust settings]
 
 ## Scopes
 
-| Scope | Chain | Description |
-|-------|-------|-------------|
-| `bug` | debug -> implement_task -> test-driven-development -> commit | General bug fix workflow |
-| `hook` | debug-hooks -> hook-developer -> implement_task -> test hook | Hook-specific debugging |
-| `deps` | dependency-preflight -> oracle -> plan-agent -> implement_plan -> qlty-check | Dependency issues |
-| `pr-comments` | github-search -> research-codebase -> plan-agent -> implement_plan -> commit | Address PR feedback |
+| Scope         | Chain                                                                        | Description              |
+| ------------- | ---------------------------------------------------------------------------- | ------------------------ |
+| `bug`         | debug -> implement_task -> test-driven-development -> commit                 | General bug fix workflow |
+| `hook`        | debug-hooks -> hook-developer -> implement_task -> test hook                 | Hook-specific debugging  |
+| `deps`        | dependency-preflight -> oracle -> plan-agent -> implement_plan -> qlty-check | Dependency issues        |
+| `pr-comments` | github-search -> research-codebase -> plan-agent -> implement_plan -> commit | Address PR feedback      |
 
 ## Options
 
-| Option | Effect |
-|--------|--------|
-| `--no-test` | Skip regression test creation |
-| `--dry-run` | Diagnose only, don't implement fix |
-| `--no-commit` | Don't auto-commit the fix |
+| Option        | Effect                             |
+| ------------- | ---------------------------------- |
+| `--no-test`   | Skip regression test creation      |
+| `--dry-run`   | Diagnose only, don't implement fix |
+| `--no-commit` | Don't auto-commit the fix          |
 
 ## Workflow
 
@@ -225,16 +240,20 @@ Present findings to user:
 ### Evidence Found
 
 **Logs:**
+
 - [Finding with timestamp/line reference]
 
 **Database:**
+
 - [Finding with table/query reference]
 
 **Git State:**
+
 - [Recent relevant commits]
 - [Uncommitted changes]
 
 **Runtime:**
+
 - [Process/port findings]
 
 ### Root Cause Analysis
@@ -242,10 +261,12 @@ Present findings to user:
 **Primary Hypothesis:** [Most likely cause based on evidence]
 
 **Supporting Evidence:**
+
 1. [Evidence 1]
 2. [Evidence 2]
 
 **Alternative Hypotheses:**
+
 - [Alternative 1]: [Why less likely]
 
 ### Proposed Fix
@@ -253,6 +274,7 @@ Present findings to user:
 **Approach:** [How to fix]
 
 **Files to Modify:**
+
 - `path/to/file.ts:123` - [Change description]
 
 **Risk Assessment:** [Low/Medium/High] - [Why]
@@ -288,6 +310,7 @@ Run a quick premortem on the proposed fix to catch risks:
 ```
 
 **Context for premortem:**
+
 ```yaml
 premortem:
   mode: quick
@@ -302,6 +325,7 @@ premortem:
 ```
 
 **Risk Decision:**
+
 - **No HIGH tigers**: Proceed to implementation
 - **HIGH tigers found**: Present to user with options:
   - Accept risks and proceed
@@ -326,6 +350,7 @@ If "Research mitigations", spawn scout + oracle in parallel per risk, then re-pr
 Route to appropriate implementation skill based on scope:
 
 #### bug scope:
+
 ```
 Task(
   subagent_type="kraken",
@@ -346,6 +371,7 @@ Task(
 ```
 
 #### hook scope:
+
 ```
 Task(
   subagent_type="kraken",
@@ -365,6 +391,7 @@ Task(
 ```
 
 #### deps scope:
+
 ```
 Task(
   subagent_type="kraken",
@@ -384,6 +411,7 @@ Task(
 ```
 
 #### pr-comments scope:
+
 ```
 Task(
   subagent_type="kraken",
@@ -564,35 +592,34 @@ commit (reference PR comments)
 ```yaml
 ---
 session: fix-{scope}-{short-description}
-ts: {ISO timestamp}
-commit: {git commit hash}
-branch: {git branch}
-status: {complete|partial|blocked|diagnosis-only}
+ts: { ISO timestamp }
+commit: { git commit hash }
+branch: { git branch }
+status: { complete|partial|blocked|diagnosis-only }
 ---
-
-scope: {bug|hook|deps|pr-comments}
-options: {flags used}
+scope: { bug|hook|deps|pr-comments }
+options: { flags used }
 
 issue:
-  description: {original user description}
-  evidence: {key findings from investigation}
+  description: { original user description }
+  evidence: { key findings from investigation }
 
 diagnosis:
-  root_cause: {identified cause}
-  hypothesis: {why we think this}
-  files: [{affected files}]
+  root_cause: { identified cause }
+  hypothesis: { why we think this }
+  files: [{ affected files }]
 
 fix:
-  approach: {what was done}
-  files_modified: [{files changed}]
-  test_added: {test file if created}
+  approach: { what was done }
+  files_modified: [{ files changed }]
+  test_added: { test file if created }
 
 verification:
-  test_command: {command to verify}
-  human_confirmed: {true|false}
+  test_command: { command to verify }
+  human_confirmed: { true|false }
 
 next:
-  - {any follow-up needed}
+  - { any follow-up needed }
 ```
 
 **Location:** `thoughts/shared/handoffs/fix/{scope}/{timestamp}_{description}.yaml`
@@ -600,30 +627,35 @@ next:
 ## Examples
 
 ### Basic Bug Fix
+
 ```
 /fix bug
 # -> Investigates, diagnoses, implements, tests, commits
 ```
 
 ### Diagnose Only
+
 ```
 /fix bug --dry-run
 # -> Investigates, creates diagnosis handoff, stops
 ```
 
 ### Fix Without Auto-Commit
+
 ```
 /fix hook --no-commit
 # -> Full fix workflow but stops before commit
 ```
 
 ### Quick Fix (No Regression Test)
+
 ```
 /fix bug --no-test
 # -> Implements fix, commits, no regression test
 ```
 
 ### Address PR Comments
+
 ```
 /fix pr-comments
 # -> Fetches PR, creates plan, implements, commits
@@ -631,17 +663,18 @@ next:
 
 ## Error Handling
 
-| Error | Action |
-|-------|--------|
-| Investigation finds nothing | Ask user for more context |
-| User rejects diagnosis | Refine hypothesis with user input |
-| Fix breaks other tests | Rollback, refine approach |
-| User rejects verification | Offer to revert or adjust |
-| Commit fails | Present error, offer retry |
+| Error                       | Action                            |
+| --------------------------- | --------------------------------- |
+| Investigation finds nothing | Ask user for more context         |
+| User rejects diagnosis      | Refine hypothesis with user input |
+| Fix breaks other tests      | Rollback, refine approach         |
+| User rejects verification   | Offer to revert or adjust         |
+| Commit fails                | Present error, offer retry        |
 
 ## Integration with Other Skills
 
 This skill orchestrates:
+
 - `debug` / `debug-hooks`: Initial investigation
 - `sleuth`: Parallel investigation agent
 - `kraken`: TDD implementation agent
@@ -658,14 +691,15 @@ This skill orchestrates:
 
 ## Checkpoints Summary
 
-| Checkpoint | Purpose | Skip Condition |
-|------------|---------|----------------|
-| After diagnosis | Confirm root cause | Never skip |
+| Checkpoint      | Purpose                  | Skip Condition |
+| --------------- | ------------------------ | -------------- |
+| After diagnosis | Confirm root cause       | Never skip     |
 | After premortem | Accept or mitigate risks | No HIGH tigers |
-| After fix | Verify resolution | Never skip |
-| Before commit | Review changes | `--no-commit` |
+| After fix       | Verify resolution        | Never skip     |
+| Before commit   | Review changes           | `--no-commit`  |
 
 The human checkpoints are critical for:
+
 1. Preventing wrong fixes from being implemented
 2. Ensuring user understands what changed
 3. Catching edge cases only humans notice

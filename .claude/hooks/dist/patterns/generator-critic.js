@@ -14,9 +14,9 @@
  * - GC_MAX_ROUNDS: Maximum number of refinement rounds
  * - CLAUDE_PROJECT_DIR: Project directory for DB path
  */
-import { existsSync } from 'fs';
+import { existsSync } from "fs";
 // Import shared utilities
-import { getDbPath, runPythonQuery, isValidId } from '../shared/db-utils.js';
+import { getDbPath, runPythonQuery, isValidId } from "../shared/db-utils.js";
 // =============================================================================
 // onSubagentStart Handler
 // =============================================================================
@@ -26,43 +26,44 @@ import { getDbPath, runPythonQuery, isValidId } from '../shared/db-utils.js';
  * Always returns 'continue' - never blocks agent start.
  */
 export async function onSubagentStart(input) {
-    const gcId = process.env.GC_ID;
-    // If no GC_ID, continue silently (not in a generator-critic pattern)
-    if (!gcId) {
-        return { result: 'continue' };
+  const gcId = process.env.GC_ID;
+  // If no GC_ID, continue silently (not in a generator-critic pattern)
+  if (!gcId) {
+    return { result: "continue" };
+  }
+  // Validate GC_ID format
+  if (!isValidId(gcId)) {
+    return { result: "continue" };
+  }
+  const role = process.env.AGENT_ROLE || "unknown";
+  const iteration = parseInt(process.env.GC_ITERATION || "1", 10);
+  const maxRounds = parseInt(process.env.GC_MAX_ROUNDS || "3", 10);
+  // Log for debugging - this goes to stderr, not stdout
+  console.error(
+    `[gc] ${role} starting for iteration ${iteration}/${maxRounds} (${gcId})`,
+  );
+  // Inject role-specific context
+  let message = "";
+  if (role === "generator") {
+    message = `You are the GENERATOR in an iterative refinement loop (iteration ${iteration}/${maxRounds}). `;
+    if (iteration === 1) {
+      message += "Create an initial solution to the task.";
+    } else {
+      message += "Refine your previous output based on critic feedback.";
     }
-    // Validate GC_ID format
-    if (!isValidId(gcId)) {
-        return { result: 'continue' };
-    }
-    const role = process.env.AGENT_ROLE || 'unknown';
-    const iteration = parseInt(process.env.GC_ITERATION || '1', 10);
-    const maxRounds = parseInt(process.env.GC_MAX_ROUNDS || '3', 10);
-    // Log for debugging - this goes to stderr, not stdout
-    console.error(`[gc] ${role} starting for iteration ${iteration}/${maxRounds} (${gcId})`);
-    // Inject role-specific context
-    let message = '';
-    if (role === 'generator') {
-        message = `You are the GENERATOR in an iterative refinement loop (iteration ${iteration}/${maxRounds}). `;
-        if (iteration === 1) {
-            message += 'Create an initial solution to the task.';
-        }
-        else {
-            message += 'Refine your previous output based on critic feedback.';
-        }
-    }
-    else if (role === 'critic') {
-        message = `You are the CRITIC in an iterative refinement loop (iteration ${iteration}/${maxRounds}). `;
-        message += 'Review the generator\'s output and provide constructive feedback. ';
-        message += 'If the output meets all requirements, include "APPROVED" in your response.';
-    }
-    else {
-        message = `Generator-Critic pattern active (iteration ${iteration}/${maxRounds}).`;
-    }
-    return {
-        result: 'continue',
-        message
-    };
+  } else if (role === "critic") {
+    message = `You are the CRITIC in an iterative refinement loop (iteration ${iteration}/${maxRounds}). `;
+    message +=
+      "Review the generator's output and provide constructive feedback. ";
+    message +=
+      'If the output meets all requirements, include "APPROVED" in your response.';
+  } else {
+    message = `Generator-Critic pattern active (iteration ${iteration}/${maxRounds}).`;
+  }
+  return {
+    result: "continue",
+    message,
+  };
 }
 // =============================================================================
 // onSubagentStop Handler
@@ -73,24 +74,24 @@ export async function onSubagentStart(input) {
  * Records generator output and critic feedback.
  */
 export async function onSubagentStop(input) {
-    const gcId = process.env.GC_ID;
-    // If no GC_ID, continue silently
-    if (!gcId) {
-        return { result: 'continue' };
-    }
-    // Validate GC_ID format
-    if (!isValidId(gcId)) {
-        return { result: 'continue' };
-    }
-    const role = process.env.AGENT_ROLE || 'unknown';
-    const iteration = parseInt(process.env.GC_ITERATION || '1', 10);
-    const dbPath = getDbPath();
-    if (!existsSync(dbPath)) {
-        return { result: 'continue' };
-    }
-    try {
-        // Track iteration completion
-        const query = `
+  const gcId = process.env.GC_ID;
+  // If no GC_ID, continue silently
+  if (!gcId) {
+    return { result: "continue" };
+  }
+  // Validate GC_ID format
+  if (!isValidId(gcId)) {
+    return { result: "continue" };
+  }
+  const role = process.env.AGENT_ROLE || "unknown";
+  const iteration = parseInt(process.env.GC_ITERATION || "1", 10);
+  const dbPath = getDbPath();
+  if (!existsSync(dbPath)) {
+    return { result: "continue" };
+  }
+  try {
+    // Track iteration completion
+    const query = `
 import sqlite3
 import json
 import sys
@@ -159,18 +160,22 @@ conn.close()
 
 print(json.dumps({'success': True}))
 `;
-        const result = runPythonQuery(query, [dbPath, gcId, iteration.toString(), role]);
-        if (!result.success) {
-            console.error('SubagentStop Python error:', result.stderr);
-            return { result: 'continue' };
-        }
-        console.error(`[gc] ${role} completed iteration ${iteration}`);
-        return { result: 'continue' };
+    const result = runPythonQuery(query, [
+      dbPath,
+      gcId,
+      iteration.toString(),
+      role,
+    ]);
+    if (!result.success) {
+      console.error("SubagentStop Python error:", result.stderr);
+      return { result: "continue" };
     }
-    catch (err) {
-        console.error('SubagentStop hook error:', err);
-        return { result: 'continue' };
-    }
+    console.error(`[gc] ${role} completed iteration ${iteration}`);
+    return { result: "continue" };
+  } catch (err) {
+    console.error("SubagentStop hook error:", err);
+    return { result: "continue" };
+  }
 }
 // =============================================================================
 // onPreToolUse Handler
@@ -181,28 +186,28 @@ print(json.dumps({'success': True}))
  * No injection for critic or first iteration.
  */
 export async function onPreToolUse(input) {
-    const gcId = process.env.GC_ID;
-    // If no GC_ID, continue silently
-    if (!gcId) {
-        return { result: 'continue' };
-    }
-    // Validate GC_ID format
-    if (!isValidId(gcId)) {
-        return { result: 'continue' };
-    }
-    const role = process.env.AGENT_ROLE || 'unknown';
-    const iteration = parseInt(process.env.GC_ITERATION || '1', 10);
-    const dbPath = getDbPath();
-    // Only inject feedback to generator on iterations > 1
-    if (role !== 'generator' || iteration <= 1) {
-        return { result: 'continue' };
-    }
-    if (!existsSync(dbPath)) {
-        return { result: 'continue' };
-    }
-    try {
-        // Fetch previous critic feedback
-        const query = `
+  const gcId = process.env.GC_ID;
+  // If no GC_ID, continue silently
+  if (!gcId) {
+    return { result: "continue" };
+  }
+  // Validate GC_ID format
+  if (!isValidId(gcId)) {
+    return { result: "continue" };
+  }
+  const role = process.env.AGENT_ROLE || "unknown";
+  const iteration = parseInt(process.env.GC_ITERATION || "1", 10);
+  const dbPath = getDbPath();
+  // Only inject feedback to generator on iterations > 1
+  if (role !== "generator" || iteration <= 1) {
+    return { result: "continue" };
+  }
+  if (!existsSync(dbPath)) {
+    return { result: "continue" };
+  }
+  try {
+    // Fetch previous critic feedback
+    const query = `
 import sqlite3
 import json
 import sys
@@ -229,31 +234,33 @@ feedback = row[0] if row else None
 conn.close()
 print(json.dumps({'feedback': feedback}))
 `;
-        const prevIteration = iteration - 1;
-        const result = runPythonQuery(query, [dbPath, gcId, prevIteration.toString()]);
-        if (!result.success) {
-            return { result: 'continue' };
-        }
-        // Parse feedback
-        let data;
-        try {
-            data = JSON.parse(result.stdout);
-        }
-        catch (parseErr) {
-            return { result: 'continue' };
-        }
-        if (data.feedback && data.feedback !== '(feedback recorded)') {
-            return {
-                result: 'continue',
-                message: `CRITIC FEEDBACK from iteration ${prevIteration}: ${data.feedback}`
-            };
-        }
-        return { result: 'continue' };
+    const prevIteration = iteration - 1;
+    const result = runPythonQuery(query, [
+      dbPath,
+      gcId,
+      prevIteration.toString(),
+    ]);
+    if (!result.success) {
+      return { result: "continue" };
     }
-    catch (err) {
-        console.error('PreToolUse hook error:', err);
-        return { result: 'continue' };
+    // Parse feedback
+    let data;
+    try {
+      data = JSON.parse(result.stdout);
+    } catch (parseErr) {
+      return { result: "continue" };
     }
+    if (data.feedback && data.feedback !== "(feedback recorded)") {
+      return {
+        result: "continue",
+        message: `CRITIC FEEDBACK from iteration ${prevIteration}: ${data.feedback}`,
+      };
+    }
+    return { result: "continue" };
+  } catch (err) {
+    console.error("PreToolUse hook error:", err);
+    return { result: "continue" };
+  }
 }
 // =============================================================================
 // onPostToolUse Handler
@@ -263,8 +270,8 @@ print(json.dumps({'feedback': feedback}))
  * Currently no-op for generator-critic pattern.
  */
 export async function onPostToolUse(input) {
-    // No special handling needed for generator-critic pattern
-    return { result: 'continue' };
+  // No special handling needed for generator-critic pattern
+  return { result: "continue" };
 }
 // =============================================================================
 // onStop Handler
@@ -275,27 +282,27 @@ export async function onPostToolUse(input) {
  * Blocks if neither condition is met.
  */
 export async function onStop(input) {
-    // Prevent infinite loops - if we're already in a stop hook, continue
-    if (input.stop_hook_active) {
-        return { result: 'continue' };
-    }
-    const gcId = process.env.GC_ID;
-    if (!gcId) {
-        return { result: 'continue' };
-    }
-    // Validate GC_ID format
-    if (!isValidId(gcId)) {
-        return { result: 'continue' };
-    }
-    const iteration = parseInt(process.env.GC_ITERATION || '1', 10);
-    const maxRounds = parseInt(process.env.GC_MAX_ROUNDS || '3', 10);
-    const dbPath = getDbPath();
-    if (!existsSync(dbPath)) {
-        return { result: 'continue' };
-    }
-    try {
-        // Check if approved or max rounds reached
-        const query = `
+  // Prevent infinite loops - if we're already in a stop hook, continue
+  if (input.stop_hook_active) {
+    return { result: "continue" };
+  }
+  const gcId = process.env.GC_ID;
+  if (!gcId) {
+    return { result: "continue" };
+  }
+  // Validate GC_ID format
+  if (!isValidId(gcId)) {
+    return { result: "continue" };
+  }
+  const iteration = parseInt(process.env.GC_ITERATION || "1", 10);
+  const maxRounds = parseInt(process.env.GC_MAX_ROUNDS || "3", 10);
+  const dbPath = getDbPath();
+  if (!existsSync(dbPath)) {
+    return { result: "continue" };
+  }
+  try {
+    // Check if approved or max rounds reached
+    const query = `
 import sqlite3
 import json
 import sys
@@ -338,38 +345,37 @@ print(json.dumps({
     'latest_feedback': latest_feedback
 }))
 `;
-        const result = runPythonQuery(query, [dbPath, gcId]);
-        if (!result.success) {
-            return { result: 'continue' };
-        }
-        // Parse result
-        let data;
-        try {
-            data = JSON.parse(result.stdout);
-        }
-        catch (parseErr) {
-            return { result: 'continue' };
-        }
-        // Check if approved
-        if (data.approved) {
-            return {
-                result: 'continue',
-                message: 'Generator-Critic pattern complete: Output approved by critic.'
-            };
-        }
-        // Check if max rounds reached
-        if (iteration >= maxRounds) {
-            return {
-                result: 'continue',
-                message: `Generator-Critic pattern complete: Max rounds (${maxRounds}) reached.`
-            };
-        }
-        // Not approved and not at max rounds - could continue or block
-        // For now, continue (pattern implementation controls iteration)
-        return { result: 'continue' };
+    const result = runPythonQuery(query, [dbPath, gcId]);
+    if (!result.success) {
+      return { result: "continue" };
     }
-    catch (err) {
-        console.error('Stop hook error:', err);
-        return { result: 'continue' };
+    // Parse result
+    let data;
+    try {
+      data = JSON.parse(result.stdout);
+    } catch (parseErr) {
+      return { result: "continue" };
     }
+    // Check if approved
+    if (data.approved) {
+      return {
+        result: "continue",
+        message:
+          "Generator-Critic pattern complete: Output approved by critic.",
+      };
+    }
+    // Check if max rounds reached
+    if (iteration >= maxRounds) {
+      return {
+        result: "continue",
+        message: `Generator-Critic pattern complete: Max rounds (${maxRounds}) reached.`,
+      };
+    }
+    // Not approved and not at max rounds - could continue or block
+    // For now, continue (pattern implementation controls iteration)
+    return { result: "continue" };
+  } catch (err) {
+    console.error("Stop hook error:", err);
+    return { result: "continue" };
+  }
 }

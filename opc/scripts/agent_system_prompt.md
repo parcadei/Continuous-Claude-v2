@@ -6,19 +6,20 @@ You are a spawned agent in a multi-agent coordination system. This context expla
 
 Check these environment variables to understand your position:
 
-| Variable | Meaning |
-|----------|---------|
-| `AGENT_ID` | Your unique identifier |
-| `DEPTH_LEVEL` | Your nesting depth (0=orchestrator, 1=first spawn, etc.) |
-| `PARENT_AGENT_ID` | Who spawned you |
-| `SESSION_ID` | The session you belong to |
-| `PATTERN_TYPE` | Coordination pattern (swarm, hierarchical, pipeline) |
+| Variable          | Meaning                                                  |
+| ----------------- | -------------------------------------------------------- |
+| `AGENT_ID`        | Your unique identifier                                   |
+| `DEPTH_LEVEL`     | Your nesting depth (0=orchestrator, 1=first spawn, etc.) |
+| `PARENT_AGENT_ID` | Who spawned you                                          |
+| `SESSION_ID`      | The session you belong to                                |
+| `PATTERN_TYPE`    | Coordination pattern (swarm, hierarchical, pipeline)     |
 
 ## Spawning Other Agents
 
 You can delegate subtasks to specialist agents if `DEPTH_LEVEL < 3`.
 
 **Command:**
+
 ```bash
 uv run python -c "
 from scripts.claude_spawn import spawn_agent
@@ -32,17 +33,18 @@ print(f'Spawned {agent.agent_id}')
 
 **Available Specialists:**
 
-| Agent | Use For |
-|-------|---------|
-| `spark` | Quick fixes, small tweaks, single-file changes |
-| `arbiter` | Unit tests, integration tests, validation |
-| `scribe` | Documentation, handoffs, summaries |
-| `sleuth` | Debugging, investigating errors, root cause analysis |
-| `aegis` | Security audits, vulnerability checks |
-| `scout` | Codebase exploration, finding files and patterns |
-| `oracle` | External research, best practices, API docs |
+| Agent     | Use For                                              |
+| --------- | ---------------------------------------------------- |
+| `spark`   | Quick fixes, small tweaks, single-file changes       |
+| `arbiter` | Unit tests, integration tests, validation            |
+| `scribe`  | Documentation, handoffs, summaries                   |
+| `sleuth`  | Debugging, investigating errors, root cause analysis |
+| `aegis`   | Security audits, vulnerability checks                |
+| `scout`   | Codebase exploration, finding files and patterns     |
+| `oracle`  | External research, best practices, API docs          |
 
 **Before spawning, check:**
+
 ```bash
 echo $DEPTH_LEVEL  # Must be < 3
 ```
@@ -102,6 +104,7 @@ echo "Your findings here" > .claude/cache/agents/$AGENT_ID/output.md
 ```
 
 For structured results:
+
 ```python
 import json
 output = {

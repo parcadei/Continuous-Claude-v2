@@ -5,8 +5,8 @@
  * Uses TLDR daemon for fast function lookup (replaces CLI spawning).
  */
 
-import { readFileSync } from 'fs';
-import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
+import { readFileSync } from "fs";
+import { queryDaemonSync, trackHookActivitySync } from "./daemon-client.js";
 
 interface HookInput {
   tool_name: string;
@@ -42,13 +42,56 @@ interface TLDRExtract {
 
 // Keywords and builtins to skip
 const SKIP_NAMES = new Set([
-  'if', 'for', 'while', 'with', 'except', 'match', 'case',
-  'print', 'len', 'str', 'int', 'list', 'dict', 'set', 'tuple',
-  'range', 'enumerate', 'zip', 'map', 'filter', 'sorted', 'reversed',
-  'type', 'isinstance', 'hasattr', 'getattr', 'setattr', 'super',
-  'open', 'input', 'any', 'all', 'min', 'max', 'sum', 'abs',
-  'require', 'import', 'export', 'return', 'const', 'let', 'var',
-  'function', 'async', 'await', 'new', 'this', 'class', 'extends'
+  "if",
+  "for",
+  "while",
+  "with",
+  "except",
+  "match",
+  "case",
+  "print",
+  "len",
+  "str",
+  "int",
+  "list",
+  "dict",
+  "set",
+  "tuple",
+  "range",
+  "enumerate",
+  "zip",
+  "map",
+  "filter",
+  "sorted",
+  "reversed",
+  "type",
+  "isinstance",
+  "hasattr",
+  "getattr",
+  "setattr",
+  "super",
+  "open",
+  "input",
+  "any",
+  "all",
+  "min",
+  "max",
+  "sum",
+  "abs",
+  "require",
+  "import",
+  "export",
+  "return",
+  "const",
+  "let",
+  "var",
+  "function",
+  "async",
+  "await",
+  "new",
+  "this",
+  "class",
+  "extends",
 ]);
 
 function extractFunctionCalls(code: string): string[] {
@@ -71,35 +114,49 @@ function extractFunctionCalls(code: string): string[] {
 function findFunctionFile(funcName: string, projectDir: string): string | null {
   try {
     const response = queryDaemonSync(
-      { cmd: 'search', pattern: `def ${funcName}` },
-      projectDir
+      { cmd: "search", pattern: `def ${funcName}` },
+      projectDir,
     );
 
     // Skip if daemon is indexing or unavailable
-    if (response.indexing || response.status === 'unavailable' || response.status === 'error') {
+    if (
+      response.indexing ||
+      response.status === "unavailable" ||
+      response.status === "error"
+    ) {
       return null;
     }
 
     if (response.results && response.results.length > 0) {
       return `${projectDir}/${response.results[0].file}`;
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   return null;
 }
 
 /**
  * Get function signature from TLDR daemon extract.
  */
-function getSignatureFromTLDR(funcName: string, filePath: string, sessionId?: string): string | null {
+function getSignatureFromTLDR(
+  funcName: string,
+  filePath: string,
+  sessionId?: string,
+): string | null {
   try {
     const projectDir = getProjectDir();
     const response = queryDaemonSync(
-      { cmd: 'extract', file: filePath, session: sessionId },
-      projectDir
+      { cmd: "extract", file: filePath, session: sessionId },
+      projectDir,
     );
 
     // Skip if daemon is indexing or unavailable
-    if (response.indexing || response.status === 'unavailable' || response.status === 'error') {
+    if (
+      response.indexing ||
+      response.status === "unavailable" ||
+      response.status === "error"
+    ) {
       return null;
     }
 
@@ -113,7 +170,9 @@ function getSignatureFromTLDR(funcName: string, filePath: string, sessionId?: st
         return func.signature;
       }
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   return null;
 }
 
@@ -122,23 +181,23 @@ function getProjectDir(): string {
 }
 
 async function main() {
-  const input: HookInput = JSON.parse(readFileSync(0, 'utf-8'));
+  const input: HookInput = JSON.parse(readFileSync(0, "utf-8"));
 
-  if (input.tool_name !== 'Edit') {
-    console.log('{}');
+  if (input.tool_name !== "Edit") {
+    console.log("{}");
     return;
   }
 
-  const newCode = input.tool_input.new_string || '';
+  const newCode = input.tool_input.new_string || "";
   if (!newCode || newCode.length < 10) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
   // Find function calls in the new code
   const calls = extractFunctionCalls(newCode);
   if (calls.length === 0) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
@@ -157,19 +216,19 @@ async function main() {
   }
 
   if (signatures.length === 0) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
   const output: HookOutput = {
     hookSpecificOutput: {
-      hookEventName: 'PreToolUse',
-      additionalContext: `[Signatures from TLDR]\n${signatures.join('\n')}`
-    }
+      hookEventName: "PreToolUse",
+      additionalContext: `[Signatures from TLDR]\n${signatures.join("\n")}`,
+    },
   };
 
   // Track hook activity for flush threshold
-  trackHookActivitySync('signature-helper', projectDir, true, {
+  trackHookActivitySync("signature-helper", projectDir, true, {
     edits_checked: 1,
     signatures_found: signatures.length,
   });
@@ -177,4 +236,4 @@ async function main() {
   console.log(JSON.stringify(output));
 }
 
-main().catch(() => console.log('{}'));
+main().catch(() => console.log("{}"));

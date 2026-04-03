@@ -11,8 +11,8 @@
  * Uses TLDR daemon for fast cached responses (50ms vs 500ms CLI).
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
+import { readFileSync, existsSync } from "fs";
+import { join, dirname } from "path";
 import {
   queryDaemonSync,
   contextDaemon,
@@ -22,7 +22,7 @@ import {
   extractDaemon,
   DaemonResponse,
   trackHookActivitySync,
-} from './daemon-client';
+} from "./daemon-client";
 
 interface HookInput {
   session_id: string;
@@ -39,7 +39,7 @@ interface HookInput {
 interface HookOutput {
   hookSpecificOutput?: {
     hookEventName: string;
-    permissionDecision: 'allow' | 'deny' | 'ask';
+    permissionDecision: "allow" | "deny" | "ask";
     permissionDecisionReason?: string;
     updatedInput?: Record<string, unknown>;
   };
@@ -48,7 +48,7 @@ interface HookOutput {
 }
 
 // Intent detection patterns
-type TldrLayer = 'call_graph' | 'cfg' | 'dfg' | 'pdg' | 'ast';
+type TldrLayer = "call_graph" | "cfg" | "dfg" | "pdg" | "ast";
 
 interface IntentPattern {
   patterns: RegExp[];
@@ -67,8 +67,8 @@ const INTENT_PATTERNS: IntentPattern[] = [
       /data\s+flow/i,
       /variable\s+(?:origin|source)/i,
     ],
-    layers: ['dfg'],
-    description: 'data flow analysis'
+    layers: ["dfg"],
+    description: "data flow analysis",
   },
   {
     // Program slicing / dependency questions
@@ -79,8 +79,8 @@ const INTENT_PATTERNS: IntentPattern[] = [
       /dependencies?\s+(?:of|for)/i,
       /impact\s+(?:of|analysis)/i,
     ],
-    layers: ['pdg'],
-    description: 'program slicing'
+    layers: ["pdg"],
+    description: "program slicing",
   },
   {
     // Complexity / control flow questions
@@ -92,8 +92,8 @@ const INTENT_PATTERNS: IntentPattern[] = [
       /cyclomatic/i,
       /paths?\s+through/i,
     ],
-    layers: ['cfg'],
-    description: 'control flow analysis'
+    layers: ["cfg"],
+    description: "control flow analysis",
   },
   {
     // Structure only
@@ -103,8 +103,8 @@ const INTENT_PATTERNS: IntentPattern[] = [
       /what\s+(?:functions?|methods?)\s+(?:are\s+)?in/i,
       /overview\s+of/i,
     ],
-    layers: ['ast'],
-    description: 'structure overview'
+    layers: ["ast"],
+    description: "structure overview",
   },
   {
     // Debug / investigate (default rich context)
@@ -116,9 +116,9 @@ const INTENT_PATTERNS: IntentPattern[] = [
       /how\s+does?\s+(\w+)\s+work/i,
       /explain/i,
     ],
-    layers: ['call_graph', 'cfg'],
-    description: 'debugging context'
-  }
+    layers: ["call_graph", "cfg"],
+    description: "debugging context",
+  },
 ];
 
 // Function name extraction patterns
@@ -131,17 +131,67 @@ const FUNCTION_PATTERNS = [
 ];
 
 const EXCLUDE_WORDS = new Set([
-  'the', 'and', 'for', 'with', 'from', 'this', 'that', 'what', 'how',
-  'can', 'you', 'fix', 'debug', 'investigate', 'look', 'check', 'analyze',
-  'function', 'method', 'class', 'file', 'code', 'error', 'bug', 'issue',
-  'please', 'help', 'need', 'want', 'should', 'could', 'would', 'make',
-  'add', 'remove', 'update', 'change', 'modify', 'create', 'delete',
-  'test', 'tests', 'run', 'build', 'install', 'start', 'stop',
-  'where', 'does', 'come', 'from', 'affects', 'line', 'variable',
+  "the",
+  "and",
+  "for",
+  "with",
+  "from",
+  "this",
+  "that",
+  "what",
+  "how",
+  "can",
+  "you",
+  "fix",
+  "debug",
+  "investigate",
+  "look",
+  "check",
+  "analyze",
+  "function",
+  "method",
+  "class",
+  "file",
+  "code",
+  "error",
+  "bug",
+  "issue",
+  "please",
+  "help",
+  "need",
+  "want",
+  "should",
+  "could",
+  "would",
+  "make",
+  "add",
+  "remove",
+  "update",
+  "change",
+  "modify",
+  "create",
+  "delete",
+  "test",
+  "tests",
+  "run",
+  "build",
+  "install",
+  "start",
+  "stop",
+  "where",
+  "does",
+  "come",
+  "from",
+  "affects",
+  "line",
+  "variable",
 ]);
 
 // Detect intent from prompt
-function detectIntent(prompt: string): { layers: TldrLayer[]; description: string } {
+function detectIntent(prompt: string): {
+  layers: TldrLayer[];
+  description: string;
+} {
   for (const intent of INTENT_PATTERNS) {
     for (const pattern of intent.patterns) {
       if (pattern.test(prompt)) {
@@ -150,16 +200,16 @@ function detectIntent(prompt: string): { layers: TldrLayer[]; description: strin
     }
   }
   // Default: call graph for navigation
-  return { layers: ['call_graph'], description: 'code navigation' };
+  return { layers: ["call_graph"], description: "code navigation" };
 }
 
 // Detect language from project files
 function detectLanguage(projectPath: string): string {
   const indicators: Record<string, string[]> = {
-    python: ['pyproject.toml', 'setup.py', 'requirements.txt', 'Pipfile'],
-    typescript: ['tsconfig.json', 'package.json'],
-    rust: ['Cargo.toml'],
-    go: ['go.mod', 'go.sum'],
+    python: ["pyproject.toml", "setup.py", "requirements.txt", "Pipfile"],
+    typescript: ["tsconfig.json", "package.json"],
+    rust: ["Cargo.toml"],
+    go: ["go.mod", "go.sum"],
   };
 
   for (const [lang, files] of Object.entries(indicators)) {
@@ -169,7 +219,7 @@ function detectLanguage(projectPath: string): string {
       }
     }
   }
-  return 'python';
+  return "python";
 }
 
 // Extract potential entry points from prompt
@@ -180,17 +230,19 @@ function extractEntryPoints(prompt: string): string[] {
     let match;
     while ((match = pattern.exec(prompt)) !== null) {
       const candidate = match[1];
-      if (candidate &&
-          candidate.length > 2 &&
-          !EXCLUDE_WORDS.has(candidate.toLowerCase())) {
+      if (
+        candidate &&
+        candidate.length > 2 &&
+        !EXCLUDE_WORDS.has(candidate.toLowerCase())
+      ) {
         candidates.add(candidate);
       }
     }
   }
 
   return Array.from(candidates).sort((a, b) => {
-    const aHasDot = a.includes('.');
-    const bHasDot = b.includes('.');
+    const aHasDot = a.includes(".");
+    const bHasDot = b.includes(".");
     if (aHasDot && !bHasDot) return -1;
     if (bHasDot && !aHasDot) return 1;
     return b.length - a.length;
@@ -224,20 +276,20 @@ function getTldrContext(
   language: string,
   layers: TldrLayer[],
   lineNumber?: number | null,
-  varName?: string | null
+  varName?: string | null,
 ): string | null {
   const results: string[] = [];
 
   try {
     for (const layer of layers) {
       switch (layer) {
-        case 'call_graph': {
+        case "call_graph": {
           // Use daemon context command
           const response = queryDaemonSync(
-            { cmd: 'context', entry: entryPoint, language, depth: 2 },
-            projectPath
+            { cmd: "context", entry: entryPoint, language, depth: 2 },
+            projectPath,
           );
-          if (response.status === 'ok' && response.result) {
+          if (response.status === "ok" && response.result) {
             const ctx = response.result;
             const lines: string[] = [`## Context: ${entryPoint}`];
             if (ctx.entry_point) {
@@ -258,90 +310,100 @@ function getTldrContext(
                 lines.push(`  ← ${c.function} (${c.file}:${c.line})`);
               }
             }
-            results.push(lines.join('\n'));
+            results.push(lines.join("\n"));
           }
           break;
         }
 
-        case 'cfg': {
+        case "cfg": {
           // Use daemon cfg command - need to find file first
           const searchResp = queryDaemonSync(
-            { cmd: 'search', pattern: `def ${entryPoint}` },
-            projectPath
+            { cmd: "search", pattern: `def ${entryPoint}` },
+            projectPath,
           );
           if (searchResp.results && searchResp.results.length > 0) {
             const file = searchResp.results[0].file;
             const cfgResp = queryDaemonSync(
-              { cmd: 'cfg', file, function: entryPoint, language },
-              projectPath
+              { cmd: "cfg", file, function: entryPoint, language },
+              projectPath,
             );
-            if (cfgResp.status === 'ok' && cfgResp.result) {
+            if (cfgResp.status === "ok" && cfgResp.result) {
               const cfg = cfgResp.result;
               const lines: string[] = [`## CFG: ${entryPoint}`];
-              lines.push(`Blocks: ${cfg.num_blocks || 'N/A'}`);
-              lines.push(`Cyclomatic: ${cfg.cyclomatic_complexity || 'N/A'}`);
+              lines.push(`Blocks: ${cfg.num_blocks || "N/A"}`);
+              lines.push(`Cyclomatic: ${cfg.cyclomatic_complexity || "N/A"}`);
               if (cfg.blocks && Array.isArray(cfg.blocks)) {
                 for (const b of cfg.blocks.slice(0, 8)) {
-                  lines.push(`  Block ${b.id}: lines ${b.start_line}-${b.end_line} (${b.block_type})`);
+                  lines.push(
+                    `  Block ${b.id}: lines ${b.start_line}-${b.end_line} (${b.block_type})`,
+                  );
                 }
               }
-              results.push(lines.join('\n'));
+              results.push(lines.join("\n"));
             }
           }
           break;
         }
 
-        case 'dfg': {
+        case "dfg": {
           // Use daemon dfg command
-          const funcForDfg = entryPoint.split('.').pop() || entryPoint;
+          const funcForDfg = entryPoint.split(".").pop() || entryPoint;
           const searchResp = queryDaemonSync(
-            { cmd: 'search', pattern: `def ${funcForDfg}` },
-            projectPath
+            { cmd: "search", pattern: `def ${funcForDfg}` },
+            projectPath,
           );
           if (searchResp.results && searchResp.results.length > 0) {
             const file = searchResp.results[0].file;
             const dfgResp = queryDaemonSync(
-              { cmd: 'dfg', file, function: funcForDfg, language },
-              projectPath
+              { cmd: "dfg", file, function: funcForDfg, language },
+              projectPath,
             );
-            if (dfgResp.status === 'ok' && dfgResp.result) {
+            if (dfgResp.status === "ok" && dfgResp.result) {
               const dfg = dfgResp.result;
               const varTarget = varName || entryPoint;
               const lines: string[] = [`## DFG: ${varTarget} in ${funcForDfg}`];
               if (dfg.definitions && Array.isArray(dfg.definitions)) {
-                lines.push('Definitions:');
+                lines.push("Definitions:");
                 for (const d of dfg.definitions.slice(0, 10)) {
                   lines.push(`  ${d.var_name} @ line ${d.line}`);
                 }
               }
               if (dfg.uses && Array.isArray(dfg.uses)) {
-                lines.push('Uses:');
+                lines.push("Uses:");
                 for (const u of dfg.uses.slice(0, 8)) {
                   lines.push(`  ${u.var_name} @ line ${u.line}`);
                 }
               }
-              results.push(lines.join('\n'));
+              results.push(lines.join("\n"));
             }
           }
           break;
         }
 
-        case 'pdg': {
+        case "pdg": {
           // Use daemon slice command for PDG
-          const targetLine = lineNumber || 10;  // Default to line 10 if no line specified
+          const targetLine = lineNumber || 10; // Default to line 10 if no line specified
           const searchResp = queryDaemonSync(
-            { cmd: 'search', pattern: `def ${entryPoint}` },
-            projectPath
+            { cmd: "search", pattern: `def ${entryPoint}` },
+            projectPath,
           );
           if (searchResp.results && searchResp.results.length > 0) {
             const file = searchResp.results[0].file;
             const sliceResp = queryDaemonSync(
-              { cmd: 'slice', file, function: entryPoint, line: targetLine, direction: 'backward' },
-              projectPath
+              {
+                cmd: "slice",
+                file,
+                function: entryPoint,
+                line: targetLine,
+                direction: "backward",
+              },
+              projectPath,
             );
-            if (sliceResp.status === 'ok' && sliceResp.result) {
+            if (sliceResp.status === "ok" && sliceResp.result) {
               const slice = sliceResp.result;
-              const lines: string[] = [`## PDG Slice: ${entryPoint} @ line ${targetLine}`];
+              const lines: string[] = [
+                `## PDG Slice: ${entryPoint} @ line ${targetLine}`,
+              ];
               if (slice.lines && Array.isArray(slice.lines)) {
                 lines.push(`Slice lines: ${slice.lines.length}`);
                 for (const ln of slice.lines.slice(0, 15)) {
@@ -349,21 +411,21 @@ function getTldrContext(
                 }
               }
               if (slice.variables && Array.isArray(slice.variables)) {
-                lines.push(`Variables: ${slice.variables.join(', ')}`);
+                lines.push(`Variables: ${slice.variables.join(", ")}`);
               }
-              results.push(lines.join('\n'));
+              results.push(lines.join("\n"));
             }
           }
           break;
         }
 
-        case 'ast': {
+        case "ast": {
           // Use daemon structure command
           const structResp = queryDaemonSync(
-            { cmd: 'structure', language, max_results: 20 },
-            projectPath
+            { cmd: "structure", language, max_results: 20 },
+            projectPath,
           );
-          if (structResp.status === 'ok' && structResp.result) {
+          if (structResp.status === "ok" && structResp.result) {
             const struct = structResp.result;
             const lines: string[] = [`## Structure Overview`];
             if (struct.files && Array.isArray(struct.files)) {
@@ -381,14 +443,14 @@ function getTldrContext(
                 }
               }
             }
-            results.push(lines.join('\n'));
+            results.push(lines.join("\n"));
           }
           break;
         }
       }
     }
 
-    return results.length > 0 ? results.join('\n\n') : null;
+    return results.length > 0 ? results.join("\n\n") : null;
   } catch {
     return null;
   }
@@ -397,9 +459,15 @@ function getTldrContext(
 // Find project root
 function findProjectRoot(startPath: string): string {
   let current = startPath;
-  const markers = ['.git', 'pyproject.toml', 'package.json', 'Cargo.toml', 'go.mod'];
+  const markers = [
+    ".git",
+    "pyproject.toml",
+    "package.json",
+    "Cargo.toml",
+    "go.mod",
+  ];
 
-  while (current !== '/') {
+  while (current !== "/") {
     for (const marker of markers) {
       if (existsSync(join(current, marker))) {
         return current;
@@ -411,24 +479,28 @@ function findProjectRoot(startPath: string): string {
 }
 
 function readStdin(): string {
-  return readFileSync(0, 'utf-8');
+  return readFileSync(0, "utf-8");
 }
 
 async function main() {
   const input: HookInput = JSON.parse(readStdin());
 
-  if (input.tool_name !== 'Task') {
-    console.log('{}');
+  if (input.tool_name !== "Task") {
+    console.log("{}");
     return;
   }
 
-  const prompt = input.tool_input.prompt || '';
-  const description = input.tool_input.description || '';
+  const prompt = input.tool_input.prompt || "";
+  const description = input.tool_input.description || "";
   const fullText = `${prompt} ${description}`;
 
   // Skip if already has TLDR context
-  if (prompt.includes('## Code Context:') || prompt.includes('## CFG:') || prompt.includes('## DFG:')) {
-    console.log('{}');
+  if (
+    prompt.includes("## Code Context:") ||
+    prompt.includes("## CFG:") ||
+    prompt.includes("## DFG:")
+  ) {
+    console.log("{}");
     return;
   }
 
@@ -441,7 +513,7 @@ async function main() {
   const varName = extractVariableName(fullText);
 
   if (entryPoints.length === 0 && !varName && !lineNumber) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
@@ -454,7 +526,14 @@ async function main() {
   let usedTarget: string = varName || entryPoints[0] || `line ${lineNumber}`;
 
   for (const entryPoint of entryPoints.slice(0, 3)) {
-    tldrContext = getTldrContext(projectRoot, entryPoint, language, layers, lineNumber, varName);
+    tldrContext = getTldrContext(
+      projectRoot,
+      entryPoint,
+      language,
+      layers,
+      lineNumber,
+      varName,
+    );
     if (tldrContext) {
       usedTarget = entryPoint;
       break;
@@ -463,16 +542,23 @@ async function main() {
 
   // Fallback: try with varName if we have it
   if (!tldrContext && varName) {
-    tldrContext = getTldrContext(projectRoot, varName, language, layers, lineNumber, varName);
+    tldrContext = getTldrContext(
+      projectRoot,
+      varName,
+      language,
+      layers,
+      lineNumber,
+      varName,
+    );
   }
 
   if (!tldrContext) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
   // Inject context
-  const enhancedPrompt = `## TLDR Context (${intentDesc}: ${layers.join('+')})
+  const enhancedPrompt = `## TLDR Context (${intentDesc}: ${layers.join("+")})
 
 ${tldrContext}
 
@@ -482,18 +568,18 @@ ${prompt}`;
 
   const output: HookOutput = {
     hookSpecificOutput: {
-      hookEventName: 'PreToolUse',
-      permissionDecision: 'allow',
-      permissionDecisionReason: `Injected ${layers.join('+')} context for: ${usedTarget}`,
+      hookEventName: "PreToolUse",
+      permissionDecision: "allow",
+      permissionDecisionReason: `Injected ${layers.join("+")} context for: ${usedTarget}`,
       updatedInput: {
         ...input.tool_input,
         prompt: enhancedPrompt,
-      }
-    }
+      },
+    },
   };
 
   // Track hook activity for flush threshold
-  trackHookActivitySync('tldr-context-inject', projectRoot, true, {
+  trackHookActivitySync("tldr-context-inject", projectRoot, true, {
     context_injected: 1,
     layers_used: layers.length,
   });
@@ -503,5 +589,5 @@ ${prompt}`;
 
 main().catch((err) => {
   console.error(`TLDR hook error: ${err.message}`);
-  console.log('{}');
+  console.log("{}");
 });

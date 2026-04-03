@@ -56,13 +56,12 @@ To create a new MCP chain script and wrap it as a skill:
 Copy the multi-tool-pipeline template:
 
 ```bash
-cp $CLAUDE_OPC_DIR/scripts/multi_tool_pipeline.py $CLAUDE_PROJECT_DIR/scripts/my_pipeline.py
+cp $CLAUDE_OPC_DIR/scripts/multi_tool_pipeline.py $CLAUDE_CC_DIR/scripts/my_pipeline.py
 ```
 
 Reference the template pattern:
 
 ```bash
-cat $CLAUDE_CC_DIR/.claude/skills/multi-tool-pipeline/SKILL.md
 cat $CLAUDE_OPC_DIR/scripts/multi_tool_pipeline.py
 ```
 
@@ -96,6 +95,7 @@ allowed-tools: [Bash, Read]
 # My Pipeline Skill
 
 ## When to Use
+
 - [Trigger conditions]
 
 ## Instructions
@@ -107,9 +107,11 @@ uv run python -m runtime.harness scripts/my_pipeline.py --arg1 "value"
 \`\`\`
 
 ### Parameters
+
 - `--arg1`: Description
 
 ## MCP Servers Required
+
 - server1: For tool1
 - server2: For tool2
 ```
@@ -140,8 +142,8 @@ Add to `.claude/skills/skill-rules.json`:
 For full details, read:
 
 ```bash
-cat $CLAUDE_CC_DIR/.claude/rules/skill-development.md
-cat $CLAUDE_CC_DIR/.claude/rules/mcp-scripts.md
+cat $CLAUDE_CC_DIR/.claude/skills/skill-development/SKILL.md
+cat $CLAUDE_CC_DIR/.claude/skills/mcp-scripts/SKILL.md
 ```
 
 ## Quick Checklist

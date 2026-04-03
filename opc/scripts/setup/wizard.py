@@ -38,7 +38,8 @@ try:
 
     console = Console()
 except ImportError:
-    rich_escape = lambda x: x  # No escaping needed without Rich
+    def rich_escape(x):
+        return x  # No escaping needed without Rich
 
     # Fallback for minimal environments
     class Console:
@@ -136,7 +137,7 @@ async def check_container_runtime() -> dict[str, Any]:
             result = sock.connect_ex((host, port))
             sock.close()
             return result == 0
-        except (socket.timeout, OSError):
+        except (TimeoutError, OSError):
             return False
 
     # Try Docker first (most common)
@@ -684,7 +685,7 @@ async def run_setup_wizard() -> None:
     # Step 5: Container stack (Sandbox Infrastructure)
     # Skip if using embedded PostgreSQL or SQLite
     runtime = prereqs.get("container_runtime", "docker")
-    console.print(f"\n[bold]Step 6/13: Container Stack (Sandbox Infrastructure)[/bold]")
+    console.print("\n[bold]Step 6/13: Container Stack (Sandbox Infrastructure)[/bold]")
 
     if db_mode == "embedded":
         console.print("  [dim]Skipped - using embedded PostgreSQL (no Docker needed)[/dim]")
@@ -702,7 +703,7 @@ async def run_setup_wizard() -> None:
         set_container_runtime(runtime)
 
         console.print(
-            f"  [dim]Starting containers (first run downloads ~500MB, may take a few minutes)...[/dim]"
+            "  [dim]Starting containers (first run downloads ~500MB, may take a few minutes)...[/dim]"
         )
         result = await start_docker_stack(env_file=env_path)
         if result["success"]:
@@ -1448,7 +1449,7 @@ async def run_setup_wizard() -> None:
                     if result.returncode == 0:
                         console.print("  [green]OK[/green] Loogle built")
                     else:
-                        console.print(f"  [red]ERROR[/red] Build failed")
+                        console.print("  [red]ERROR[/red] Build failed")
                         console.print(f"       {result.stderr[:200]}")
                         console.print(
                             "  You can build manually: cd ~/.local/share/loogle && lake build"
@@ -1484,10 +1485,10 @@ async def run_setup_wizard() -> None:
                 else:
                     console.print(f"  [dim]LOOGLE_HOME already in {shell_config.name}[/dim]")
             elif sys.platform == "win32":
-                console.print(f"  [yellow]NOTE[/yellow] Add to your environment:")
+                console.print("  [yellow]NOTE[/yellow] Add to your environment:")
                 console.print(f"       set LOOGLE_HOME={loogle_home}")
             else:
-                console.print(f"  [yellow]NOTE[/yellow] Add to your shell config:")
+                console.print("  [yellow]NOTE[/yellow] Add to your shell config:")
                 console.print(f'       export LOOGLE_HOME="{loogle_home}"')
 
             # Install loogle-search script
@@ -1507,7 +1508,7 @@ async def run_setup_wizard() -> None:
                     dst_server = bin_dir / "loogle-server"
                     shutil.copy(src_server, dst_server)
                     dst_server.chmod(0o755)
-                    console.print(f"  [green]OK[/green] Installed loogle-server")
+                    console.print("  [green]OK[/green] Installed loogle-server")
             else:
                 console.print(f"  [yellow]WARN[/yellow] loogle_search.py not found at {src_script}")
 
@@ -1533,11 +1534,11 @@ async def run_setup_wizard() -> None:
 async def run_uninstall_wizard() -> None:
     """Run the uninstall wizard to remove OPC and restore backup."""
     from scripts.setup.claude_integration import (
+        PRESERVE_DIRS,
+        PRESERVE_FILES,
         find_latest_backup,
         get_global_claude_dir,
         uninstall_opc_integration,
-        PRESERVE_FILES,
-        PRESERVE_DIRS,
     )
 
     console.print(

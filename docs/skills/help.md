@@ -31,18 +31,19 @@ When you run `/help` without arguments, Claude asks what you're trying to accomp
 
 Pass a topic to get focused documentation:
 
-| Argument | Shows |
-|----------|-------|
+| Argument    | Shows                                                            |
+| ----------- | ---------------------------------------------------------------- |
 | `workflows` | All workflow skills (/fix, /build, /tdd, etc.) with agent chains |
-| `agents` | Full agent catalog organized by purpose |
-| `tools` | CLI tools: tldr, /prove, memory system, /premortem |
-| `hooks` | Active hooks by lifecycle event |
-| `advanced` | Skill/agent frontmatter, MCP servers, rules, customization |
-| `<name>` | Deep dive on any specific skill or agent |
+| `agents`    | Full agent catalog organized by purpose                          |
+| `tools`     | CLI tools: tldr, /prove, memory system, /premortem               |
+| `hooks`     | Active hooks by lifecycle event                                  |
+| `advanced`  | Skill/agent frontmatter, MCP servers, rules, customization       |
+| `<name>`    | Deep dive on any specific skill or agent                         |
 
 ## Examples
 
 ### Find the right workflow
+
 ```
 User: /help
 Claude: What are you trying to do?
@@ -58,6 +59,7 @@ Claude: For performance optimization, consider:
 ```
 
 ### Learn about a specific agent
+
 ```
 User: /help kraken
 
@@ -80,6 +82,7 @@ Claude: ## kraken - TDD Implementation Agent
 ```
 
 ### Discover available hooks
+
 ```
 User: /help hooks
 
@@ -105,6 +108,7 @@ This workspace has 136+ skills, 31 agents, and 25+ hooks. Without discoverabilit
 3. **Onboarding friction** - New users don't know where to start
 
 The `/help` skill solves this by:
+
 - **Guiding by goal** rather than listing all options
 - **Progressive disclosure** - overview first, details on demand
 - **Dynamic content** - reads frontmatter so it stays current

@@ -12,40 +12,45 @@
  *
  * Fire-and-forget style - latency is minimal since hooks run in parallel.
  */
-import { readFileSync } from 'fs';
-import { spawnSync } from 'child_process';
-import { join } from 'path';
+import { readFileSync } from "fs";
+import { spawnSync } from "child_process";
+import { join } from "path";
 /**
  * Check if we should broadcast (only for agents, not main session)
  */
 function shouldBroadcast() {
-    const depthLevel = parseInt(process.env.DEPTH_LEVEL || '0', 10);
-    const agentId = process.env.AGENT_ID;
-    // Only broadcast for agents (depth > 0) with an ID
-    return depthLevel > 0 && !!agentId;
+  const depthLevel = parseInt(process.env.DEPTH_LEVEL || "0", 10);
+  const agentId = process.env.AGENT_ID;
+  // Only broadcast for agents (depth > 0) with an ID
+  return depthLevel > 0 && !!agentId;
 }
 /**
  * Extract todos from TodoWrite tool input
  */
 function extractTodos(input) {
-    if (input.tool_name !== 'TodoWrite') {
-        return null;
-    }
-    const todos = input.tool_input?.todos;
-    if (Array.isArray(todos)) {
-        return todos;
-    }
+  if (input.tool_name !== "TodoWrite") {
     return null;
+  }
+  const todos = input.tool_input?.todos;
+  if (Array.isArray(todos)) {
+    return todos;
+  }
+  return null;
 }
 /**
  * Broadcast state to PostgreSQL via Python script
  */
 function broadcastState(agentId, toolName, todos) {
-    const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-    const scriptPath = join(projectDir, 'scripts', 'agentica_patterns', 'agent_state_broadcast.py');
-    const now = new Date().toISOString();
-    // Build Python script to call broadcast_state
-    const pythonScript = `
+  const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  const scriptPath = join(
+    projectDir,
+    "scripts",
+    "agentica_patterns",
+    "agent_state_broadcast.py",
+  );
+  const now = new Date().toISOString();
+  // Build Python script to call broadcast_state
+  const pythonScript = `
 import asyncio
 import json
 import sys
@@ -70,50 +75,52 @@ async def main():
 
 asyncio.run(main())
 `;
-    const todosJson = todos ? JSON.stringify(todos) : 'null';
-    // Fire-and-forget - use spawnSync with short timeout
-    // We don't wait for the result since hooks run in parallel
-    try {
-        spawnSync('python3', ['-c', pythonScript, agentId, toolName, now, todosJson], {
-            encoding: 'utf-8',
-            timeout: 5000, // 5 second timeout
-            maxBuffer: 1024 * 64
-        });
-    }
-    catch {
-        // Silently ignore errors - fire-and-forget
-    }
+  const todosJson = todos ? JSON.stringify(todos) : "null";
+  // Fire-and-forget - use spawnSync with short timeout
+  // We don't wait for the result since hooks run in parallel
+  try {
+    spawnSync(
+      "python3",
+      ["-c", pythonScript, agentId, toolName, now, todosJson],
+      {
+        encoding: "utf-8",
+        timeout: 5000, // 5 second timeout
+        maxBuffer: 1024 * 64,
+      },
+    );
+  } catch {
+    // Silently ignore errors - fire-and-forget
+  }
 }
 async function main() {
-    let input;
-    try {
-        const rawInput = readFileSync(0, 'utf-8');
-        input = JSON.parse(rawInput);
-    }
-    catch {
-        // Malformed input - return continue
-        console.log(JSON.stringify({ result: 'continue' }));
-        return;
-    }
-    // Early exit if not an agent
-    if (!shouldBroadcast()) {
-        console.log(JSON.stringify({ result: 'continue' }));
-        return;
-    }
-    const agentId = process.env.AGENT_ID;
-    if (!agentId) {
-        console.log(JSON.stringify({ result: 'continue' }));
-        return;
-    }
-    // Extract todos if TodoWrite
-    const todos = extractTodos(input);
-    // Broadcast state (fire-and-forget)
-    broadcastState(agentId, input.tool_name, todos);
-    // Always continue - never block
-    const output = { result: 'continue' };
-    console.log(JSON.stringify(output));
+  let input;
+  try {
+    const rawInput = readFileSync(0, "utf-8");
+    input = JSON.parse(rawInput);
+  } catch {
+    // Malformed input - return continue
+    console.log(JSON.stringify({ result: "continue" }));
+    return;
+  }
+  // Early exit if not an agent
+  if (!shouldBroadcast()) {
+    console.log(JSON.stringify({ result: "continue" }));
+    return;
+  }
+  const agentId = process.env.AGENT_ID;
+  if (!agentId) {
+    console.log(JSON.stringify({ result: "continue" }));
+    return;
+  }
+  // Extract todos if TodoWrite
+  const todos = extractTodos(input);
+  // Broadcast state (fire-and-forget)
+  broadcastState(agentId, input.tool_name, todos);
+  // Always continue - never block
+  const output = { result: "continue" };
+  console.log(JSON.stringify(output));
 }
 main().catch(() => {
-    // Always return continue on error
-    console.log(JSON.stringify({ result: 'continue' }));
+  // Always return continue on error
+  console.log(JSON.stringify({ result: "continue" }));
 });

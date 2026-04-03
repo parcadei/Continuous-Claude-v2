@@ -5,8 +5,8 @@
  * Triggers automatic semantic re-indexing when threshold is reached.
  */
 
-import { readFileSync } from 'fs';
-import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
+import { readFileSync } from "fs";
+import { queryDaemonSync, trackHookActivitySync } from "./daemon-client.js";
 
 interface HookInput {
   tool_name: string;
@@ -26,17 +26,17 @@ interface HookOutput {
 }
 
 async function main() {
-  const input: HookInput = JSON.parse(readFileSync(0, 'utf-8'));
+  const input: HookInput = JSON.parse(readFileSync(0, "utf-8"));
 
   // Only notify on successful Edit operations
-  if (input.tool_name !== 'Edit' && input.tool_name !== 'Write') {
-    console.log('{}');
+  if (input.tool_name !== "Edit" && input.tool_name !== "Write") {
+    console.log("{}");
     return;
   }
 
   const filePath = input.tool_input?.file_path;
   if (!filePath) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
@@ -44,12 +44,12 @@ async function main() {
   try {
     const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
     const response = queryDaemonSync(
-      { cmd: 'notify', file: filePath },
-      projectDir
+      { cmd: "notify", file: filePath },
+      projectDir,
     );
 
     // Track hook activity for flush threshold
-    trackHookActivitySync('post-edit-notify', projectDir, true, {
+    trackHookActivitySync("post-edit-notify", projectDir, true, {
       edits_notified: 1,
       reindexes_triggered: response.reindex_triggered ? 1 : 0,
     });
@@ -58,9 +58,9 @@ async function main() {
     if (response.reindex_triggered) {
       const output: HookOutput = {
         hookSpecificOutput: {
-          hookEventName: 'PostToolUse',
-          additionalContext: `[Semantic reindex triggered: ${response.dirty_count}/${response.threshold} files changed]`
-        }
+          hookEventName: "PostToolUse",
+          additionalContext: `[Semantic reindex triggered: ${response.dirty_count}/${response.threshold} files changed]`,
+        },
       };
       console.log(JSON.stringify(output));
       return;
@@ -69,7 +69,7 @@ async function main() {
     // Daemon not running - silently ignore
   }
 
-  console.log('{}');
+  console.log("{}");
 }
 
-main().catch(() => console.log('{}'));
+main().catch(() => console.log("{}"));

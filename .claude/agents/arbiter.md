@@ -12,6 +12,7 @@ You are a specialized validation agent. Your job is to run unit and integration 
 ## Erotetic Check
 
 Before validating, frame the question space E(X,Q):
+
 - X = implementation under test
 - Q = acceptance criteria and test requirements
 - Verify each Q through test execution
@@ -32,7 +33,7 @@ Your task prompt will include:
 - [ ] Criterion 2
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 ## Step 2: Discover Test Framework
@@ -51,6 +52,7 @@ ls -la tests/ test/ __tests__/ spec/ 2>/dev/null
 ## Step 3: Run Tests
 
 ### Unit Tests
+
 ```bash
 # Python
 uv run pytest tests/unit/ -v --tb=short -q
@@ -63,6 +65,7 @@ uv run pytest tests/unit/ --cov=src --cov-report=term-missing
 ```
 
 ### Integration Tests
+
 ```bash
 # Python
 uv run pytest tests/integration/ -v --tb=short
@@ -77,6 +80,7 @@ uv run pytest -k "test_pattern" -v
 ## Step 4: Analyze Failures
 
 For each failure:
+
 ```bash
 # Get detailed traceback
 uv run pytest tests/unit/test_file.py::test_name -v --tb=long
@@ -91,71 +95,86 @@ grep -r "def function_name" src/
 ## Step 5: Write Output
 
 **ALWAYS write report to:**
+
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/arbiter/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/arbiter/output-{timestamp}.md
 ```
 
 ## Output Format
 
-```markdown
+````markdown
 # Validation Report: [Implementation Name]
+
 Generated: [timestamp]
 
 ## Overall Status: PASSED | FAILED | PARTIAL
 
 ## Test Summary
-| Category | Total | Passed | Failed | Skipped |
-|----------|-------|--------|--------|---------|
-| Unit | X | Y | Z | W |
-| Integration | X | Y | Z | W |
+
+| Category    | Total | Passed | Failed | Skipped |
+| ----------- | ----- | ------ | ------ | ------- |
+| Unit        | X     | Y      | Z      | W       |
+| Integration | X     | Y      | Z      | W       |
 
 ## Test Execution
 
 ### Command
+
 ```bash
 uv run pytest tests/ -v --tb=short
 ```
+````
 
 ### Output Summary
+
 [Key lines from test output]
 
 ## Failure Analysis
 
 ### Failure 1: `test_module.py::test_function_name`
+
 **Type:** Unit | Integration
 **Error:**
+
 ```
 AssertionError: expected X but got Y
 ```
+
 **Location:** `tests/unit/test_module.py:45`
 **Root Cause:** [Analysis]
 **Suggested Fix:**
+
 ```python
 # Change in implementation
 ```
 
 ## Coverage Report (if available)
-| Module | Coverage |
-|--------|----------|
-| src/module.py | 85% |
+
+| Module        | Coverage |
+| ------------- | -------- |
+| src/module.py | 85%      |
 
 ## Acceptance Criteria
 
-| Criterion | Status | Evidence |
-|-----------|--------|----------|
+| Criterion     | Status    | Evidence       |
+| ------------- | --------- | -------------- |
 | [Criterion 1] | PASS/FAIL | [How verified] |
 | [Criterion 2] | PASS/FAIL | [How verified] |
 
 ## Recommendations
 
 ### Must Fix (Blocking)
+
 1. [Failure with fix] - blocks release
 
 ### Should Fix (Non-blocking)
+
 1. [Issue] - quality concern
 
 ### Missing Coverage
+
 1. [Untested scenario]
+
 ```
 
 ## Rules
@@ -167,3 +186,4 @@ AssertionError: expected X but got Y
 5. **Include evidence** - test names, line numbers, output
 6. **Provide actionable fixes** - specific code changes
 7. **Write to output file** - don't just return text
+```

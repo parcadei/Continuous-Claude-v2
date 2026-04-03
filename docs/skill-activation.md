@@ -34,12 +34,13 @@ ACTION: Use Task tool with agent for exploration
 
 The skill activation system uses two matching strategies:
 
-| Strategy | What It Matches | Confidence |
-|----------|----------------|------------|
-| **Keywords** | Simple words like "fix", "debug", "broken" | Medium (validated to reduce false positives) |
-| **Intent Patterns** | Regex patterns like `"fix.*?(bug\|error\|issue)"` | High (strong signal) |
+| Strategy            | What It Matches                                   | Confidence                                   |
+| ------------------- | ------------------------------------------------- | -------------------------------------------- |
+| **Keywords**        | Simple words like "fix", "debug", "broken"        | Medium (validated to reduce false positives) |
+| **Intent Patterns** | Regex patterns like `"fix.*?(bug\|error\|issue)"` | High (strong signal)                         |
 
 **Priority Levels:**
+
 - ⚠️ **CRITICAL** - Must use (e.g., handoffs before ending session)
 - 📚 **RECOMMENDED** - Should use (e.g., workflow skills)
 - 💡 **SUGGESTED** - Consider using (e.g., optimization tools)
@@ -70,58 +71,63 @@ This reduces false positives by 80% compared to naive keyword matching.
 
 When your context usage hits thresholds, you'll see tiered warnings:
 
-| Context % | Warning Level | Action |
-|-----------|--------------|--------|
-| 70-79% | Notice | "Consider handoff when you reach a stopping point" |
-| 80-89% | Warning | "Recommend: /create_handoff then /clear soon" |
-| 90%+ | **CRITICAL** | "Run /create_handoff NOW before auto-compact!" |
+| Context % | Warning Level | Action                                             |
+| --------- | ------------- | -------------------------------------------------- |
+| 70-79%    | Notice        | "Consider handoff when you reach a stopping point" |
+| 80-89%    | Warning       | "Recommend: /create_handoff then /clear soon"      |
+| 90%+      | **CRITICAL**  | "Run /create_handoff NOW before auto-compact!"     |
 
 These ensure you preserve state before Claude Code's automatic compaction.
 
 ## Natural Language Examples
 
-| What You Say | What Activates |
-|--------------|----------------|
-| "Fix the broken login" | `/fix` workflow → debug-agent, scout |
-| "Build a user dashboard" | `/build` workflow → plan-agent, kraken |
-| "I want to understand this codebase" | `/explore` + scout agent |
-| "What could go wrong with this plan?" | `/premortem` |
-| "Help me figure out what I need" | `/discovery-interview` |
-| "Done for today" | `create_handoff` (critical) |
-| "Resume where we left off" | `resume_handoff` |
-| "Research auth patterns" | oracle agent + nia/perplexity |
-| "How does this function work?" | tldr-code → call graph, CFG, DFG |
-| "Find all usages of this API" | scout agent + ast-grep |
-| "Run all tests" | `/test` workflow → arbiter |
-| "Check code quality" | `qlty-check` |
-| "Search for 'TODO'" | morph-search (20x faster than grep) |
-| "Refactor this module" | `/refactor` workflow |
-| "Ready to release" | `/release` workflow → security, E2E, docs |
+| What You Say                          | What Activates                            |
+| ------------------------------------- | ----------------------------------------- |
+| "Fix the broken login"                | `/fix` workflow → debug-agent, scout      |
+| "Build a user dashboard"              | `/build` workflow → plan-agent, kraken    |
+| "I want to understand this codebase"  | `/explore` + scout agent                  |
+| "What could go wrong with this plan?" | `/premortem`                              |
+| "Help me figure out what I need"      | `/discovery-interview`                    |
+| "Done for today"                      | `create_handoff` (critical)               |
+| "Resume where we left off"            | `resume_handoff`                          |
+| "Research auth patterns"              | oracle agent + nia/perplexity             |
+| "How does this function work?"        | tldr-code → call graph, CFG, DFG          |
+| "Find all usages of this API"         | scout agent + ast-grep                    |
+| "Run all tests"                       | `/test` workflow → arbiter                |
+| "Check code quality"                  | `qlty-check`                              |
+| "Search for 'TODO'"                   | morph-search (20x faster than grep)       |
+| "Refactor this module"                | `/refactor` workflow                      |
+| "Ready to release"                    | `/release` workflow → security, E2E, docs |
 
 ## Why This Approach?
 
 ### More Discoverable
+
 You don't need to know that `/premortem` exists. Just say "what could go wrong?" and the system suggests it.
 
 ### Context-Aware
+
 The system knows when you're 90% through context and **blocks** to require a handoff. Guardrails prevent state loss.
 
 ### Reduces Cognitive Load
+
 Instead of remembering 109 skills:
+
 - Describe intent naturally
 - Get curated suggestions
 - Confirm or adjust
 
 ### Still Supports Power Users
+
 You can still type `/fix`, `/build`, etc. directly. The system recognizes both patterns.
 
 ## Skill vs Workflow vs Agent
 
-| Type | Purpose | Example |
-|------|---------|---------|
-| **Skill** | Single-purpose tool or reference | `commit`, `tldr-code`, `qlty-check` |
-| **Workflow** | Multi-step process | `/fix` (scout → premortem → spark → arbiter) |
-| **Agent** | Specialized sub-session | scout (exploration), oracle (research), kraken (implementation) |
+| Type         | Purpose                          | Example                                                         |
+| ------------ | -------------------------------- | --------------------------------------------------------------- |
+| **Skill**    | Single-purpose tool or reference | `commit`, `tldr-code`, `qlty-check`                             |
+| **Workflow** | Multi-step process               | `/fix` (scout → premortem → spark → arbiter)                    |
+| **Agent**    | Specialized sub-session          | scout (exploration), oracle (research), kraken (implementation) |
 
 The activation system suggests all three based on your intent.
 
@@ -190,18 +196,18 @@ This helps choose the right orchestration strategy for multi-agent workflows.
 
 You can adjust enforcement levels in `skill-rules.json`:
 
-| Enforcement | Behavior |
-|-------------|----------|
-| `"block"` | Must use skill before proceeding (guardrail) |
-| `"suggest"` | Shows suggestion but doesn't block |
-| `"warn"` | Shows warning, allows proceeding |
+| Enforcement | Behavior                                     |
+| ----------- | -------------------------------------------- |
+| `"block"`   | Must use skill before proceeding (guardrail) |
+| `"suggest"` | Shows suggestion but doesn't block           |
+| `"warn"`    | Shows warning, allows proceeding             |
 
 Example: Make handoffs mandatory at 85% context instead of 90%:
 
 ```json
 {
   "create_handoff": {
-    "enforcement": "block",  // ← Changed from "suggest"
+    "enforcement": "block", // ← Changed from "suggest"
     "priority": "critical"
   }
 }

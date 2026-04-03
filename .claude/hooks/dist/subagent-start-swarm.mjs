@@ -20,9 +20,11 @@ async function main() {
   }
   const agentId = input.agent_id ?? "unknown";
   const agentType = input.agent_type ?? "unknown";
-  console.error(`[subagent-start] Agent ${agentId} (type: ${agentType}) joining swarm ${swarmId}`);
+  console.error(
+    `[subagent-start] Agent ${agentId} (type: ${agentType}) joining swarm ${swarmId}`,
+  );
   const output = {
-    result: "continue"
+    result: "continue",
   };
   console.log(JSON.stringify(output));
 }

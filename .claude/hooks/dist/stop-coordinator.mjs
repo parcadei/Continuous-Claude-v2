@@ -22,25 +22,25 @@ function getDbPath() {
     ".claude",
     "cache",
     "agentica-coordination",
-    "coordination.db"
+    "coordination.db",
   );
 }
 function runPythonQuery(script, args) {
   try {
     const result = spawnSync("python3", ["-c", script, ...args], {
       encoding: "utf-8",
-      maxBuffer: 1024 * 1024
+      maxBuffer: 1024 * 1024,
     });
     return {
       success: result.status === 0,
       stdout: result.stdout?.trim() || "",
-      stderr: result.stderr || ""
+      stderr: result.stderr || "",
     };
   } catch (err) {
     return {
       success: false,
       stdout: "",
-      stderr: String(err)
+      stderr: String(err),
     };
   }
 }
@@ -109,7 +109,7 @@ print(json.dumps({'done': done_count, 'total': total_count}))
       const waiting = counts.total - counts.done;
       return {
         result: "block",
-        message: `Waiting for ${waiting} agent(s) to complete. Synthesize results when all agents broadcast 'done'.`
+        message: `Waiting for ${waiting} agent(s) to complete. Synthesize results when all agents broadcast 'done'.`,
       };
     }
     return { result: "continue" };
@@ -188,7 +188,7 @@ print(json.dumps({'completed': completed_count, 'votes': votes}))
       const waiting = totalJurors - data.completed;
       return {
         result: "block",
-        message: `Waiting for ${waiting} juror(s) to complete their deliberations. All votes must be recorded before reaching a verdict.`
+        message: `Waiting for ${waiting} juror(s) to complete their deliberations. All votes must be recorded before reaching a verdict.`,
       };
     }
     let message = `All ${totalJurors} jurors have completed their deliberations.
@@ -202,7 +202,7 @@ print(json.dumps({'completed': completed_count, 'votes': votes}))
     message += "\nProvide your final verdict based on the consensus.";
     return {
       result: "continue",
-      message
+      message,
     };
   } catch (err) {
     console.error("Stop hook error:", err);
@@ -290,7 +290,7 @@ print(json.dumps({'completed': completed_count, 'total': total_count, 'specialis
       const waiting = data.total - data.completed;
       return {
         result: "block",
-        message: `Waiting for ${waiting} specialist(s) to complete their subtasks. All specialists must finish before synthesis.`
+        message: `Waiting for ${waiting} specialist(s) to complete their subtasks. All specialists must finish before synthesis.`,
       };
     }
     let message = `All ${data.total} specialists have completed their subtasks.
@@ -301,10 +301,11 @@ print(json.dumps({'completed': completed_count, 'total': total_count, 'specialis
       message += `- Specialist ${spec.agent_id} (level ${spec.level}): completed
 `;
     }
-    message += "\nSynthesize the specialist results into a comprehensive final answer.";
+    message +=
+      "\nSynthesize the specialist results into a comprehensive final answer.";
     return {
       result: "continue",
-      message
+      message,
     };
   } catch (err) {
     console.error("Stop hook error:", err);
@@ -388,13 +389,14 @@ print(json.dumps({
     if (data.approved) {
       return {
         result: "continue",
-        message: "Generator-Critic pattern complete: Output approved by critic."
+        message:
+          "Generator-Critic pattern complete: Output approved by critic.",
       };
     }
     if (iteration >= maxRounds) {
       return {
         result: "continue",
-        message: `Generator-Critic pattern complete: Max rounds (${maxRounds}) reached.`
+        message: `Generator-Critic pattern complete: Max rounds (${maxRounds}) reached.`,
       };
     }
     return { result: "continue" };
@@ -470,7 +472,8 @@ print(json.dumps(state))
     }
     let message = "BLACKBOARD PATTERN COMPLETION:\n\n";
     message += "All specialists have completed their contributions.\n";
-    message += "Review the final blackboard state below and determine if the solution is complete and coherent.\n\n";
+    message +=
+      "Review the final blackboard state below and determine if the solution is complete and coherent.\n\n";
     if (state.length === 0) {
       message += "(No state contributed yet)\n";
     } else {
@@ -485,7 +488,7 @@ ${item.key}: ${item.value}`;
     }
     return {
       result: "continue",
-      message
+      message,
     };
   } catch (err) {
     console.error("Stop hook error:", err);
@@ -559,16 +562,20 @@ print(json.dumps({'state': state, 'failure_count': failure_count, 'last_failure_
     message += `- Failure Count: ${data.failure_count}
 `;
     if (data.state === "open") {
-      message += "\nWARNING: Circuit is OPEN due to repeated failures. Fallback agent is being used.";
-      message += "\nThe circuit will automatically test the primary agent after the reset timeout.";
+      message +=
+        "\nWARNING: Circuit is OPEN due to repeated failures. Fallback agent is being used.";
+      message +=
+        "\nThe circuit will automatically test the primary agent after the reset timeout.";
     } else if (data.state === "half_open") {
-      message += "\nINFO: Circuit is in HALF-OPEN state, testing if primary agent has recovered.";
+      message +=
+        "\nINFO: Circuit is in HALF-OPEN state, testing if primary agent has recovered.";
     } else {
-      message += "\nINFO: Circuit is CLOSED, primary agent is operating normally.";
+      message +=
+        "\nINFO: Circuit is CLOSED, primary agent is operating normally.";
     }
     return {
       result: "continue",
-      message
+      message,
     };
   } catch (err) {
     console.error("Stop hook error:", err);
@@ -653,7 +660,7 @@ print(json.dumps({'completed': completed_count, 'results': results}))
       const waiting = totalMappers - data.completed;
       return {
         result: "block",
-        message: `Waiting for ${waiting} mapper(s) to complete. All mappers must finish before the reduce phase can begin.`
+        message: `Waiting for ${waiting} mapper(s) to complete. All mappers must finish before the reduce phase can begin.`,
       };
     }
     let message = `All ${totalMappers} mappers have completed their work.
@@ -668,7 +675,7 @@ print(json.dumps({'completed': completed_count, 'results': results}))
     message += "\nProceed with the reduce phase to synthesize these results.";
     return {
       result: "continue",
-      message
+      message,
     };
   } catch (err) {
     console.error("Stop hook error:", err);
@@ -743,7 +750,11 @@ print(json.dumps({'handlers': handlers}))
     let message = "CHAIN OF RESPONSIBILITY RESOLUTION:\n\n";
     let resolvedBy = null;
     for (const handler of data.handlers) {
-      const action = handler.handled ? "HANDLED" : handler.escalated ? "ESCALATED" : "PENDING";
+      const action = handler.handled
+        ? "HANDLED"
+        : handler.escalated
+          ? "ESCALATED"
+          : "PENDING";
       message += `- Handler ${handler.priority}: ${action}`;
       if (handler.agent_id && handler.agent_id !== "unknown") {
         message += ` (${handler.agent_id})`;
@@ -761,7 +772,7 @@ Request was successfully handled by Handler ${resolvedBy}.`;
     }
     return {
       result: "continue",
-      message
+      message,
     };
   } catch (err) {
     console.error("Stop hook error:", err);
@@ -855,7 +866,7 @@ print(json.dumps({
     }
     return {
       result: "continue",
-      message
+      message,
     };
   } catch (err) {
     console.error("Stop hook error:", err);
@@ -942,7 +953,7 @@ print(json.dumps({'rounds': rounds}))
       message += "\nProvide your final verdict.";
       return {
         result: "continue",
-        message
+        message,
       };
     }
     return { result: "continue" };
@@ -1022,12 +1033,15 @@ print(json.dumps({'stages': stages, 'completed': completed}))
     } catch (parseErr) {
       return { result: "continue" };
     }
-    const totalStages = parseInt(totalStagesStr || "0", 10) || pipelineData.stages.length;
-    const stageNames = pipelineData.stages.map((s) => s.name || `stage-${s.index}`).join(" -> ");
+    const totalStages =
+      parseInt(totalStagesStr || "0", 10) || pipelineData.stages.length;
+    const stageNames = pipelineData.stages
+      .map((s) => s.name || `stage-${s.index}`)
+      .join(" -> ");
     const completedCount = pipelineData.completed;
     return {
       result: "continue",
-      message: `Pipeline complete: ${completedCount}/${totalStages} stages. Stages: ${stageNames}`
+      message: `Pipeline complete: ${completedCount}/${totalStages} stages. Stages: ${stageNames}`,
     };
   } catch (err) {
     console.error("Pipeline Stop hook error:", err);

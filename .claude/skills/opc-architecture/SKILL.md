@@ -8,9 +8,14 @@ user-invocable: false
 
 OPC (Orchestrated Parallel Claude) extends Claude Code - it does NOT replace it.
 
+## When to Use
+
+This skill is invoked when understanding OPC architecture. Not user-invocable directly.
+
 ## Core Concept
 
 Claude Code CLI is the execution engine. OPC adds orchestration via:
+
 - **Hooks** - Intercept Claude Code events (PreToolUse, PostToolUse, SessionStart, etc.)
 - **Skills** - Load prompts into Claude Code
 - **Scripts** - Called by hooks/skills for coordination
@@ -19,6 +24,7 @@ Claude Code CLI is the execution engine. OPC adds orchestration via:
 ## How Agents Work
 
 When you spawn an agent:
+
 1. Main Claude Code instance (your terminal) runs hook on Task tool
 2. Hook calls `subprocess.Popen(["claude", "-p", "prompt"])`
 3. A NEW Claude Code instance spawns as child process

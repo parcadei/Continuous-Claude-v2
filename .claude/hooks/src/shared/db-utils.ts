@@ -11,13 +11,13 @@
  * - getActiveAgentCount(): Returns count of running agents (Phase 2: Resource Limits)
  */
 
-import { spawnSync } from 'child_process';
-import { existsSync } from 'fs';
-import { join } from 'path';
-import type { QueryResult } from './types.js';
+import { spawnSync } from "child_process";
+import { existsSync } from "fs";
+import { join } from "path";
+import type { QueryResult } from "./types.js";
 
 // Re-export SAFE_ID_PATTERN and isValidId from pattern-router for convenience
-export { SAFE_ID_PATTERN, isValidId } from './pattern-router.js';
+export { SAFE_ID_PATTERN, isValidId } from "./pattern-router.js";
 
 /**
  * Get the path to the coordination database.
@@ -29,8 +29,13 @@ export { SAFE_ID_PATTERN, isValidId } from './pattern-router.js';
  */
 export function getDbPath(): string {
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-  return join(projectDir, '.claude', 'cache',
-    'agentica-coordination', 'coordination.db');
+  return join(
+    projectDir,
+    ".claude",
+    "cache",
+    "agentica-coordination",
+    "coordination.db",
+  );
 }
 
 /**
@@ -46,13 +51,14 @@ export function getDbPath(): string {
  */
 export function queryDb(pythonQuery: string, args: string[]): string {
   // Use spawnSync with argument array to prevent command injection
-  const result = spawnSync('python3', ['-c', pythonQuery, ...args], {
-    encoding: 'utf-8',
-    maxBuffer: 1024 * 1024
+  const result = spawnSync("python3", ["-c", pythonQuery, ...args], {
+    encoding: "utf-8",
+    maxBuffer: 1024 * 1024,
   });
 
   if (result.status !== 0) {
-    const errorMsg = result.stderr || `Python exited with code ${result.status}`;
+    const errorMsg =
+      result.stderr || `Python exited with code ${result.status}`;
     throw new Error(`Python query failed: ${errorMsg}`);
   }
 
@@ -71,21 +77,21 @@ export function queryDb(pythonQuery: string, args: string[]): string {
  */
 export function runPythonQuery(script: string, args: string[]): QueryResult {
   try {
-    const result = spawnSync('python3', ['-c', script, ...args], {
-      encoding: 'utf-8',
-      maxBuffer: 1024 * 1024
+    const result = spawnSync("python3", ["-c", script, ...args], {
+      encoding: "utf-8",
+      maxBuffer: 1024 * 1024,
     });
 
     return {
       success: result.status === 0,
-      stdout: result.stdout?.trim() || '',
-      stderr: result.stderr || ''
+      stdout: result.stdout?.trim() || "",
+      stderr: result.stderr || "",
     };
   } catch (err) {
     return {
       success: false,
-      stdout: '',
-      stderr: String(err)
+      stdout: "",
+      stderr: String(err),
     };
   }
 }
@@ -107,13 +113,13 @@ export function registerAgent(
   agentId: string,
   sessionId: string,
   pattern: string | null = null,
-  pid: number | null = null
+  pid: number | null = null,
 ): { success: boolean; error?: string } {
   const dbPath = getDbPath();
 
   // Detect source: if AGENTICA_SERVER env var is set, it's from agentica
   // Otherwise it's from the CLI (Task tool)
-  const source = process.env.AGENTICA_SERVER ? 'agentica' : 'cli';
+  const source = process.env.AGENTICA_SERVER ? "agentica" : "cli";
 
   const pythonScript = `
 import sqlite3
@@ -186,17 +192,17 @@ except Exception as e:
     dbPath,
     agentId,
     sessionId,
-    pattern || 'null',
-    pid !== null ? String(pid) : 'null',
-    source
+    pattern || "null",
+    pid !== null ? String(pid) : "null",
+    source,
   ];
 
   const result = runPythonQuery(pythonScript, args);
 
-  if (!result.success || result.stdout !== 'ok') {
+  if (!result.success || result.stdout !== "ok") {
     return {
       success: false,
-      error: result.stderr || result.stdout || 'Unknown error'
+      error: result.stderr || result.stdout || "Unknown error",
     };
   }
 
@@ -215,8 +221,8 @@ except Exception as e:
  */
 export function completeAgent(
   agentId: string,
-  status: string = 'completed',
-  errorMessage: string | null = null
+  status: string = "completed",
+  errorMessage: string | null = null,
 ): { success: boolean; error?: string } {
   const dbPath = getDbPath();
 
@@ -267,19 +273,14 @@ except Exception as e:
     sys.exit(1)
 `;
 
-  const args = [
-    dbPath,
-    agentId,
-    status,
-    errorMessage || 'null'
-  ];
+  const args = [dbPath, agentId, status, errorMessage || "null"];
 
   const result = runPythonQuery(pythonScript, args);
 
-  if (!result.success || result.stdout !== 'ok') {
+  if (!result.success || result.stdout !== "ok") {
     return {
       success: false,
-      error: result.stderr || result.stdout || 'Unknown error'
+      error: result.stderr || result.stdout || "Unknown error",
     };
   }
 
@@ -369,7 +370,7 @@ except Exception as e:
     return false;
   }
 
-  return result.stdout.startsWith('swarm:');
+  return result.stdout.startsWith("swarm:");
 }
 
 /**

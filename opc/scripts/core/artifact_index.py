@@ -24,9 +24,10 @@ import json
 import os
 import re
 import sqlite3
-import yaml
 from datetime import datetime
 from pathlib import Path
+
+import yaml
 
 # Load .env files for DATABASE_URL (cross-platform)
 try:
@@ -208,7 +209,7 @@ class DatabaseConnection:
         if not match:
             return sql
 
-        table = match.group(1)
+        match.group(1)
         columns = [c.strip() for c in match.group(2).split(",")]
 
         # Build ON CONFLICT clause

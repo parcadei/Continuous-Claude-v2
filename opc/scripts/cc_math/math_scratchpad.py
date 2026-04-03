@@ -48,7 +48,7 @@ import json
 import os
 import re
 import sys
-from typing import Any, Dict, Optional
+from typing import Any
 
 # Import from existing scripts
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -369,7 +369,7 @@ def _verify_with_z3(step_text: str, context: dict[str, Any]) -> dict:
         }
 
 
-def _is_simple_assignment(step: str) -> tuple[bool, str | None, Optional[str]]:
+def _is_simple_assignment(step: str) -> tuple[bool, str | None, str | None]:
     """Check if step is a simple assignment like 'x = 2'.
 
     Returns:
@@ -713,8 +713,8 @@ def explain_step(step_text: str) -> dict:
         "integration": f"Power rule for integration: integral of x^n = x^(n+1)/(n+1). Applied to get {output_expr or 'result'}.",
         "factoring": "Factored expression using difference of squares or other factoring technique.",
         "substitution": "Substituted known values to verify equality.",
-        "simplification": f"Simplified using algebraic or trigonometric identity.",
-        "unknown": f"Could not determine the specific operation type.",
+        "simplification": "Simplified using algebraic or trigonometric identity.",
+        "unknown": "Could not determine the specific operation type.",
     }
 
     return {

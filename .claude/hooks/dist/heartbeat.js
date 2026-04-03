@@ -9,39 +9,40 @@
  * - File claims are only valid if the claiming session is alive
  * - Stale sessions (>10 min no heartbeat) get cleaned up
  */
-import { readFileSync } from 'fs';
-import { runPgQuery } from './shared/db-utils-pg.js';
+import { readFileSync } from "fs";
+import { runPgQuery } from "./shared/db-utils-pg.js";
 function getSessionId() {
-    return process.env.COORDINATION_SESSION_ID ||
-        process.env.BRAINTRUST_SPAN_ID?.slice(0, 8) ||
-        '';
+  return (
+    process.env.COORDINATION_SESSION_ID ||
+    process.env.BRAINTRUST_SPAN_ID?.slice(0, 8) ||
+    ""
+  );
 }
 function getProject() {
-    return process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  return process.env.CLAUDE_PROJECT_DIR || process.cwd();
 }
 function readStdin() {
-    try {
-        return readFileSync(0, 'utf-8');
-    }
-    catch {
-        return '{}';
-    }
+  try {
+    return readFileSync(0, "utf-8");
+  } catch {
+    return "{}";
+  }
 }
 export function main() {
-    // Skip if coordination not enabled (SQLite users)
-    if (process.env.CONTINUOUS_CLAUDE_COORDINATION !== 'true') {
-        console.log(JSON.stringify({ result: 'continue' }));
-        return;
-    }
-    const sessionId = getSessionId();
-    const project = getProject();
-    // Skip if no session ID (shouldn't happen, but be safe)
-    if (!sessionId) {
-        console.log(JSON.stringify({ result: 'continue' }));
-        return;
-    }
-    // Update heartbeat - single fast UPDATE query
-    const pythonCode = `
+  // Skip if coordination not enabled (SQLite users)
+  if (process.env.CONTINUOUS_CLAUDE_COORDINATION !== "true") {
+    console.log(JSON.stringify({ result: "continue" }));
+    return;
+  }
+  const sessionId = getSessionId();
+  const project = getProject();
+  // Skip if no session ID (shouldn't happen, but be safe)
+  if (!sessionId) {
+    console.log(JSON.stringify({ result: "continue" }));
+    return;
+  }
+  // Update heartbeat - single fast UPDATE query
+  const pythonCode = `
 import asyncpg
 import os
 
@@ -62,9 +63,9 @@ async def main():
 
 asyncio.run(main())
 `;
-    // Fire and forget - don't block on result
-    runPgQuery(pythonCode, [sessionId, project]);
-    // Always continue
-    console.log(JSON.stringify({ result: 'continue' }));
+  // Fire and forget - don't block on result
+  runPgQuery(pythonCode, [sessionId, project]);
+  // Always continue
+  console.log(JSON.stringify({ result: "continue" }));
 }
 main();

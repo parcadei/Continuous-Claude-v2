@@ -12,7 +12,6 @@ Use this skill when working on convergence problems in real analysis.
 
 ## Decision Tree
 
-
 1. **Identify Sequence/Series Type**
    - Geometric series: |r| < 1 converges
    - p-series: p > 1 converges
@@ -30,20 +29,22 @@ Use this skill when working on convergence problems in real analysis.
 4. **Compute Sum (if convergent)**
    - `sympy_compute.py sum "a_n" --var n --from 0 --to oo`
 
-
 ## Tool Commands
 
 ### Sympy_Limit
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py limit "a_n" --var n --at oo
 ```
 
 ### Sympy_Sum
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py sum "1/n**2" --var n --from 1 --to oo
 ```
 
 ### Z3_Prove
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "series_bounded"
 ```

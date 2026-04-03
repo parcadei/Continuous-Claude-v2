@@ -11,11 +11,9 @@ function main() {
   }
   console.error("multi-agent test hook fired");
   const output = {
-    result: "continue"
+    result: "continue",
   };
   console.log(JSON.stringify(output));
 }
 main();
-export {
-  main
-};
+export { main };

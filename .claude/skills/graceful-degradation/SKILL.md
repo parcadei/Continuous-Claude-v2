@@ -8,6 +8,10 @@ user-invocable: false
 
 When optional services are unavailable, degrade gracefully with actionable fallback messages.
 
+## When to Use
+
+This skill is invoked when handling optional service failures. Not user-invocable directly.
+
 ## Pattern
 
 Check availability at the start, cache the result, and provide helpful messages that explain what's missing and how to fix it.
@@ -42,8 +46,8 @@ async function checkLMStudio(): Promise<boolean> {
   }
 
   try {
-    const response = await fetch('http://localhost:1234/v1/models', {
-      signal: AbortSignal.timeout(2000)
+    const response = await fetch("http://localhost:1234/v1/models", {
+      signal: AbortSignal.timeout(2000),
     });
     lmstudioAvailable = response.ok;
   } catch {
@@ -54,9 +58,9 @@ async function checkLMStudio(): Promise<boolean> {
 }
 
 // Usage
-if (!await checkLMStudio()) {
+if (!(await checkLMStudio())) {
   return {
-    result: 'continue',
+    result: "continue",
     message: `LMStudio not available at localhost:1234.
 
 To enable Godel-Prover tactic suggestions:
@@ -64,7 +68,7 @@ To enable Godel-Prover tactic suggestions:
 2. Load "Goedel-Prover-V2-8B" model
 3. Start the local server on port 1234
 
-Continuing without AI-assisted tactics...`
+Continuing without AI-assisted tactics...`,
   };
 }
 ```

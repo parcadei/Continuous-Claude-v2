@@ -115,7 +115,6 @@ async def wait_for_services(
     start_time = asyncio.get_event_loop().time()
 
     while (asyncio.get_event_loop().time() - start_time) < timeout:
-        all_healthy = True
 
         for service in services:
             try:

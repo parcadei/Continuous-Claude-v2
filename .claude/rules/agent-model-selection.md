@@ -5,6 +5,7 @@
 ## When to use Haiku
 
 Only use `model: haiku` for truly mechanical tasks:
+
 - Simple file formatting
 - Single-file renames
 - Trivial string replacements

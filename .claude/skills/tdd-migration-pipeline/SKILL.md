@@ -32,6 +32,7 @@ Orchestrator-only workflow for migrating or rewriting codebases. You do NOT read
 ## Pipeline Phases
 
 ### Phase 1: SPEC
+
 ```
 Instruct spec-agent (use scout or architect):
 - Analyze {source_path} using tldr-skill
@@ -39,6 +40,7 @@ Instruct spec-agent (use scout or architect):
 ```
 
 **Agent prompt template:**
+
 ```
 Analyze the codebase at {source_path} using tldr commands (tldr structure, tldr extract, tldr calls).
 Create spec.md with:
@@ -50,6 +52,7 @@ Write to: {target_dir}/spec.md
 ```
 
 ### Phase 2: FAILING TESTS
+
 ```
 Instruct test-agent (use arbiter):
 - Read spec.md
@@ -62,6 +65,7 @@ Instruct review-agent (use critic):
 ```
 
 ### Phase 3: ADVERSARIAL (x3 iterations)
+
 ```
 Instruct premortem-agent (use premortem skill):
 - Review spec + tests
@@ -73,6 +77,7 @@ Instruct premortem-agent (use premortem skill):
 **Key:** Each pass should find NEW issues, not repeat previous ones.
 
 ### Phase 4: PHASED PLAN
+
 ```
 Instruct planner-agent (use architect or plan-agent):
 - Input: spec.md + tests + mitigations
@@ -84,6 +89,7 @@ Instruct planner-agent (use architect or plan-agent):
 ```
 
 ### Phase 5: BUILD LOOP (per phase)
+
 ```
 For each phase in phased-plan.yaml:
 
@@ -99,6 +105,7 @@ For each phase in phased-plan.yaml:
 ```
 
 ### Phase 6: INTEGRATION VALIDATION
+
 ```
 Instruct integration-agent (use atlas or validator):
 - Use tldr to diff against {reference_repo}
@@ -115,24 +122,24 @@ Instruct integration-agent (use atlas or validator):
 When invoking this workflow, specify:
 
 ```yaml
-SOURCE: {path to source code}
-TARGET_DIR: {new folder for migrated code}
-TARGET_LANG: {typescript|python|go|rust|etc}
-REFERENCE_REPO: {url or path for final diff comparison}
-SKILLS: [tldr-code, qlty-check, {domain-specific}]
+SOURCE: { path to source code }
+TARGET_DIR: { new folder for migrated code }
+TARGET_LANG: { typescript|python|go|rust|etc }
+REFERENCE_REPO: { url or path for final diff comparison }
+SKILLS: [tldr-code, qlty-check, { domain-specific }]
 ```
 
 ## Agent Mapping
 
-| Phase | Agent Type | Subagent |
-|-------|-----------|----------|
-| Spec | research | `scout` or `architect` |
-| Tests | validate | `arbiter` |
-| Review | review | `critic` or `judge` |
-| Premortem | review | `premortem` skill |
-| Plan | plan | `architect` or `plan-agent` |
-| Build | implement | `kraken` (large) or `spark` (small) |
-| Integration | validate | `atlas` or `validator` |
+| Phase       | Agent Type | Subagent                            |
+| ----------- | ---------- | ----------------------------------- |
+| Spec        | research   | `scout` or `architect`              |
+| Tests       | validate   | `arbiter`                           |
+| Review      | review     | `critic` or `judge`                 |
+| Premortem   | review     | `premortem` skill                   |
+| Plan        | plan       | `architect` or `plan-agent`         |
+| Build       | implement  | `kraken` (large) or `spark` (small) |
+| Integration | validate   | `atlas` or `validator`              |
 
 ## Example Orchestration
 

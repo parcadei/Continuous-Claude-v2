@@ -16,18 +16,18 @@
  * - CLAUDE_PROJECT_DIR: Project directory for DB path
  */
 
-import { existsSync } from 'fs';
+import { existsSync } from "fs";
 
 // Import shared utilities
-import { getDbPath, runPythonQuery, isValidId } from '../shared/db-utils.js';
+import { getDbPath, runPythonQuery, isValidId } from "../shared/db-utils.js";
 import type {
   SubagentStartInput,
   SubagentStopInput,
   PreToolUseInput,
   PostToolUseInput,
   StopInput,
-  HookOutput
-} from '../shared/types.js';
+  HookOutput,
+} from "../shared/types.js";
 
 // Re-export types for convenience
 export type {
@@ -36,7 +36,7 @@ export type {
   PreToolUseInput,
   PostToolUseInput,
   StopInput,
-  HookOutput
+  HookOutput,
 };
 
 // =============================================================================
@@ -48,46 +48,52 @@ export type {
  * Injects role context message (advocate/adversary/judge).
  * Always returns 'continue' - never blocks agent start.
  */
-export async function onSubagentStart(input: SubagentStartInput): Promise<HookOutput> {
+export async function onSubagentStart(
+  input: SubagentStartInput,
+): Promise<HookOutput> {
   const advId = process.env.ADV_ID;
 
   // If no ADV_ID, continue silently (not in an adversarial debate)
   if (!advId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate ADV_ID format
   if (!isValidId(advId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const role = process.env.AGENT_ROLE || 'unknown';
-  const round = process.env.ADVERSARIAL_ROUND || '1';
-  const maxRounds = process.env.ADVERSARIAL_MAX_ROUNDS || '3';
+  const role = process.env.AGENT_ROLE || "unknown";
+  const round = process.env.ADVERSARIAL_ROUND || "1";
+  const maxRounds = process.env.ADVERSARIAL_MAX_ROUNDS || "3";
 
   // Log for debugging - this goes to stderr, not stdout
-  console.error(`[adversarial] ${role} starting round ${round}/${maxRounds} for debate ${advId}`);
+  console.error(
+    `[adversarial] ${role} starting round ${round}/${maxRounds} for debate ${advId}`,
+  );
 
   // Inject role context message
-  let message = '';
+  let message = "";
 
-  if (role === 'advocate') {
+  if (role === "advocate") {
     message = `You are the ADVOCATE in round ${round} of ${maxRounds}.`;
-    message += ' Present arguments in favor of the position.';
-    message += ' Be persuasive, thorough, and address critiques from previous rounds.';
-  } else if (role === 'adversary') {
+    message += " Present arguments in favor of the position.";
+    message +=
+      " Be persuasive, thorough, and address critiques from previous rounds.";
+  } else if (role === "adversary") {
     message = `You are the ADVERSARY in round ${round} of ${maxRounds}.`;
-    message += ' Critique and attack the advocate\'s arguments.';
-    message += ' Find flaws, weaknesses, and counterarguments.';
-  } else if (role === 'judge') {
+    message += " Critique and attack the advocate's arguments.";
+    message += " Find flaws, weaknesses, and counterarguments.";
+  } else if (role === "judge") {
     message = `You are the JUDGE evaluating the complete debate.`;
-    message += ' Review both positions objectively and decide which is stronger.';
-    message += ' Provide your verdict with clear reasoning.';
+    message +=
+      " Review both positions objectively and decide which is stronger.";
+    message += " Provide your verdict with clear reasoning.";
   }
 
   return {
-    result: 'continue',
-    message
+    result: "continue",
+    message,
   };
 }
 
@@ -99,22 +105,24 @@ export async function onSubagentStart(input: SubagentStartInput): Promise<HookOu
  * Handles SubagentStop hook for adversarial pattern.
  * Tracks round completion and provides context for next round.
  */
-export async function onSubagentStop(input: SubagentStopInput): Promise<HookOutput> {
+export async function onSubagentStop(
+  input: SubagentStopInput,
+): Promise<HookOutput> {
   const advId = process.env.ADV_ID;
 
   // If no ADV_ID, continue silently
   if (!advId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate ADV_ID format
   if (!isValidId(advId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const role = process.env.AGENT_ROLE || 'unknown';
-  const round = parseInt(process.env.ADVERSARIAL_ROUND || '1', 10);
-  const maxRounds = parseInt(process.env.ADVERSARIAL_MAX_ROUNDS || '3', 10);
+  const role = process.env.AGENT_ROLE || "unknown";
+  const round = parseInt(process.env.ADVERSARIAL_ROUND || "1", 10);
+  const maxRounds = parseInt(process.env.ADVERSARIAL_MAX_ROUNDS || "3", 10);
 
   // Log for debugging
   console.error(`[adversarial] ${role} completed round ${round}/${maxRounds}`);
@@ -122,17 +130,17 @@ export async function onSubagentStop(input: SubagentStopInput): Promise<HookOutp
   // Check if we need to prompt for next round
   if (round < maxRounds) {
     return {
-      result: 'continue',
-      message: `Round ${round} of ${maxRounds} complete. Prepare for next round of debate.`
+      result: "continue",
+      message: `Round ${round} of ${maxRounds} complete. Prepare for next round of debate.`,
     };
-  } else if (round === maxRounds && role !== 'judge') {
+  } else if (round === maxRounds && role !== "judge") {
     return {
-      result: 'continue',
-      message: `All ${maxRounds} debate rounds complete. Ready for judge's verdict.`
+      result: "continue",
+      message: `All ${maxRounds} debate rounds complete. Ready for judge's verdict.`,
     };
   }
 
-  return { result: 'continue' };
+  return { result: "continue" };
 }
 
 // =============================================================================
@@ -143,36 +151,38 @@ export async function onSubagentStop(input: SubagentStopInput): Promise<HookOutp
  * Handles PreToolUse hook for adversarial pattern.
  * Injects opponent's last argument as context for informed debate.
  */
-export async function onPreToolUse(input: PreToolUseInput): Promise<HookOutput> {
+export async function onPreToolUse(
+  input: PreToolUseInput,
+): Promise<HookOutput> {
   const advId = process.env.ADV_ID;
 
   // If no ADV_ID, continue silently
   if (!advId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate ADV_ID format
   if (!isValidId(advId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const role = process.env.AGENT_ROLE || 'unknown';
-  const round = parseInt(process.env.ADVERSARIAL_ROUND || '1', 10);
+  const role = process.env.AGENT_ROLE || "unknown";
+  const round = parseInt(process.env.ADVERSARIAL_ROUND || "1", 10);
   const dbPath = getDbPath();
 
   // Only inject opponent context for advocate/adversary, not judge
-  if (role !== 'advocate' && role !== 'adversary') {
-    return { result: 'continue' };
+  if (role !== "advocate" && role !== "adversary") {
+    return { result: "continue" };
   }
 
   // Only if we're past round 1 (need previous arguments)
   if (round <= 1 || !existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
     // Query for opponent's last argument
-    const opponentRole = role === 'advocate' ? 'adversary' : 'advocate';
+    const opponentRole = role === "advocate" ? "adversary" : "advocate";
     const query = `
 import sqlite3
 import json
@@ -190,7 +200,7 @@ conn.execute("PRAGMA journal_mode = WAL")
 
 # Get opponent's argument from previous round
 cursor = conn.execute('''
-    SELECT ${opponentRole === 'advocate' ? 'advocate_argument' : 'adversary_argument'}
+    SELECT ${opponentRole === "advocate" ? "advocate_argument" : "adversary_argument"}
     FROM adversarial_rounds
     WHERE adv_id = ? AND round = ?
 ''', (adv_id, prev_round))
@@ -202,10 +212,15 @@ conn.close()
 print(json.dumps({'opponent_argument': opponent_arg}))
 `;
 
-    const result = runPythonQuery(query, [dbPath, advId, (round - 1).toString(), opponentRole]);
+    const result = runPythonQuery(query, [
+      dbPath,
+      advId,
+      (round - 1).toString(),
+      opponentRole,
+    ]);
 
     if (!result.success) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // Parse Python output
@@ -213,20 +228,20 @@ print(json.dumps({'opponent_argument': opponent_arg}))
     try {
       data = JSON.parse(result.stdout);
     } catch (parseErr) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     if (data.opponent_argument) {
       return {
-        result: 'continue',
-        message: `OPPONENT'S LAST ARGUMENT:\n${data.opponent_argument}\n\nConsider this when forming your response.`
+        result: "continue",
+        message: `OPPONENT'S LAST ARGUMENT:\n${data.opponent_argument}\n\nConsider this when forming your response.`,
       };
     }
 
-    return { result: 'continue' };
+    return { result: "continue" };
   } catch (err) {
-    console.error('PreToolUse hook error:', err);
-    return { result: 'continue' };
+    console.error("PreToolUse hook error:", err);
+    return { result: "continue" };
   }
 }
 
@@ -238,36 +253,38 @@ print(json.dumps({'opponent_argument': opponent_arg}))
  * Handles PostToolUse hook for adversarial pattern.
  * Logs debate turns to database for history tracking.
  */
-export async function onPostToolUse(input: PostToolUseInput): Promise<HookOutput> {
+export async function onPostToolUse(
+  input: PostToolUseInput,
+): Promise<HookOutput> {
   const advId = process.env.ADV_ID;
 
   // If no ADV_ID, continue silently
   if (!advId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate ADV_ID format
   if (!isValidId(advId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Only log Write tool calls (arguments being saved)
-  if (input.tool_name !== 'Write') {
-    return { result: 'continue' };
+  if (input.tool_name !== "Write") {
+    return { result: "continue" };
   }
 
-  const role = process.env.AGENT_ROLE || 'unknown';
-  const round = parseInt(process.env.ADVERSARIAL_ROUND || '1', 10);
+  const role = process.env.AGENT_ROLE || "unknown";
+  const round = parseInt(process.env.ADVERSARIAL_ROUND || "1", 10);
   const dbPath = getDbPath();
 
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
     // Extract argument content from tool input
     const toolInput = input.tool_input as { content?: string };
-    const argument = toolInput.content || '';
+    const argument = toolInput.content || "";
 
     // Log debate turn to database
     const query = `
@@ -341,10 +358,10 @@ print(json.dumps({'success': True}))
 
     runPythonQuery(query, [dbPath, advId, round.toString(), role, argument]);
 
-    return { result: 'continue' };
+    return { result: "continue" };
   } catch (err) {
-    console.error('PostToolUse hook error:', err);
-    return { result: 'continue' };
+    console.error("PostToolUse hook error:", err);
+    return { result: "continue" };
   }
 }
 
@@ -359,32 +376,32 @@ print(json.dumps({'success': True}))
 export async function onStop(input: StopInput): Promise<HookOutput> {
   // Prevent infinite loops - if we're already in a stop hook, continue
   if (input.stop_hook_active) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   const advId = process.env.ADV_ID;
 
   if (!advId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate ADV_ID format
   if (!isValidId(advId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const role = process.env.AGENT_ROLE || 'unknown';
-  const round = parseInt(process.env.ADVERSARIAL_ROUND || '1', 10);
-  const maxRounds = parseInt(process.env.ADVERSARIAL_MAX_ROUNDS || '3', 10);
+  const role = process.env.AGENT_ROLE || "unknown";
+  const round = parseInt(process.env.ADVERSARIAL_ROUND || "1", 10);
+  const maxRounds = parseInt(process.env.ADVERSARIAL_MAX_ROUNDS || "3", 10);
   const dbPath = getDbPath();
 
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
     // If we're the judge at the end, provide debate summary
-    if (role === 'judge' && round === maxRounds) {
+    if (role === "judge" && round === maxRounds) {
       const query = `
 import sqlite3
 import json
@@ -422,35 +439,42 @@ print(json.dumps({'rounds': rounds}))
       const result = runPythonQuery(query, [dbPath, advId]);
 
       if (!result.success) {
-        return { result: 'continue' };
+        return { result: "continue" };
       }
 
       // Parse Python output
-      let data: { rounds: Array<{ round: number; advocate: string | null; adversary: string | null; verdict: string | null }> };
+      let data: {
+        rounds: Array<{
+          round: number;
+          advocate: string | null;
+          adversary: string | null;
+          verdict: string | null;
+        }>;
+      };
       try {
         data = JSON.parse(result.stdout);
       } catch (parseErr) {
-        return { result: 'continue' };
+        return { result: "continue" };
       }
 
       // Provide debate summary
       let message = `DEBATE SUMMARY (${data.rounds.length} rounds):\n\n`;
       for (const r of data.rounds) {
         message += `Round ${r.round}:\n`;
-        message += `- Advocate: ${r.advocate ? r.advocate.substring(0, 100) + '...' : '(pending)'}\n`;
-        message += `- Adversary: ${r.adversary ? r.adversary.substring(0, 100) + '...' : '(pending)'}\n`;
+        message += `- Advocate: ${r.advocate ? r.advocate.substring(0, 100) + "..." : "(pending)"}\n`;
+        message += `- Adversary: ${r.adversary ? r.adversary.substring(0, 100) + "..." : "(pending)"}\n`;
       }
-      message += '\nProvide your final verdict.';
+      message += "\nProvide your final verdict.";
 
       return {
-        result: 'continue',
-        message
+        result: "continue",
+        message,
       };
     }
 
-    return { result: 'continue' };
+    return { result: "continue" };
   } catch (err) {
-    console.error('Stop hook error:', err);
-    return { result: 'continue' };
+    console.error("Stop hook error:", err);
+    return { result: "continue" };
   }
 }

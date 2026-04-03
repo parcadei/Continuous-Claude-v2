@@ -4,68 +4,66 @@
  * Prevents Claude from stopping if there are unresolved Lean errors/sorries.
  * Implements the APOLLO recursive repair pattern.
  */
-import { readFileSync, existsSync, unlinkSync } from 'fs';
-import { join } from 'path';
+import { readFileSync, existsSync, unlinkSync } from "fs";
+import { join } from "path";
 const STATE_DIR = process.env.CLAUDE_PROJECT_DIR
-    ? join(process.env.CLAUDE_PROJECT_DIR, '.claude', 'cache', 'lean')
-    : '/tmp/claude-lean';
-const STATE_FILE = join(STATE_DIR, 'compiler-state.json');
+  ? join(process.env.CLAUDE_PROJECT_DIR, ".claude", "cache", "lean")
+  : "/tmp/claude-lean";
+const STATE_FILE = join(STATE_DIR, "compiler-state.json");
 // Max age for state (5 minutes) - ignore stale state
 const MAX_STATE_AGE_MS = 5 * 60 * 1000;
 function readStdin() {
-    return readFileSync(0, 'utf-8');
+  return readFileSync(0, "utf-8");
 }
 function loadState() {
-    if (!existsSync(STATE_FILE))
-        return null;
-    try {
-        const state = JSON.parse(readFileSync(STATE_FILE, 'utf-8'));
-        // Check if state is stale
-        if (Date.now() - state.timestamp > MAX_STATE_AGE_MS) {
-            unlinkSync(STATE_FILE);
-            return null;
-        }
-        return state;
+  if (!existsSync(STATE_FILE)) return null;
+  try {
+    const state = JSON.parse(readFileSync(STATE_FILE, "utf-8"));
+    // Check if state is stale
+    if (Date.now() - state.timestamp > MAX_STATE_AGE_MS) {
+      unlinkSync(STATE_FILE);
+      return null;
     }
-    catch {
-        return null;
-    }
+    return state;
+  } catch {
+    return null;
+  }
 }
 function clearState() {
-    if (existsSync(STATE_FILE)) {
-        unlinkSync(STATE_FILE);
-    }
+  if (existsSync(STATE_FILE)) {
+    unlinkSync(STATE_FILE);
+  }
 }
 async function main() {
-    const input = JSON.parse(readStdin());
-    // CRITICAL: Prevent infinite loops
-    if (input.stop_hook_active) {
-        console.log('{}');
-        return;
-    }
-    const state = loadState();
-    // No Lean state or no errors - allow stop
-    if (!state || !state.has_errors) {
-        console.log('{}');
-        return;
-    }
-    // Check if state is for current session
-    if (state.session_id !== input.session_id) {
-        clearState();
-        console.log('{}');
-        return;
-    }
-    // Build repair prompt based on error type
-    let repairPrompt;
-    if (state.sorries.length > 0) {
-        repairPrompt = `
+  const input = JSON.parse(readStdin());
+  // CRITICAL: Prevent infinite loops
+  if (input.stop_hook_active) {
+    console.log("{}");
+    return;
+  }
+  const state = loadState();
+  // No Lean state or no errors - allow stop
+  if (!state || !state.has_errors) {
+    console.log("{}");
+    return;
+  }
+  // Check if state is for current session
+  if (state.session_id !== input.session_id) {
+    clearState();
+    console.log("{}");
+    return;
+  }
+  // Build repair prompt based on error type
+  let repairPrompt;
+  if (state.sorries.length > 0) {
+    repairPrompt = `
 🔄 APOLLO REPAIR LOOP - Unresolved 'sorry' placeholders
 
 File: ${state.file_path}
 
 The proof has ${state.sorries.length} incomplete part(s):
 
-${state.sorries.join('\n')}
+${state.sorries.join("\n")}
 
 **Your task:**
 1. Pick ONE sorry to fix (start with the simplest)
@@ -76,9 +74,8 @@ ${state.sorries.join('\n')}
 
 Continue fixing until all sorries are resolved.
 `;
-    }
-    else {
-        repairPrompt = `
+  } else {
+    repairPrompt = `
 🔄 APOLLO REPAIR LOOP - Lean Compiler Errors
 
 File: ${state.file_path}
@@ -95,14 +92,16 @@ ${state.errors.slice(0, 2000)}
 
 Fix the errors and re-write the file.
 `;
-    }
-    // Block stop, inject repair prompt
-    console.log(JSON.stringify({
-        decision: 'block',
-        reason: repairPrompt
-    }));
+  }
+  // Block stop, inject repair prompt
+  console.log(
+    JSON.stringify({
+      decision: "block",
+      reason: repairPrompt,
+    }),
+  );
 }
-main().catch(err => {
-    console.error(err.message);
-    process.exit(1);
+main().catch((err) => {
+  console.error(err.message);
+  process.exit(1);
 });

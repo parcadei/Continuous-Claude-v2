@@ -5,19 +5,22 @@
  * These tests should PASS after implementation.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
-import { readFileSync } from 'fs';
-import { join } from 'path';
-import type { SkillRulesConfig, SkillRule } from '../shared/skill-router-types.js';
+import { describe, it, expect, beforeEach } from "vitest";
+import { readFileSync } from "fs";
+import { join } from "path";
+import type {
+  SkillRulesConfig,
+  SkillRule,
+} from "../shared/skill-router-types.js";
 
-describe('Backward Compatibility', () => {
+describe("Backward Compatibility", () => {
   let skillRules: SkillRulesConfig;
 
   beforeEach(() => {
     const projectDir = process.env.CLAUDE_PROJECT_DIR ?? process.cwd();
-    const rulesPath = join(projectDir, '.claude', 'skills', 'skill-rules.json');
+    const rulesPath = join(projectDir, ".claude", "skills", "skill-rules.json");
     try {
-      const content = readFileSync(rulesPath, 'utf-8');
+      const content = readFileSync(rulesPath, "utf-8");
       skillRules = JSON.parse(content);
     } catch {
       // Use a minimal valid config for testing
@@ -25,12 +28,12 @@ describe('Backward Compatibility', () => {
     }
   });
 
-  it('should load existing skill-rules.json without errors', () => {
+  it("should load existing skill-rules.json without errors", () => {
     expect(skillRules).toBeDefined();
     expect(skillRules.skills).toBeDefined();
   });
 
-  it('should work with skills that have no prerequisites field', () => {
+  it("should work with skills that have no prerequisites field", () => {
     // Get a skill without prerequisites (any existing skill)
     const skillNames = Object.keys(skillRules.skills);
     if (skillNames.length === 0) {
@@ -47,7 +50,7 @@ describe('Backward Compatibility', () => {
     }).not.toThrow();
   });
 
-  it('should work with skills that have no coActivate field', () => {
+  it("should work with skills that have no coActivate field", () => {
     const skillNames = Object.keys(skillRules.skills);
     if (skillNames.length === 0) {
       expect(true).toBe(true);
@@ -62,7 +65,7 @@ describe('Backward Compatibility', () => {
     }).not.toThrow();
   });
 
-  it('should default loading mode to lazy when not specified', () => {
+  it("should default loading mode to lazy when not specified", () => {
     const skillNames = Object.keys(skillRules.skills);
     if (skillNames.length === 0) {
       expect(true).toBe(true);
@@ -71,14 +74,14 @@ describe('Backward Compatibility', () => {
 
     const firstSkill = skillRules.skills[skillNames[0]];
     // Default should be lazy when not specified
-    const loading = firstSkill.loading ?? 'lazy';
-    expect(loading).toBe('lazy');
+    const loading = firstSkill.loading ?? "lazy";
+    expect(loading).toBe("lazy");
   });
 
-  it('should maintain existing prompt matching functionality', () => {
+  it("should maintain existing prompt matching functionality", () => {
     // Find a skill with promptTriggers
     const skillWithTriggers = Object.entries(skillRules.skills).find(
-      ([_, rule]) => rule.promptTriggers?.keywords?.length
+      ([_, rule]) => rule.promptTriggers?.keywords?.length,
     );
 
     if (!skillWithTriggers) {

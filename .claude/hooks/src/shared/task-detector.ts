@@ -25,7 +25,7 @@ export interface TaskDetectionResult {
   /** Whether the prompt appears to be a task (vs conversational) */
   isTask: boolean;
   /** The type of task detected */
-  taskType?: 'implementation' | 'research' | 'debug' | 'planning' | 'unknown';
+  taskType?: "implementation" | "research" | "debug" | "planning" | "unknown";
   /** Confidence score 0-1 (higher = more confident) */
   confidence: number;
   /** Words/patterns that triggered detection */
@@ -41,7 +41,7 @@ interface TaskIndicator {
   /** Simple keyword form for trigger extraction */
   keyword: string;
   /** Task type this indicates */
-  type: 'implementation' | 'research' | 'debug' | 'planning';
+  type: "implementation" | "research" | "debug" | "planning";
   /** Weight for confidence scoring (0-1) */
   weight: number;
 }
@@ -51,16 +51,66 @@ interface TaskIndicator {
  * Strong signals that the user wants to build/create something.
  */
 const IMPLEMENTATION_INDICATORS: TaskIndicator[] = [
-  { pattern: /\bimplement\b/i, keyword: 'implement', type: 'implementation', weight: 0.9 },
-  { pattern: /\bbuild\b/i, keyword: 'build', type: 'implementation', weight: 0.9 },
-  { pattern: /\bcreate\b/i, keyword: 'create', type: 'implementation', weight: 0.8 },
-  { pattern: /\badd\s+(a\s+)?feature/i, keyword: 'add feature', type: 'implementation', weight: 0.85 },
-  { pattern: /\bwrite\s+(a\s+)?(function|class|method|component|module)/i, keyword: 'write', type: 'implementation', weight: 0.85 },
-  { pattern: /\bdevelop\b/i, keyword: 'develop', type: 'implementation', weight: 0.8 },
-  { pattern: /\bset\s*up\b/i, keyword: 'set up', type: 'implementation', weight: 0.7 },
-  { pattern: /\bconfigure\b/i, keyword: 'configure', type: 'implementation', weight: 0.7 },
-  { pattern: /\brefactor\b/i, keyword: 'refactor', type: 'implementation', weight: 0.8 },
-  { pattern: /\bmigrate\b/i, keyword: 'migrate', type: 'implementation', weight: 0.75 },
+  {
+    pattern: /\bimplement\b/i,
+    keyword: "implement",
+    type: "implementation",
+    weight: 0.9,
+  },
+  {
+    pattern: /\bbuild\b/i,
+    keyword: "build",
+    type: "implementation",
+    weight: 0.9,
+  },
+  {
+    pattern: /\bcreate\b/i,
+    keyword: "create",
+    type: "implementation",
+    weight: 0.8,
+  },
+  {
+    pattern: /\badd\s+(a\s+)?feature/i,
+    keyword: "add feature",
+    type: "implementation",
+    weight: 0.85,
+  },
+  {
+    pattern: /\bwrite\s+(a\s+)?(function|class|method|component|module)/i,
+    keyword: "write",
+    type: "implementation",
+    weight: 0.85,
+  },
+  {
+    pattern: /\bdevelop\b/i,
+    keyword: "develop",
+    type: "implementation",
+    weight: 0.8,
+  },
+  {
+    pattern: /\bset\s*up\b/i,
+    keyword: "set up",
+    type: "implementation",
+    weight: 0.7,
+  },
+  {
+    pattern: /\bconfigure\b/i,
+    keyword: "configure",
+    type: "implementation",
+    weight: 0.7,
+  },
+  {
+    pattern: /\brefactor\b/i,
+    keyword: "refactor",
+    type: "implementation",
+    weight: 0.8,
+  },
+  {
+    pattern: /\bmigrate\b/i,
+    keyword: "migrate",
+    type: "implementation",
+    weight: 0.75,
+  },
 ];
 
 /**
@@ -68,13 +118,33 @@ const IMPLEMENTATION_INDICATORS: TaskIndicator[] = [
  * Signals that the user wants to fix or investigate an issue.
  */
 const DEBUG_INDICATORS: TaskIndicator[] = [
-  { pattern: /\bdebug\b/i, keyword: 'debug', type: 'debug', weight: 0.9 },
-  { pattern: /\bfix\s+(the\s+)?(bug|issue|error|problem)/i, keyword: 'fix bug', type: 'debug', weight: 0.9 },
-  { pattern: /\binvestigate\b/i, keyword: 'investigate', type: 'debug', weight: 0.85 },
-  { pattern: /\btroubleshoot\b/i, keyword: 'troubleshoot', type: 'debug', weight: 0.85 },
-  { pattern: /\bdiagnose\b/i, keyword: 'diagnose', type: 'debug', weight: 0.8 },
-  { pattern: /\bwhy\s+is\s+.*\b(failing|broken|not\s+working)/i, keyword: 'why failing', type: 'debug', weight: 0.75 },
-  { pattern: /\bfix\b/i, keyword: 'fix', type: 'debug', weight: 0.6 },
+  { pattern: /\bdebug\b/i, keyword: "debug", type: "debug", weight: 0.9 },
+  {
+    pattern: /\bfix\s+(the\s+)?(bug|issue|error|problem)/i,
+    keyword: "fix bug",
+    type: "debug",
+    weight: 0.9,
+  },
+  {
+    pattern: /\binvestigate\b/i,
+    keyword: "investigate",
+    type: "debug",
+    weight: 0.85,
+  },
+  {
+    pattern: /\btroubleshoot\b/i,
+    keyword: "troubleshoot",
+    type: "debug",
+    weight: 0.85,
+  },
+  { pattern: /\bdiagnose\b/i, keyword: "diagnose", type: "debug", weight: 0.8 },
+  {
+    pattern: /\bwhy\s+is\s+.*\b(failing|broken|not\s+working)/i,
+    keyword: "why failing",
+    type: "debug",
+    weight: 0.75,
+  },
+  { pattern: /\bfix\b/i, keyword: "fix", type: "debug", weight: 0.6 },
 ];
 
 /**
@@ -82,13 +152,48 @@ const DEBUG_INDICATORS: TaskIndicator[] = [
  * Signals that the user wants to learn about or explore options.
  */
 const RESEARCH_INDICATORS: TaskIndicator[] = [
-  { pattern: /\bhow\s+do\s+I\b/i, keyword: 'how do I', type: 'research', weight: 0.85 },
-  { pattern: /\bfind\s+out\b/i, keyword: 'find out', type: 'research', weight: 0.8 },
-  { pattern: /\bresearch\b/i, keyword: 'research', type: 'research', weight: 0.85 },
-  { pattern: /\blook\s+into\b/i, keyword: 'look into', type: 'research', weight: 0.8 },
-  { pattern: /\bexplore\s+(the\s+)?(options|possibilities|approaches)/i, keyword: 'explore', type: 'research', weight: 0.75 },
-  { pattern: /\bwhat\s+are\s+(the\s+)?(best\s+practices|options|ways)/i, keyword: 'best practices', type: 'research', weight: 0.7 },
-  { pattern: /\blearn\s+about\b/i, keyword: 'learn about', type: 'research', weight: 0.7 },
+  {
+    pattern: /\bhow\s+do\s+I\b/i,
+    keyword: "how do I",
+    type: "research",
+    weight: 0.85,
+  },
+  {
+    pattern: /\bfind\s+out\b/i,
+    keyword: "find out",
+    type: "research",
+    weight: 0.8,
+  },
+  {
+    pattern: /\bresearch\b/i,
+    keyword: "research",
+    type: "research",
+    weight: 0.85,
+  },
+  {
+    pattern: /\blook\s+into\b/i,
+    keyword: "look into",
+    type: "research",
+    weight: 0.8,
+  },
+  {
+    pattern: /\bexplore\s+(the\s+)?(options|possibilities|approaches)/i,
+    keyword: "explore",
+    type: "research",
+    weight: 0.75,
+  },
+  {
+    pattern: /\bwhat\s+are\s+(the\s+)?(best\s+practices|options|ways)/i,
+    keyword: "best practices",
+    type: "research",
+    weight: 0.7,
+  },
+  {
+    pattern: /\blearn\s+about\b/i,
+    keyword: "learn about",
+    type: "research",
+    weight: 0.7,
+  },
 ];
 
 /**
@@ -96,13 +201,38 @@ const RESEARCH_INDICATORS: TaskIndicator[] = [
  * Signals that the user wants to design or plan something.
  */
 const PLANNING_INDICATORS: TaskIndicator[] = [
-  { pattern: /\bplan\b/i, keyword: 'plan', type: 'planning', weight: 0.85 },
-  { pattern: /\bdesign\b/i, keyword: 'design', type: 'planning', weight: 0.85 },
-  { pattern: /\barchitect\b/i, keyword: 'architect', type: 'planning', weight: 0.9 },
-  { pattern: /\boutline\b/i, keyword: 'outline', type: 'planning', weight: 0.75 },
-  { pattern: /\bstrateg(y|ize)\b/i, keyword: 'strategy', type: 'planning', weight: 0.8 },
-  { pattern: /\bpropose\b/i, keyword: 'propose', type: 'planning', weight: 0.7 },
-  { pattern: /\bstructure\b/i, keyword: 'structure', type: 'planning', weight: 0.65 },
+  { pattern: /\bplan\b/i, keyword: "plan", type: "planning", weight: 0.85 },
+  { pattern: /\bdesign\b/i, keyword: "design", type: "planning", weight: 0.85 },
+  {
+    pattern: /\barchitect\b/i,
+    keyword: "architect",
+    type: "planning",
+    weight: 0.9,
+  },
+  {
+    pattern: /\boutline\b/i,
+    keyword: "outline",
+    type: "planning",
+    weight: 0.75,
+  },
+  {
+    pattern: /\bstrateg(y|ize)\b/i,
+    keyword: "strategy",
+    type: "planning",
+    weight: 0.8,
+  },
+  {
+    pattern: /\bpropose\b/i,
+    keyword: "propose",
+    type: "planning",
+    weight: 0.7,
+  },
+  {
+    pattern: /\bstructure\b/i,
+    keyword: "structure",
+    type: "planning",
+    weight: 0.65,
+  },
 ];
 
 /**
@@ -165,7 +295,9 @@ export function detectTask(prompt: string): TaskDetectionResult {
   const promptLower = prompt.toLowerCase();
 
   // Check for conversational patterns first
-  const conversationalMatches = CONVERSATIONAL_PATTERNS.filter(p => p.test(promptLower));
+  const conversationalMatches = CONVERSATIONAL_PATTERNS.filter((p) =>
+    p.test(promptLower),
+  );
 
   // Find all task indicator matches
   const matches: Array<{ indicator: TaskIndicator; keyword: string }> = [];
@@ -198,7 +330,7 @@ export function detectTask(prompt: string): TaskDetectionResult {
   let confidence = totalWeight / matches.length;
 
   // Boost for multiple different task indicators (capped at 0.15 boost)
-  const uniqueTypes = new Set(matches.map(m => m.indicator.type));
+  const uniqueTypes = new Set(matches.map((m) => m.indicator.type));
   if (uniqueTypes.size > 1) {
     confidence += 0.1;
   }
@@ -225,12 +357,12 @@ export function detectTask(prompt: string): TaskDetectionResult {
 
   // Determine primary task type (highest weight match)
   const sortedMatches = [...matches].sort(
-    (a, b) => b.indicator.weight - a.indicator.weight
+    (a, b) => b.indicator.weight - a.indicator.weight,
   );
   const primaryType = sortedMatches[0].indicator.type;
 
   // Extract unique triggers
-  const triggers = [...new Set(matches.map(m => m.keyword))];
+  const triggers = [...new Set(matches.map((m) => m.keyword))];
 
   return {
     isTask: true,

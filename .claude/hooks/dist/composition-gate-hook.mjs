@@ -7,7 +7,8 @@ import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 var __filename = fileURLToPath(import.meta.url);
 var __dirname = dirname(__filename);
-var PROJECT_DIR = process.env.CLAUDE_PROJECT_DIR || resolve(__dirname, "..", "..", "..", "..");
+var PROJECT_DIR =
+  process.env.CLAUDE_PROJECT_DIR || resolve(__dirname, "..", "..", "..", "..");
 function callValidateComposition(patternA, patternB, scope, operator = ";") {
   const expr = `${patternA} ${operator}[${scope}] ${patternB}`;
   const cmd = `uv run python scripts/validate_composition.py --json "${expr}"`;
@@ -16,7 +17,7 @@ function callValidateComposition(patternA, patternB, scope, operator = ";") {
       cwd: PROJECT_DIR,
       encoding: "utf-8",
       timeout: 1e4,
-      stdio: ["pipe", "pipe", "pipe"]
+      stdio: ["pipe", "pipe", "pipe"],
     });
     const result = JSON.parse(stdout);
     return {
@@ -24,7 +25,7 @@ function callValidateComposition(patternA, patternB, scope, operator = ";") {
       composition: result.expression ?? expr,
       errors: result.compositions?.[0]?.errors ?? [],
       warnings: result.compositions?.[0]?.warnings ?? [],
-      scopeTrace: result.compositions?.[0]?.scope_trace ?? []
+      scopeTrace: result.compositions?.[0]?.scope_trace ?? [],
     };
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err);
@@ -33,7 +34,7 @@ function callValidateComposition(patternA, patternB, scope, operator = ";") {
       composition: expr,
       errors: [`Bridge error: ${errorMessage}`],
       warnings: [],
-      scopeTrace: []
+      scopeTrace: [],
     };
   }
 }
@@ -46,7 +47,7 @@ function validateComposition(patterns, scope = "handoff", operator = ";") {
       composition: "",
       errors: [],
       warnings: [],
-      scopeTrace: []
+      scopeTrace: [],
     };
   }
   if (patterns.length === 1) {
@@ -55,7 +56,7 @@ function validateComposition(patterns, scope = "handoff", operator = ";") {
       composition: patterns[0],
       errors: [],
       warnings: [],
-      scopeTrace: []
+      scopeTrace: [],
     };
   }
   const allWarnings = [];
@@ -66,7 +67,7 @@ function validateComposition(patterns, scope = "handoff", operator = ";") {
       patterns[i],
       patterns[i + 1],
       scope,
-      operator
+      operator,
     );
     if (!result.valid) {
       return {
@@ -74,7 +75,7 @@ function validateComposition(patterns, scope = "handoff", operator = ";") {
         composition: compositionStr,
         errors: result.errors,
         warnings: result.warnings,
-        scopeTrace: result.scopeTrace
+        scopeTrace: result.scopeTrace,
       };
     }
     allWarnings.push(...result.warnings);
@@ -86,7 +87,7 @@ function validateComposition(patterns, scope = "handoff", operator = ";") {
     composition: compositionStr,
     errors: [],
     warnings: allWarnings,
-    scopeTrace: allTraces
+    scopeTrace: allTraces,
   };
 }
 
@@ -98,12 +99,13 @@ var CompositionInvalidError = class extends Error {
     this.name = "CompositionInvalidError";
   }
 };
-function gate3Composition(patternA, patternB, scope = "handoff", operator = ";") {
-  const result = validateComposition(
-    [patternA, patternB],
-    scope,
-    operator
-  );
+function gate3Composition(
+  patternA,
+  patternB,
+  scope = "handoff",
+  operator = ";",
+) {
+  const result = validateComposition([patternA, patternB], scope, operator);
   if (!result.valid) {
     throw new CompositionInvalidError(result.errors);
   }
@@ -127,15 +129,19 @@ async function main() {
   }
   try {
     gate3Composition(pattern, pattern);
-    console.log(JSON.stringify({
-      result: "continue",
-      message: `C:\u2713 ${pattern}`
-    }));
+    console.log(
+      JSON.stringify({
+        result: "continue",
+        message: `C:\u2713 ${pattern}`,
+      }),
+    );
   } catch (error) {
-    console.log(JSON.stringify({
-      result: "continue",
-      message: "C:? (check failed, allowing)"
-    }));
+    console.log(
+      JSON.stringify({
+        result: "continue",
+        message: "C:? (check failed, allowing)",
+      }),
+    );
   }
 }
 main().catch(() => {

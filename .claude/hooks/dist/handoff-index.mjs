@@ -6,24 +6,26 @@ import Database from "better-sqlite3";
 function getPpid(pid) {
   if (process.platform === "win32") {
     try {
-      const result = execSync(`wmic process where ProcessId=${pid} get ParentProcessId`, {
-        encoding: "utf-8",
-        timeout: 5e3
-      });
+      const result = execSync(
+        `wmic process where ProcessId=${pid} get ParentProcessId`,
+        {
+          encoding: "utf-8",
+          timeout: 5e3,
+        },
+      );
       for (const line of result.split("\n")) {
         const trimmed = line.trim();
         if (/^\d+$/.test(trimmed)) {
           return parseInt(trimmed, 10);
         }
       }
-    } catch {
-    }
+    } catch {}
     return null;
   }
   try {
     const result = execSync(`ps -o ppid= -p ${pid}`, {
       encoding: "utf-8",
-      timeout: 5e3
+      timeout: 5e3,
     });
     const ppid = parseInt(result.trim(), 10);
     return isNaN(ppid) ? null : ppid;
@@ -43,7 +45,13 @@ function getTerminalShellPid() {
   }
 }
 function storeSessionAffinity(projectDir, terminalPid, sessionName) {
-  const dbPath = path.join(projectDir, ".claude", "cache", "artifact-index", "context.db");
+  const dbPath = path.join(
+    projectDir,
+    ".claude",
+    "cache",
+    "artifact-index",
+    "context.db",
+  );
   const dbDir = path.dirname(dbPath);
   try {
     if (!fs.existsSync(dbDir)) {
@@ -63,8 +71,7 @@ function storeSessionAffinity(projectDir, terminalPid, sessionName) {
     `);
     stmt.run(terminalPid.toString(), sessionName);
     db.close();
-  } catch {
-  }
+  } catch {}
 }
 function extractSessionName(filePath) {
   const parts = filePath.split("/");
@@ -83,13 +90,18 @@ async function main() {
     return;
   }
   const filePath = input.tool_input?.file_path || "";
-  const isHandoffFile = filePath.endsWith(".md") || filePath.endsWith(".yaml") || filePath.endsWith(".yml");
+  const isHandoffFile =
+    filePath.endsWith(".md") ||
+    filePath.endsWith(".yaml") ||
+    filePath.endsWith(".yml");
   if (!filePath.includes("handoffs") || !isHandoffFile) {
     console.log(JSON.stringify({ result: "continue" }));
     return;
   }
   try {
-    const fullPath = path.isAbsolute(filePath) ? filePath : path.join(projectDir, filePath);
+    const fullPath = path.isAbsolute(filePath)
+      ? filePath
+      : path.join(projectDir, filePath);
     if (!fs.existsSync(fullPath)) {
       console.log(JSON.stringify({ result: "continue" }));
       return;
@@ -100,7 +112,13 @@ async function main() {
     const hasFrontmatter = content.startsWith("---");
     const hasRootSpanId = content.includes("root_span_id:");
     if (!hasRootSpanId) {
-      const stateFile = path.join(homeDir, ".claude", "state", "braintrust_sessions", `${input.session_id}.json`);
+      const stateFile = path.join(
+        homeDir,
+        ".claude",
+        "state",
+        "braintrust_sessions",
+        `${input.session_id}.json`,
+      );
       if (fs.existsSync(stateFile)) {
         try {
           const stateContent = fs.readFileSync(stateFile, "utf-8");
@@ -108,15 +126,18 @@ async function main() {
           const newFields = [
             `root_span_id: ${state.root_span_id}`,
             `turn_span_id: ${state.current_turn_span_id || ""}`,
-            `session_id: ${input.session_id}`
+            `session_id: ${input.session_id}`,
           ].join("\n");
           if (isYamlFile) {
             content = `${newFields}
 ${content}`;
           } else if (hasFrontmatter) {
-            content = content.replace(/^---\n/, `---
+            content = content.replace(
+              /^---\n/,
+              `---
 ${newFields}
-`);
+`,
+            );
           } else {
             content = `---
 ${newFields}
@@ -128,8 +149,7 @@ ${content}`;
           fs.writeFileSync(tempPath, content);
           fs.renameSync(tempPath, fullPath);
           modified = true;
-        } catch (stateErr) {
-        }
+        } catch (stateErr) {}
       }
     }
     const terminalPid = getTerminalShellPid();
@@ -139,11 +159,15 @@ ${content}`;
     }
     const indexScript = path.join(projectDir, "scripts", "artifact_index.py");
     if (fs.existsSync(indexScript)) {
-      const child = spawn("uv", ["run", "python", indexScript, "--file", fullPath], {
-        cwd: projectDir,
-        detached: true,
-        stdio: "ignore"
-      });
+      const child = spawn(
+        "uv",
+        ["run", "python", indexScript, "--file", fullPath],
+        {
+          cwd: projectDir,
+          detached: true,
+          stdio: "ignore",
+        },
+      );
       child.unref();
     }
     console.log(JSON.stringify({ result: "continue" }));
@@ -154,7 +178,7 @@ ${content}`;
 async function readStdin() {
   return new Promise((resolve) => {
     let data = "";
-    process.stdin.on("data", (chunk) => data += chunk);
+    process.stdin.on("data", (chunk) => (data += chunk));
     process.stdin.on("end", () => resolve(data));
   });
 }

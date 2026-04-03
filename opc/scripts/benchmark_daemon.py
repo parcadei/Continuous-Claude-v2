@@ -10,12 +10,11 @@ Usage:
     cd opc && uv run python scripts/benchmark_daemon.py
 """
 
+import hashlib
 import json
-import os
 import socket
 import subprocess
 import time
-import hashlib
 from pathlib import Path
 from statistics import mean, stdev
 

@@ -2,7 +2,13 @@
 import { readFileSync as readFileSync2, existsSync as existsSync2 } from "fs";
 
 // src/shared/spec-context.ts
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "fs";
+import {
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+} from "fs";
 import { join, dirname } from "path";
 var SPEC_CONTEXT_VERSION = "1.0";
 function getSpecContextPath(projectDir) {
@@ -13,8 +19,7 @@ function loadSpecContext(projectDir) {
   if (existsSync(path)) {
     try {
       return JSON.parse(readFileSync(path, "utf-8"));
-    } catch {
-    }
+    } catch {}
   }
   return { version: SPEC_CONTEXT_VERSION, sessions: {} };
 }
@@ -40,11 +45,14 @@ function extractCriteria(content) {
     "## Success Criteria",
     "## Acceptance Criteria",
     "### Success Criteria",
-    "### Acceptance Criteria"
+    "### Acceptance Criteria",
   ];
   const extracted = [];
   for (const section of sections) {
-    const regex = new RegExp(`${section.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=\\n## |\\n### |$)`, "i");
+    const regex = new RegExp(
+      `${section.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=\\n## |\\n### |$)`,
+      "i",
+    );
     const match = content.match(regex);
     if (match) {
       extracted.push(match[0].slice(0, 600));
@@ -52,7 +60,9 @@ function extractCriteria(content) {
   }
   const checkboxes = content.match(/- \[ \] .+/g) || [];
   if (checkboxes.length > 0) {
-    extracted.push("Acceptance Criteria:\n" + checkboxes.slice(0, 10).join("\n"));
+    extracted.push(
+      "Acceptance Criteria:\n" + checkboxes.slice(0, 10).join("\n"),
+    );
   }
   if (extracted.length > 0) {
     return extracted.join("\n\n").slice(0, 1500);
@@ -60,7 +70,9 @@ function extractCriteria(content) {
   return content.slice(0, 800);
 }
 function extractAcceptanceCriteria(specContent, section) {
-  const content = section ? extractSpecRequirements(specContent, section) : specContent;
+  const content = section
+    ? extractSpecRequirements(specContent, section)
+    : specContent;
   const criteria = [];
   const checkboxes = content.match(/- \[ \] .+/g) || [];
   criteria.push(...checkboxes);
@@ -94,15 +106,19 @@ async function main() {
     return;
   }
   const specContent = readFileSync2(session.active_spec, "utf-8");
-  const criteria = extractAcceptanceCriteria(specContent, session.current_phase ?? void 0);
+  const criteria = extractAcceptanceCriteria(
+    specContent,
+    session.current_phase ?? void 0,
+  );
   if (criteria.length === 0) {
     console.log("{}");
     return;
   }
   const phase = session.current_phase ? ` (${session.current_phase})` : "";
-  console.log(JSON.stringify({
-    decision: "block",
-    reason: `\u{1F6A6} PHASE GATE - Implementation validation required${phase}
+  console.log(
+    JSON.stringify({
+      decision: "block",
+      reason: `\u{1F6A6} PHASE GATE - Implementation validation required${phase}
 
 You've made ${session.edit_count} edits. Before finishing, verify against acceptance criteria:
 
@@ -113,7 +129,8 @@ ${criteria.join("\n")}
 - \u23F3 Partial: What's done, what's left
 - \u274C Not addressed: Why, and should it be?
 
-After verification, you may continue or finish.`
-  }));
+After verification, you may continue or finish.`,
+    }),
+  );
 }
 main().catch(() => console.log("{}"));

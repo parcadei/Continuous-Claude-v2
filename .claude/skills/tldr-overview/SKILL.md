@@ -7,7 +7,12 @@ description: Get a token-efficient overview of any project using the TLDR stack
 
 Get a token-efficient overview of any project using the TLDR stack.
 
+## When to Use
+
+This skill is invoked when getting a token-efficient overview of a project. User-invocable via /overview or /tldr-overview.
+
 ## Trigger
+
 - `/overview` or `/tldr-overview`
 - "give me an overview of this project"
 - "what's in this codebase"
@@ -16,24 +21,31 @@ Get a token-efficient overview of any project using the TLDR stack.
 ## Execution
 
 ### 1. File Tree (Navigation Map)
+
 ```bash
 tldr tree . --ext .py    # or .ts, .go, .rs
 ```
 
 ### 2. Code Structure (What Exists)
+
 ```bash
 tldr structure src/ --lang python --max 50
 ```
+
 Returns: functions, classes, imports per file
 
 ### 3. Call Graph Entry Points (Architecture)
+
 ```bash
 tldr calls src/
 ```
+
 Returns: cross-file relationships, main entry points
 
 ### 4. Key Function Complexity (Hot Spots)
+
 For each entry point found:
+
 ```bash
 tldr cfg src/main.py main  # Get complexity
 ```
@@ -60,6 +72,7 @@ Token cost: ~{N} tokens (vs ~{M} raw = {savings}% savings)
 ```
 
 ## When NOT to Use
+
 - Already familiar with the project
 - Working on a specific file (use targeted tldr commands instead)
 - Test files (need full context)

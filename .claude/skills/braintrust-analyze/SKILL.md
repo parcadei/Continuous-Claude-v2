@@ -52,18 +52,22 @@ uv run python -m runtime.harness scripts/braintrust_analyze.py --token-trends
 ## What You'll Learn
 
 ### Session Analysis
+
 - Tool usage breakdown
 - Agent spawns (plan-agent, debug-agent, etc.)
 - Skill activations (/commit, /research, etc.)
 - Token consumption estimates
 
 ### Loop Detection
+
 Find sessions where the same tool was called repeatedly, which may indicate:
+
 - Stuck in a search loop
 - Inefficient approach
 - Opportunity for better tooling
 
 ### Usage Patterns
+
 - Which agents you use most
 - Which skills get activated
 - Daily/weekly activity trends
@@ -71,12 +75,14 @@ Find sessions where the same tool was called repeatedly, which may indicate:
 ## Examples
 
 ### Quick Retrospective
+
 ```bash
 # What happened in my last session?
 uv run python -m runtime.harness scripts/braintrust_analyze.py --last-session
 ```
 
 Output:
+
 ```
 ## Session Analysis
 **ID:** `92940b91...`
@@ -91,11 +97,13 @@ Output:
 ```
 
 ### Find Loops
+
 ```bash
 uv run python -m runtime.harness scripts/braintrust_analyze.py --detect-loops
 ```
 
 ### Weekly Review
+
 ```bash
 uv run python -m runtime.harness scripts/braintrust_analyze.py --weekly-summary
 ```

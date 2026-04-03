@@ -23,11 +23,13 @@ This directory contains Skills in Claude Code's native format:
 Each Skill directory contains:
 
 **1. SKILL.md (Required)**
+
 - YAML frontmatter with `name` and `description`
 - Markdown instructions for Claude to follow
 - References to workflow.py with CLI usage
 
 **2. workflow.py (Implementation)**
+
 - Python script with argparse CLI
 - MCP tool orchestration code
 - Returns structured results
@@ -36,10 +38,12 @@ Each Skill directory contains:
 
 **Automatic discovery:**
 Claude Code scans `.claude/skills/` and finds:
+
 - simple-fetch
 - multi-tool-pipeline
 
 **When triggered:**
+
 1. Claude reads SKILL.md
 2. Follows instructions
 3. Executes workflow.py with appropriate CLI args
@@ -48,16 +52,19 @@ Claude Code scans `.claude/skills/` and finds:
 ## Skills vs Scripts
 
 **`.claude/skills/`** (This directory):
+
 - Claude Code Skills format (discoverable by Claude)
 - SKILL.md with YAML frontmatter
 - Claude Code validation rules
 
 **`../../skills/`** (Parent directory):
+
 - Python CLI workflow scripts
 - Can be executed standalone
 - Referenced by Skills
 
 **Integration:**
+
 - Skills wrap workflows for Claude Code discovery
 - Workflows can be used with or without Skills wrapper
 - Best of both: Claude's framework + our execution efficiency
@@ -65,11 +72,13 @@ Claude Code scans `.claude/skills/` and finds:
 ## Generic Examples Included
 
 **simple-fetch:**
+
 - Basic single-tool pattern
 - Template for simple workflows
 - Demonstrates CLI argument pattern
 
 **multi-tool-pipeline:**
+
 - Multi-tool chaining pattern
 - Template for complex workflows
 - Shows sequential execution
@@ -85,6 +94,7 @@ Claude Code scans `.claude/skills/` and finds:
 ## Validation Rules
 
 Skills must pass Claude Code validation:
+
 - `name`: lowercase letters, numbers, hyphens only (max 64 chars)
 - `description`: non-empty (max 1024 chars)
 - No XML tags

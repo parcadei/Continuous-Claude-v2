@@ -29,13 +29,13 @@ Structured release preparation to ship with confidence.
 
 ## Agent Sequence
 
-| # | Agent | Role | Output |
-|---|-------|------|--------|
-| 1 | **aegis** | Security vulnerability scan | Security report |
-| 2 | **atlas** | Run full E2E test suite | Test report |
-| 3 | **review-agent** | Final release review | Release approval |
-| 4 | **herald** | Version bump, changelog generation | Updated version files |
-| 5 | **scribe** | Release notes, documentation | RELEASE.md, docs |
+| #   | Agent            | Role                               | Output                |
+| --- | ---------------- | ---------------------------------- | --------------------- |
+| 1   | **aegis**        | Security vulnerability scan        | Security report       |
+| 2   | **atlas**        | Run full E2E test suite            | Test report           |
+| 3   | **review-agent** | Final release review               | Release approval      |
+| 4   | **herald**       | Version bump, changelog generation | Updated version files |
+| 5   | **scribe**       | Release notes, documentation       | RELEASE.md, docs      |
 
 ## Why This Order?
 
@@ -149,24 +149,28 @@ Task(
 ## Release Types
 
 ### Major Release (Breaking Changes)
+
 ```
 /release --major
 → Full workflow with migration guide
 ```
 
 ### Minor Release (New Features)
+
 ```
 /release --minor
 → Full workflow, lighter security review
 ```
 
 ### Patch Release (Bug Fixes)
+
 ```
 /release --patch
 → Security + tests + quick review
 ```
 
 ### Hotfix
+
 ```
 /release --hotfix
 → Expedited: aegis → atlas → herald
@@ -223,6 +227,7 @@ Phase 5: Release notes...
 ## Blockers
 
 The workflow stops if:
+
 - Critical security vulnerability found
 - E2E tests failing
 - Review verdict is RELEASE_BLOCKED

@@ -9,11 +9,11 @@
  * - Auto-start capability
  * - Graceful degradation when indexing
  */
-import { existsSync, readFileSync } from 'fs';
-import { execSync, spawnSync } from 'child_process';
-import { join } from 'path';
-import * as net from 'net';
-import * as crypto from 'crypto';
+import { existsSync, readFileSync } from "fs";
+import { execSync, spawnSync } from "child_process";
+import { join } from "path";
+import * as net from "net";
+import * as crypto from "crypto";
 /** Query timeout in milliseconds (3 seconds) */
 const QUERY_TIMEOUT = 3000;
 /**
@@ -24,16 +24,19 @@ const QUERY_TIMEOUT = 3000;
  * @returns Connection info for Unix socket or TCP
  */
 export function getConnectionInfo(projectDir) {
-    const hash = crypto.createHash('md5').update(projectDir).digest('hex').substring(0, 8);
-    if (process.platform === 'win32') {
-        // TCP on localhost with deterministic port
-        const port = 49152 + (parseInt(hash, 16) % 10000);
-        return { type: 'tcp', host: '127.0.0.1', port };
-    }
-    else {
-        // Unix socket
-        return { type: 'unix', path: `/tmp/tldr-${hash}.sock` };
-    }
+  const hash = crypto
+    .createHash("md5")
+    .update(projectDir)
+    .digest("hex")
+    .substring(0, 8);
+  if (process.platform === "win32") {
+    // TCP on localhost with deterministic port
+    const port = 49152 + (parseInt(hash, 16) % 10000);
+    return { type: "tcp", host: "127.0.0.1", port };
+  } else {
+    // Unix socket
+    return { type: "unix", path: `/tmp/tldr-${hash}.sock` };
+  }
 }
 /**
  * Compute deterministic socket path from project path.
@@ -43,8 +46,12 @@ export function getConnectionInfo(projectDir) {
  * @returns Socket path string (Unix only, use getConnectionInfo for cross-platform)
  */
 export function getSocketPath(projectDir) {
-    const hash = crypto.createHash('md5').update(projectDir).digest('hex').substring(0, 8);
-    return `/tmp/tldr-${hash}.sock`;
+  const hash = crypto
+    .createHash("md5")
+    .update(projectDir)
+    .digest("hex")
+    .substring(0, 8);
+  return `/tmp/tldr-${hash}.sock`;
 }
 /**
  * Read daemon status from .tldr/status file.
@@ -53,16 +60,15 @@ export function getSocketPath(projectDir) {
  * @returns Status string ('ready', 'indexing', 'stopped') or null if no status file
  */
 export function getStatusFile(projectDir) {
-    const statusPath = join(projectDir, '.tldr', 'status');
-    if (existsSync(statusPath)) {
-        try {
-            return readFileSync(statusPath, 'utf-8').trim();
-        }
-        catch {
-            return null;
-        }
+  const statusPath = join(projectDir, ".tldr", "status");
+  if (existsSync(statusPath)) {
+    try {
+      return readFileSync(statusPath, "utf-8").trim();
+    } catch {
+      return null;
     }
-    return null;
+  }
+  return null;
 }
 /**
  * Check if daemon is currently indexing.
@@ -71,7 +77,7 @@ export function getStatusFile(projectDir) {
  * @returns true if daemon is indexing
  */
 export function isIndexing(projectDir) {
-    return getStatusFile(projectDir) === 'indexing';
+  return getStatusFile(projectDir) === "indexing";
 }
 /**
  * Check if daemon is reachable (platform-aware).
@@ -80,36 +86,34 @@ export function isIndexing(projectDir) {
  * @returns true if daemon is reachable
  */
 function isDaemonReachable(projectDir) {
-    const connInfo = getConnectionInfo(projectDir);
-    if (connInfo.type === 'tcp') {
-        // On Windows, try to connect to TCP port
-        try {
-            const testSocket = new net.Socket();
-            testSocket.setTimeout(100);
-            let connected = false;
-            testSocket.on('connect', () => {
-                connected = true;
-                testSocket.destroy();
-            });
-            testSocket.on('error', () => {
-                testSocket.destroy();
-            });
-            testSocket.connect(connInfo.port, connInfo.host);
-            // Give it a moment
-            const end = Date.now() + 200;
-            while (Date.now() < end && !connected) {
-                // spin
-            }
-            return connected;
-        }
-        catch {
-            return false;
-        }
+  const connInfo = getConnectionInfo(projectDir);
+  if (connInfo.type === "tcp") {
+    // On Windows, try to connect to TCP port
+    try {
+      const testSocket = new net.Socket();
+      testSocket.setTimeout(100);
+      let connected = false;
+      testSocket.on("connect", () => {
+        connected = true;
+        testSocket.destroy();
+      });
+      testSocket.on("error", () => {
+        testSocket.destroy();
+      });
+      testSocket.connect(connInfo.port, connInfo.host);
+      // Give it a moment
+      const end = Date.now() + 200;
+      while (Date.now() < end && !connected) {
+        // spin
+      }
+      return connected;
+    } catch {
+      return false;
     }
-    else {
-        // Unix socket - check file exists
-        return existsSync(connInfo.path);
-    }
+  } else {
+    // Unix socket - check file exists
+    return existsSync(connInfo.path);
+  }
 }
 /**
  * Try to start the daemon for a project.
@@ -118,29 +122,28 @@ function isDaemonReachable(projectDir) {
  * @returns true if start was attempted successfully
  */
 export function tryStartDaemon(projectDir) {
-    try {
-        // Try using the tldr CLI to start the daemon
-        spawnSync('tldr', ['daemon', 'start', '--project', projectDir], {
-            timeout: 5000,
-            stdio: 'ignore',
-        });
-        // Give daemon a moment to start
-        const start = Date.now();
-        while (Date.now() - start < 2000) {
-            if (isDaemonReachable(projectDir)) {
-                return true;
-            }
-            // Busy wait (small delay)
-            const end = Date.now() + 50;
-            while (Date.now() < end) {
-                // spin
-            }
-        }
-        return isDaemonReachable(projectDir);
+  try {
+    // Try using the tldr CLI to start the daemon
+    spawnSync("tldr", ["daemon", "start", "--project", projectDir], {
+      timeout: 5000,
+      stdio: "ignore",
+    });
+    // Give daemon a moment to start
+    const start = Date.now();
+    while (Date.now() - start < 2000) {
+      if (isDaemonReachable(projectDir)) {
+        return true;
+      }
+      // Busy wait (small delay)
+      const end = Date.now() + 50;
+      while (Date.now() < end) {
+        // spin
+      }
     }
-    catch {
-        return false;
-    }
+    return isDaemonReachable(projectDir);
+  } catch {
+    return false;
+  }
 }
 /**
  * Query the daemon asynchronously using net.Socket.
@@ -150,93 +153,100 @@ export function tryStartDaemon(projectDir) {
  * @returns Promise resolving to daemon response
  */
 export function queryDaemon(query, projectDir) {
-    return new Promise((resolve, reject) => {
-        // Check if indexing - return early with indexing flag
-        if (isIndexing(projectDir)) {
+  return new Promise((resolve, reject) => {
+    // Check if indexing - return early with indexing flag
+    if (isIndexing(projectDir)) {
+      resolve({
+        indexing: true,
+        status: "indexing",
+        message: "Daemon is still indexing, results may be incomplete",
+      });
+      return;
+    }
+    const connInfo = getConnectionInfo(projectDir);
+    // Check if daemon is reachable
+    if (!isDaemonReachable(projectDir)) {
+      // Try to start daemon
+      if (!tryStartDaemon(projectDir)) {
+        resolve({
+          status: "unavailable",
+          error: "Daemon not running and could not start",
+        });
+        return;
+      }
+    }
+    const client = new net.Socket();
+    let data = "";
+    let resolved = false;
+    // Timeout handling
+    const timer = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        client.destroy();
+        resolve({ status: "error", error: "timeout" });
+      }
+    }, QUERY_TIMEOUT);
+    // Connect based on platform
+    if (connInfo.type === "tcp") {
+      client.connect(connInfo.port, connInfo.host, () => {
+        client.write(JSON.stringify(query) + "\n");
+      });
+    } else {
+      client.connect(connInfo.path, () => {
+        client.write(JSON.stringify(query) + "\n");
+      });
+    }
+    client.on("data", (chunk) => {
+      data += chunk.toString();
+      if (data.includes("\n")) {
+        if (!resolved) {
+          resolved = true;
+          clearTimeout(timer);
+          client.end();
+          try {
+            resolve(JSON.parse(data.trim()));
+          } catch {
             resolve({
-                indexing: true,
-                status: 'indexing',
-                message: 'Daemon is still indexing, results may be incomplete',
+              status: "error",
+              error: "Invalid JSON response from daemon",
             });
-            return;
+          }
         }
-        const connInfo = getConnectionInfo(projectDir);
-        // Check if daemon is reachable
-        if (!isDaemonReachable(projectDir)) {
-            // Try to start daemon
-            if (!tryStartDaemon(projectDir)) {
-                resolve({ status: 'unavailable', error: 'Daemon not running and could not start' });
-                return;
-            }
-        }
-        const client = new net.Socket();
-        let data = '';
-        let resolved = false;
-        // Timeout handling
-        const timer = setTimeout(() => {
-            if (!resolved) {
-                resolved = true;
-                client.destroy();
-                resolve({ status: 'error', error: 'timeout' });
-            }
-        }, QUERY_TIMEOUT);
-        // Connect based on platform
-        if (connInfo.type === 'tcp') {
-            client.connect(connInfo.port, connInfo.host, () => {
-                client.write(JSON.stringify(query) + '\n');
-            });
-        }
-        else {
-            client.connect(connInfo.path, () => {
-                client.write(JSON.stringify(query) + '\n');
-            });
-        }
-        client.on('data', (chunk) => {
-            data += chunk.toString();
-            if (data.includes('\n')) {
-                if (!resolved) {
-                    resolved = true;
-                    clearTimeout(timer);
-                    client.end();
-                    try {
-                        resolve(JSON.parse(data.trim()));
-                    }
-                    catch {
-                        resolve({ status: 'error', error: 'Invalid JSON response from daemon' });
-                    }
-                }
-            }
-        });
-        client.on('error', (err) => {
-            if (!resolved) {
-                resolved = true;
-                clearTimeout(timer);
-                if (err.message.includes('ECONNREFUSED') || err.message.includes('ENOENT')) {
-                    resolve({ status: 'unavailable', error: 'Daemon not running' });
-                }
-                else {
-                    resolve({ status: 'error', error: err.message });
-                }
-            }
-        });
-        client.on('close', () => {
-            if (!resolved) {
-                resolved = true;
-                clearTimeout(timer);
-                if (data) {
-                    try {
-                        resolve(JSON.parse(data.trim()));
-                    }
-                    catch {
-                        resolve({ status: 'error', error: 'Incomplete response' });
-                    }
-                }
-                else {
-                    resolve({ status: 'error', error: 'Connection closed without response' });
-                }
-            }
-        });
+      }
     });
+    client.on("error", (err) => {
+      if (!resolved) {
+        resolved = true;
+        clearTimeout(timer);
+        if (
+          err.message.includes("ECONNREFUSED") ||
+          err.message.includes("ENOENT")
+        ) {
+          resolve({ status: "unavailable", error: "Daemon not running" });
+        } else {
+          resolve({ status: "error", error: err.message });
+        }
+      }
+    });
+    client.on("close", () => {
+      if (!resolved) {
+        resolved = true;
+        clearTimeout(timer);
+        if (data) {
+          try {
+            resolve(JSON.parse(data.trim()));
+          } catch {
+            resolve({ status: "error", error: "Incomplete response" });
+          }
+        } else {
+          resolve({
+            status: "error",
+            error: "Connection closed without response",
+          });
+        }
+      }
+    });
+  });
 }
 /**
  * Query the daemon synchronously using nc (netcat) or PowerShell (Windows).
@@ -247,28 +257,31 @@ export function queryDaemon(query, projectDir) {
  * @returns Daemon response
  */
 export function queryDaemonSync(query, projectDir) {
-    // Check if indexing - return early with indexing flag
-    if (isIndexing(projectDir)) {
-        return {
-            indexing: true,
-            status: 'indexing',
-            message: 'Daemon is still indexing, results may be incomplete',
-        };
+  // Check if indexing - return early with indexing flag
+  if (isIndexing(projectDir)) {
+    return {
+      indexing: true,
+      status: "indexing",
+      message: "Daemon is still indexing, results may be incomplete",
+    };
+  }
+  const connInfo = getConnectionInfo(projectDir);
+  // Check if daemon is reachable
+  if (!isDaemonReachable(projectDir)) {
+    // Try to start daemon
+    if (!tryStartDaemon(projectDir)) {
+      return {
+        status: "unavailable",
+        error: "Daemon not running and could not start",
+      };
     }
-    const connInfo = getConnectionInfo(projectDir);
-    // Check if daemon is reachable
-    if (!isDaemonReachable(projectDir)) {
-        // Try to start daemon
-        if (!tryStartDaemon(projectDir)) {
-            return { status: 'unavailable', error: 'Daemon not running and could not start' };
-        }
-    }
-    try {
-        const input = JSON.stringify(query);
-        let result;
-        if (connInfo.type === 'tcp') {
-            // Windows: Use PowerShell to communicate with TCP socket
-            const psCommand = `
+  }
+  try {
+    const input = JSON.stringify(query);
+    let result;
+    if (connInfo.type === "tcp") {
+      // Windows: Use PowerShell to communicate with TCP socket
+      const psCommand = `
         $client = New-Object System.Net.Sockets.TcpClient('${connInfo.host}', ${connInfo.port})
         $stream = $client.GetStream()
         $writer = New-Object System.IO.StreamWriter($stream)
@@ -279,30 +292,34 @@ export function queryDaemonSync(query, projectDir) {
         $client.Close()
         Write-Output $response
       `.trim();
-            result = execSync(`powershell -Command "${psCommand.replace(/"/g, '\\"')}"`, {
-                encoding: 'utf-8',
-                timeout: QUERY_TIMEOUT,
-            });
-        }
-        else {
-            // Unix: Use nc (netcat) to communicate with Unix socket
-            // echo '{"cmd":"ping"}' | nc -U /tmp/tldr-xxx.sock
-            result = execSync(`echo '${input}' | nc -U "${connInfo.path}"`, {
-                encoding: 'utf-8',
-                timeout: QUERY_TIMEOUT,
-            });
-        }
-        return JSON.parse(result.trim());
+      result = execSync(
+        `powershell -Command "${psCommand.replace(/"/g, '\\"')}"`,
+        {
+          encoding: "utf-8",
+          timeout: QUERY_TIMEOUT,
+        },
+      );
+    } else {
+      // Unix: Use nc (netcat) to communicate with Unix socket
+      // echo '{"cmd":"ping"}' | nc -U /tmp/tldr-xxx.sock
+      result = execSync(`echo '${input}' | nc -U "${connInfo.path}"`, {
+        encoding: "utf-8",
+        timeout: QUERY_TIMEOUT,
+      });
     }
-    catch (err) {
-        if (err.killed) {
-            return { status: 'error', error: 'timeout' };
-        }
-        if (err.message?.includes('ECONNREFUSED') || err.message?.includes('ENOENT')) {
-            return { status: 'unavailable', error: 'Daemon not running' };
-        }
-        return { status: 'error', error: err.message || 'Unknown error' };
+    return JSON.parse(result.trim());
+  } catch (err) {
+    if (err.killed) {
+      return { status: "error", error: "timeout" };
     }
+    if (
+      err.message?.includes("ECONNREFUSED") ||
+      err.message?.includes("ENOENT")
+    ) {
+      return { status: "unavailable", error: "Daemon not running" };
+    }
+    return { status: "error", error: err.message || "Unknown error" };
+  }
 }
 /**
  * Convenience function to ping the daemon.
@@ -311,8 +328,8 @@ export function queryDaemonSync(query, projectDir) {
  * @returns true if daemon responds to ping
  */
 export async function pingDaemon(projectDir) {
-    const response = await queryDaemon({ cmd: 'ping' }, projectDir);
-    return response.status === 'ok';
+  const response = await queryDaemon({ cmd: "ping" }, projectDir);
+  return response.status === "ok";
 }
 /**
  * Convenience function to search using the daemon.
@@ -323,8 +340,11 @@ export async function pingDaemon(projectDir) {
  * @returns Search results or empty array
  */
 export async function searchDaemon(pattern, projectDir, maxResults = 100) {
-    const response = await queryDaemon({ cmd: 'search', pattern, max_results: maxResults }, projectDir);
-    return response.results || [];
+  const response = await queryDaemon(
+    { cmd: "search", pattern, max_results: maxResults },
+    projectDir,
+  );
+  return response.results || [];
 }
 /**
  * Convenience function to get impact analysis (callers of a function).
@@ -334,8 +354,11 @@ export async function searchDaemon(pattern, projectDir, maxResults = 100) {
  * @returns Array of callers or empty array
  */
 export async function impactDaemon(funcName, projectDir) {
-    const response = await queryDaemon({ cmd: 'impact', func: funcName }, projectDir);
-    return response.callers || [];
+  const response = await queryDaemon(
+    { cmd: "impact", func: funcName },
+    projectDir,
+  );
+  return response.callers || [];
 }
 /**
  * Convenience function to extract file info.
@@ -345,8 +368,11 @@ export async function impactDaemon(funcName, projectDir) {
  * @returns Extraction result or null
  */
 export async function extractDaemon(filePath, projectDir) {
-    const response = await queryDaemon({ cmd: 'extract', file: filePath }, projectDir);
-    return response.result || null;
+  const response = await queryDaemon(
+    { cmd: "extract", file: filePath },
+    projectDir,
+  );
+  return response.result || null;
 }
 /**
  * Get daemon status.
@@ -355,7 +381,7 @@ export async function extractDaemon(filePath, projectDir) {
  * @returns Status response
  */
 export async function statusDaemon(projectDir) {
-    return queryDaemon({ cmd: 'status' }, projectDir);
+  return queryDaemon({ cmd: "status" }, projectDir);
 }
 /**
  * Convenience function for dead code analysis.
@@ -365,9 +391,16 @@ export async function statusDaemon(projectDir) {
  * @param language - Language to analyze (default: python)
  * @returns Dead code analysis result
  */
-export async function deadCodeDaemon(projectDir, entryPoints, language = 'python') {
-    const response = await queryDaemon({ cmd: 'dead', entry_points: entryPoints, language }, projectDir);
-    return response.result || response;
+export async function deadCodeDaemon(
+  projectDir,
+  entryPoints,
+  language = "python",
+) {
+  const response = await queryDaemon(
+    { cmd: "dead", entry_points: entryPoints, language },
+    projectDir,
+  );
+  return response.result || response;
 }
 /**
  * Convenience function for architecture analysis.
@@ -376,9 +409,9 @@ export async function deadCodeDaemon(projectDir, entryPoints, language = 'python
  * @param language - Language to analyze (default: python)
  * @returns Architecture analysis result
  */
-export async function archDaemon(projectDir, language = 'python') {
-    const response = await queryDaemon({ cmd: 'arch', language }, projectDir);
-    return response.result || response;
+export async function archDaemon(projectDir, language = "python") {
+  const response = await queryDaemon({ cmd: "arch", language }, projectDir);
+  return response.result || response;
 }
 /**
  * Convenience function for CFG extraction.
@@ -389,9 +422,17 @@ export async function archDaemon(projectDir, language = 'python') {
  * @param language - Language (default: python)
  * @returns CFG result
  */
-export async function cfgDaemon(filePath, funcName, projectDir, language = 'python') {
-    const response = await queryDaemon({ cmd: 'cfg', file: filePath, function: funcName, language }, projectDir);
-    return response.result || response;
+export async function cfgDaemon(
+  filePath,
+  funcName,
+  projectDir,
+  language = "python",
+) {
+  const response = await queryDaemon(
+    { cmd: "cfg", file: filePath, function: funcName, language },
+    projectDir,
+  );
+  return response.result || response;
 }
 /**
  * Convenience function for DFG extraction.
@@ -402,9 +443,17 @@ export async function cfgDaemon(filePath, funcName, projectDir, language = 'pyth
  * @param language - Language (default: python)
  * @returns DFG result
  */
-export async function dfgDaemon(filePath, funcName, projectDir, language = 'python') {
-    const response = await queryDaemon({ cmd: 'dfg', file: filePath, function: funcName, language }, projectDir);
-    return response.result || response;
+export async function dfgDaemon(
+  filePath,
+  funcName,
+  projectDir,
+  language = "python",
+) {
+  const response = await queryDaemon(
+    { cmd: "dfg", file: filePath, function: funcName, language },
+    projectDir,
+  );
+  return response.result || response;
 }
 /**
  * Convenience function for program slicing.
@@ -417,9 +466,26 @@ export async function dfgDaemon(filePath, funcName, projectDir, language = 'pyth
  * @param variable - Optional variable to track
  * @returns Slice result with lines array
  */
-export async function sliceDaemon(filePath, funcName, line, projectDir, direction = 'backward', variable) {
-    const response = await queryDaemon({ cmd: 'slice', file: filePath, function: funcName, line, direction, variable }, projectDir);
-    return response;
+export async function sliceDaemon(
+  filePath,
+  funcName,
+  line,
+  projectDir,
+  direction = "backward",
+  variable,
+) {
+  const response = await queryDaemon(
+    {
+      cmd: "slice",
+      file: filePath,
+      function: funcName,
+      line,
+      direction,
+      variable,
+    },
+    projectDir,
+  );
+  return response;
 }
 /**
  * Convenience function for building call graph.
@@ -428,9 +494,9 @@ export async function sliceDaemon(filePath, funcName, line, projectDir, directio
  * @param language - Language (default: python)
  * @returns Call graph result
  */
-export async function callsDaemon(projectDir, language = 'python') {
-    const response = await queryDaemon({ cmd: 'calls', language }, projectDir);
-    return response.result || response;
+export async function callsDaemon(projectDir, language = "python") {
+  const response = await queryDaemon({ cmd: "calls", language }, projectDir);
+  return response.result || response;
 }
 /**
  * Convenience function for cache warming.
@@ -439,8 +505,8 @@ export async function callsDaemon(projectDir, language = 'python') {
  * @param language - Language (default: python)
  * @returns Warm result with file/edge counts
  */
-export async function warmDaemon(projectDir, language = 'python') {
-    return queryDaemon({ cmd: 'warm', language }, projectDir);
+export async function warmDaemon(projectDir, language = "python") {
+  return queryDaemon({ cmd: "warm", language }, projectDir);
 }
 /**
  * Convenience function for semantic search.
@@ -451,8 +517,11 @@ export async function warmDaemon(projectDir, language = 'python') {
  * @returns Search results
  */
 export async function semanticSearchDaemon(projectDir, query, k = 10) {
-    const response = await queryDaemon({ cmd: 'semantic', action: 'search', query, k }, projectDir);
-    return response.results || [];
+  const response = await queryDaemon(
+    { cmd: "semantic", action: "search", query, k },
+    projectDir,
+  );
+  return response.results || [];
 }
 /**
  * Convenience function for semantic indexing.
@@ -461,6 +530,9 @@ export async function semanticSearchDaemon(projectDir, query, k = 10) {
  * @param language - Language (default: python)
  * @returns Index result with count
  */
-export async function semanticIndexDaemon(projectDir, language = 'python') {
-    return queryDaemon({ cmd: 'semantic', action: 'index', language }, projectDir);
+export async function semanticIndexDaemon(projectDir, language = "python") {
+  return queryDaemon(
+    { cmd: "semantic", action: "index", language },
+    projectDir,
+  );
 }

@@ -30,14 +30,15 @@ Dedicated security analysis for sensitive code.
 
 ## Agent Sequence
 
-| # | Agent | Role | Output |
-|---|-------|------|--------|
-| 1 | **aegis** | Comprehensive security scan | Vulnerability report |
-| 2 | **arbiter** | Verify fixes, run security tests | Verification report |
+| #   | Agent       | Role                             | Output               |
+| --- | ----------- | -------------------------------- | -------------------- |
+| 1   | **aegis**   | Comprehensive security scan      | Vulnerability report |
+| 2   | **arbiter** | Verify fixes, run security tests | Verification report  |
 
 ## Why Dedicated Security?
 
 The `/review` workflow focuses on code quality. Security needs:
+
 - Specialized vulnerability patterns
 - Dependency scanning
 - Secret detection
@@ -116,24 +117,28 @@ Task(
 ## Security Scopes
 
 ### Full Codebase
+
 ```
 User: /security
 → Scan entire codebase
 ```
 
 ### Specific Area
+
 ```
 User: /security authentication
 → Focus on auth-related code
 ```
 
 ### Single File
+
 ```
 User: /security src/api/auth.py
 → Deep dive on one file
 ```
 
 ### Dependencies Only
+
 ```
 User: /security --deps
 → Only dependency vulnerabilities
@@ -209,18 +214,18 @@ Security audit: PASSED
 
 ## OWASP Top 10 Coverage
 
-| Risk | Checked |
-|------|---------|
-| A01 Broken Access Control | ✅ |
-| A02 Cryptographic Failures | ✅ |
-| A03 Injection | ✅ |
-| A04 Insecure Design | ✅ |
-| A05 Security Misconfiguration | ✅ |
-| A06 Vulnerable Components | ✅ |
-| A07 Auth Failures | ✅ |
-| A08 Data Integrity Failures | ✅ |
-| A09 Logging Failures | ✅ |
-| A10 SSRF | ✅ |
+| Risk                          | Checked |
+| ----------------------------- | ------- |
+| A01 Broken Access Control     | ✅      |
+| A02 Cryptographic Failures    | ✅      |
+| A03 Injection                 | ✅      |
+| A04 Insecure Design           | ✅      |
+| A05 Security Misconfiguration | ✅      |
+| A06 Vulnerable Components     | ✅      |
+| A07 Auth Failures             | ✅      |
+| A08 Data Integrity Failures   | ✅      |
+| A09 Logging Failures          | ✅      |
+| A10 SSRF                      | ✅      |
 
 ## Flags
 

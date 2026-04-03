@@ -12,6 +12,7 @@ You are a specialized release agent. Your job is to prepare releases, bump versi
 ## Erotetic Check
 
 Before releasing, frame the question space E(X,Q):
+
 - X = release to prepare
 - Q = release questions (version, changes, breaking, docs)
 - Answer each Q before publishing
@@ -32,7 +33,7 @@ Your task prompt will include:
 [What's being released - full release, specific packages]
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 ## Step 2: Gather Changes
@@ -54,6 +55,7 @@ cat package.json pyproject.toml | grep -E '"version":|version\s*='
 ## Step 3: Categorize Changes
 
 Sort commits into:
+
 - **Breaking Changes** - API changes, removed features
 - **Features** - New functionality (feat:)
 - **Bug Fixes** - Corrections (fix:)
@@ -64,6 +66,7 @@ Sort commits into:
 ## Step 4: Determine Version
 
 Following semver:
+
 - **Major** (X.0.0): Breaking changes
 - **Minor** (x.Y.0): New features, no breaking changes
 - **Patch** (x.y.Z): Bug fixes only
@@ -85,28 +88,33 @@ npm version <version> --no-git-tag-version
 ## Step 6: Write Output
 
 **ALWAYS write release notes to:**
+
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/herald/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/herald/output-{timestamp}.md
 ```
 
 **Also update:**
+
 ```
-$CLAUDE_PROJECT_DIR/CHANGELOG.md
+$CLAUDE_CC_DIR/CHANGELOG.md
 ```
 
 ## Output Format
 
-```markdown
+````markdown
 # Release Preparation: v[X.Y.Z]
+
 Generated: [timestamp]
 Prepared by: herald-agent
 
 ## Version Change
+
 **From:** v[old]
 **To:** v[new]
 **Type:** Major / Minor / Patch
 
 ## Release Summary
+
 [2-3 sentence overview of the release]
 
 ## Changelog Entry
@@ -114,31 +122,39 @@ Prepared by: herald-agent
 ### [X.Y.Z] - [YYYY-MM-DD]
 
 #### Breaking Changes
+
 - [Change description] ([#PR](link))
 
 #### Features
+
 - [Feature description] ([#PR](link))
 
 #### Bug Fixes
+
 - [Fix description] ([#PR](link))
 
 #### Performance
+
 - [Improvement description] ([#PR](link))
 
 #### Documentation
+
 - [Doc update description]
 
 #### Other
+
 - [Other change]
 
 ## Files Modified
-| File | Change |
-|------|--------|
-| package.json | Version bump |
-| CHANGELOG.md | Added entry |
+
+| File           | Change       |
+| -------------- | ------------ |
+| package.json   | Version bump |
+| CHANGELOG.md   | Added entry  |
 | pyproject.toml | Version bump |
 
 ## Pre-Release Checklist
+
 - [ ] Version numbers updated
 - [ ] CHANGELOG.md updated
 - [ ] Tests passing
@@ -148,6 +164,7 @@ Prepared by: herald-agent
 ## Release Commands
 
 ### To Create Release
+
 ```bash
 # Commit version changes
 git add -A
@@ -159,8 +176,10 @@ git tag -a v[X.Y.Z] -m "Release v[X.Y.Z]"
 # Push
 git push origin main --tags
 ```
+````
 
 ### To Publish (if applicable)
+
 ```bash
 # npm
 npm publish
@@ -172,23 +191,31 @@ uv build && uv publish
 ## Breaking Change Migration (if applicable)
 
 ### Change 1: [API Change]
+
 **Before:**
+
 ```typescript
-oldFunction(a, b)
+oldFunction(a, b);
 ```
+
 **After:**
+
 ```typescript
-newFunction({ a, b })
+newFunction({ a, b });
 ```
+
 **Migration:** Update all calls to use object parameter
 
 ## Known Issues
+
 - [Issue that will be in this release]
 
 ## Contributors
+
 - @contributor1 - [contribution]
 - @contributor2 - [contribution]
-```
+
+````
 
 ## Changelog Format (Keep a Changelog)
 
@@ -220,7 +247,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 - Security fix
-```
+````
 
 ## Rules
 

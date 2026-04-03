@@ -12,7 +12,6 @@ Use this skill when working on limits-colimits problems in category theory.
 
 ## Decision Tree
 
-
 1. **Identify Limit Type**
    - Product: limit of discrete diagram
    - Equalizer: limit of parallel pair f, g: A -> B
@@ -45,25 +44,28 @@ Use this skill when working on limits-colimits problems in category theory.
    - Lean 4: `Adjunction.rightAdjointPreservesLimits`
    - See: `.claude/skills/lean4-limits/SKILL.md` for exact syntax
 
-
 ## Tool Commands
 
 ### Lean4_Limit
+
 ```bash
 # Lean 4: import CategoryTheory.Limits.Shapes.Products
 ```
 
 ### Lean4_Universal
+
 ```bash
 # Lean 4: IsLimit.lift cone -- unique morphism from universal property
 ```
 
 ### Sympy_Pullback
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py solve "f(a) == g(b)"
 ```
 
 ### Lean4_Build
+
 ```bash
 lake build  # Compiler-in-the-loop verification
 ```

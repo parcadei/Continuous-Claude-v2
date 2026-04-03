@@ -11,15 +11,15 @@ import {
   type PatternType,
   type ScopeType,
   type OperatorType,
-} from './pattern-selector.js';
+} from "./pattern-selector.js";
 
 /**
  * Error thrown when pattern composition validation fails.
  */
 export class CompositionInvalidError extends Error {
   constructor(public readonly errors: string[]) {
-    super(`Invalid composition: ${errors.join('; ')}`);
-    this.name = 'CompositionInvalidError';
+    super(`Invalid composition: ${errors.join("; ")}`);
+    this.name = "CompositionInvalidError";
   }
 }
 
@@ -39,13 +39,13 @@ export class CompositionInvalidError extends Error {
 export function gate3Composition(
   patternA: string,
   patternB: string,
-  scope: ScopeType = 'handoff',
-  operator: OperatorType = ';'
+  scope: ScopeType = "handoff",
+  operator: OperatorType = ";",
 ): ValidationResult {
   const result = validateComposition(
     [patternA, patternB] as PatternType[],
     scope,
-    operator
+    operator,
   );
 
   if (!result.valid) {
@@ -66,8 +66,8 @@ export function gate3Composition(
  */
 export function gate3CompositionChain(
   patterns: PatternType[],
-  scope: ScopeType = 'handoff',
-  operator: OperatorType = ';'
+  scope: ScopeType = "handoff",
+  operator: OperatorType = ";",
 ): ValidationResult {
   const result = validateComposition(patterns, scope, operator);
 

@@ -8,6 +8,10 @@ user-invocable: false
 
 When building infrastructure, verify it's actually connected to the system before marking as complete.
 
+## When to Use
+
+This skill is invoked after building infrastructure to verify it's properly wired. Not user-invocable directly.
+
 ## Pattern
 
 Infrastructure is not done when the code is written - it's done when it's wired into the system and actively used. Dead code (built but never called) is wasted effort.
@@ -15,6 +19,7 @@ Infrastructure is not done when the code is written - it's done when it's wired 
 ## DO
 
 1. **Trace the execution path** - Follow from user intent to actual code execution:
+
    ```bash
    # Example: Verify Task tool spawns correctly
    grep -r "claude -p" src/
@@ -22,6 +27,7 @@ Infrastructure is not done when the code is written - it's done when it's wired 
    ```
 
 2. **Check hooks are registered**, not just implemented:
+
    ```bash
    # Hook exists?
    ls -la .claude/hooks/my-hook.sh
@@ -31,6 +37,7 @@ Infrastructure is not done when the code is written - it's done when it's wired 
    ```
 
 3. **Verify database connections** - Ensure infrastructure uses the right backend:
+
    ```bash
    # Check connection strings
    grep -r "postgresql://" src/
@@ -38,6 +45,7 @@ Infrastructure is not done when the code is written - it's done when it's wired 
    ```
 
 4. **Test end-to-end** - Run the feature and verify infrastructure is invoked:
+
    ```bash
    # Add debug logging
    echo "DEBUG: DAG spawn invoked" >> /tmp/debug.log
@@ -78,6 +86,7 @@ Before declaring infrastructure complete:
 ## Example: DAG Task Graph
 
 **Wrong approach:**
+
 ```
 ✓ Built BeadsTaskGraph class
 ✓ Implemented DAG dependencies
@@ -87,6 +96,7 @@ Before declaring infrastructure complete:
 ```
 
 **Right approach:**
+
 ```
 ✓ Built BeadsTaskGraph class
 ✓ Wired into Task tool execution path

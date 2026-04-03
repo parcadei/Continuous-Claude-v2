@@ -8,6 +8,10 @@ user-invocable: false
 
 Evidence-based patterns for configuring LLM parameters, based on APOLLO and Godel-Prover research.
 
+## When to Use
+
+This skill is invoked when configuring LLM parameters. Not user-invocable directly.
+
 ## Pattern
 
 Different tasks require different LLM configurations. Use these evidence-based settings.
@@ -16,11 +20,11 @@ Different tasks require different LLM configurations. Use these evidence-based s
 
 Based on APOLLO parity analysis:
 
-| Parameter | Value | Rationale |
-|-----------|-------|-----------|
-| max_tokens | 4096 | Proofs need space for chain-of-thought |
-| temperature | 0.6 | Higher creativity for tactic exploration |
-| top_p | 0.95 | Allow diverse proof paths |
+| Parameter   | Value | Rationale                                |
+| ----------- | ----- | ---------------------------------------- |
+| max_tokens  | 4096  | Proofs need space for chain-of-thought   |
+| temperature | 0.6   | Higher creativity for tactic exploration |
+| top_p       | 0.95  | Allow diverse proof paths                |
 
 ### Proof Plan Prompt
 
@@ -39,23 +43,24 @@ The proof plan (chain-of-thought) significantly improves tactic quality.
 ### Parallel Sampling
 
 For hard proofs, use parallel sampling:
+
 - Generate N=8-32 candidate proof attempts
 - Use best-of-N selection
 - Each sample at temperature 0.6-0.8
 
 ## Code Generation
 
-| Parameter | Value | Rationale |
-|-----------|-------|-----------|
-| max_tokens | 2048 | Sufficient for most functions |
-| temperature | 0.2-0.4 | Prefer deterministic output |
+| Parameter   | Value   | Rationale                     |
+| ----------- | ------- | ----------------------------- |
+| max_tokens  | 2048    | Sufficient for most functions |
+| temperature | 0.2-0.4 | Prefer deterministic output   |
 
 ## Creative / Exploration Tasks
 
-| Parameter | Value | Rationale |
-|-----------|-------|-----------|
-| max_tokens | 4096 | Space for exploration |
-| temperature | 0.8-1.0 | Maximum creativity |
+| Parameter   | Value   | Rationale             |
+| ----------- | ------- | --------------------- |
+| max_tokens  | 4096    | Space for exploration |
+| temperature | 0.8-1.0 | Maximum creativity    |
 
 ## Anti-Patterns
 

@@ -9,6 +9,16 @@ allowed-tools: [Read, Bash, Glob, Grep]
 
 Run comprehensive health checks on all Claude Code components.
 
+## When to Use
+
+Activate when:
+
+- User says "/mot"
+- User asks for "system health check" or "health check"
+- User says "check hooks" or "check agents"
+- User says "validate setup" or "audit system"
+- User asks "what's broken?" or "what needs fixing?"
+
 ## Usage
 
 ```
@@ -24,6 +34,7 @@ Run comprehensive health checks on all Claude Code components.
 ## Audit Process
 
 ### Phase 1: Skills Audit
+
 ```bash
 # Count skills
 echo "=== SKILLS ==="
@@ -54,6 +65,7 @@ echo "Name consistency: $((SKILL_COUNT - FAIL)) pass, $FAIL fail"
 ```
 
 ### Phase 2: Agents Audit
+
 ```bash
 echo "=== AGENTS ==="
 AGENT_COUNT=$(ls .claude/agents/*.md 2>/dev/null | wc -l | xargs)
@@ -95,6 +107,7 @@ done
 ```
 
 ### Phase 3: Hooks Audit
+
 ```bash
 echo "=== HOOKS ==="
 
@@ -136,6 +149,7 @@ grep -oE '"command":\s*"[^"]*\.sh"' .claude/settings.json 2>/dev/null | \
 ```
 
 ### Phase 4: Memory Audit
+
 ```bash
 echo "=== MEMORY SYSTEM ==="
 
@@ -179,6 +193,7 @@ echo "Checking Python dependencies..."
 ```
 
 ### Phase 5: Cross-Reference Audit
+
 ```bash
 echo "=== CROSS-REFERENCES ==="
 
@@ -202,11 +217,13 @@ echo "Skill→Agent refs: $FAIL broken"
 If `--fix` is specified, automatically fix:
 
 1. **Make shell wrappers executable**
+
    ```bash
    chmod +x .claude/hooks/*.sh
    ```
 
 2. **Rebuild hooks if TypeScript newer than bundles**
+
    ```bash
    cd .claude/hooks && npm run build
    ```
@@ -223,11 +240,13 @@ Write full report to `.claude/cache/mot/report-{timestamp}.md`:
 
 ```markdown
 # MOT Health Report
+
 Generated: {timestamp}
 
 ## Summary
+
 | Category | Pass | Fail | Warn |
-|----------|------|------|------|
+| -------- | ---- | ---- | ---- |
 | Skills   | 204  | 2    | 0    |
 | Agents   | 47   | 1    | 3    |
 | Hooks    | 58   | 2    | 1    |
@@ -237,15 +256,19 @@ Generated: {timestamp}
 ## Issues Found
 
 ### P0 - Critical
+
 - [FAIL] Hook build failed: tldr-context-inject.ts
 
 ### P1 - High
+
 - [FAIL] Agent references missing: scot → scout (typo)
 
 ### P2 - Medium
+
 - [WARN] 3 hooks need rebuild (dist older than src)
 
 ### P3 - Low
+
 - [INFO] VOYAGE_API_KEY not set (using local BGE)
 ```
 
@@ -258,6 +281,7 @@ Generated: {timestamp}
 ## Quick Mode (--quick)
 
 Only run P0 checks:
+
 1. Frontmatter parses
 2. Hooks build
 3. Shell wrappers executable

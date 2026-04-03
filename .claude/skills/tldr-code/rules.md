@@ -4,14 +4,14 @@
 
 For code-related queries, prefer TLDR over Grep/Read:
 
-| Task | OLD way | NEW way |
-|------|---------|---------|
-| Debug function | Grep → Read file | TLDR call_graph + cfg |
-| Understand function | Read file | TLDR call_graph |
-| Check complexity | Read + count | TLDR cfg |
-| Track variable | Grep through files | TLDR dfg |
-| Find dependencies | Grep imports | TLDR pdg |
-| Refactor safely | Read all files | TLDR call_graph (who calls this?) |
+| Task                | OLD way            | NEW way                           |
+| ------------------- | ------------------ | --------------------------------- |
+| Debug function      | Grep → Read file   | TLDR call_graph + cfg             |
+| Understand function | Read file          | TLDR call_graph                   |
+| Check complexity    | Read + count       | TLDR cfg                          |
+| Track variable      | Grep through files | TLDR dfg                          |
+| Find dependencies   | Grep imports       | TLDR pdg                          |
+| Refactor safely     | Read all files     | TLDR call_graph (who calls this?) |
 
 ## Decision Tree
 

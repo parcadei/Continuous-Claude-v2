@@ -18,18 +18,20 @@ Cognitive prosthetics for unit-aware computation. Use Pint for converting betwee
 
 ## Quick Reference
 
-| I want to... | Command | Example |
-|--------------|---------|---------|
-| Convert units | `convert` | `convert "5 meters" --to feet` |
-| Unit math | `calc` | `calc "10 m/s * 5 s"` |
-| Check dimensions | `check` | `check newton --against "kg * m / s^2"` |
-| Parse quantity | `parse` | `parse "100 km/h"` |
-| Simplify units | `simplify` | `simplify "1 kg*m/s^2"` |
+| I want to...     | Command    | Example                                 |
+| ---------------- | ---------- | --------------------------------------- |
+| Convert units    | `convert`  | `convert "5 meters" --to feet`          |
+| Unit math        | `calc`     | `calc "10 m/s * 5 s"`                   |
+| Check dimensions | `check`    | `check newton --against "kg * m / s^2"` |
+| Parse quantity   | `parse`    | `parse "100 km/h"`                      |
+| Simplify units   | `simplify` | `simplify "1 kg*m/s^2"`                 |
 
 ## Commands
 
 ### parse
+
 Parse a quantity string into magnitude, units, and dimensionality.
+
 ```bash
 uv run python -m runtime.harness scripts/pint_compute.py \
     parse "100 km/h"
@@ -39,7 +41,9 @@ uv run python -m runtime.harness scripts/pint_compute.py \
 ```
 
 ### convert
+
 Convert a quantity to different units.
+
 ```bash
 uv run python -m runtime.harness scripts/pint_compute.py \
     convert "5 meters" --to feet
@@ -52,7 +56,9 @@ uv run python -m runtime.harness scripts/pint_compute.py \
 ```
 
 ### calc
+
 Perform unit-aware arithmetic. Operators must be space-separated.
+
 ```bash
 uv run python -m runtime.harness scripts/pint_compute.py \
     calc "5 m * 3 s"
@@ -65,7 +71,9 @@ uv run python -m runtime.harness scripts/pint_compute.py \
 ```
 
 ### check
+
 Check if two units have compatible dimensions.
+
 ```bash
 uv run python -m runtime.harness scripts/pint_compute.py \
     check newton --against "kg * m / s^2"
@@ -75,7 +83,9 @@ uv run python -m runtime.harness scripts/pint_compute.py \
 ```
 
 ### simplify
+
 Simplify compound units to base or compact form.
+
 ```bash
 uv run python -m runtime.harness scripts/pint_compute.py \
     simplify "1 kg*m/s^2"
@@ -86,17 +96,17 @@ uv run python -m runtime.harness scripts/pint_compute.py \
 
 ## Common Unit Domains
 
-| Domain | Examples |
-|--------|----------|
-| Length | meter, foot, inch, mile, km, yard |
-| Time | second, minute, hour, day, year |
-| Mass | kg, gram, pound, ounce, ton |
-| Velocity | m/s, km/h, mph, knot |
-| Energy | joule, calorie, eV, kWh, BTU |
-| Force | newton, pound_force, dyne |
-| Temperature | kelvin, celsius, fahrenheit |
-| Pressure | pascal, bar, atmosphere, psi |
-| Power | watt, horsepower |
+| Domain      | Examples                          |
+| ----------- | --------------------------------- |
+| Length      | meter, foot, inch, mile, km, yard |
+| Time        | second, minute, hour, day, year   |
+| Mass        | kg, gram, pound, ounce, ton       |
+| Velocity    | m/s, km/h, mph, knot              |
+| Energy      | joule, calorie, eV, kWh, BTU      |
+| Force       | newton, pound_force, dyne         |
+| Temperature | kelvin, celsius, fahrenheit       |
+| Pressure    | pascal, bar, atmosphere, psi      |
+| Power       | watt, horsepower                  |
 
 ## Output Format
 
@@ -115,6 +125,7 @@ All commands return JSON with relevant fields:
 ## Error Handling
 
 Dimensionality errors are caught and reported:
+
 ```bash
 # This will error - incompatible dimensions
 uv run python -m runtime.harness scripts/pint_compute.py \

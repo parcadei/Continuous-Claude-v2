@@ -54,16 +54,19 @@ tldr arch [path]                    # Detect architectural layers
 ```
 
 **Impact Analysis**: Before refactoring, check what would break
+
 ```bash
 tldr impact process_data src/ --depth 3 --file "*.py"
 ```
 
 **Dead Code Detection**: Find unused functions for cleanup
+
 ```bash
 tldr dead src/ --entry main cli test_
 ```
 
 **Architecture Detection**: Understand layer structure
+
 ```bash
 tldr arch src/
 # Output:
@@ -130,26 +133,31 @@ Machine-verified mathematical proofs using Lean 4 and Mathlib.
 ### 5-Phase Workflow
 
 **Phase 1: RESEARCH** - Understand if/how this can be formalized
+
 - Search Mathlib for existing formalizations
 - Find proof strategies using Nia MCP, Perplexity MCP, or WebSearch
 - Identify obstacles (missing lemmas, required axioms)
 
 **Phase 2: DESIGN** - Build proof structure with sorries
+
 - Create Lean file with imports, definitions, theorem statement
 - Add helper lemmas as `sorry` placeholders
 - Annotate each sorry with complexity estimate
 
 **Phase 3: TEST** - Catch false lemmas before proving
+
 - Generate test cases for axiom candidates
 - Run counterexample search with `#eval`
 - Reformulate if counterexamples found
 
 **Phase 4: IMPLEMENT** - Fill in the proofs
+
 - Compiler-in-the-loop checks on every write
 - Godel-Prover suggests tactics on errors
 - Iterate until all sorries filled
 
 **Phase 5: VERIFY** - Audit proof quality
+
 - Check axioms used (propext, Classical.choice are standard)
 - Confirm zero sorries remaining
 - Generate summary with proof strategy
@@ -158,17 +166,18 @@ Machine-verified mathematical proofs using Lean 4 and Mathlib.
 
 The workflow uses available tools in priority order:
 
-| Tool | Best For |
-|------|----------|
-| Mathlib grep/loogle | Existing formalizations |
-| Nia MCP | Library documentation |
-| Perplexity MCP | Proof strategies, papers |
-| WebSearch | General references |
-| WebFetch | Specific paper content |
+| Tool                | Best For                 |
+| ------------------- | ------------------------ |
+| Mathlib grep/loogle | Existing formalizations  |
+| Nia MCP             | Library documentation    |
+| Perplexity MCP      | Proof strategies, papers |
+| WebSearch           | General references       |
+| WebFetch            | Specific paper content   |
 
 ### Checkpoints
 
 The workflow pauses for user input when:
+
 - Research finds obstacles requiring decisions
 - Testing finds counterexamples
 - Implementation hits unfillable sorry after N attempts
@@ -197,13 +206,13 @@ The workflow pauses for user input when:
 
 ### What Can Be Proven
 
-| Domain | Examples |
-|--------|----------|
-| Category Theory | Functors, natural transformations, Yoneda |
-| Abstract Algebra | Groups, rings, homomorphisms |
-| Topology | Continuity, compactness, connectedness |
-| Analysis | Limits, derivatives, integrals |
-| Logic | Propositional, first-order |
+| Domain           | Examples                                  |
+| ---------------- | ----------------------------------------- |
+| Category Theory  | Functors, natural transformations, Yoneda |
+| Abstract Algebra | Groups, rings, homomorphisms              |
+| Topology         | Continuity, compactness, connectedness    |
+| Analysis         | Limits, derivatives, integrals            |
+| Logic            | Propositional, first-order                |
 
 ### Behind the Scenes
 
@@ -227,6 +236,7 @@ Store knowledge for future sessions:
 ```
 
 **Storage command (direct)**:
+
 ```bash
 cd opc && uv run python scripts/store_learning.py \
   --session-id "remember-$(date +%Y%m%d-%H%M%S)" \
@@ -258,6 +268,7 @@ cd opc && PYTHONPATH=. uv run python scripts/recall_learnings.py \
 ### What's Stored
 
 The memory system contains session learnings:
+
 - **What worked**: Successful approaches and solutions
 - **What failed**: Pitfalls to avoid
 - **Decisions**: Architectural choices and rationale
@@ -290,18 +301,21 @@ The memory system contains session learnings:
 ### Search Modes
 
 **Text-only (SQLite/Postgres)**:
+
 ```bash
 # Fast keyword search
 recall_learnings.py --query "redis cache"
 ```
 
 **Hybrid RRF (Postgres only)**:
+
 ```bash
 # Combines text + vector rankings (default for postgres)
 recall_learnings.py --query "authentication" --k 10
 ```
 
 **Vector-only (Postgres)**:
+
 ```bash
 # Semantic similarity only
 recall_learnings.py --query "user login" --provider openai
@@ -310,6 +324,7 @@ recall_learnings.py --query "user login" --provider openai
 ### When to Use Recall
 
 Query memory proactively when:
+
 - Starting work on something you may have done before
 - Encountering an error or tricky situation
 - Making architectural or design decisions
@@ -322,36 +337,42 @@ Model Context Protocol servers extend Claude Code with external tools.
 ### Available MCP Servers
 
 **ast-grep** - Structural code search
+
 ```bash
 # Search by AST pattern, not text
 mcp__ast-grep__search --pattern "function $NAME($ARGS) { $BODY }"
 ```
 
 **firecrawl** - Web scraping and crawling
+
 ```bash
 # Extract structured data from websites
 mcp__firecrawl__scrape --url "https://example.com"
 ```
 
 **github-search** - GitHub repository search
+
 ```bash
 # Search across GitHub codebases
 mcp__github-search__code --query "authentication typescript"
 ```
 
 **morph** - Fast file editing
+
 ```bash
 # Efficient bulk edits
 mcp__morph__edit --file "src/config.ts" --changes "..."
 ```
 
 **nia** - Documentation search
+
 ```bash
 # Search library docs
 mcp__nia__search --query "React hooks useEffect"
 ```
 
 **perplexity** - AI-powered web research
+
 ```bash
 # Get research summaries
 mcp__perplexity__search --query "best practices for API design"
@@ -360,10 +381,12 @@ mcp__perplexity__search --query "best practices for API design"
 ### MCP Configuration
 
 MCP servers can be configured in:
+
 - Project: `.mcp.json` (committed to repo)
 - User: `~/.claude/mcp-config.json` (personal tools)
 
 Example configuration:
+
 ```json
 {
   "mcpServers": {
@@ -398,49 +421,53 @@ claude mcp list
 
 ### When to Use MCP Tools
 
-| Tool | Use Case |
-|------|----------|
-| ast-grep | Structural refactoring, pattern-based search |
-| firecrawl | Web scraping, data extraction |
-| github-search | Cross-repo code search |
-| morph | Bulk file edits |
-| nia | Library documentation lookup |
-| perplexity | Research, proof strategies, current info |
+| Tool          | Use Case                                     |
+| ------------- | -------------------------------------------- |
+| ast-grep      | Structural refactoring, pattern-based search |
+| firecrawl     | Web scraping, data extraction                |
+| github-search | Cross-repo code search                       |
+| morph         | Bulk file edits                              |
+| nia           | Library documentation lookup                 |
+| perplexity    | Research, proof strategies, current info     |
 
 ## Tool Selection Guide
 
 ### Code Analysis
+
 - **Structure overview**: `tldr structure` or `tldr tree`
 - **Find functions**: `tldr search` or `ast-grep`
 - **Understand flow**: `tldr cfg` or `tldr dfg`
 - **Check impact**: `tldr impact`
 
 ### Research
+
 - **Math proofs**: Nia MCP, then Perplexity MCP, then WebSearch
 - **Library docs**: Nia MCP
 - **Current events**: Perplexity MCP or WebSearch
 - **Code examples**: GitHub MCP
 
 ### Memory
+
 - **Store learning**: `/remember` or `store_learning.py`
 - **Recall patterns**: `/recall` or `recall_learnings.py`
 - **Check past work**: Recall with specific keywords
 
 ### Verification
+
 - **Math proofs**: `/prove` (Lean 4)
 - **Code correctness**: Unit tests, type checking
 - **Architectural review**: `tldr arch`, dead code analysis
 
 ## Performance Characteristics
 
-| Tool | Speed | Token Usage | Best For |
-|------|-------|-------------|----------|
-| TLDR | Fast | 95% savings | Structure, flow, analysis |
-| /prove | Slow | High | Mathematical correctness |
-| Recall (SQLite) | Fast | Low | Text search |
-| Recall (Postgres+vector) | Medium | Medium | Semantic search |
-| ast-grep | Fast | Low | Structural patterns |
-| Perplexity MCP | Medium | Medium | Research summaries |
+| Tool                     | Speed  | Token Usage | Best For                  |
+| ------------------------ | ------ | ----------- | ------------------------- |
+| TLDR                     | Fast   | 95% savings | Structure, flow, analysis |
+| /prove                   | Slow   | High        | Mathematical correctness  |
+| Recall (SQLite)          | Fast   | Low         | Text search               |
+| Recall (Postgres+vector) | Medium | Medium      | Semantic search           |
+| ast-grep                 | Fast   | Low         | Structural patterns       |
+| Perplexity MCP           | Medium | Medium      | Research summaries        |
 
 ## Environment Variables
 
@@ -464,6 +491,7 @@ MCP_TOOL_TIMEOUT=30000            # Tool execution timeout (ms)
 ## Troubleshooting
 
 ### TLDR not found
+
 ```bash
 # Install from PyPI
 uv tool install llm-tldr
@@ -471,6 +499,7 @@ uv tool install llm-tldr
 ```
 
 ### Recall returns no results
+
 ```bash
 # Check backend
 cd opc && uv run python scripts/recall_learnings.py --query "test"
@@ -483,6 +512,7 @@ psql $DATABASE_URL -c "SELECT COUNT(*) FROM archival_memory"
 ```
 
 ### /prove fails to start
+
 ```bash
 # Check Lean installation
 lean --version
@@ -492,6 +522,7 @@ curl http://localhost:1234/health
 ```
 
 ### MCP server won't connect
+
 ```bash
 # List servers and status
 claude mcp list

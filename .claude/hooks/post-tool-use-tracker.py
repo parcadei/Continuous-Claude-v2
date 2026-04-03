@@ -349,7 +349,7 @@ def handle_edit_tool(tool_info: dict) -> None:
     tsc_cmd = get_tsc_command(repo)
 
     commands_file = cache_dir / "commands.txt"
-    commands_tmp = cache_dir / "commands.txt.tmp"
+    cache_dir / "commands.txt.tmp"
 
     # Read existing commands
     existing_commands = set()

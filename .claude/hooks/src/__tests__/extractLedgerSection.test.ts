@@ -7,14 +7,14 @@
  * Run with: npx tsx --test src/__tests__/extractLedgerSection.test.ts
  */
 
-import { describe, it } from 'node:test';
-import * as assert from 'node:assert';
+import { describe, it } from "node:test";
+import * as assert from "node:assert";
 
 // Import the function under test
-import { extractLedgerSection } from '../session-start-continuity.js';
+import { extractLedgerSection } from "../session-start-continuity.js";
 
-describe('extractLedgerSection', () => {
-  it('should return correct Ledger section from valid handoff', () => {
+describe("extractLedgerSection", () => {
+  it("should return correct Ledger section from valid handoff", () => {
     const handoffContent = `# Work Stream: test-session
 
 ## Ledger
@@ -46,17 +46,39 @@ More context lines.
 
     const result = extractLedgerSection(handoffContent);
 
-    assert.notStrictEqual(result, null, 'Should not return null for valid handoff with Ledger section');
-    assert.ok(result!.startsWith('## Ledger'), 'Result should start with "## Ledger"');
-    assert.ok(result!.includes('**Goal:** Test the new format'), 'Should include Goal field');
-    assert.ok(result!.includes('### Now'), 'Should include Now section');
-    assert.ok(result!.includes('[->] Testing new format'), 'Should include current focus');
-    assert.ok(result!.includes('### Decisions'), 'Should include Decisions section');
-    assert.ok(!result!.includes('## Context'), 'Should NOT include Context section');
-    assert.ok(!result!.includes('Detailed context here'), 'Should NOT include context content');
+    assert.notStrictEqual(
+      result,
+      null,
+      "Should not return null for valid handoff with Ledger section",
+    );
+    assert.ok(
+      result!.startsWith("## Ledger"),
+      'Result should start with "## Ledger"',
+    );
+    assert.ok(
+      result!.includes("**Goal:** Test the new format"),
+      "Should include Goal field",
+    );
+    assert.ok(result!.includes("### Now"), "Should include Now section");
+    assert.ok(
+      result!.includes("[->] Testing new format"),
+      "Should include current focus",
+    );
+    assert.ok(
+      result!.includes("### Decisions"),
+      "Should include Decisions section",
+    );
+    assert.ok(
+      !result!.includes("## Context"),
+      "Should NOT include Context section",
+    );
+    assert.ok(
+      !result!.includes("Detailed context here"),
+      "Should NOT include context content",
+    );
   });
 
-  it('should return null for handoff without Ledger section', () => {
+  it("should return null for handoff without Ledger section", () => {
     const handoffContent = `# Work Stream: test-session
 
 ## Context
@@ -69,18 +91,22 @@ Just context directly.
 
     const result = extractLedgerSection(handoffContent);
 
-    assert.strictEqual(result, null, 'Should return null when no Ledger section exists');
+    assert.strictEqual(
+      result,
+      null,
+      "Should return null when no Ledger section exists",
+    );
   });
 
-  it('should return null for empty file', () => {
-    const handoffContent = '';
+  it("should return null for empty file", () => {
+    const handoffContent = "";
 
     const result = extractLedgerSection(handoffContent);
 
-    assert.strictEqual(result, null, 'Should return null for empty content');
+    assert.strictEqual(result, null, "Should return null for empty content");
   });
 
-  it('should handle Ledger section at end of file (no --- separator)', () => {
+  it("should handle Ledger section at end of file (no --- separator)", () => {
     const handoffContent = `# Work Stream: test-session
 
 ## Ledger
@@ -96,15 +122,25 @@ Just context directly.
 
     const result = extractLedgerSection(handoffContent);
 
-    assert.notStrictEqual(result, null, 'Should not return null when Ledger is at end of file');
-    assert.ok(result!.startsWith('## Ledger'), 'Result should start with "## Ledger"');
-    assert.ok(result!.includes('**Goal:** Test edge case'), 'Should include Goal field');
-    assert.ok(result!.includes('### Now'), 'Should include Now section');
-    assert.ok(result!.includes('### Next'), 'Should include Next section');
-    assert.ok(result!.includes('Future task'), 'Should include the last item');
+    assert.notStrictEqual(
+      result,
+      null,
+      "Should not return null when Ledger is at end of file",
+    );
+    assert.ok(
+      result!.startsWith("## Ledger"),
+      'Result should start with "## Ledger"',
+    );
+    assert.ok(
+      result!.includes("**Goal:** Test edge case"),
+      "Should include Goal field",
+    );
+    assert.ok(result!.includes("### Now"), "Should include Now section");
+    assert.ok(result!.includes("### Next"), "Should include Next section");
+    assert.ok(result!.includes("Future task"), "Should include the last item");
   });
 
-  it('should handle multiple ## headings after Ledger - stops at first ---', () => {
+  it("should handle multiple ## headings after Ledger - stops at first ---", () => {
     const handoffContent = `# Work Stream: test-session
 
 ## Ledger
@@ -132,15 +168,27 @@ Blockers section.
 
     const result = extractLedgerSection(handoffContent);
 
-    assert.notStrictEqual(result, null, 'Should not return null');
-    assert.ok(result!.startsWith('## Ledger'), 'Result should start with "## Ledger"');
-    assert.ok(result!.includes('### Decisions'), 'Should include Decisions (before separator)');
-    assert.ok(!result!.includes('## Context'), 'Should NOT include Context (after separator)');
-    assert.ok(!result!.includes('## What Was Done'), 'Should NOT include What Was Done');
-    assert.ok(!result!.includes('## Blockers'), 'Should NOT include Blockers');
+    assert.notStrictEqual(result, null, "Should not return null");
+    assert.ok(
+      result!.startsWith("## Ledger"),
+      'Result should start with "## Ledger"',
+    );
+    assert.ok(
+      result!.includes("### Decisions"),
+      "Should include Decisions (before separator)",
+    );
+    assert.ok(
+      !result!.includes("## Context"),
+      "Should NOT include Context (after separator)",
+    );
+    assert.ok(
+      !result!.includes("## What Was Done"),
+      "Should NOT include What Was Done",
+    );
+    assert.ok(!result!.includes("## Blockers"), "Should NOT include Blockers");
   });
 
-  it('should handle Ledger with no --- but next ## heading', () => {
+  it("should handle Ledger with no --- but next ## heading", () => {
     // Edge case: No --- separator, but there's a ## heading that ends the Ledger
     const handoffContent = `# Work Stream: test-session
 
@@ -157,13 +205,19 @@ This is after Ledger, should not be included.
 
     const result = extractLedgerSection(handoffContent);
 
-    assert.notStrictEqual(result, null, 'Should not return null');
-    assert.ok(result!.includes('**Goal:** No separator test'), 'Should include Goal');
-    assert.ok(result!.includes('### Now'), 'Should include Now');
-    assert.ok(!result!.includes('## Context'), 'Should stop at ## Context heading');
+    assert.notStrictEqual(result, null, "Should not return null");
+    assert.ok(
+      result!.includes("**Goal:** No separator test"),
+      "Should include Goal",
+    );
+    assert.ok(result!.includes("### Now"), "Should include Now");
+    assert.ok(
+      !result!.includes("## Context"),
+      "Should stop at ## Context heading",
+    );
   });
 
-  it('should trim whitespace from extracted content', () => {
+  it("should trim whitespace from extracted content", () => {
     const handoffContent = `# Work Stream: test-session
 
 ## Ledger
@@ -182,8 +236,11 @@ This is after Ledger, should not be included.
 
     const result = extractLedgerSection(handoffContent);
 
-    assert.notStrictEqual(result, null, 'Should not return null');
+    assert.notStrictEqual(result, null, "Should not return null");
     // The result should be trimmed (no leading/trailing whitespace in content)
-    assert.ok(!result!.endsWith('\n\n\n'), 'Should not end with multiple newlines');
+    assert.ok(
+      !result!.endsWith("\n\n\n"),
+      "Should not end with multiple newlines",
+    );
   });
 });

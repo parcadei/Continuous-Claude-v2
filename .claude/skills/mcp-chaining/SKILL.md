@@ -20,13 +20,13 @@ A research-to-implement pipeline that chains 5 MCP tools for end-to-end workflow
 
 A pipeline that chains these tools:
 
-| Step | Server | Tool ID | Purpose |
-|------|--------|---------|---------|
-| 1 | nia | `nia__search` | Search library documentation |
-| 2 | ast-grep | `ast-grep__find_code` | Find AST code patterns |
-| 3 | morph | `morph__warpgrep_codebase_search` | Fast codebase search |
-| 4 | qlty | `qlty__qlty_check` | Code quality validation |
-| 5 | git | `git__git_status` | Git operations |
+| Step | Server   | Tool ID                           | Purpose                      |
+| ---- | -------- | --------------------------------- | ---------------------------- |
+| 1    | nia      | `nia__search`                     | Search library documentation |
+| 2    | ast-grep | `ast-grep__find_code`             | Find AST code patterns       |
+| 3    | morph    | `morph__warpgrep_codebase_search` | Fast codebase search         |
+| 4    | qlty     | `qlty__qlty_check`                | Code quality validation      |
+| 5    | git      | `git__git_status`                 | Git operations               |
 
 ## Key Files
 
@@ -82,6 +82,7 @@ if not await check_tool_available("nia__search"):
 ## Tool Name Reference
 
 ### nia (Documentation Search)
+
 ```
 nia__search              - Universal documentation search
 nia__nia_research        - Research with sources
@@ -90,6 +91,7 @@ nia__nia_explore         - Explore package structure
 ```
 
 ### ast-grep (Structural Code Search)
+
 ```
 ast-grep__find_code      - Find code by AST pattern
 ast-grep__find_code_by_rule - Find by YAML rule
@@ -97,12 +99,14 @@ ast-grep__scan_code      - Scan with multiple patterns
 ```
 
 ### morph (Fast Text Search + Edit)
+
 ```
 morph__warpgrep_codebase_search  - 20x faster grep
 morph__edit_file                 - Smart file editing
 ```
 
 ### qlty (Code Quality)
+
 ```
 qlty__qlty_check         - Run quality checks
 qlty__qlty_fmt           - Auto-format code
@@ -111,6 +115,7 @@ qlty__smells             - Detect code smells
 ```
 
 ### git (Version Control)
+
 ```
 git__git_status          - Get repo status
 git__git_diff            - Show differences

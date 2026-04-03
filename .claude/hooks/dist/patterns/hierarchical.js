@@ -16,9 +16,9 @@
  * - HIERARCHY_LEVEL: Level in hierarchy (0 = coordinator, 1+ = specialist)
  * - CLAUDE_PROJECT_DIR: Project directory for DB path
  */
-import { existsSync } from 'fs';
+import { existsSync } from "fs";
 // Import shared utilities
-import { getDbPath, runPythonQuery, isValidId } from '../shared/db-utils.js';
+import { getDbPath, runPythonQuery, isValidId } from "../shared/db-utils.js";
 // =============================================================================
 // onSubagentStart Handler
 // =============================================================================
@@ -28,40 +28,43 @@ import { getDbPath, runPythonQuery, isValidId } from '../shared/db-utils.js';
  * Always returns 'continue' - never blocks agent start.
  */
 export async function onSubagentStart(input) {
-    const hierarchyId = process.env.HIERARCHY_ID;
-    // If no HIERARCHY_ID, continue silently (not in a hierarchy)
-    if (!hierarchyId) {
-        return { result: 'continue' };
+  const hierarchyId = process.env.HIERARCHY_ID;
+  // If no HIERARCHY_ID, continue silently (not in a hierarchy)
+  if (!hierarchyId) {
+    return { result: "continue" };
+  }
+  // Validate HIERARCHY_ID format
+  if (!isValidId(hierarchyId)) {
+    return { result: "continue" };
+  }
+  const agentRole = process.env.AGENT_ROLE || "specialist";
+  const hierarchyLevel = process.env.HIERARCHY_LEVEL || "1";
+  const coordinatorId = process.env.COORDINATOR_ID;
+  // Log for debugging - this goes to stderr, not stdout
+  console.error(
+    `[hierarchical] Starting ${agentRole} at level ${hierarchyLevel} for hierarchy ${hierarchyId}`,
+  );
+  // Inject role-specific context message
+  let message = "";
+  if (agentRole === "coordinator") {
+    message = `You are the coordinator in a hierarchical pattern. `;
+    message +=
+      "Your role is to decompose complex tasks into subtasks for specialist agents. ";
+    message +=
+      "Delegate to specialists, then synthesize their results into a comprehensive answer.";
+  } else {
+    // Specialist
+    message = `You are a specialist in a hierarchical pattern (level ${hierarchyLevel}). `;
+    message += "Focus on executing your assigned subtask thoroughly. ";
+    message += "Your results will be aggregated by the coordinator.";
+    if (coordinatorId) {
+      message += ` Report to coordinator: ${coordinatorId}`;
     }
-    // Validate HIERARCHY_ID format
-    if (!isValidId(hierarchyId)) {
-        return { result: 'continue' };
-    }
-    const agentRole = process.env.AGENT_ROLE || 'specialist';
-    const hierarchyLevel = process.env.HIERARCHY_LEVEL || '1';
-    const coordinatorId = process.env.COORDINATOR_ID;
-    // Log for debugging - this goes to stderr, not stdout
-    console.error(`[hierarchical] Starting ${agentRole} at level ${hierarchyLevel} for hierarchy ${hierarchyId}`);
-    // Inject role-specific context message
-    let message = '';
-    if (agentRole === 'coordinator') {
-        message = `You are the coordinator in a hierarchical pattern. `;
-        message += 'Your role is to decompose complex tasks into subtasks for specialist agents. ';
-        message += 'Delegate to specialists, then synthesize their results into a comprehensive answer.';
-    }
-    else {
-        // Specialist
-        message = `You are a specialist in a hierarchical pattern (level ${hierarchyLevel}). `;
-        message += 'Focus on executing your assigned subtask thoroughly. ';
-        message += 'Your results will be aggregated by the coordinator.';
-        if (coordinatorId) {
-            message += ` Report to coordinator: ${coordinatorId}`;
-        }
-    }
-    return {
-        result: 'continue',
-        message
-    };
+  }
+  return {
+    result: "continue",
+    message,
+  };
 }
 // =============================================================================
 // onSubagentStop Handler
@@ -72,34 +75,34 @@ export async function onSubagentStart(input) {
  * Notifies when specialists complete.
  */
 export async function onSubagentStop(input) {
-    const hierarchyId = process.env.HIERARCHY_ID;
-    // If no HIERARCHY_ID, continue silently
-    if (!hierarchyId) {
-        return { result: 'continue' };
-    }
-    // Validate HIERARCHY_ID format
-    if (!isValidId(hierarchyId)) {
-        return { result: 'continue' };
-    }
-    const agentId = input.agent_id ?? 'unknown';
-    // Validate agent_id format
-    if (!isValidId(agentId)) {
-        return { result: 'continue' };
-    }
-    const agentRole = process.env.AGENT_ROLE || 'specialist';
-    const coordinatorId = process.env.COORDINATOR_ID;
-    const hierarchyLevel = parseInt(process.env.HIERARCHY_LEVEL || '1', 10);
-    const dbPath = getDbPath();
-    if (!existsSync(dbPath)) {
-        return { result: 'continue' };
-    }
-    // Only track specialist completion (coordinators don't need tracking here)
-    if (agentRole !== 'specialist') {
-        return { result: 'continue' };
-    }
-    try {
-        // Mark specialist as completed
-        const query = `
+  const hierarchyId = process.env.HIERARCHY_ID;
+  // If no HIERARCHY_ID, continue silently
+  if (!hierarchyId) {
+    return { result: "continue" };
+  }
+  // Validate HIERARCHY_ID format
+  if (!isValidId(hierarchyId)) {
+    return { result: "continue" };
+  }
+  const agentId = input.agent_id ?? "unknown";
+  // Validate agent_id format
+  if (!isValidId(agentId)) {
+    return { result: "continue" };
+  }
+  const agentRole = process.env.AGENT_ROLE || "specialist";
+  const coordinatorId = process.env.COORDINATOR_ID;
+  const hierarchyLevel = parseInt(process.env.HIERARCHY_LEVEL || "1", 10);
+  const dbPath = getDbPath();
+  if (!existsSync(dbPath)) {
+    return { result: "continue" };
+  }
+  // Only track specialist completion (coordinators don't need tracking here)
+  if (agentRole !== "specialist") {
+    return { result: "continue" };
+  }
+  try {
+    // Mark specialist as completed
+    const query = `
 import sqlite3
 import json
 import sys
@@ -162,46 +165,45 @@ total_count = cursor.fetchone()[0]
 conn.close()
 print(json.dumps({'completed': completed_count, 'total': total_count}))
 `;
-        const result = runPythonQuery(query, [
-            dbPath,
-            hierarchyId,
-            agentId,
-            coordinatorId || '',
-            hierarchyLevel.toString()
-        ]);
-        if (!result.success) {
-            console.error('SubagentStop Python error:', result.stderr);
-            return { result: 'continue' };
-        }
-        // Parse Python output
-        let counts;
-        try {
-            counts = JSON.parse(result.stdout);
-        }
-        catch (parseErr) {
-            return { result: 'continue' };
-        }
-        // Log for debugging
-        console.error(`[hierarchical] Specialist ${agentId} done. Progress: ${counts.completed}/${counts.total}`);
-        // Notify about progress
-        if (counts.completed >= counts.total && counts.total > 0) {
-            return {
-                result: 'continue',
-                message: `All ${counts.total} specialists have completed their subtasks. Ready for synthesis.`
-            };
-        }
-        else {
-            const remaining = counts.total - counts.completed;
-            return {
-                result: 'continue',
-                message: `Specialist completed. Waiting for ${remaining} more specialist(s) to finish.`
-            };
-        }
+    const result = runPythonQuery(query, [
+      dbPath,
+      hierarchyId,
+      agentId,
+      coordinatorId || "",
+      hierarchyLevel.toString(),
+    ]);
+    if (!result.success) {
+      console.error("SubagentStop Python error:", result.stderr);
+      return { result: "continue" };
     }
-    catch (err) {
-        console.error('SubagentStop hook error:', err);
-        return { result: 'continue' };
+    // Parse Python output
+    let counts;
+    try {
+      counts = JSON.parse(result.stdout);
+    } catch (parseErr) {
+      return { result: "continue" };
     }
+    // Log for debugging
+    console.error(
+      `[hierarchical] Specialist ${agentId} done. Progress: ${counts.completed}/${counts.total}`,
+    );
+    // Notify about progress
+    if (counts.completed >= counts.total && counts.total > 0) {
+      return {
+        result: "continue",
+        message: `All ${counts.total} specialists have completed their subtasks. Ready for synthesis.`,
+      };
+    } else {
+      const remaining = counts.total - counts.completed;
+      return {
+        result: "continue",
+        message: `Specialist completed. Waiting for ${remaining} more specialist(s) to finish.`,
+      };
+    }
+  } catch (err) {
+    console.error("SubagentStop hook error:", err);
+    return { result: "continue" };
+  }
 }
 // =============================================================================
 // onPreToolUse Handler
@@ -212,19 +214,19 @@ print(json.dumps({'completed': completed_count, 'total': total_count}))
  * Currently allows all tools - can be extended for broadcast scoping.
  */
 export async function onPreToolUse(input) {
-    const hierarchyId = process.env.HIERARCHY_ID;
-    // If no HIERARCHY_ID, continue silently
-    if (!hierarchyId) {
-        return { result: 'continue' };
-    }
-    // Validate HIERARCHY_ID format
-    if (!isValidId(hierarchyId)) {
-        return { result: 'continue' };
-    }
-    // For hierarchical pattern, we don't block tools currently
-    // This could be extended to scope Task broadcasts to same hierarchy level
-    // For now, just continue
-    return { result: 'continue' };
+  const hierarchyId = process.env.HIERARCHY_ID;
+  // If no HIERARCHY_ID, continue silently
+  if (!hierarchyId) {
+    return { result: "continue" };
+  }
+  // Validate HIERARCHY_ID format
+  if (!isValidId(hierarchyId)) {
+    return { result: "continue" };
+  }
+  // For hierarchical pattern, we don't block tools currently
+  // This could be extended to scope Task broadcasts to same hierarchy level
+  // For now, just continue
+  return { result: "continue" };
 }
 // =============================================================================
 // onPostToolUse Handler
@@ -235,34 +237,38 @@ export async function onPreToolUse(input) {
  * Records spawned agents in hierarchy_agents table for tracking.
  */
 export async function onPostToolUse(input) {
-    const hierarchyId = process.env.HIERARCHY_ID;
-    const agentRole = process.env.AGENT_ROLE;
-    const coordinatorId = process.env.AGENT_ID || process.env.COORDINATOR_ID;
-    const hierarchyLevel = parseInt(process.env.HIERARCHY_LEVEL || '0', 10);
-    // Only track Task tool usage by coordinators
-    if (!hierarchyId || agentRole !== 'coordinator' || input.tool_name !== 'Task') {
-        return { result: 'continue' };
-    }
-    // Validate hierarchy ID
-    if (!isValidId(hierarchyId)) {
-        return { result: 'continue' };
-    }
-    // Extract spawned agent ID from tool response
-    const response = input.tool_response;
-    const spawnedAgentId = response?.agent_id ?? response?.task_id;
-    if (!spawnedAgentId || typeof spawnedAgentId !== 'string') {
-        return { result: 'continue' };
-    }
-    // Validate spawned agent ID
-    if (!isValidId(spawnedAgentId)) {
-        return { result: 'continue' };
-    }
-    const dbPath = getDbPath();
-    if (!existsSync(dbPath)) {
-        return { result: 'continue' };
-    }
-    try {
-        const query = `
+  const hierarchyId = process.env.HIERARCHY_ID;
+  const agentRole = process.env.AGENT_ROLE;
+  const coordinatorId = process.env.AGENT_ID || process.env.COORDINATOR_ID;
+  const hierarchyLevel = parseInt(process.env.HIERARCHY_LEVEL || "0", 10);
+  // Only track Task tool usage by coordinators
+  if (
+    !hierarchyId ||
+    agentRole !== "coordinator" ||
+    input.tool_name !== "Task"
+  ) {
+    return { result: "continue" };
+  }
+  // Validate hierarchy ID
+  if (!isValidId(hierarchyId)) {
+    return { result: "continue" };
+  }
+  // Extract spawned agent ID from tool response
+  const response = input.tool_response;
+  const spawnedAgentId = response?.agent_id ?? response?.task_id;
+  if (!spawnedAgentId || typeof spawnedAgentId !== "string") {
+    return { result: "continue" };
+  }
+  // Validate spawned agent ID
+  if (!isValidId(spawnedAgentId)) {
+    return { result: "continue" };
+  }
+  const dbPath = getDbPath();
+  if (!existsSync(dbPath)) {
+    return { result: "continue" };
+  }
+  try {
+    const query = `
 import sqlite3
 import sys
 from datetime import datetime
@@ -306,22 +312,21 @@ conn.commit()
 conn.close()
 print('ok')
 `;
-        const result = runPythonQuery(query, [
-            dbPath,
-            hierarchyId,
-            spawnedAgentId,
-            coordinatorId || '',
-            (hierarchyLevel + 1).toString() // Specialist is one level below coordinator
-        ]);
-        if (!result.success) {
-            console.error('PostToolUse Python error:', result.stderr);
-        }
-        return { result: 'continue' };
+    const result = runPythonQuery(query, [
+      dbPath,
+      hierarchyId,
+      spawnedAgentId,
+      coordinatorId || "",
+      (hierarchyLevel + 1).toString(), // Specialist is one level below coordinator
+    ]);
+    if (!result.success) {
+      console.error("PostToolUse Python error:", result.stderr);
     }
-    catch (err) {
-        console.error('PostToolUse hook error:', err);
-        return { result: 'continue' };
-    }
+    return { result: "continue" };
+  } catch (err) {
+    console.error("PostToolUse hook error:", err);
+    return { result: "continue" };
+  }
 }
 // =============================================================================
 // onStop Handler
@@ -332,30 +337,30 @@ print('ok')
  * Returns synthesis prompt when all specialists are done.
  */
 export async function onStop(input) {
-    // Prevent infinite loops - if we're already in a stop hook, continue
-    if (input.stop_hook_active) {
-        return { result: 'continue' };
-    }
-    const hierarchyId = process.env.HIERARCHY_ID;
-    if (!hierarchyId) {
-        return { result: 'continue' };
-    }
-    // Validate HIERARCHY_ID format
-    if (!isValidId(hierarchyId)) {
-        return { result: 'continue' };
-    }
-    const agentRole = process.env.AGENT_ROLE || 'specialist';
-    // Only block coordinator (specialists can finish immediately)
-    if (agentRole !== 'coordinator') {
-        return { result: 'continue' };
-    }
-    const dbPath = getDbPath();
-    if (!existsSync(dbPath)) {
-        return { result: 'continue' };
-    }
-    try {
-        // Query completion status
-        const query = `
+  // Prevent infinite loops - if we're already in a stop hook, continue
+  if (input.stop_hook_active) {
+    return { result: "continue" };
+  }
+  const hierarchyId = process.env.HIERARCHY_ID;
+  if (!hierarchyId) {
+    return { result: "continue" };
+  }
+  // Validate HIERARCHY_ID format
+  if (!isValidId(hierarchyId)) {
+    return { result: "continue" };
+  }
+  const agentRole = process.env.AGENT_ROLE || "specialist";
+  // Only block coordinator (specialists can finish immediately)
+  if (agentRole !== "coordinator") {
+    return { result: "continue" };
+  }
+  const dbPath = getDbPath();
+  if (!existsSync(dbPath)) {
+    return { result: "continue" };
+  }
+  try {
+    // Query completion status
+    const query = `
 import sqlite3
 import json
 import sys
@@ -399,39 +404,38 @@ if completed_count == total_count and total_count > 0:
 conn.close()
 print(json.dumps({'completed': completed_count, 'total': total_count, 'specialists': specialists}))
 `;
-        const result = runPythonQuery(query, [dbPath, hierarchyId]);
-        if (!result.success) {
-            return { result: 'continue' };
-        }
-        // Parse Python output
-        let data;
-        try {
-            data = JSON.parse(result.stdout);
-        }
-        catch (parseErr) {
-            return { result: 'continue' };
-        }
-        if (data.completed < data.total) {
-            const waiting = data.total - data.completed;
-            return {
-                result: 'block',
-                message: `Waiting for ${waiting} specialist(s) to complete their subtasks. All specialists must finish before synthesis.`
-            };
-        }
-        // All specialists have completed - provide synthesis prompt
-        let message = `All ${data.total} specialists have completed their subtasks.\n\n`;
-        message += 'SPECIALIST RESULTS:\n';
-        for (const spec of data.specialists) {
-            message += `- Specialist ${spec.agent_id} (level ${spec.level}): completed\n`;
-        }
-        message += '\nSynthesize the specialist results into a comprehensive final answer.';
-        return {
-            result: 'continue',
-            message
-        };
+    const result = runPythonQuery(query, [dbPath, hierarchyId]);
+    if (!result.success) {
+      return { result: "continue" };
     }
-    catch (err) {
-        console.error('Stop hook error:', err);
-        return { result: 'continue' };
+    // Parse Python output
+    let data;
+    try {
+      data = JSON.parse(result.stdout);
+    } catch (parseErr) {
+      return { result: "continue" };
     }
+    if (data.completed < data.total) {
+      const waiting = data.total - data.completed;
+      return {
+        result: "block",
+        message: `Waiting for ${waiting} specialist(s) to complete their subtasks. All specialists must finish before synthesis.`,
+      };
+    }
+    // All specialists have completed - provide synthesis prompt
+    let message = `All ${data.total} specialists have completed their subtasks.\n\n`;
+    message += "SPECIALIST RESULTS:\n";
+    for (const spec of data.specialists) {
+      message += `- Specialist ${spec.agent_id} (level ${spec.level}): completed\n`;
+    }
+    message +=
+      "\nSynthesize the specialist results into a comprehensive final answer.";
+    return {
+      result: "continue",
+      message,
+    };
+  } catch (err) {
+    console.error("Stop hook error:", err);
+    return { result: "continue" };
+  }
 }

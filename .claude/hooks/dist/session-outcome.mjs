@@ -4,7 +4,7 @@ import * as path from "path";
 async function readStdin() {
   return new Promise((resolve) => {
     let data = "";
-    process.stdin.on("data", (chunk) => data += chunk);
+    process.stdin.on("data", (chunk) => (data += chunk));
     process.stdin.on("end", () => resolve(data));
   });
 }
@@ -15,7 +15,13 @@ async function main() {
     console.log(JSON.stringify({ result: "continue" }));
     return;
   }
-  const dbPath = path.join(projectDir, ".claude", "cache", "artifact-index", "context.db");
+  const dbPath = path.join(
+    projectDir,
+    ".claude",
+    "cache",
+    "artifact-index",
+    "context.db",
+  );
   const dbExists = fs.existsSync(dbPath);
   if (!dbExists) {
     console.log(JSON.stringify({ result: "continue" }));
@@ -24,11 +30,14 @@ async function main() {
   const ledgerDir = path.join(projectDir, "thoughts", "ledgers");
   let ledgerFiles;
   try {
-    ledgerFiles = fs.readdirSync(ledgerDir).filter((f) => f.startsWith("CONTINUITY_CLAUDE-") && f.endsWith(".md")).sort((a, b) => {
-      const statA = fs.statSync(path.join(ledgerDir, a));
-      const statB = fs.statSync(path.join(ledgerDir, b));
-      return statB.mtime.getTime() - statA.mtime.getTime();
-    });
+    ledgerFiles = fs
+      .readdirSync(ledgerDir)
+      .filter((f) => f.startsWith("CONTINUITY_CLAUDE-") && f.endsWith(".md"))
+      .sort((a, b) => {
+        const statA = fs.statSync(path.join(ledgerDir, a));
+        const statB = fs.statSync(path.join(ledgerDir, b));
+        return statB.mtime.getTime() - statA.mtime.getTime();
+      });
   } catch {
     console.log(JSON.stringify({ result: "continue" }));
     return;
@@ -37,15 +46,26 @@ async function main() {
     console.log(JSON.stringify({ result: "continue" }));
     return;
   }
-  const sessionName = ledgerFiles[0].replace("CONTINUITY_CLAUDE-", "").replace(".md", "");
-  const handoffDir = path.join(projectDir, "thoughts", "shared", "handoffs", sessionName);
+  const sessionName = ledgerFiles[0]
+    .replace("CONTINUITY_CLAUDE-", "")
+    .replace(".md", "");
+  const handoffDir = path.join(
+    projectDir,
+    "thoughts",
+    "shared",
+    "handoffs",
+    sessionName,
+  );
   if (!fs.existsSync(handoffDir)) {
     console.log(JSON.stringify({ result: "continue" }));
     return;
   }
-  const handoffFiles = fs.readdirSync(handoffDir).filter((f) => f.endsWith(".md") && /^\d{4}-\d{2}-\d{2}_/.test(f)).sort((a, b) => {
-    return b.localeCompare(a);
-  });
+  const handoffFiles = fs
+    .readdirSync(handoffDir)
+    .filter((f) => f.endsWith(".md") && /^\d{4}-\d{2}-\d{2}_/.test(f))
+    .sort((a, b) => {
+      return b.localeCompare(a);
+    });
   if (handoffFiles.length === 0) {
     console.log(JSON.stringify({ result: "continue" }));
     return;
@@ -77,7 +97,7 @@ Outcome meanings:
   PARTIAL_MINUS  - Some progress, major issues remain
   FAILED         - Task abandoned or blocked
 \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
-`
+`,
   };
   console.log(JSON.stringify(output));
 }

@@ -9,7 +9,7 @@
  * Plan reference: thoughts/shared/plans/self-improving-skill-system.md (Phase 9)
  */
 
-import type { QHeuristic } from './erotetic-questions.js';
+import type { QHeuristic } from "./erotetic-questions.js";
 
 // =============================================================================
 // Type Definitions
@@ -37,7 +37,7 @@ export interface TerminationResult {
   /** Whether the questioning loop should end */
   shouldTerminate: boolean;
   /** Reason for termination (or 'continue' if not terminating) */
-  reason: 'all_resolved' | 'defaults_requested' | 'max_questions' | 'continue';
+  reason: "all_resolved" | "defaults_requested" | "max_questions" | "continue";
   /** Final resolution with defaults applied if needed */
   finalResolution: Record<string, string>;
 }
@@ -81,7 +81,7 @@ const USE_DEFAULTS_PATTERNS: RegExp[] = [
  */
 export function detectDefaultsIntent(response: string): boolean {
   const text = response.toLowerCase().trim();
-  return USE_DEFAULTS_PATTERNS.some(pattern => pattern.test(text));
+  return USE_DEFAULTS_PATTERNS.some((pattern) => pattern.test(text));
 }
 
 /**
@@ -94,7 +94,7 @@ export function detectDefaultsIntent(response: string): boolean {
  */
 export function applyDefaults(
   resolved: Record<string, string>,
-  unresolved: QHeuristic[]
+  unresolved: QHeuristic[],
 ): Record<string, string> {
   // Create a new object (don't mutate input)
   const result: Record<string, string> = { ...resolved };
@@ -103,7 +103,7 @@ export function applyDefaults(
   for (const q of unresolved) {
     // Only apply default if not already resolved
     if (!(q.id in result)) {
-      result[q.id] = q.default ?? '';
+      result[q.id] = q.default ?? "";
     }
   }
 
@@ -129,7 +129,7 @@ export function checkTermination(state: TerminationState): TerminationResult {
   if (unresolved.length === 0) {
     return {
       shouldTerminate: true,
-      reason: 'all_resolved',
+      reason: "all_resolved",
       finalResolution: { ...resolved },
     };
   }
@@ -138,7 +138,7 @@ export function checkTermination(state: TerminationState): TerminationResult {
   if (userRequestedDefaults) {
     return {
       shouldTerminate: true,
-      reason: 'defaults_requested',
+      reason: "defaults_requested",
       finalResolution: applyDefaults(resolved, unresolved),
     };
   }
@@ -147,7 +147,7 @@ export function checkTermination(state: TerminationState): TerminationResult {
   if (questionsAsked >= MAX_QUESTIONS_TOTAL) {
     return {
       shouldTerminate: true,
-      reason: 'max_questions',
+      reason: "max_questions",
       finalResolution: applyDefaults(resolved, unresolved),
     };
   }
@@ -155,7 +155,7 @@ export function checkTermination(state: TerminationState): TerminationResult {
   // Default: Continue asking questions
   return {
     shouldTerminate: false,
-    reason: 'continue',
+    reason: "continue",
     finalResolution: { ...resolved }, // Return current state
   };
 }

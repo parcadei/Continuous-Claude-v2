@@ -34,7 +34,7 @@ docker exec continuous-claude-postgres psql -U claude -d continuous_claude -c \
 
 ## Tables
 
-| Table | Purpose |
-|-------|---------|
-| `sessions` | Cross-session awareness |
+| Table         | Purpose                         |
+| ------------- | ------------------------------- |
+| `sessions`    | Cross-session awareness         |
 | `file_claims` | File locking/conflict detection |

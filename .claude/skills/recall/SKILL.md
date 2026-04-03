@@ -8,6 +8,15 @@ user-invocable: false
 
 Query the memory system for relevant learnings from past sessions.
 
+## When to Use
+
+Activate when:
+
+- User says "/recall" or "/remember"
+- User asks "what did we do before?" or "any previous work on X?"
+- User asks "has this been attempted before?"
+- User says "recall past learnings about X"
+
 ## Usage
 
 ```

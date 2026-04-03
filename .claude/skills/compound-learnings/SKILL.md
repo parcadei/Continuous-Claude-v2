@@ -22,10 +22,10 @@ Transform ephemeral session learnings into permanent, compounding capabilities.
 
 ```bash
 # List learnings (most recent first)
-ls -t $CLAUDE_PROJECT_DIR/.claude/cache/learnings/*.md | head -20
+ls -t $CLAUDE_CC_DIR/.claude/cache/learnings/*.md | head -20
 
 # Count total
-ls $CLAUDE_PROJECT_DIR/.claude/cache/learnings/*.md | wc -l
+ls $CLAUDE_CC_DIR/.claude/cache/learnings/*.md | wc -l
 ```
 
 Read the most recent 5-10 files (or specify a date range).
@@ -34,21 +34,21 @@ Read the most recent 5-10 files (or specify a date range).
 
 For each learnings file, extract entries from these specific sections:
 
-| Section Header | What to Extract |
-|----------------|-----------------|
-| `## Patterns` or `Reusable techniques` | Direct candidates for rules |
-| `**Takeaway:**` or `**Actionable takeaway:**` | Decision heuristics |
-| `## What Worked` | Success patterns |
-| `## What Failed` | Anti-patterns (invert to rules) |
-| `## Key Decisions` | Design principles |
+| Section Header                                | What to Extract                 |
+| --------------------------------------------- | ------------------------------- |
+| `## Patterns` or `Reusable techniques`        | Direct candidates for rules     |
+| `**Takeaway:**` or `**Actionable takeaway:**` | Decision heuristics             |
+| `## What Worked`                              | Success patterns                |
+| `## What Failed`                              | Anti-patterns (invert to rules) |
+| `## Key Decisions`                            | Design principles               |
 
 Build a frequency table as you go:
 
 ```markdown
-| Pattern | Sessions | Category |
-|---------|----------|----------|
-| "Check artifacts before editing" | abc, def, ghi | debugging |
-| "Pass IDs explicitly" | abc, def, ghi, jkl | reliability |
+| Pattern                          | Sessions           | Category    |
+| -------------------------------- | ------------------ | ----------- |
+| "Check artifacts before editing" | abc, def, ghi      | debugging   |
+| "Pass IDs explicitly"            | abc, def, ghi, jkl | reliability |
 ```
 
 ### Step 2b: Consolidate Similar Patterns
@@ -56,10 +56,11 @@ Build a frequency table as you go:
 Before counting, merge patterns that express the same principle:
 
 **Example consolidation:**
+
 - "Artifact-first debugging"
 - "Verify hook output by inspecting files"
 - "Filesystem-first debugging"
-→ All express: **"Observe outputs before editing code"**
+  → All express: **"Observe outputs before editing code"**
 
 Use the most general formulation. Update the frequency table.
 
@@ -71,7 +72,7 @@ If >50% of patterns relate to one topic (e.g., "hooks", "tracing", "async"):
 → That topic may need a **dedicated skill** rather than multiple rules
 → One skill compounds better than five rules
 
-Ask yourself: *"Is there a skill that would make all these rules unnecessary?"*
+Ask yourself: _"Is there a skill that would make all these rules unnecessary?"_
 
 ### Step 4: Categorize (Decision Tree)
 
@@ -97,21 +98,21 @@ Does it enhance an existing agent workflow?
 
 **Artifact Type Examples:**
 
-| Pattern | Type | Why |
-|---------|------|-----|
-| "Run linting before commit" | Hook (PreToolUse) | Automatic gate |
+| Pattern                            | Type              | Why               |
+| ---------------------------------- | ----------------- | ----------------- |
+| "Run linting before commit"        | Hook (PreToolUse) | Automatic gate    |
 | "Extract learnings on session end" | Hook (SessionEnd) | Automatic trigger |
-| "Debug hooks step by step" | Skill | Manual sequence |
-| "Always pass IDs explicitly" | Rule | Heuristic |
+| "Debug hooks step by step"         | Skill             | Manual sequence   |
+| "Always pass IDs explicitly"       | Rule              | Heuristic         |
 
 ### Step 5: Apply Signal Thresholds
 
-| Occurrences | Action |
-|-------------|--------|
-| 1 | Note but skip (unless critical failure) |
-| 2 | Consider - present to user |
-| 3+ | Strong signal - recommend creation |
-| 4+ | Definitely create |
+| Occurrences | Action                                  |
+| ----------- | --------------------------------------- |
+| 1           | Note but skip (unless critical failure) |
+| 2           | Consider - present to user              |
+| 3+          | Strong signal - recommend creation      |
+| 4+          | Definitely create                       |
 
 ### Step 6: Propose Artifacts
 
@@ -145,9 +146,10 @@ Use `AskUserQuestion` to get approval for each artifact (or batch approval).
 ### Step 7: Create Approved Artifacts
 
 #### For Rules:
+
 ```bash
 # Write to rules directory
-cat > $CLAUDE_PROJECT_DIR/.claude/rules/<name>.md << 'EOF'
+cat > $CLAUDE_CC_DIR/.claude/rules/<name>.md << 'EOF'
 # Rule Name
 
 [Context: why this rule exists, based on N sessions]
@@ -168,7 +170,9 @@ EOF
 ```
 
 #### For Skills:
+
 Create `.claude/skills/<name>/SKILL.md` with:
+
 - Frontmatter (name, description, allowed-tools)
 - When to Use
 - Step-by-step instructions (executable)
@@ -177,17 +181,18 @@ Create `.claude/skills/<name>/SKILL.md` with:
 Add triggers to `skill-rules.json` if appropriate.
 
 #### For Hooks:
+
 Create shell wrapper + TypeScript handler:
 
 ```bash
 # Shell wrapper
-cat > $CLAUDE_PROJECT_DIR/.claude/hooks/<name>.sh << 'EOF'
+cat > $CLAUDE_CC_DIR/.claude/hooks/<name>.sh << 'EOF'
 #!/bin/bash
 set -e
-cd "$CLAUDE_PROJECT_DIR/.claude/hooks"
+cd "$CLAUDE_CC_DIR/.claude/hooks"
 cat | node dist/<name>.mjs
 EOF
-chmod +x $CLAUDE_PROJECT_DIR/.claude/hooks/<name>.sh
+chmod +x $CLAUDE_CC_DIR/.claude/hooks/<name>.sh
 ```
 
 Then create `src/<name>.ts`, build with esbuild, and register in `settings.json`:
@@ -195,17 +200,22 @@ Then create `src/<name>.ts`, build with esbuild, and register in `settings.json`
 ```json
 {
   "hooks": {
-    "EventName": [{
-      "hooks": [{
-        "type": "command",
-        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/<name>.sh"
-      }]
-    }]
+    "EventName": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_CC_DIR/.claude/hooks/<name>.sh"
+          }
+        ]
+      }
+    ]
   }
 }
 ```
 
 #### For Agent Updates:
+
 Edit existing agent in `.claude/agents/<name>.md` to add the learned capability.
 
 ### Step 8: Summary Report
@@ -218,10 +228,12 @@ Edit existing agent in `.claude/agents/<name>.md` to add the learned capability.
 **Artifacts Created:** [K]
 
 ### Created:
+
 - Rule: `explicit-identity.md` - Pass IDs explicitly across boundaries
 - Skill: `debug-hooks` - Hook debugging workflow
 
 ### Skipped (insufficient signal):
+
 - "Pattern X" (1 occurrence)
 
 **Your setup is now permanently improved.**

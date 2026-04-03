@@ -66,10 +66,10 @@ Short description of what this skill does.
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `/my-skill` | Main invocation |
-| `/my-skill --option` | With options |
+| Command              | Description     |
+| -------------------- | --------------- |
+| `/my-skill`          | Main invocation |
+| `/my-skill --option` | With options    |
 
 ## Example
 
@@ -108,11 +108,14 @@ Agents are specialized AI workers defined in `.claude/agents/<agent-name>.md`.
 
 ```markdown
 # Frontmatter
+
 ---
+
 name: <name of agent>
 description: <one line description of agent>
 model: <preferred model: opus | sonnet | haiku>
 tools: <list tools agent needs (optional): Read | Grep | Glob | etc...>
+
 ---
 
 ## Prompt
@@ -121,6 +124,7 @@ tools: <list tools agent needs (optional): Read | Grep | Glob | etc...>
 You are the agent-name agent for Continuous Claude.
 
 Your job is to:
+
 1. Specific task
 2. Another task
 
@@ -138,13 +142,13 @@ Return results as:
 
 ### Agent Types
 
-| Type | Model | Use Case |
-|------|-------|----------|
-| **Orchestrator** | Opus | Coordinate multi-agent workflows |
-| **Researcher** | Sonnet/Opus | Explore codebase or external sources |
-| **Implementer** | Opus | Write/modify code |
-| **Reviewer** | Opus | Analyze and critique |
-| **Specialist** | Varies | Domain-specific tasks |
+| Type             | Model       | Use Case                             |
+| ---------------- | ----------- | ------------------------------------ |
+| **Orchestrator** | Opus        | Coordinate multi-agent workflows     |
+| **Researcher**   | Sonnet/Opus | Explore codebase or external sources |
+| **Implementer**  | Opus        | Write/modify code                    |
+| **Reviewer**     | Opus        | Analyze and critique                 |
+| **Specialist**   | Varies      | Domain-specific tasks                |
 
 ### Spawning Agents
 
@@ -154,8 +158,8 @@ Agents are spawned via the Task tool:
 Task({
   subagent_type: "my-agent",
   prompt: "Do the thing",
-  description: "Doing the thing"
-})
+  description: "Doing the thing",
+});
 ```
 
 ---
@@ -166,17 +170,17 @@ Hooks intercept Claude Code at lifecycle points. Located in `.claude/hooks/`.
 
 ### Hook Types
 
-| Lifecycle | When it runs |
-|-----------|--------------|
-| `SessionStart` | Session begins |
-| `SessionEnd` | Session ends |
-| `PreToolUse` | Before tool execution |
-| `PostToolUse` | After tool execution |
-| `UserPromptSubmit` | User sends a message |
-| `PreCompact` | Before context compaction |
-| `SubagentStart` | Subagent spawned |
-| `SubagentStop` | Subagent completes |
-| `Stop` | LLM generation stops |
+| Lifecycle          | When it runs              |
+| ------------------ | ------------------------- |
+| `SessionStart`     | Session begins            |
+| `SessionEnd`       | Session ends              |
+| `PreToolUse`       | Before tool execution     |
+| `PostToolUse`      | After tool execution      |
+| `UserPromptSubmit` | User sends a message      |
+| `PreCompact`       | Before context compaction |
+| `SubagentStart`    | Subagent spawned          |
+| `SubagentStop`     | Subagent completes        |
+| `Stop`             | LLM generation stops      |
 
 ### Shell Hook Template
 
@@ -213,20 +217,18 @@ interface HookInput {
 
 interface HookOutput {
   result?: string;
-  permissionDecision?: 'allow' | 'deny';
+  permissionDecision?: "allow" | "deny";
   reason?: string;
 }
 
 async function hook(input: HookInput): Promise<HookOutput> {
   // Your logic here
-  return { result: 'success' };
+  return { result: "success" };
 }
 
 // Entry point
-const input: HookInput = JSON.parse(
-  require('fs').readFileSync(0, 'utf-8')
-);
-hook(input).then(output => console.log(JSON.stringify(output)));
+const input: HookInput = JSON.parse(require("fs").readFileSync(0, "utf-8"));
+hook(input).then((output) => console.log(JSON.stringify(output)));
 ```
 
 ### Registering Hooks
@@ -285,11 +287,13 @@ tldr/
 ### Adding Language Support
 
 1. Add tree-sitter grammar:
+
 ```bash
 uv pip install tree-sitter-<language>
 ```
 
 2. Update `hybrid_extractor.py`:
+
 ```python
 LANGUAGE_CONFIGS = {
     'mylang': LanguageConfig(

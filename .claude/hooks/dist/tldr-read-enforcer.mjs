@@ -1,5 +1,9 @@
 // src/tldr-read-enforcer.ts
-import { readFileSync as readFileSync2, existsSync as existsSync2, statSync } from "fs";
+import {
+  readFileSync as readFileSync2,
+  existsSync as existsSync2,
+  statSync,
+} from "fs";
 import { basename, extname, isAbsolute, join as join2 } from "path";
 
 // src/daemon-client.ts
@@ -14,12 +18,20 @@ function resolveProjectDir(projectDir) {
 }
 function getLockPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
-  const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(resolvedPath)
+    .digest("hex")
+    .substring(0, 8);
   return `${tmpdir()}/tldr-${hash}.lock`;
 }
 function getPidPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
-  const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(resolvedPath)
+    .digest("hex")
+    .substring(0, 8);
   return `${tmpdir()}/tldr-${hash}.pid`;
 }
 function isDaemonProcessRunning(projectDir) {
@@ -45,8 +57,7 @@ function tryAcquireLock(projectDir) {
       }
       try {
         unlinkSync(lockPath);
-      } catch {
-      }
+      } catch {}
     }
     writeFileSync(lockPath, Date.now().toString(), { flag: "wx" });
     return true;
@@ -57,15 +68,18 @@ function tryAcquireLock(projectDir) {
 function releaseLock(projectDir) {
   try {
     unlinkSync(getLockPath(projectDir));
-  } catch {
-  }
+  } catch {}
 }
 var QUERY_TIMEOUT = 3e3;
 function getConnectionInfo(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
-  const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(resolvedPath)
+    .digest("hex")
+    .substring(0, 8);
   if (process.platform === "win32") {
-    const port = 49152 + parseInt(hash, 16) % 1e4;
+    const port = 49152 + (parseInt(hash, 16) % 1e4);
     return { type: "tcp", host: "127.0.0.1", port };
   } else {
     return { type: "unix", path: `${tmpdir()}/tldr-${hash}.sock` };
@@ -101,8 +115,7 @@ function isDaemonReachable(projectDir) {
       });
       testSocket.connect(connInfo.port, connInfo.host);
       const end = Date.now() + 200;
-      while (Date.now() < end && !connected) {
-      }
+      while (Date.now() < end && !connected) {}
       return connected;
     } catch {
       return false;
@@ -117,7 +130,7 @@ function isDaemonReachable(projectDir) {
           encoding: "utf-8",
           timeout: 1e3,
           // Increased from 500ms
-          stdio: ["pipe", "pipe", "pipe"]
+          stdio: ["pipe", "pipe", "pipe"],
         });
         return true;
       } catch {
@@ -128,14 +141,13 @@ function isDaemonReachable(projectDir) {
       execSync(`echo '{"cmd":"ping"}' | nc -U "${connInfo.path}"`, {
         encoding: "utf-8",
         timeout: 500,
-        stdio: ["pipe", "pipe", "pipe"]
+        stdio: ["pipe", "pipe", "pipe"],
       });
       return true;
     } catch {
       try {
         unlinkSync(connInfo.path);
-      } catch {
-      }
+      } catch {}
       return false;
     }
   }
@@ -151,43 +163,49 @@ function tryStartDaemon(projectDir) {
     if (!tryAcquireLock(projectDir)) {
       const start = Date.now();
       while (Date.now() - start < 5e3) {
-        if (isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir)) {
+        if (
+          isDaemonProcessRunning(projectDir) ||
+          isDaemonReachable(projectDir)
+        ) {
           return true;
         }
         const end = Date.now() + 100;
-        while (Date.now() < end) {
-        }
+        while (Date.now() < end) {}
       }
-      return isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir);
+      return (
+        isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir)
+      );
     }
     try {
       const tldrPath = join(projectDir, "opc", "packages", "tldr-code");
       let started = false;
       if (existsSync(tldrPath)) {
-        const result = spawnSync("uv", ["run", "tldr", "daemon", "start", "--project", projectDir], {
-          timeout: 1e4,
-          stdio: "ignore",
-          cwd: tldrPath
-        });
+        const result = spawnSync(
+          "uv",
+          ["run", "tldr", "daemon", "start", "--project", projectDir],
+          {
+            timeout: 1e4,
+            stdio: "ignore",
+            cwd: tldrPath,
+          },
+        );
         started = result.status === 0;
       }
       if (!started && !process.env.TLDR_DEV) {
         spawnSync("tldr", ["daemon", "start", "--project", projectDir], {
           timeout: 5e3,
-          stdio: "ignore"
+          stdio: "ignore",
         });
       }
       const start = Date.now();
       while (Date.now() - start < 1e4) {
         if (isDaemonReachable(projectDir)) {
           const cooldown = Date.now() + 1e3;
-          while (Date.now() < cooldown) {
-          }
+          while (Date.now() < cooldown) {}
           return true;
         }
         const end = Date.now() + 100;
-        while (Date.now() < end) {
-        }
+        while (Date.now() < end) {}
       }
       return isDaemonReachable(projectDir);
     } finally {
@@ -202,13 +220,16 @@ function queryDaemonSync(query, projectDir) {
     return {
       indexing: true,
       status: "indexing",
-      message: "Daemon is still indexing, results may be incomplete"
+      message: "Daemon is still indexing, results may be incomplete",
     };
   }
   const connInfo = getConnectionInfo(projectDir);
   if (!isDaemonReachable(projectDir)) {
     if (!tryStartDaemon(projectDir)) {
-      return { status: "unavailable", error: "Daemon not running and could not start" };
+      return {
+        status: "unavailable",
+        error: "Daemon not running and could not start",
+      };
     }
   }
   try {
@@ -226,14 +247,17 @@ function queryDaemonSync(query, projectDir) {
         $client.Close()
         Write-Output $response
       `.trim();
-      result = execSync(`powershell -Command "${psCommand.replace(/"/g, '\\"')}"`, {
-        encoding: "utf-8",
-        timeout: QUERY_TIMEOUT
-      });
+      result = execSync(
+        `powershell -Command "${psCommand.replace(/"/g, '\\"')}"`,
+        {
+          encoding: "utf-8",
+          timeout: QUERY_TIMEOUT,
+        },
+      );
     } else {
       result = execSync(`echo '${input}' | nc -U "${connInfo.path}"`, {
         encoding: "utf-8",
-        timeout: QUERY_TIMEOUT
+        timeout: QUERY_TIMEOUT,
       });
     }
     return JSON.parse(result.trim());
@@ -241,20 +265,27 @@ function queryDaemonSync(query, projectDir) {
     if (err.killed) {
       return { status: "error", error: "timeout" };
     }
-    if (err.message?.includes("ECONNREFUSED") || err.message?.includes("ENOENT")) {
+    if (
+      err.message?.includes("ECONNREFUSED") ||
+      err.message?.includes("ENOENT")
+    ) {
       return { status: "unavailable", error: "Daemon not running" };
     }
     return { status: "error", error: err.message || "Unknown error" };
   }
 }
-function trackHookActivitySync(hookName, projectDir, success = true, metrics = {}) {
+function trackHookActivitySync(
+  hookName,
+  projectDir,
+  success = true,
+  metrics = {},
+) {
   try {
     queryDaemonSync(
       { cmd: "track", hook: hookName, success, metrics },
-      projectDir
+      projectDir,
     );
-  } catch {
-  }
+  } catch {}
 }
 
 // src/tldr-read-enforcer.ts
@@ -280,7 +311,7 @@ var CODE_EXTENSIONS = /* @__PURE__ */ new Set([
   ".js",
   ".jsx",
   ".go",
-  ".rs"
+  ".rs",
 ]);
 var ALLOWED_PATTERNS = [
   /\.json$/,
@@ -306,7 +337,7 @@ var ALLOWED_PATTERNS = [
   /\.claude\/hooks\//,
   /\.claude\/skills\//,
   /init-db\.sql$/,
-  /migrations\//
+  /migrations\//,
 ];
 var ALLOWED_DIRS = ["/tmp/", "node_modules/", ".venv/", "__pycache__/"];
 function isCodeFile(filePath) {
@@ -330,12 +361,13 @@ function detectLanguage(filePath) {
     ".js": "javascript",
     ".jsx": "javascript",
     ".go": "go",
-    ".rs": "rust"
+    ".rs": "rust",
   };
   return langMap[ext] || "python";
 }
 function chooseTldrMode(target, layers, contextSource) {
-  const fromSearchRouter = contextSource.startsWith("function:") || contextSource.startsWith("class:");
+  const fromSearchRouter =
+    contextSource.startsWith("function:") || contextSource.startsWith("class:");
   if (target && fromSearchRouter) {
     return { mode: "context", reason: `search: ${target}` };
   }
@@ -344,7 +376,14 @@ function chooseTldrMode(target, layers, contextSource) {
   }
   return { mode: "structure", reason: "navigation" };
 }
-function getTldrContext(filePath, language, layers = ["ast", "call_graph"], target = null, sessionId = null, contextSource = "default") {
+function getTldrContext(
+  filePath,
+  language,
+  layers = ["ast", "call_graph"],
+  target = null,
+  sessionId = null,
+  contextSource = "default",
+) {
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
   const fileName = basename(filePath);
   const results = [];
@@ -357,21 +396,27 @@ function getTldrContext(filePath, language, layers = ["ast", "call_graph"], targ
     if (mode === "context" && target) {
       const contextResp = queryDaemonSync(
         { cmd: "context", entry: target, language, depth: 2 },
-        projectDir
+        projectDir,
       );
       if (contextResp.status === "ok" && contextResp.result) {
         results.push("## Focused Context");
-        results.push(typeof contextResp.result === "string" ? contextResp.result : JSON.stringify(contextResp.result, null, 2));
+        results.push(
+          typeof contextResp.result === "string"
+            ? contextResp.result
+            : JSON.stringify(contextResp.result, null, 2),
+        );
         results.push("");
         results.push("---");
-        results.push("To see more: Read with offset/limit, or ask about specific functions");
+        results.push(
+          "To see more: Read with offset/limit, or ask about specific functions",
+        );
         return results.join("\n");
       }
     }
     if (mode === "structure") {
       const extractResp = queryDaemonSync(
         { cmd: "extract", file: filePath, session: sessionId || void 0 },
-        projectDir
+        projectDir,
       );
       if (extractResp.status === "ok" && extractResp.result) {
         results.push("## Structure (names only)");
@@ -379,8 +424,12 @@ function getTldrContext(filePath, language, layers = ["ast", "call_graph"], targ
         if (info.functions?.length > 0) {
           results.push("### Functions");
           for (const fn of info.functions.slice(0, 30)) {
-            const params = fn.params ? `(${fn.params.slice(0, 3).join(", ")}${fn.params.length > 3 ? "..." : ""})` : "()";
-            results.push(`  ${fn.name}${params}  [line ${fn.line_number || fn.line || "?"}]`);
+            const params = fn.params
+              ? `(${fn.params.slice(0, 3).join(", ")}${fn.params.length > 3 ? "..." : ""})`
+              : "()";
+            results.push(
+              `  ${fn.name}${params}  [line ${fn.line_number || fn.line || "?"}]`,
+            );
             if (fn.docstring) {
               const firstLine = fn.docstring.split("\n")[0].trim().slice(0, 80);
               results.push(`    # ${firstLine}`);
@@ -390,25 +439,43 @@ function getTldrContext(filePath, language, layers = ["ast", "call_graph"], targ
         if (info.classes?.length > 0) {
           results.push("### Classes");
           for (const cls of info.classes.slice(0, 20)) {
-            const methods = cls.methods?.slice(0, 5).map((m) => m.name).join(", ") || "";
-            results.push(`  ${cls.name}  [line ${cls.line_number || cls.line || "?"}]`);
+            const methods =
+              cls.methods
+                ?.slice(0, 5)
+                .map((m) => m.name)
+                .join(", ") || "";
+            results.push(
+              `  ${cls.name}  [line ${cls.line_number || cls.line || "?"}]`,
+            );
             if (cls.docstring) {
-              const firstLine = cls.docstring.split("\n")[0].trim().slice(0, 80);
+              const firstLine = cls.docstring
+                .split("\n")[0]
+                .trim()
+                .slice(0, 80);
               results.push(`    # ${firstLine}`);
             }
-            if (methods) results.push(`    methods: ${methods}${cls.methods?.length > 5 ? "..." : ""}`);
+            if (methods)
+              results.push(
+                `    methods: ${methods}${cls.methods?.length > 5 ? "..." : ""}`,
+              );
           }
         }
         results.push("");
         results.push("---");
-        results.push("To see full code: Read with limit=100 (or offset=N limit=M for specific lines)");
+        results.push(
+          "To see full code: Read with limit=100 (or offset=N limit=M for specific lines)",
+        );
         return results.join("\n");
       }
     }
-    if (layers.includes("ast") || layers.includes("call_graph") || mode === "extract") {
+    if (
+      layers.includes("ast") ||
+      layers.includes("call_graph") ||
+      mode === "extract"
+    ) {
       const extractResp = queryDaemonSync(
         { cmd: "extract", file: filePath, session: sessionId || void 0 },
-        projectDir
+        projectDir,
       );
       if (extractResp.status === "ok" && extractResp.result) {
         const info = extractResp.result;
@@ -417,7 +484,9 @@ function getTldrContext(filePath, language, layers = ["ast", "call_graph"], targ
           for (const fn of info.functions) {
             const params = fn.params ? fn.params.join(", ") : "";
             const ret = fn.return_type ? ` -> ${fn.return_type}` : "";
-            results.push(`  ${fn.name}(${params})${ret}  [line ${fn.line_number || fn.line}]`);
+            results.push(
+              `  ${fn.name}(${params})${ret}  [line ${fn.line_number || fn.line}]`,
+            );
             if (fn.docstring) {
               const doc = fn.docstring.substring(0, 100).replace(/\n/g, " ");
               results.push(`    # ${doc}`);
@@ -428,7 +497,9 @@ function getTldrContext(filePath, language, layers = ["ast", "call_graph"], targ
           results.push("");
           results.push("## Classes");
           for (const cls of info.classes) {
-            results.push(`  class ${cls.name}  [line ${cls.line_number || cls.line}]`);
+            results.push(
+              `  class ${cls.name}  [line ${cls.line_number || cls.line}]`,
+            );
             if (cls.methods) {
               for (const m of cls.methods.slice(0, 10)) {
                 results.push(`    .${m.name}()`);
@@ -436,7 +507,11 @@ function getTldrContext(filePath, language, layers = ["ast", "call_graph"], targ
             }
           }
         }
-        if (layers.includes("call_graph") && info.call_graph && info.call_graph.calls) {
+        if (
+          layers.includes("call_graph") &&
+          info.call_graph &&
+          info.call_graph.calls
+        ) {
           results.push("");
           results.push("## Call Graph");
           const entries = Object.entries(info.call_graph.calls).slice(0, 15);
@@ -450,16 +525,20 @@ function getTldrContext(filePath, language, layers = ["ast", "call_graph"], targ
       const funcName = target || "main";
       const cfgResp = queryDaemonSync(
         { cmd: "cfg", file: filePath, function: funcName, language },
-        projectDir
+        projectDir,
       );
       if (cfgResp.status === "ok" && cfgResp.result) {
         const cfg = cfgResp.result;
         results.push("");
         results.push(`## CFG: ${funcName}`);
-        results.push(`  Blocks: ${cfg.num_blocks || "N/A"}, Cyclomatic: ${cfg.cyclomatic_complexity || "N/A"}`);
+        results.push(
+          `  Blocks: ${cfg.num_blocks || "N/A"}, Cyclomatic: ${cfg.cyclomatic_complexity || "N/A"}`,
+        );
         if (cfg.blocks && Array.isArray(cfg.blocks)) {
           for (const b of cfg.blocks.slice(0, 8)) {
-            results.push(`    Block ${b.id}: lines ${b.start_line}-${b.end_line} (${b.block_type})`);
+            results.push(
+              `    Block ${b.id}: lines ${b.start_line}-${b.end_line} (${b.block_type})`,
+            );
           }
         }
       }
@@ -468,7 +547,7 @@ function getTldrContext(filePath, language, layers = ["ast", "call_graph"], targ
       const funcName = target || "main";
       const dfgResp = queryDaemonSync(
         { cmd: "dfg", file: filePath, function: funcName, language },
-        projectDir
+        projectDir,
       );
       if (dfgResp.status === "ok" && dfgResp.result) {
         const dfg = dfgResp.result;
@@ -491,8 +570,14 @@ function getTldrContext(filePath, language, layers = ["ast", "call_graph"], targ
     if (layers.includes("pdg")) {
       const funcName = target || "main";
       const sliceResp = queryDaemonSync(
-        { cmd: "slice", file: filePath, function: funcName, line: 10, direction: "backward" },
-        projectDir
+        {
+          cmd: "slice",
+          file: filePath,
+          function: funcName,
+          line: 10,
+          direction: "backward",
+        },
+        projectDir,
       );
       if (sliceResp.status === "ok" && sliceResp.result) {
         const slice = sliceResp.result;
@@ -521,7 +606,9 @@ async function main() {
     return;
   }
   const rawFilePath = input.tool_input.file_path || "";
-  const filePath = isAbsolute(rawFilePath) ? rawFilePath : join2(input.cwd, rawFilePath);
+  const filePath = isAbsolute(rawFilePath)
+    ? rawFilePath
+    : join2(input.cwd, rawFilePath);
   if (!isCodeFile(filePath)) {
     console.log("{}");
     return;
@@ -530,7 +617,10 @@ async function main() {
     console.log("{}");
     return;
   }
-  if (input.tool_input.offset || input.tool_input.limit && input.tool_input.limit < 100) {
+  if (
+    input.tool_input.offset ||
+    (input.tool_input.limit && input.tool_input.limit < 100)
+  ) {
     console.log("{}");
     return;
   }
@@ -554,27 +644,36 @@ async function main() {
     target = searchContext.target;
     contextSource = `${searchContext.targetType}: ${searchContext.target}`;
   }
-  const tldrContext = getTldrContext(filePath, language, layers, target, input.session_id, contextSource);
+  const tldrContext = getTldrContext(
+    filePath,
+    language,
+    layers,
+    target,
+    input.session_id,
+    contextSource,
+  );
   if (!tldrContext) {
     console.log("{}");
     return;
   }
-  const layerNames = layers.map((l) => {
-    switch (l) {
-      case "ast":
-        return "L1:AST";
-      case "call_graph":
-        return "L2:CallGraph";
-      case "cfg":
-        return "L3:CFG";
-      case "dfg":
-        return "L4:DFG";
-      case "pdg":
-        return "L5:PDG";
-      default:
-        return l;
-    }
-  }).join(" + ");
+  const layerNames = layers
+    .map((l) => {
+      switch (l) {
+        case "ast":
+          return "L1:AST";
+        case "call_graph":
+          return "L2:CallGraph";
+        case "cfg":
+          return "L3:CFG";
+        case "dfg":
+          return "L4:DFG";
+        case "pdg":
+          return "L5:PDG";
+        default:
+          return l;
+      }
+    })
+    .join(" + ");
   let crossFileSection = "";
   if (searchContext?.callers && searchContext.callers.length > 0) {
     const callerLines = searchContext.callers.slice(0, 10).map((c) => {
@@ -585,12 +684,19 @@ async function main() {
     });
     crossFileSection = `
 ## Cross-File Usage (${searchContext.callers.length} refs)
-${callerLines.join("\n")}${searchContext.callers.length > 10 ? `
-  ... and ${searchContext.callers.length - 10} more` : ""}
+${callerLines.join("\n")}${
+      searchContext.callers.length > 10
+        ? `
+  ... and ${searchContext.callers.length - 10} more`
+        : ""
+    }
 `;
   }
   let definitionSection = "";
-  if (searchContext?.definitionLocation && !searchContext.definitionLocation.includes(basename(filePath))) {
+  if (
+    searchContext?.definitionLocation &&
+    !searchContext.definitionLocation.includes(basename(filePath))
+  ) {
     definitionSection = `
 \u{1F4CD} Defined at: ${searchContext.definitionLocation}
 `;
@@ -598,7 +704,7 @@ ${callerLines.join("\n")}${searchContext.callers.length > 10 ? `
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
   trackHookActivitySync("tldr-read-enforcer", projectDir, true, {
     reads_intercepted: 1,
-    layers_returned: layers.length
+    layers_returned: layers.length,
   });
   const output = {
     hookSpecificOutput: {
@@ -610,8 +716,8 @@ ${searchContext ? `\u{1F517} Context: ${contextSource}` : ""}${definitionSection
 ${tldrContext}${crossFileSection}
 ---
 To read specific lines, use: Read with offset/limit
-To read full file anyway, use: Read ${basename(filePath)} (test files bypass this)`
-    }
+To read full file anyway, use: Read ${basename(filePath)} (test files bypass this)`,
+    },
   };
   console.log(JSON.stringify(output));
 }

@@ -2,7 +2,23 @@
 name: tldr-code
 description: Token-efficient code analysis via 5-layer stack (AST, Call Graph, CFG, DFG, PDG). 95% token savings.
 allowed-tools: [Bash]
-keywords: [debug, refactor, understand, complexity, "call graph", "data flow", "what calls", "how complex", search, explore, analyze, dead code, architecture, imports]
+keywords:
+  [
+    debug,
+    refactor,
+    understand,
+    complexity,
+    "call graph",
+    "data flow",
+    "what calls",
+    "how complex",
+    search,
+    explore,
+    analyze,
+    dead code,
+    architecture,
+    imports,
+  ]
 ---
 
 # TLDR-Code: Complete Reference
@@ -11,22 +27,22 @@ Token-efficient code analysis. **95% savings** vs raw file reads.
 
 ## Quick Reference
 
-| Task | Command |
-|------|---------|
-| File tree | `tldr tree src/` |
-| Code structure | `tldr structure . --lang python` |
-| Search code | `tldr search "pattern" .` |
-| Call graph | `tldr calls src/` |
-| Who calls X? | `tldr impact func_name .` |
-| Control flow | `tldr cfg file.py func` |
-| Data flow | `tldr dfg file.py func` |
-| Program slice | `tldr slice file.py func 42` |
-| Dead code | `tldr dead src/` |
-| Architecture | `tldr arch src/` |
-| Imports | `tldr imports file.py` |
-| Who imports X? | `tldr importers module_name .` |
-| Affected tests | `tldr change-impact --git` |
-| Type check | `tldr diagnostics file.py` |
+| Task            | Command                            |
+| --------------- | ---------------------------------- |
+| File tree       | `tldr tree src/`                   |
+| Code structure  | `tldr structure . --lang python`   |
+| Search code     | `tldr search "pattern" .`          |
+| Call graph      | `tldr calls src/`                  |
+| Who calls X?    | `tldr impact func_name .`          |
+| Control flow    | `tldr cfg file.py func`            |
+| Data flow       | `tldr dfg file.py func`            |
+| Program slice   | `tldr slice file.py func 42`       |
+| Dead code       | `tldr dead src/`                   |
+| Architecture    | `tldr arch src/`                   |
+| Imports         | `tldr imports file.py`             |
+| Who imports X?  | `tldr importers module_name .`     |
+| Affected tests  | `tldr change-impact --git`         |
+| Type check      | `tldr diagnostics file.py`         |
 | Semantic search | `tldr semantic search "auth flow"` |
 
 ---
@@ -213,13 +229,13 @@ tldr daemon notify src/api.py
 
 ### Daemon Features
 
-| Feature | Description |
-|---------|-------------|
-| Auto-shutdown | 30 minutes idle |
-| Query caching | SalsaDB memoization |
-| Content hashing | Skip unchanged files |
-| Dirty tracking | Incremental re-indexing |
-| Cross-platform | Unix sockets / Windows TCP |
+| Feature         | Description                |
+| --------------- | -------------------------- |
+| Auto-shutdown   | 30 minutes idle            |
+| Query caching   | SalsaDB memoization        |
+| Content hashing | Skip unchanged files       |
+| Dirty tracking  | Incremental re-indexing    |
+| Cross-platform  | Unix sockets / Windows TCP |
 
 ### Daemon Socket Protocol
 
@@ -234,6 +250,7 @@ Send JSON to socket, receive JSON response:
 ```
 
 **All 22 daemon commands:**
+
 ```
 ping, status, shutdown, search, extract, impact, dead, arch,
 cfg, dfg, slice, calls, warm, semantic, tree, structure,
@@ -268,6 +285,7 @@ tldr semantic search "database connection" --expand  # Follow call graph
 ### Configuration
 
 In `.claude/settings.json`:
+
 ```json
 {
   "semantic_search": {
@@ -282,23 +300,23 @@ In `.claude/settings.json`:
 
 ## Languages Supported
 
-| Language | AST | Call Graph | CFG | DFG | PDG |
-|----------|-----|------------|-----|-----|-----|
-| Python | Yes | Yes | Yes | Yes | Yes |
-| TypeScript | Yes | Yes | Yes | Yes | Yes |
-| JavaScript | Yes | Yes | Yes | Yes | Yes |
-| Go | Yes | Yes | Yes | Yes | Yes |
-| Rust | Yes | Yes | Yes | Yes | Yes |
-| Java | Yes | Yes | - | - | - |
-| C/C++ | Yes | Yes | - | - | - |
-| Ruby | Yes | - | - | - | - |
-| PHP | Yes | - | - | - | - |
-| Kotlin | Yes | - | - | - | - |
-| Swift | Yes | - | - | - | - |
-| C# | Yes | - | - | - | - |
-| Scala | Yes | - | - | - | - |
-| Lua | Yes | - | - | - | - |
-| Elixir | Yes | - | - | - | - |
+| Language   | AST | Call Graph | CFG | DFG | PDG |
+| ---------- | --- | ---------- | --- | --- | --- |
+| Python     | Yes | Yes        | Yes | Yes | Yes |
+| TypeScript | Yes | Yes        | Yes | Yes | Yes |
+| JavaScript | Yes | Yes        | Yes | Yes | Yes |
+| Go         | Yes | Yes        | Yes | Yes | Yes |
+| Rust       | Yes | Yes        | Yes | Yes | Yes |
+| Java       | Yes | Yes        | -   | -   | -   |
+| C/C++      | Yes | Yes        | -   | -   | -   |
+| Ruby       | Yes | -          | -   | -   | -   |
+| PHP        | Yes | -          | -   | -   | -   |
+| Kotlin     | Yes | -          | -   | -   | -   |
+| Swift      | Yes | -          | -   | -   | -   |
+| C#         | Yes | -          | -   | -   | -   |
+| Scala      | Yes | -          | -   | -   | -   |
+| Lua        | Yes | -          | -   | -   | -   |
+| Elixir     | Yes | -          | -   | -   | -   |
 
 ---
 
@@ -322,17 +340,17 @@ Use `--no-ignore` to bypass.
 
 ## When to Use TLDR vs Other Tools
 
-| Task | Use TLDR | Use Grep |
-|------|----------|----------|
-| Find function definition | `tldr extract file --function X` | - |
-| Search code patterns | `tldr search "pattern"` | - |
-| String literal search | - | `grep "literal"` |
-| Config values | - | `grep "KEY="` |
-| Cross-file calls | `tldr calls` | - |
-| Reverse deps | `tldr impact func` | - |
-| Complexity analysis | `tldr cfg file func` | - |
-| Variable tracking | `tldr dfg file func` | - |
-| Natural language query | `tldr semantic search` | - |
+| Task                     | Use TLDR                         | Use Grep         |
+| ------------------------ | -------------------------------- | ---------------- |
+| Find function definition | `tldr extract file --function X` | -                |
+| Search code patterns     | `tldr search "pattern"`          | -                |
+| String literal search    | -                                | `grep "literal"` |
+| Config values            | -                                | `grep "KEY="`    |
+| Cross-file calls         | `tldr calls`                     | -                |
+| Reverse deps             | `tldr impact func`               | -                |
+| Complexity analysis      | `tldr cfg file func`             | -                |
+| Variable tracking        | `tldr dfg file func`             | -                |
+| Natural language query   | `tldr semantic search`           | -                |
 
 ---
 
@@ -383,6 +401,7 @@ tldr search "def buggy_func" . -C 20
 ### Why This Works
 
 For cross-file bugs (e.g., wrong field name, type mismatch), you need to see:
+
 - The file with the bug (handler accessing `task.user_id`)
 - The file with the contract (model defining `owner_id`)
 
@@ -391,6 +410,7 @@ TLDR finds which files matter. Then you read them.
 ### Getting More Context
 
 If TLDR output isn't enough:
+
 - `tldr search "pattern" . -C 20` - Get actual code with 20 lines context
 - `tldr imports file.py` - See what a file depends on
 - Read the file directly if you need the full implementation

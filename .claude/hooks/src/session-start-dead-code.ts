@@ -7,13 +7,13 @@
  * This helps developers identify cleanup opportunities at the start of work.
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
+import { readFileSync, existsSync } from "fs";
+import { queryDaemonSync, trackHookActivitySync } from "./daemon-client.js";
 
 interface SessionStartInput {
   session_id: string;
   hook_event_name: string;
-  source: 'startup' | 'resume' | 'clear' | 'compact';
+  source: "startup" | "resume" | "clear" | "compact";
   cwd: string;
 }
 
@@ -29,16 +29,19 @@ interface DeadCodeResult {
 }
 
 function readStdin(): string {
-  return readFileSync(0, 'utf-8');
+  return readFileSync(0, "utf-8");
 }
 
 // Query daemon for dead code analysis (fast - uses in-memory indexes)
 function getDeadCode(projectPath: string): DeadCodeResult | null {
   try {
-    const response = queryDaemonSync({ cmd: 'dead', language: 'python' }, projectPath);
+    const response = queryDaemonSync(
+      { cmd: "dead", language: "python" },
+      projectPath,
+    );
 
     // Handle daemon unavailable or errors
-    if (response.status === 'unavailable' || response.status === 'error') {
+    if (response.status === "unavailable" || response.status === "error") {
       return null;
     }
 
@@ -77,11 +80,11 @@ function getDeadCode(projectPath: string): DeadCodeResult | null {
 // Format warning message
 function formatWarning(result: DeadCodeResult): string {
   if (result.count === 0) {
-    return '';
+    return "";
   }
 
   const lines: string[] = [
-    `Dead code detected (${result.count} unused function${result.count === 1 ? '' : 's'}):`,
+    `Dead code detected (${result.count} unused function${result.count === 1 ? "" : "s"}):`,
   ];
 
   // Show up to 5 functions
@@ -95,18 +98,18 @@ function formatWarning(result: DeadCodeResult): string {
     lines.push(`  ... and ${result.count - 5} more`);
   }
 
-  lines.push('');
-  lines.push('Consider removing or use `tldr dead .` for full list.');
+  lines.push("");
+  lines.push("Consider removing or use `tldr dead .` for full list.");
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 async function main() {
   const input: SessionStartInput = JSON.parse(readStdin());
 
   // Only run on startup/resume (not clear/compact)
-  if (!['startup', 'resume'].includes(input.source)) {
-    console.log('{}');
+  if (!["startup", "resume"].includes(input.source)) {
+    console.log("{}");
     return;
   }
 
@@ -114,7 +117,7 @@ async function main() {
 
   // Skip if no project directory
   if (!projectDir || !existsSync(projectDir)) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
@@ -123,12 +126,12 @@ async function main() {
 
   if (!result || result.count === 0) {
     // No dead code or tldr not available - silent exit
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
   // Track hook activity for flush threshold
-  trackHookActivitySync('session-start-dead-code', projectDir, true, {
+  trackHookActivitySync("session-start-dead-code", projectDir, true, {
     sessions_checked: 1,
     dead_found: result.count,
   });
@@ -140,5 +143,5 @@ async function main() {
 
 main().catch(() => {
   // Silent fail - don't block session start
-  console.log('{}');
+  console.log("{}");
 });

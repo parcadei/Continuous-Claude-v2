@@ -17,10 +17,10 @@
  * Error thrown when a circular dependency is detected in skill prerequisites.
  */
 export class CircularDependencyError extends Error {
-    cyclePath;
-    constructor(cyclePath) {
-        super(`Circular dependency detected: ${cyclePath.join(' -> ')}`);
-        this.cyclePath = cyclePath;
-        this.name = 'CircularDependencyError';
-    }
+  cyclePath;
+  constructor(cyclePath) {
+    super(`Circular dependency detected: ${cyclePath.join(" -> ")}`);
+    this.cyclePath = cyclePath;
+    this.name = "CircularDependencyError";
+  }
 }

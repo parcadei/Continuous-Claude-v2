@@ -13,17 +13,17 @@
  * All supported orchestration patterns.
  */
 export const SUPPORTED_PATTERNS = [
-  'swarm',
-  'jury',
-  'pipeline',
-  'generator_critic',
-  'hierarchical',
-  'map_reduce',
-  'blackboard',
-  'circuit_breaker',
-  'chain_of_responsibility',
-  'adversarial',
-  'event_driven',
+  "swarm",
+  "jury",
+  "pipeline",
+  "generator_critic",
+  "hierarchical",
+  "map_reduce",
+  "blackboard",
+  "circuit_breaker",
+  "chain_of_responsibility",
+  "adversarial",
+  "event_driven",
 ] as const;
 
 export type PatternType = (typeof SUPPORTED_PATTERNS)[number];

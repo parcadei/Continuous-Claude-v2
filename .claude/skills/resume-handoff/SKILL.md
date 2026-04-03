@@ -7,6 +7,15 @@ description: Resume work from handoff document with context analysis and validat
 
 You are tasked with resuming work from a handoff document through an interactive process. These handoffs contain critical context, learnings, and next steps from previous work sessions that need to be understood and continued.
 
+## When to Use
+
+Activate when:
+
+- User says "/resume" or "/resume-handoff"
+- User says "resume this handoff" or "continue from handoff"
+- User says "I have a handoff from previous session"
+- User provides a path to a handoff file to continue
+
 ## Initial Response
 
 When this command is invoked:
@@ -30,6 +39,7 @@ When this command is invoked:
    - Then propose a course of action to the user and confirm, or ask for clarification on direction.
 
 3. **If no parameters provided**, respond with:
+
 ```
 I'll help you resume work from a handoff document. Let me find the available handoffs.
 
@@ -80,6 +90,7 @@ Then wait for the user's input.
 ### Step 2: Synthesize and Present Analysis
 
 1. **Present comprehensive analysis**:
+
    ```
    I've analyzed the handoff from [date] by [researcher]. Here's the current situation:
 
@@ -122,6 +133,7 @@ Then wait for the user's input.
    - Prioritize based on dependencies and handoff guidance
 
 2. **Present the plan**:
+
    ```
    I've created a task list based on the handoff and current analysis:
 
@@ -163,6 +175,7 @@ Then wait for the user's input.
    | `chronicler` | session | Session analysis, history summaries |
 
 2. **Spawn the specialist via Task tool**:
+
    ```
    Use Task tool with:
    - subagent_type: [selected agent from above]
@@ -212,24 +225,28 @@ Then wait for the user's input.
 ## Common Scenarios
 
 ### Scenario 1: Clean Continuation
+
 - All changes from handoff are present
 - No conflicts or regressions
 - Clear next steps in action items
 - Proceed with recommended actions
 
 ### Scenario 2: Diverged Codebase
+
 - Some changes missing or modified
 - New related code added since handoff
 - Need to reconcile differences
 - Adapt plan based on current state
 
 ### Scenario 3: Incomplete Handoff Work
+
 - Tasks marked as "in_progress" in handoff
 - Need to complete unfinished work first
 - May need to re-understand partial implementations
 - Focus on completing before new work
 
 ### Scenario 4: Stale Handoff
+
 - Significant time has passed
 - Major refactoring has occurred
 - Original approach may no longer apply

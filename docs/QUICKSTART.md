@@ -24,6 +24,7 @@ uv run python scripts/setup/wizard.py
 ```
 
 The wizard walks you through 12 configuration steps including:
+
 - Database setup (PostgreSQL via Docker)
 - Optional API keys (Braintrust, Perplexity, Nia)
 - Claude Code integration (49 agents, 109 skills, 30 hooks)
@@ -59,12 +60,12 @@ Claude Code now has:
 
 Just say these phrases to Claude:
 
-| Say This | What Happens |
-|----------|--------------|
-| "create a handoff" | Saves session state for later |
-| "resume from handoff" | Loads previous session context |
-| "what worked for X before?" | Recalls past learnings |
-| "/workflow" | Goal-based routing |
+| Say This                    | What Happens                   |
+| --------------------------- | ------------------------------ |
+| "create a handoff"          | Saves session state for later  |
+| "resume from handoff"       | Loads previous session context |
+| "what worked for X before?" | Recalls past learnings         |
+| "/workflow"                 | Goal-based routing             |
 
 ## Directory Structure
 
@@ -94,6 +95,7 @@ your-project/
 ## Troubleshooting
 
 ### "Database connection failed"
+
 ```bash
 # Check Docker is running
 docker ps
@@ -103,11 +105,13 @@ cd docker && docker compose up -d
 ```
 
 ### "No module found"
+
 ```bash
 cd opc && uv sync
 ```
 
 ### "Hooks not working"
+
 ```bash
 # Check hooks are built
 ls ~/.claude/hooks/dist/*.mjs

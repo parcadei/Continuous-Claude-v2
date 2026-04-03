@@ -12,7 +12,6 @@ Use this skill when working on natural-transformations problems in category theo
 
 ## Decision Tree
 
-
 1. **Verify Naturality**
    - eta: F => G is natural transformation between functors F, G: C -> D
    - For each f: A -> B in C, diagram commutes:
@@ -41,25 +40,28 @@ Use this skill when working on natural-transformations problems in category theo
    - Fully embeds C into [C^op, Set]
    - See: `.claude/skills/lean4-nat-trans/SKILL.md` for exact syntax
 
-
 ## Tool Commands
 
 ### Lean4_Naturality
+
 ```bash
 # Lean 4: theorem nat : η.app B ≫ G.map f = F.map f ≫ η.app A := η.naturality
 ```
 
 ### Lean4_Nat_Trans
+
 ```bash
 # Lean 4: def η : F ⟶ G where app := fun X => component_X
 ```
 
 ### Lean4_Yoneda
+
 ```bash
 # Lean 4: CategoryTheory.yonedaEquiv -- Yoneda lemma
 ```
 
 ### Lean4_Build
+
 ```bash
 lake build  # Compiler-in-the-loop verification
 ```

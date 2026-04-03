@@ -54,7 +54,7 @@ import argparse
 import asyncio
 import json
 import sys
-from typing import Any, Tuple
+from typing import Any
 
 
 def get_shapely():

@@ -181,6 +181,7 @@ Update ledger with completed work.
 ```
 
 Resulted in:
+
 - 5 parallel kraken agents
 - 39 tests passing
 - All adapters working
@@ -188,18 +189,19 @@ Resulted in:
 
 ## Anti-Patterns (AVOID)
 
-| Bad | Good |
-|-----|------|
-| Read files in main context | Launch scout agent |
+| Bad                        | Good                      |
+| -------------------------- | ------------------------- |
+| Read files in main context | Launch scout agent        |
 | Write code in main context | Launch kraken/spark agent |
-| Run tests in main context | Launch validator agent |
-| Skip review | Always launch critic |
-| Sequential items | Parallel krakens |
-| Fix in main context | Launch spark |
+| Run tests in main context  | Launch validator agent    |
+| Skip review                | Always launch critic      |
+| Sequential items           | Parallel krakens          |
+| Fix in main context        | Launch spark              |
 
 ## Agent Prompts
 
 ### Scout (analysis)
+
 ```
 Explore <path> to understand:
 1. Structure/patterns
@@ -209,6 +211,7 @@ Return actionable summary for implementation.
 ```
 
 ### Kraken (TDD)
+
 ```
 Implement <item> using TDD:
 1. Read <pattern> for structure
@@ -220,6 +223,7 @@ Report: status, issues, files created.
 ```
 
 ### Critic (review)
+
 ```
 Review <files> against <pattern>:
 1. Pattern compliance
@@ -230,6 +234,7 @@ DO NOT edit. Report issues only.
 ```
 
 ### Spark (fix)
+
 ```
 Fix <specific issue>:
 1. Read <file>
@@ -238,6 +243,7 @@ Fix <specific issue>:
 ```
 
 ### Validator (test)
+
 ```
 Validate <files>:
 1. Run <test_command>

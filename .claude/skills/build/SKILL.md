@@ -9,6 +9,20 @@ keywords: [build, greenfield, brownfield, tdd, refactor, workflow, orchestrate]
 
 You are a workflow orchestrator that chains existing skills for feature development. You coordinate the execution of multiple skills in sequence, passing handoffs between them and pausing for human checkpoints at phase boundaries.
 
+## When to Use
+
+Activate when user says things like:
+
+- "/build"
+- "build a feature"
+- "implement a new feature"
+- "create something new"
+- "start a project"
+- "greenfield development"
+- "brownfield development"
+- "I want to build X"
+- "let's start working on X"
+
 ## Invocation
 
 ```
@@ -38,6 +52,7 @@ options:
 ```
 
 **Mapping:**
+
 - "Help me choose" → Continue to Phase 1-4 questions
 - "Greenfield" → Set mode=greenfield, skip to Phase 5 (description)
 - "Brownfield" → Set mode=brownfield, skip to Phase 5 (description)
@@ -45,6 +60,7 @@ options:
 - "Refactor" → Set mode=refactor, skip to Phase 5 (description)
 
 **If Answer is Unclear (via "Other"):**
+
 ```yaml
 question: "I want to understand your workflow needs. Did you mean..."
 header: "Clarify"
@@ -74,11 +90,13 @@ options:
 ```
 
 **Mapping:**
+
 - "New feature from scratch" → greenfield mode
 - "Adding to existing codebase" → brownfield mode
 - "Refactoring existing code" → refactor mode
 
 **If Answer is Unclear (via "Other"):**
+
 ```yaml
 question: "I want to make sure I understand. Did you mean..."
 header: "Clarify"
@@ -108,11 +126,13 @@ options:
 ```
 
 **Mapping:**
+
 - "Clear spec" → --skip-discovery
 - "Rough idea" → run discovery-interview first
 - "Exploring" → run discovery-interview with broader scope
 
 **If Answer is Unclear (via "Other"):**
+
 ```yaml
 question: "I want to make sure I understand your requirements state. Did you mean..."
 header: "Clarify"
@@ -142,11 +162,13 @@ options:
 ```
 
 **Mapping:**
+
 - "Just implement" → standard chain
 - "Tests first" → tdd mode (overrides previous if not refactor)
 - "Validate plan" → keep validate-agent in chain
 
 **If Answer is Unclear (via "Other"):**
+
 ```yaml
 question: "I want to make sure I understand your preferred approach. Did you mean..."
 header: "Clarify"
@@ -177,10 +199,12 @@ options:
 ```
 
 **Mapping:**
+
 - No "Auto-commit" selected → --skip-commit
 - No "Create PR" selected → --skip-pr
 
 **If Answer is Unclear (via "Other"):**
+
 ```yaml
 question: "I want to understand what you need after implementation. Which apply?"
 header: "Clarify"
@@ -203,7 +227,7 @@ Finally, ask for the feature description:
 ```yaml
 question: "Describe what you want to build (1-2 sentences):"
 header: "Feature"
-options: []  # Free text input via "Other"
+options: [] # Free text input via "Other"
 ```
 
 ### Summary Before Execution
@@ -225,28 +249,29 @@ This ensures the user knows exactly what will happen before any agents spawn.
 
 ## Modes
 
-| Mode | Chain | Use Case |
-|------|-------|----------|
-| `greenfield` | discovery-interview -> plan-agent -> validate-agent -> implement_plan -> commit -> describe_pr | New feature from scratch |
-| `brownfield` | onboard -> research-codebase -> plan-agent -> validate-agent -> implement_plan | Feature in existing codebase |
-| `tdd` | plan-agent -> test-driven-development -> implement_plan | Test-first implementation |
-| `refactor` | tldr-code (impact) -> plan-agent -> test-driven-development -> implement_plan | Safe refactoring with impact analysis |
+| Mode         | Chain                                                                                          | Use Case                              |
+| ------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------- |
+| `greenfield` | discovery-interview -> plan-agent -> validate-agent -> implement_plan -> commit -> describe_pr | New feature from scratch              |
+| `brownfield` | onboard -> research-codebase -> plan-agent -> validate-agent -> implement_plan                 | Feature in existing codebase          |
+| `tdd`        | plan-agent -> test-driven-development -> implement_plan                                        | Test-first implementation             |
+| `refactor`   | tldr-code (impact) -> plan-agent -> test-driven-development -> implement_plan                  | Safe refactoring with impact analysis |
 
 ## Options
 
-| Option | Effect |
-|--------|--------|
+| Option             | Effect                                                  |
+| ------------------ | ------------------------------------------------------- |
 | `--skip-discovery` | Skip interview phase (use existing spec or description) |
-| `--skip-validate` | Skip validation phase (trust plan as-is) |
-| `--skip-commit` | Don't auto-commit after implementation |
-| `--skip-pr` | Don't create PR description |
-| `--parallel` | Run independent research agents in parallel |
+| `--skip-validate`  | Skip validation phase (trust plan as-is)                |
+| `--skip-commit`    | Don't auto-commit after implementation                  |
+| `--skip-pr`        | Don't create PR description                             |
+| `--parallel`       | Run independent research agents in parallel             |
 
 ## Handoff Directory
 
 All handoffs go to: `thoughts/shared/handoffs/<session>/`
 
 Session name derived from:
+
 1. Existing continuity ledger name, OR
 2. Generated from feature description: `build-<date>-<kebab-description>`
 
@@ -273,6 +298,7 @@ CHAINS = {
 ```
 
 Apply options to modify chain:
+
 - `--skip-discovery`: Remove "discovery-interview" from chain
 - `--skip-validate`: Remove "validate-agent" from chain
 - `--skip-commit`: Remove "commit" from chain
@@ -281,6 +307,7 @@ Apply options to modify chain:
 ### Step 1: Setup
 
 1. Create handoff directory:
+
    ```bash
    SESSION="build-$(date +%Y%m%d)-<kebab-description>"
    mkdir -p "thoughts/shared/handoffs/$SESSION"
@@ -323,6 +350,7 @@ For each skill in the chain:
 #### Skill Execution Details
 
 **discovery-interview:**
+
 ```
 Task(
   subagent_type="discovery-interview",
@@ -339,9 +367,11 @@ Task(
   """
 )
 ```
+
 Output: Spec file at `thoughts/shared/specs/<name>-spec.md`
 
 **onboard:**
+
 ```
 Task(
   subagent_type="onboard",
@@ -355,9 +385,11 @@ Task(
   """
 )
 ```
+
 Output: TLDR caches, continuity ledger
 
 **research-codebase:**
+
 ```
 Task(
   subagent_type="research-codebase",
@@ -372,9 +404,11 @@ Task(
   """
 )
 ```
+
 Output: Research document at `thoughts/shared/research/<date>-<topic>.md`
 
 **tldr-impact (for refactor mode):**
+
 ```bash
 # Run impact analysis on the function/module being refactored
 tldr impact <target> src/ --depth 3 > thoughts/shared/handoffs/<session>/impact-analysis.json
@@ -382,9 +416,11 @@ tldr impact <target> src/ --depth 3 > thoughts/shared/handoffs/<session>/impact-
 # Also run architecture analysis
 tldr arch src/ > thoughts/shared/handoffs/<session>/architecture.json
 ```
+
 Output: Impact and architecture analysis files
 
 **plan-agent:**
+
 ```
 Task(
   subagent_type="plan-agent",
@@ -404,9 +440,11 @@ Task(
   """
 )
 ```
+
 Output: Plan at `thoughts/shared/plans/PLAN-<name>.md`, handoff at `<session>/plan-<name>.md`
 
 **CHECKPOINT: After plan-agent**
+
 ```
 Plan created: thoughts/shared/plans/PLAN-<name>.md
 
@@ -419,6 +457,7 @@ Please review the plan. Options:
 ```
 
 **validate-agent:**
+
 ```
 Task(
   subagent_type="validate-agent",
@@ -433,9 +472,11 @@ Task(
   """
 )
 ```
+
 Output: Validation handoff at `<session>/validation-<name>.md`
 
 **CHECKPOINT: After validate-agent (if issues found)**
+
 ```
 Validation complete with issues:
 - [Issue 1]
@@ -448,6 +489,7 @@ Options:
 ```
 
 **test-driven-development (for tdd/refactor modes):**
+
 ```
 Present TDD guidance to user:
 
@@ -458,9 +500,11 @@ Present TDD guidance to user:
 
 I'll guide you through each cycle. Starting with first test..."
 ```
+
 This is interactive - guide user through TDD cycles.
 
 **implement_plan:**
+
 ```
 # Check plan size
 if task_count <= 3:
@@ -483,9 +527,11 @@ else:
           """
         )
 ```
+
 Output: Task handoffs at `<session>/task-NN-<description>.md`
 
 **CHECKPOINT: After each implementation phase**
+
 ```
 Phase [N] Complete
 
@@ -501,6 +547,7 @@ Continue to next phase? [Y/n]
 ```
 
 **commit:**
+
 ```
 Follow commit skill:
 1. Show git status and diff
@@ -510,6 +557,7 @@ Follow commit skill:
 ```
 
 **describe_pr:**
+
 ```
 Follow describe_pr skill:
 1. Create PR if not exists
@@ -533,6 +581,7 @@ phases:
 ```
 
 Present to user:
+
 ```
 Workflow blocked at: validate-agent
 
@@ -571,13 +620,13 @@ Total phases: N completed, M skipped
 
 Checkpoints pause for human verification at critical decision points:
 
-| After Phase | Checkpoint Purpose |
-|-------------|-------------------|
-| discovery-interview | Verify spec captures requirements |
-| plan-agent | Approve implementation plan |
-| validate-agent (if issues) | Acknowledge validation concerns |
-| Each implement task | Verify phase works before continuing |
-| commit | Approve commit message and files |
+| After Phase                | Checkpoint Purpose                   |
+| -------------------------- | ------------------------------------ |
+| discovery-interview        | Verify spec captures requirements    |
+| plan-agent                 | Approve implementation plan          |
+| validate-agent (if issues) | Acknowledge validation concerns      |
+| Each implement task        | Verify phase works before continuing |
+| commit                     | Approve commit message and files     |
 
 **To skip checkpoints:** Run with `--no-checkpoint` (advanced users only)
 
@@ -671,7 +720,7 @@ PR #42: https://github.com/user/repo/pull/42
 
 ### TDD Mode
 
-```
+````
 User: /build tdd Add rate limiting to API endpoints
 
 Claude: Starting TDD workflow for "Add rate limiting to API endpoints"
@@ -696,7 +745,7 @@ def test_rate_limiter_returns_429_after_limit():
     for _ in range(100):
         assert limiter.check("user1") == True
     assert limiter.check("user1") == False
-```
+````
 
 Running test... FAILED (as expected - RateLimiter doesn't exist)
 
@@ -714,11 +763,13 @@ Phase 3/3: Implementation
 [Integrates rate limiter into endpoints]
 
 Build complete!
+
 ```
 
 ### Refactor Mode
 
 ```
+
 User: /build refactor Extract auth logic into separate module
 
 Claude: Starting refactor workflow for "Extract auth logic into separate module"
@@ -727,11 +778,13 @@ Phase 1/4: Impact Analysis
 Running: tldr impact auth src/ --depth 3
 
 Impact analysis complete:
+
 - 12 files directly call auth functions
 - 3 entry points affected
 - No circular dependencies detected
 
 Architecture analysis:
+
 - auth is currently in: src/api/middleware/
 - Callers in: src/api/routes/, src/api/handlers/
 
@@ -746,6 +799,7 @@ Phase 2/4: Planning
 [Creates refactor plan based on impact analysis]
 
 ...
+
 ```
 
 ## Error Recovery
@@ -753,21 +807,25 @@ Phase 2/4: Planning
 ### If a phase fails:
 
 ```
+
 Phase 3 (validate-agent) failed:
 
 Error: WebSearch unavailable
 
 Options:
+
 1. Retry phase (recommended)
 2. Skip validation (--skip-validate)
 3. Abort workflow
 
 Choice:
+
 ```
 
 ### If implementation is blocked:
 
 ```
+
 Task 3/5 blocked:
 
 Blocker: Database schema doesn't match expected structure
@@ -775,11 +833,13 @@ Found: users.email (VARCHAR)
 Expected: users.email (UNIQUE VARCHAR)
 
 Options:
+
 1. Create migration to fix schema
 2. Adjust plan to work with current schema
 3. Abort and investigate
 
 Choice:
+
 ```
 
 ## Parallel Execution
@@ -787,6 +847,7 @@ Choice:
 With `--parallel` option, independent phases run concurrently:
 
 ```
+
 /build brownfield --parallel Add dashboard feature
 
 Phase 1: Onboard (started)
@@ -796,7 +857,8 @@ Phase 2: Research-codebase (started in parallel)
 
 Phase 3: Plan-agent (uses results from both)
 ...
-```
+
+````
 
 Only truly independent phases run in parallel. Dependencies are respected.
 
@@ -817,16 +879,16 @@ Set in `.claude/settings.json`:
     }
   }
 }
-```
+````
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| "No continuity ledger found" | Run `/onboard` first or use greenfield mode |
-| "Plan validation failed" | Review validation output, update plan |
-| "Implementation blocked" | Check blocker in handoff, resolve dependency |
-| "Workflow stuck" | Check `orchestration.yaml` for state, resume or restart |
+| Issue                        | Solution                                                |
+| ---------------------------- | ------------------------------------------------------- |
+| "No continuity ledger found" | Run `/onboard` first or use greenfield mode             |
+| "Plan validation failed"     | Review validation output, update plan                   |
+| "Implementation blocked"     | Check blocker in handoff, resolve dependency            |
+| "Workflow stuck"             | Check `orchestration.yaml` for state, resume or restart |
 
 ## Related Skills
 

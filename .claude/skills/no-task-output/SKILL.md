@@ -8,6 +8,10 @@ user-invocable: false
 
 TaskOutput floods the main context window with agent transcripts (70k+ tokens).
 
+## When to Use
+
+This skill is invoked when considering use of TaskOutput for agent results. Not user-invocable directly.
+
 ## Rule
 
 NEVER use `TaskOutput` tool. Use `Task` tool with synchronous mode instead.
@@ -30,4 +34,5 @@ Task(run_in_background=false)  // Agent runs, returns summary
 ```
 
 ## Source
+
 - Session where TaskOutput caused context overflow

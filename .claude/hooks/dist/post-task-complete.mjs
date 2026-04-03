@@ -30,7 +30,7 @@ async function main() {
     ".claude",
     "cache",
     "agentica-coordination",
-    "coordination.db"
+    "coordination.db",
   );
   if (!existsSync(dbPath)) {
     console.log(JSON.stringify({ result: "continue" }));
@@ -71,10 +71,14 @@ conn.execute('''
 conn.commit()
 conn.close()
 `;
-    const result = spawnSync("python3", ["-c", insert, dbPath, swarmId, agentId], {
-      encoding: "utf-8",
-      maxBuffer: 1024 * 1024
-    });
+    const result = spawnSync(
+      "python3",
+      ["-c", insert, dbPath, swarmId, agentId],
+      {
+        encoding: "utf-8",
+        maxBuffer: 1024 * 1024,
+      },
+    );
     if (result.status !== 0) {
       console.error("Task completion tracking error:", result.stderr);
     }

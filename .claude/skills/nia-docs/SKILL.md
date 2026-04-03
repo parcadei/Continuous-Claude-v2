@@ -8,27 +8,35 @@ allowed-tools: [Bash, Read]
 
 Search across 3000+ packages (npm, PyPI, Crates, Go) and indexed sources for documentation and code examples.
 
+## When to Use
+
+This skill is invoked when searching library documentation or code examples. User-invocable via /nia-docs.
+
 ## Usage
 
 ### Semantic search in a package
+
 ```bash
 uv run python -m runtime.harness scripts/mcp/nia_docs.py \
   --package fastapi --query "dependency injection"
 ```
 
 ### Search with specific registry
+
 ```bash
 uv run python -m runtime.harness scripts/mcp/nia_docs.py \
   --package react --registry npm --query "hooks patterns"
 ```
 
 ### Grep search for specific patterns
+
 ```bash
 uv run python -m runtime.harness scripts/mcp/nia_docs.py \
   --package sqlalchemy --grep "session.execute"
 ```
 
 ### Universal search across indexed sources
+
 ```bash
 uv run python -m runtime.harness scripts/mcp/nia_docs.py \
   --search "error handling middleware"
@@ -36,14 +44,14 @@ uv run python -m runtime.harness scripts/mcp/nia_docs.py \
 
 ## Options
 
-| Option | Description |
-|--------|-------------|
-| `--package` | Package name to search in |
+| Option       | Description                                             |
+| ------------ | ------------------------------------------------------- |
+| `--package`  | Package name to search in                               |
 | `--registry` | Registry: npm, py_pi, crates, go_modules (default: npm) |
-| `--query` | Semantic search query |
-| `--grep` | Regex pattern to search |
-| `--search` | Universal search across all indexed sources |
-| `--limit` | Max results (default: 5) |
+| `--query`    | Semantic search query                                   |
+| `--grep`     | Regex pattern to search                                 |
+| `--search`   | Universal search across all indexed sources             |
+| `--limit`    | Max results (default: 5)                                |
 
 ## Examples
 

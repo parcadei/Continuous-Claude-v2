@@ -10,11 +10,11 @@
  * - file-claims.ts (reads ID for file conflict detection)
  */
 
-import { mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { mkdirSync, readFileSync, writeFileSync } from "fs";
+import { join } from "path";
 
 /** Default filename for session ID persistence */
-const SESSION_ID_FILENAME = '.coordination-session-id';
+const SESSION_ID_FILENAME = ".coordination-session-id";
 
 /**
  * Returns the path to the session ID persistence file.
@@ -23,13 +23,17 @@ const SESSION_ID_FILENAME = '.coordination-session-id';
  * @param options.createDir - If true, creates ~/.claude/ directory (default: false)
  * @returns Path to ~/.claude/.coordination-session-id
  */
-export function getSessionIdFile(options: { createDir?: boolean } = {}): string {
-  const claudeDir = join(process.env.HOME || '/tmp', '.claude');
+export function getSessionIdFile(
+  options: { createDir?: boolean } = {},
+): string {
+  const claudeDir = join(process.env.HOME || "/tmp", ".claude");
 
   if (options.createDir) {
     try {
       mkdirSync(claudeDir, { recursive: true, mode: 0o700 });
-    } catch { /* ignore mkdir errors */ }
+    } catch {
+      /* ignore mkdir errors */
+    }
   }
 
   return join(claudeDir, SESSION_ID_FILENAME);
@@ -59,7 +63,7 @@ export function generateSessionId(): string {
 export function writeSessionId(sessionId: string): boolean {
   try {
     const filePath = getSessionIdFile({ createDir: true });
-    writeFileSync(filePath, sessionId, { encoding: 'utf-8', mode: 0o600 });
+    writeFileSync(filePath, sessionId, { encoding: "utf-8", mode: 0o600 });
     return true;
   } catch {
     return false;
@@ -74,7 +78,7 @@ export function writeSessionId(sessionId: string): boolean {
 export function readSessionId(): string | null {
   try {
     const sessionFile = getSessionIdFile();
-    const id = readFileSync(sessionFile, 'utf-8').trim();
+    const id = readFileSync(sessionFile, "utf-8").trim();
     return id || null;
   } catch {
     // File doesn't exist or read error - return null
@@ -103,7 +107,9 @@ export function getSessionId(options: { debug?: boolean } = {}): string {
 
   // Fallback - log if debug enabled
   if (options.debug) {
-    console.error('[session-id] WARNING: No persisted session ID found, generating new one');
+    console.error(
+      "[session-id] WARNING: No persisted session ID found, generating new one",
+    );
   }
 
   // Fallback to Braintrust span ID or generate new

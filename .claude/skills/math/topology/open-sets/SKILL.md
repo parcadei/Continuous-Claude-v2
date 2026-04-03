@@ -12,7 +12,6 @@ Use this skill when working on open-sets problems in topology.
 
 ## Decision Tree
 
-
 1. **Is f: X -> Y continuous?**
    - For metric spaces: x_n -> x implies f(x_n) -> f(x)?
    - For general spaces: f^(-1)(open) = open?
@@ -32,27 +31,29 @@ Use this skill when working on open-sets problems in topology.
    - Epsilon-delta: for all epsilon > 0, exists delta > 0: d(x,a) < delta implies d(f(x),f(a)) < epsilon
    - `z3_solve.py prove "epsilon_delta_bound"`
 
-
 ## Tool Commands
 
 ### Z3_Preimage_Open
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "preimage_open"
 ```
 
 ### Z3_Epsilon_Delta
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "ForAll(eps, Exists(delta, d(x,a) < delta implies d(f(x),f(a)) < eps))"
 ```
 
 ### Z3_Ball_Contained
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "ball_contained"
 ```
 
 ## Key Techniques
 
-*From indexed textbooks:*
+_From indexed textbooks:_
 
 - [Introduction to Topological Manifolds... (Z-Library)] Show that every local homeomorphism is an open map. Show that every homeomorphism is a local homeomorphism. Show that a bijective continuous open map is a homeomorphism.
 - [Introduction to Topological Manifolds... (Z-Library)] The key motivation behind the denition of this new kind of space is the open set criterion for continuity (Lemma A. Appendix), which shows that continuous functions between metric spaces can be detected knowing only the open sets. Motivated by this observation, we make the following denition.

@@ -14,6 +14,7 @@ You extract **perception changes** from Claude Code session transcripts - the "a
 > "A point of view is worth 80 IQ points" - Alan Kay
 
 We're looking for mental model shifts, not just error→fix pairs:
+
 - Realizations: "Oh, X was actually Y"
 - Corrections: "I was wrong about..."
 - Insights: "The pattern here is..."
@@ -22,6 +23,7 @@ We're looking for mental model shifts, not just error→fix pairs:
 ## Input
 
 You receive:
+
 - `JSONL_PATH`: Path to session JSONL file
 - `SESSION_ID`: Session identifier (optional, extracted from path if not provided)
 
@@ -53,14 +55,15 @@ If 0 blocks with perception signals, skip to Step 5 (output summary with 0 learn
 
 Read the extracted blocks from `/tmp/perception-blocks.json` and classify each one:
 
-| Internal Type | Maps To | Signal | Example |
-|---------------|---------|--------|---------|
-| `REALIZATION` | `CODEBASE_PATTERN` | Understanding clicks | "Now I see that X works by..." |
-| `CORRECTION` | `ERROR_FIX` | Was wrong, now right | "I was wrong about --depth flag" |
-| `INSIGHT` | `CODEBASE_PATTERN` | Pattern discovered | "The issue is schema mismatch" |
+| Internal Type        | Maps To            | Signal                           | Example                                  |
+| -------------------- | ------------------ | -------------------------------- | ---------------------------------------- |
+| `REALIZATION`        | `CODEBASE_PATTERN` | Understanding clicks             | "Now I see that X works by..."           |
+| `CORRECTION`         | `ERROR_FIX`        | Was wrong, now right             | "I was wrong about --depth flag"         |
+| `INSIGHT`            | `CODEBASE_PATTERN` | Pattern discovered               | "The issue is schema mismatch"           |
 | `DEBUGGING_APPROACH` | `WORKING_SOLUTION` | Meta-learning about how to debug | "Test underlying command before wrapper" |
 
 **Valid store_learning.py types:**
+
 - `FAILED_APPROACH` - Things that didn't work
 - `WORKING_SOLUTION` - Successful approaches
 - `USER_PREFERENCE` - User style/preferences
@@ -70,6 +73,7 @@ Read the extracted blocks from `/tmp/perception-blocks.json` and classify each o
 - `OPEN_THREAD` - Unfinished work/TODOs
 
 For each block that represents a genuine perception change (not just procedural planning), extract:
+
 - Type (use the "Maps To" column for the `--type` parameter)
 - Summary (one clear sentence)
 - Context (what was being worked on)
@@ -126,12 +130,14 @@ Stored:
 ## Quality Criteria
 
 **Include:**
+
 - Mental model shifts ("X works differently than I thought")
 - Error root causes discovered ("the issue was schema mismatch")
 - Approach corrections ("I was wrong about...")
 - Surprising behaviors ("unexpected that...")
 
 **Exclude:**
+
 - Procedural planning ("Let me try X next")
 - Simple task execution ("I'll read the file")
 - Confirmations ("Good, that worked")
@@ -140,6 +146,7 @@ Stored:
 ## Example Extractions
 
 ### Good: CORRECTION
+
 ```
 Thinking: "--depth: Exists on context (default 2) and impact (default 3) commands but NOT on tree. I was wrong about tree."
 
@@ -150,6 +157,7 @@ Learning:
 ```
 
 ### Good: INSIGHT
+
 ```
 Thinking: "Now I see the issue. The code checks if (parsed.layers) but the actual JSON has entry_layer, leaf_layer, etc."
 
@@ -160,6 +168,7 @@ Learning:
 ```
 
 ### Bad: Procedural (skip)
+
 ```
 Thinking: "Let me test the various CLI commands on this codebase."
 
