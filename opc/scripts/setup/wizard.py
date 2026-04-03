@@ -612,10 +612,7 @@ async def run_setup_wizard() -> None:
     )
 
     if db_mode == "embedded":
-        from scripts.setup.embedded_postgres import (
-            run_migrations_direct,
-            setup_embedded_environment,
-        )
+        from scripts.setup.embedded_postgres import setup_embedded_environment
 
         console.print("  Setting up embedded postgres (creates Python 3.12 environment)...")
         embed_result = await setup_embedded_environment()
@@ -623,37 +620,12 @@ async def run_setup_wizard() -> None:
             console.print(
                 f"  [green]OK[/green] Embedded environment ready at {embed_result['venv']}"
             )
-
-            # Start embedded postgres server
-            from scripts.setup.embedded_postgres import start_embedded_postgres
-
-            console.print("  Starting embedded PostgreSQL server...")
-            pgdata = embed_result["pgdata"]
-            venv_path = Path(embed_result["venv"])
-            server_result = start_embedded_postgres(pgdata, venv_path)
-            if server_result["success"]:
-                console.print("  [green]OK[/green] PostgreSQL server started")
-
-                # Run schema migration
-                console.print("  Running database schema...")
-                schema_path = _project_root.parent / "docker" / "init-schema.sql"
-                migration_result = run_migrations_direct(server_result["uri"], schema_path)
-                if migration_result["success"]:
-                    console.print("  [green]OK[/green] Schema applied")
-                    if migration_result.get("warnings"):
-                        for w in migration_result["warnings"]:
-                            console.print(f"  [yellow]WARN[/yellow] {w}")
-                else:
-                    console.print(
-                        f"  [red]ERROR[/red] Schema migration failed: {migration_result.get('error', 'Unknown')}"
-                    )
-            else:
-                console.print(
-                    f"  [red]ERROR[/red] Failed to start PostgreSQL: {server_result.get('error', 'Unknown')}"
+            console.print(
+                "  [dim]To start server: {venv}/bin/python -c \"from pgserver import get_server; get_server('{pgdata}')\"".format(
+                    venv=embed_result["venv"], pgdata=embed_result["pgdata"]
                 )
-                console.print("  Falling back to Docker mode")
-                db_mode = "docker"
-
+            )
+            console.print("  [dim]To run schema: psql -f docker/init-schema.sql <uri>")
             db_config = {
                 "mode": "embedded",
                 "pgdata": str(embed_result["pgdata"]),
