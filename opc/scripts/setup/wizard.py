@@ -636,7 +636,7 @@ async def run_setup_wizard() -> None:
 
                 # Run schema migration
                 console.print("  Running database schema...")
-                schema_path = _project_root / "docker" / "init-schema.sql"
+                schema_path = _project_root.parent / "docker" / "init-schema.sql"
                 migration_result = run_migrations_direct(server_result["uri"], schema_path)
                 if migration_result["success"]:
                     console.print("  [green]OK[/green] Schema applied")
