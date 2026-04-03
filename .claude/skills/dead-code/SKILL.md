@@ -9,6 +9,14 @@ keywords: [dead code, unused, cleanup, refactor, unreachable]
 
 Find unused functions and dead code using TLDR static analysis.
 
+## When to Use
+
+Activate when:
+- User says "/dead-code" or "/find-dead-code"
+- User asks to "find unused code" or "cleanup dead code"
+- User asks to "find unreachable code"
+- During refactoring to identify code to remove
+
 ## Quick Start
 
 ```bash

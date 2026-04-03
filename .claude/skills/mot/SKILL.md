@@ -9,6 +9,15 @@ allowed-tools: [Read, Bash, Glob, Grep]
 
 Run comprehensive health checks on all Claude Code components.
 
+## When to Use
+
+Activate when:
+- User says "/mot"
+- User asks for "system health check" or "health check"
+- User says "check hooks" or "check agents"
+- User says "validate setup" or "audit system"
+- User asks "what's broken?" or "what needs fixing?"
+
 ## Usage
 
 ```

@@ -8,6 +8,10 @@ user-invocable: false
 
 When the user asks to commit, push, or save changes to git:
 
+## When to Use
+
+This is a rules skill invoked when user asks to commit. Not user-invocable directly.
+
 ## MUST Use /commit Skill
 
 **DO NOT** run `git commit` directly. Instead:

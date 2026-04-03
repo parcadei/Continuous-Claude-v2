@@ -8,6 +8,10 @@ user-invocable: false
 
 When building infrastructure, verify it's actually connected to the system before marking as complete.
 
+## When to Use
+
+This skill is invoked after building infrastructure to verify it's properly wired. Not user-invocable directly.
+
 ## Pattern
 
 Infrastructure is not done when the code is written - it's done when it's wired into the system and actively used. Dead code (built but never called) is wasted effort.

@@ -8,6 +8,10 @@ user-invocable: false
 
 Before editing code to fix a bug, confirm what the system *actually produced*.
 
+## When to Use
+
+This skill is invoked automatically before editing files. It is not user-invocable directly.
+
 ## Pattern
 
 Outputs don't lie. Code might. Check outputs first.
