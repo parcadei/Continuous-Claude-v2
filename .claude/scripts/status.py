@@ -1,8 +1,32 @@
 #!/usr/bin/env python3
 """Cross-platform status line for Claude Code.
 
-Shows: 145K 72% | main U:6 | Goal → Current focus
-Critical: ⚠ 160K 80% | main U:6 | Current focus
+Output Format:
+    {tokens} {context}% | {branch} S:{staged} U:{unstaged} A:{added} | {goal} → {now}
+
+Examples:
+    78K 39% | main A:4 | Fix wizard → Update timeout
+    145K 72% | main S:2 U:1 | Refactor OPC → Add validation
+    ⚠ 160K 80% | dev U:6 | Critical bug fix
+
+Color Coding:
+    Green  (ctx < 60%): Normal operation
+    Yellow (ctx 60-79%): Warning, consider cleanup
+    Red    (ctx ≥ 80%): Critical, show only now focus
+
+Components:
+    tokens  - Total tokens used (input + cache_read + cache_creation + overhead)
+    context% - Percentage of context window consumed
+    branch  - Git branch name (max 12 chars)
+    S:N     - Staged files (git add done)
+    U:N     - Unstaged files (changed but not staged)
+    A:N     - Untracked files (new files not git-added)
+    goal    - Objective from handoff file (max 25 chars)
+    now     - Current focus from handoff (max 30 chars)
+
+Temporary Files:
+    ~/.tmp/claude-context-pct-{session_id}.txt  - Context % for other hooks
+    ~/.tmp/claude-session-stats-{session_id}.json - Full stats for /tldr-stats skill
 
 Replaces status.sh for Windows compatibility.
 """
@@ -89,11 +113,14 @@ def log_context_drop(session_id: str, prev_pct: int, curr_pct: int) -> None:
     Logs to ~/.claude/autocompact.log (local, not pushed to repo).
     """
     from datetime import datetime
+
     log_file = Path.home() / ".claude" / "autocompact.log"
     try:
         with open(log_file, "a") as f:
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            f.write(f"{timestamp} | session:{session_id} | {prev_pct}% → {curr_pct}% (drop: {prev_pct - curr_pct}%)\n")
+            f.write(
+                f"{timestamp} | session:{session_id} | {prev_pct}% → {curr_pct}% (drop: {prev_pct - curr_pct}%)\n"
+            )
     except OSError:
         pass
 
@@ -180,15 +207,27 @@ def get_git_info(cwd: Path) -> str:
         # Check if git repo
         result = subprocess.run(
             ["git", "-C", str(cwd), "rev-parse", "--git-dir"],
-            capture_output=True, text=True, timeout=5
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         if result.returncode != 0:
             return ""
 
         # Get branch name
         result = subprocess.run(
-            ["git", "-C", str(cwd), "--no-optional-locks", "rev-parse", "--abbrev-ref", "HEAD"],
-            capture_output=True, text=True, timeout=5
+            [
+                "git",
+                "-C",
+                str(cwd),
+                "--no-optional-locks",
+                "rev-parse",
+                "--abbrev-ref",
+                "HEAD",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         branch = result.stdout.strip() if result.returncode == 0 else ""
         if len(branch) > 12:
@@ -196,22 +235,46 @@ def get_git_info(cwd: Path) -> str:
 
         # Get staged count
         result = subprocess.run(
-            ["git", "-C", str(cwd), "--no-optional-locks", "diff", "--cached", "--name-only"],
-            capture_output=True, text=True, timeout=5
+            [
+                "git",
+                "-C",
+                str(cwd),
+                "--no-optional-locks",
+                "diff",
+                "--cached",
+                "--name-only",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         staged = len(result.stdout.strip().split("\n")) if result.stdout.strip() else 0
 
         # Get unstaged count
         result = subprocess.run(
             ["git", "-C", str(cwd), "--no-optional-locks", "diff", "--name-only"],
-            capture_output=True, text=True, timeout=5
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
-        unstaged = len(result.stdout.strip().split("\n")) if result.stdout.strip() else 0
+        unstaged = (
+            len(result.stdout.strip().split("\n")) if result.stdout.strip() else 0
+        )
 
         # Get untracked count
         result = subprocess.run(
-            ["git", "-C", str(cwd), "--no-optional-locks", "ls-files", "--others", "--exclude-standard"],
-            capture_output=True, text=True, timeout=5
+            [
+                "git",
+                "-C",
+                str(cwd),
+                "--no-optional-locks",
+                "ls-files",
+                "--others",
+                "--exclude-standard",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         added = len(result.stdout.strip().split("\n")) if result.stdout.strip() else 0
 
@@ -239,8 +302,8 @@ def parse_filename_timestamp(path: Path) -> str:
 
     Returns '0000-00-00_00-00' if no timestamp found (sorts oldest).
     """
-    match = re.search(r'(\d{4}-\d{2}-\d{2}_\d{2}-\d{2})', path.name)
-    return match.group(1) if match else '0000-00-00_00-00'
+    match = re.search(r"(\d{4}-\d{2}-\d{2}_\d{2}-\d{2})", path.name)
+    return match.group(1) if match else "0000-00-00_00-00"
 
 
 def find_latest_handoff(project_dir: Path) -> Path | None:
@@ -267,7 +330,7 @@ def extract_yaml_field(content: str, field: str) -> str:
     pattern = rf"^{field}:\s*(.+?)$"
     match = re.search(pattern, content, re.MULTILINE)
     if match:
-        return match.group(1).strip().strip('"\'')
+        return match.group(1).strip().strip("\"'")
     return ""
 
 
@@ -300,14 +363,19 @@ def get_continuity_info(project_dir: Path) -> tuple[str, str]:
 
             # Fallback for now: Action Items or Next Steps section
             if not now_focus:
-                match = re.search(r"^## (?:Action Items|Next Steps)\s*\n(?:.*\n)*?^(\d+\.)\s*(.+?)$",
-                                  content, re.MULTILINE)
+                match = re.search(
+                    r"^## (?:Action Items|Next Steps)\s*\n(?:.*\n)*?^(\d+\.)\s*(.+?)$",
+                    content,
+                    re.MULTILINE,
+                )
                 if match:
                     now_focus = match.group(2).strip()
 
             # Try P0 section
             if not now_focus:
-                match = re.search(r"^### P0\s*\n(?:.*\n)*?^(\d+\.)\s*(.+?)$", content, re.MULTILINE)
+                match = re.search(
+                    r"^### P0\s*\n(?:.*\n)*?^(\d+\.)\s*(.+?)$", content, re.MULTILINE
+                )
                 if match:
                     now_focus = match.group(2).strip()
 
@@ -346,8 +414,9 @@ def get_continuity_info(project_dir: Path) -> tuple[str, str]:
     return goal, now_focus
 
 
-def build_output(context_pct: int, token_display: str, git_info: str,
-                 goal: str, now_focus: str) -> str:
+def build_output(
+    context_pct: int, token_display: str, git_info: str, goal: str, now_focus: str
+) -> str:
     """Build the final colored output string."""
     # Build continuity string
     if goal and now_focus:
