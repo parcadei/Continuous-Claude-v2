@@ -322,6 +322,7 @@ def build_typescript_hooks(hooks_dir: Path) -> tuple[bool, str]:
             cwd=hooks_dir,
             capture_output=True,
             text=True,
+            timeout=300,
         )
         if result.returncode != 0:
             return False, f"npm install failed: {result.stderr[:200]}"
@@ -333,6 +334,7 @@ def build_typescript_hooks(hooks_dir: Path) -> tuple[bool, str]:
             cwd=hooks_dir,
             capture_output=True,
             text=True,
+            timeout=120,
         )
         if result.returncode != 0:
             return False, f"npm build failed: {result.stderr[:200]}"
@@ -687,7 +689,7 @@ async def run_setup_wizard() -> None:
 
             # Wait for services
             console.print("  Waiting for services to be healthy...")
-            health = await wait_for_services()
+            health = await wait_for_services(timeout=60)
             if health["all_healthy"]:
                 console.print("  [green]OK[/green] All services healthy")
             else:
@@ -980,6 +982,7 @@ async def run_setup_wizard() -> None:
                 ["uv", "sync", "--extra", "math"],
                 capture_output=True,
                 text=True,
+                timeout=300,  # 5 min timeout for large downloads
             )
             if result.returncode == 0:
                 console.print("  [green]OK[/green] Math packages installed")
@@ -996,6 +999,7 @@ async def run_setup_wizard() -> None:
                     ],
                     capture_output=True,
                     text=True,
+                    timeout=30,
                 )
                 if verify_result.returncode == 0 and "OK" in verify_result.stdout:
                     console.print("  [green]OK[/green] All math imports verified")
@@ -1032,6 +1036,7 @@ async def run_setup_wizard() -> None:
                 ["uv", "tool", "install", "qlty"],
                 capture_output=True,
                 text=True,
+                timeout=300,
             )
             if result.returncode == 0:
                 console.print("  [green]OK[/green] qlty installed via uv")
@@ -1041,6 +1046,7 @@ async def run_setup_wizard() -> None:
                     ["curl", "-fsSL", "https://qlty.sh/install.sh"],
                     capture_output=True,
                     text=True,
+                    timeout=60,
                 )
                 if result.returncode == 0:
                     install_result = subprocess.run(
@@ -1048,6 +1054,7 @@ async def run_setup_wizard() -> None:
                         shell=True,
                         capture_output=True,
                         text=True,
+                        timeout=120,
                     )
                     if install_result.returncode == 0:
                         console.print("  [green]OK[/green] qlty installed")
@@ -1077,6 +1084,7 @@ async def run_setup_wizard() -> None:
                 ["cargo", "install", "ast-grep"],
                 capture_output=True,
                 text=True,
+                timeout=600,
             )
             if result.returncode == 0:
                 console.print("  [green]OK[/green] ast-grep installed via cargo")
@@ -1085,6 +1093,7 @@ async def run_setup_wizard() -> None:
                     ["npm", "install", "-g", "ast-grep"],
                     capture_output=True,
                     text=True,
+                    timeout=120,
                 )
                 if result.returncode == 0:
                     console.print("  [green]OK[/green] ast-grep installed via npm")
@@ -1117,10 +1126,12 @@ async def run_setup_wizard() -> None:
 
         try:
             # Install from PyPI using uv tool (puts tldr CLI in PATH)
+            # Use 300s timeout - first install resolves many deps
             result = subprocess.run(
                 ["uv", "tool", "install", "llm-tldr"],
                 capture_output=True,
                 text=True,
+                timeout=300,
             )
 
             if result.returncode == 0:
@@ -1132,6 +1143,7 @@ async def run_setup_wizard() -> None:
                     ["tldr", "--help"],
                     capture_output=True,
                     text=True,
+                    timeout=10,
                 )
                 # Check if this is llm-tldr (has 'tree', 'structure', 'daemon') not tldr-pages
                 is_llm_tldr = any(
@@ -1198,8 +1210,10 @@ async def run_setup_wizard() -> None:
 
                         if has_gpu:
                             model = "bge-large-en-v1.5"
+                            timeout = 600  # 10 min with GPU
                         else:
                             model = "all-MiniLM-L6-v2"
+                            timeout = 300  # 5 min for small model
                             console.print("  [dim]No GPU detected, using lightweight model[/dim]")
 
                         settings["semantic_search"] = {
@@ -1229,6 +1243,7 @@ async def run_setup_wizard() -> None:
                                     ],
                                     capture_output=True,
                                     text=True,
+                                    timeout=timeout,
                                     env={**os.environ, "TLDR_AUTO_DOWNLOAD": "1"},
                                 )
                                 if download_result.returncode == 0:
@@ -1354,6 +1369,7 @@ async def run_setup_wizard() -> None:
                         cwd=loogle_home,
                         capture_output=True,
                         text=True,
+                        timeout=60,
                     )
                     if result.returncode == 0:
                         console.print("  [green]OK[/green] Updated")
@@ -1369,6 +1385,7 @@ async def run_setup_wizard() -> None:
                         ["git", "clone", "https://github.com/nomeata/loogle", str(loogle_home)],
                         capture_output=True,
                         text=True,
+                        timeout=600,  # 10 min for 2GB repo
                     )
                     if result.returncode == 0:
                         console.print("  [green]OK[/green] Cloned")
@@ -1389,6 +1406,7 @@ async def run_setup_wizard() -> None:
                         cwd=loogle_home,
                         capture_output=True,
                         text=True,
+                        timeout=1200,  # 20 min
                     )
                     if result.returncode == 0:
                         console.print("  [green]OK[/green] Loogle built")
