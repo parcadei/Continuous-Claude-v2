@@ -1061,46 +1061,35 @@ async def run_setup_wizard() -> None:
     elif shutil.which("qlty"):
         console.print("  [green]OK[/green] qlty is already installed")
     elif Confirm.ask("\nInstall qlty code quality tool?", default=True):
-    elif Confirm.ask("\nInstall qlty code quality tool?", default=True):
-        console.print("  Installing qlty...")
+        console.print("  Installing qlty via curl...")
         try:
             result = subprocess.run(
-                ["uv", "tool", "install", "qlty"],
+                ["curl", "-fsSL", "https://qlty.sh/install.sh"],
                 capture_output=True,
                 text=True,
-                timeout=300,
+                timeout=60,
             )
             if result.returncode == 0:
-                console.print("  [green]OK[/green] qlty installed via uv")
-            else:
-                # Fallback to curl install
-                result = subprocess.run(
-                    ["curl", "-fsSL", "https://qlty.sh/install.sh"],
+                install_result = subprocess.run(
+                    result.stdout.strip(),
+                    shell=True,
                     capture_output=True,
                     text=True,
-                    timeout=60,
+                    timeout=120,
                 )
-                if result.returncode == 0:
-                    install_result = subprocess.run(
-                        result.stdout.strip(),
-                        shell=True,
-                        capture_output=True,
-                        text=True,
-                        timeout=120,
-                    )
-                    if install_result.returncode == 0:
-                        console.print("  [green]OK[/green] qlty installed")
-                    else:
-                        console.print("  [yellow]WARN[/yellow] qlty install had issues")
+                if install_result.returncode == 0:
+                    console.print("  [green]OK[/green] qlty installed")
                 else:
-                    console.print("  [yellow]WARN[/yellow] Could not install qlty")
+                    console.print("  [yellow]WARN[/yellow] qlty install had issues")
+            else:
+                console.print("  [yellow]WARN[/yellow] Could not install qlty")
         except subprocess.TimeoutExpired:
             console.print("  [yellow]WARN[/yellow] Installation timed out")
         except Exception as e:
             console.print(f"  [yellow]WARN[/yellow] {e}")
     else:
         console.print("  Skipped qlty installation")
-        console.print("  [dim]Install later with: uv tool install qlty[/dim]")
+        console.print("  [dim]Install later with: curl -fsSL https://qlty.sh/install.sh | sh[/dim]")
 
     # Step 12: ast-grep (AST-based Code Search)
     console.print("\n[bold]Step 12/15: ast-grep Code Analysis Tool[/bold]")
