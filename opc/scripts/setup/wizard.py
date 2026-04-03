@@ -1263,11 +1263,38 @@ async def run_setup_wizard() -> None:
                             f"  [green]OK[/green] Semantic search enabled (threshold: {threshold})"
                         )
 
-                        # Note: Model download happens automatically on first use
-                        # User can trigger manually with: tldr semantic index .
-                        console.print(
-                            "  [dim]Embedding model downloads on first use: tldr semantic index .[/dim]"
-                        )
+                        # Offer to pre-download embedding model
+                        if Confirm.ask("\n  Pre-download embedding model now?", default=False):
+                            console.print(f"  Downloading {model} embedding model...")
+                            try:
+                                download_result = subprocess.run(
+                                    [
+                                        "uv",
+                                        "run",
+                                        "tldr",
+                                        "semantic",
+                                        "download-model",
+                                        "--model",
+                                        model,
+                                    ],
+                                    capture_output=True,
+                                    text=True,
+                                    timeout=300,
+                                )
+                                if download_result.returncode == 0:
+                                    console.print("  [green]OK[/green] Embedding model downloaded")
+                                else:
+                                    console.print("  [yellow]WARN[/yellow] Download had issues")
+                                    if download_result.stderr:
+                                        console.print(f"       {download_result.stderr[:200]}")
+                            except subprocess.TimeoutExpired:
+                                console.print("  [yellow]WARN[/yellow] Download timed out")
+                            except Exception as e:
+                                console.print(f"  [yellow]WARN[/yellow] {e}")
+                        else:
+                            console.print(
+                                "  [dim]Model downloads on first use of: tldr semantic index .[/dim]"
+                            )
                     else:
                         console.print("  Semantic search disabled")
                         console.print("  [dim]Enable later in .claude/settings.json[/dim]")
