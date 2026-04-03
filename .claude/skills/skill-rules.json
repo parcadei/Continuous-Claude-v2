@@ -118,7 +118,7 @@
                 ]
             }
         },
-        "implement_plan": {
+        "implement-plan": {
             "type": "domain",
             "enforcement": "suggest",
             "priority": "critical",
@@ -169,7 +169,7 @@
                 ]
             }
         },
-        "describe_pr": {
+        "describe-pr": {
             "type": "domain",
             "enforcement": "suggest",
             "priority": "high",
@@ -288,7 +288,7 @@
                 ]
             }
         },
-        "create_handoff": {
+        "create-handoff": {
             "type": "domain",
             "enforcement": "suggest",
             "priority": "critical",
@@ -315,7 +315,7 @@
                 ]
             }
         },
-        "resume_handoff": {
+        "resume-handoff": {
             "type": "domain",
             "enforcement": "suggest",
             "priority": "critical",
@@ -337,7 +337,7 @@
                 ]
             }
         },
-        "continuity_ledger": {
+        "continuity-ledger": {
             "type": "domain",
             "enforcement": "suggest",
             "priority": "critical",
