@@ -8,6 +8,10 @@ user-invocable: false
 
 OPC (Orchestrated Parallel Claude) extends Claude Code - it does NOT replace it.
 
+## When to Use
+
+This skill is invoked when understanding OPC architecture. Not user-invocable directly.
+
 ## Core Concept
 
 Claude Code CLI is the execution engine. OPC adds orchestration via:

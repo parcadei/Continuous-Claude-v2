@@ -8,6 +8,10 @@ user-invocable: false
 
 Write prompts that Agentica agents reliably follow. Standard natural language prompts fail ~35% of the time due to LLM instruction ambiguity.
 
+## When to Use
+
+This skill is invoked when writing prompts for Agentica/REPL agents. Not user-invocable directly.
+
 ## The Orchestration Pattern
 
 Proven workflow for context-preserving agent orchestration:

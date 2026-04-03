@@ -7,6 +7,10 @@ description: Maps questions to the optimal tldr command. Use this to pick the ri
 
 Maps questions to the optimal tldr command. Use this to pick the right layer.
 
+## When to Use
+
+This skill is invoked when routing questions to the optimal TLDR command. User-invocable via /tldr-router.
+
 ## Question → Command Mapping
 
 ### "What files/functions exist?"

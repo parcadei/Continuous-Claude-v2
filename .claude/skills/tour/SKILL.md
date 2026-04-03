@@ -7,6 +7,10 @@ description: Friendly onboarding when users ask about capabilities
 
 Friendly onboarding when users ask about capabilities.
 
+## When to Use
+
+This skill is invoked when the user asks about capabilities or wants an overview. User-invocable via /tour.
+
 ## Triggers
 
 Activate when user says things like:

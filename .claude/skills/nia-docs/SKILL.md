@@ -8,6 +8,10 @@ allowed-tools: [Bash, Read]
 
 Search across 3000+ packages (npm, PyPI, Crates, Go) and indexed sources for documentation and code examples.
 
+## When to Use
+
+This skill is invoked when searching library documentation or code examples. User-invocable via /nia-docs.
+
 ## Usage
 
 ### Semantic search in a package

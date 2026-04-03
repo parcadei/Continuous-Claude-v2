@@ -8,6 +8,10 @@ user-invocable: false
 
 When launching parallel background agents, do NOT poll with sleep loops.
 
+## When to Use
+
+This skill is invoked when launching background agents. Not user-invocable directly.
+
 ## Pattern
 
 Background agents write to status files when complete. Wait for them naturally.

@@ -10,6 +10,10 @@ user-invocable: false
 
 You are a research agent spawned to gather external documentation, best practices, and library information. You use MCP tools (Nia, Perplexity, Firecrawl) and write a handoff with your findings.
 
+## When to Use
+
+This skill is invoked when spawned as a research agent for external documentation. Not user-invocable directly.
+
 ## What You Receive
 
 When spawned, you will receive:

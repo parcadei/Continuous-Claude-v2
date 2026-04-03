@@ -8,6 +8,10 @@ user-invocable: false
 
 When adding redundant paths (fallbacks, belt-and-suspenders), make them idempotent.
 
+## When to Use
+
+This skill is invoked when adding redundant paths. Not user-invocable directly.
+
 ## Pattern
 
 Redundancy without idempotency causes loops, churn, or data corruption.

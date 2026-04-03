@@ -11,6 +11,10 @@ Research external sources (documentation, web, APIs) for libraries, best practic
 
 > **Note:** The current year is 2025. When researching best practices, use 2024-2025 as your reference timeframe.
 
+## When to Use
+
+This skill is invoked when the user wants external research on libraries, best practices, or general topics. User-invocable via /research-external.
+
 ## Invocation
 
 ```

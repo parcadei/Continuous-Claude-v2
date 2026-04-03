@@ -8,6 +8,10 @@ user-invocable: false
 
 Run QLTY checks during code writing to catch issues early.
 
+## When to Use
+
+This skill is invoked when running QLTY checks during development. Not user-invocable directly.
+
 ## When to Run
 
 Run QLTY after significant code changes:

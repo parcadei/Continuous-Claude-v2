@@ -10,6 +10,10 @@ priority: high
 
 **For mathematicians who want verified proofs without learning Lean syntax.**
 
+## When to Use
+
+This skill is invoked when the user wants to prove theorems with machine verification. User-invocable via /prove.
+
 ## Prerequisites
 
 Before using this skill, check Lean4 is installed:

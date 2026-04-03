@@ -7,6 +7,10 @@ user-invocable: false
 
 # Formal Specification
 
+## When to Use
+
+This skill is invoked when implementing technical plans from thoughts/shared/plans with verification. Not user-invocable directly.
+
 ## Multimodal Logic Integration
 
 Five modal logics via fusion with bridge principles:

@@ -12,6 +12,10 @@ user-invocable: false
 
 Instead of reading individual skill documentation, call the router to get the exact command:
 
+## When to Use
+
+This skill is invoked when routing math requests to the correct CLI command. Not user-invocable directly.
+
 ## Usage
 
 ```bash

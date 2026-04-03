@@ -8,6 +8,10 @@ user-invocable: false
 
 Write modular Python code with files sized for maintainability and AI-assisted development.
 
+## When to Use
+
+This skill is invoked when organizing or refactoring Python code. Not user-invocable directly.
+
 ## File Size Guidelines
 
 | Lines | Status | Action |

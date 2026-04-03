@@ -8,6 +8,10 @@ user-invocable: false
 
 Never rely on "latest" or "current" when crossing process or async boundaries.
 
+## When to Use
+
+This skill is invoked when passing identifiers across process or async boundaries. Not user-invocable directly.
+
 ## Pattern
 
 Pass explicit identifiers through the entire pipeline. "Most recent" is a race condition.

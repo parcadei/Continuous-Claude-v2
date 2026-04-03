@@ -8,6 +8,10 @@ user-invocable: false
 
 Index artifacts when they're created, not at batch boundaries.
 
+## When to Use
+
+This skill is invoked when creating artifacts. Not user-invocable directly.
+
 ## Pattern
 
 If downstream logic depends on artifacts being queryable, index immediately at write time.

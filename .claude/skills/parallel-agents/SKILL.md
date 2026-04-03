@@ -8,6 +8,10 @@ user-invocable: false
 
 When launching multiple agents in parallel, follow this pattern to avoid context bloat.
 
+## When to Use
+
+This skill is invoked when launching multiple agents in parallel. Not user-invocable directly.
+
 ## Core Principles
 
 1. **No TaskOutput calls** - TaskOutput returns full agent output, bloating context

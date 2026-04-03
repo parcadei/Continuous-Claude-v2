@@ -8,6 +8,10 @@ user-invocable: false
 
 When launching parallel agents for code implementation, prevent type duplication.
 
+## When to Use
+
+This skill is invoked when launching parallel implementation agents. Not user-invocable directly.
+
 ## Required in Every Agent Prompt
 
 ### 1. Verification Command (MANDATORY)

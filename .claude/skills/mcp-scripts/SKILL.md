@@ -8,6 +8,10 @@ user-invocable: false
 
 When working with files in `scripts/`:
 
+## When to Use
+
+This skill is invoked when working with MCP scripts. Not user-invocable directly.
+
 ## DO
 - Use CLI arguments for all parameters (argparse)
 - Include USAGE docstring at top of file

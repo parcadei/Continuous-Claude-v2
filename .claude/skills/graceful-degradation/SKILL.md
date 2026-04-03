@@ -8,6 +8,10 @@ user-invocable: false
 
 When optional services are unavailable, degrade gracefully with actionable fallback messages.
 
+## When to Use
+
+This skill is invoked when handling optional service failures. Not user-invocable directly.
+
 ## Pattern
 
 Check availability at the start, cache the result, and provide helpful messages that explain what's missing and how to fix it.

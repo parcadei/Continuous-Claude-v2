@@ -7,6 +7,10 @@ description: Get a token-efficient overview of any project using the TLDR stack
 
 Get a token-efficient overview of any project using the TLDR stack.
 
+## When to Use
+
+This skill is invoked when getting a token-efficient overview of a project. User-invocable via /overview or /tldr-overview.
+
 ## Trigger
 - `/overview` or `/tldr-overview`
 - "give me an overview of this project"

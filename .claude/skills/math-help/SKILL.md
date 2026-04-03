@@ -9,6 +9,10 @@ user-invocable: false
 
 Cognitive prosthetics for exact mathematical computation. This guide helps you choose the right tool for your math task.
 
+## When to Use
+
+This skill is invoked when choosing which math tool to use for a given task. Not user-invocable directly.
+
 ## Quick Reference
 
 | I want to... | Use this | Example |
