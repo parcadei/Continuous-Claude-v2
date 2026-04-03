@@ -8,6 +8,10 @@ user-invocable: false
 
 When working with files in `.claude/hooks/`:
 
+## When to Use
+
+This skill is invoked when developing or debugging hooks. Not user-invocable directly.
+
 ## Pattern
 Shell wrapper (.sh) → TypeScript (.ts) via `npx tsx`
 

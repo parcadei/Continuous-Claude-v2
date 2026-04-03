@@ -8,6 +8,10 @@ user-invocable: false
 
 When building infrastructure components, ensure they're actually invoked in the execution path.
 
+## When to Use
+
+This skill is invoked after building infrastructure to verify wiring. Not user-invocable directly.
+
 ## Pattern
 
 Every module needs a clear entry point. Dead code is worse than no code - it creates maintenance burden and false confidence.

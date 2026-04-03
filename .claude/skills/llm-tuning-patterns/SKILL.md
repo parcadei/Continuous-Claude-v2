@@ -8,6 +8,10 @@ user-invocable: false
 
 Evidence-based patterns for configuring LLM parameters, based on APOLLO and Godel-Prover research.
 
+## When to Use
+
+This skill is invoked when configuring LLM parameters. Not user-invocable directly.
+
 ## Pattern
 
 Different tasks require different LLM configurations. Use these evidence-based settings.

@@ -8,6 +8,10 @@ user-invocable: false
 
 Comprehensive guide to tracing Claude Code sessions in Braintrust, including sub-agent correlation.
 
+## When to Use
+
+This skill is invoked when setting up or debugging Braintrust tracing. Not user-invocable directly.
+
 ## Architecture Overview
 
 ```

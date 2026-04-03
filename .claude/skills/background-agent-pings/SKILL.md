@@ -8,6 +8,10 @@ user-invocable: false
 
 Trust system reminders as agent progress notifications. Don't poll.
 
+## When to Use
+
+This skill is invoked when managing background agents. Not user-invocable directly.
+
 ## Pattern
 
 When you launch a background agent, **continue working on other tasks**. The system will notify you via reminders when:
