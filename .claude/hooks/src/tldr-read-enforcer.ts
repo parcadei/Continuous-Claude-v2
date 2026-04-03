@@ -10,7 +10,7 @@
  */
 
 import { readFileSync, existsSync, statSync } from 'fs';
-import { basename, extname } from 'path';
+import { basename, extname, isAbsolute, join } from 'path';
 import { queryDaemonSync, DaemonResponse, trackHookActivitySync } from './daemon-client';
 
 // Search context from smart-search-router
@@ -371,7 +371,8 @@ async function main() {
     return;
   }
 
-  const filePath = input.tool_input.file_path || '';
+  const rawFilePath = input.tool_input.file_path || '';
+  const filePath = isAbsolute(rawFilePath) ? rawFilePath : join(input.cwd, rawFilePath);
 
   // Allow non-code files
   if (!isCodeFile(filePath)) {

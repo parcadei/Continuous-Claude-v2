@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { execSync } from 'child_process';
+import * as os from 'os';
+import { execSync, spawn } from 'child_process';
 
 interface SessionStartInput {
   type?: 'startup' | 'resume' | 'clear' | 'compact';  // Legacy field
@@ -308,9 +309,52 @@ function getUnmarkedHandoffs(): UnmarkedHandoff[] {
   }
 }
 
+// ============================================
+// MEMORY DAEMON: Auto-start on session start
+// ============================================
+
+function ensureMemoryDaemon(): string | null {
+  const pidFile = path.join(os.homedir(), '.claude', 'memory-daemon.pid');
+
+  if (fs.existsSync(pidFile)) {
+    try {
+      const pid = parseInt(fs.readFileSync(pidFile, 'utf-8').trim(), 10);
+      process.kill(pid, 0);
+      return null;
+    } catch {
+      fs.unlinkSync(pidFile);
+    }
+  }
+
+  const possibleLocations = [
+    path.join(os.homedir(), '.claude', 'opc', 'scripts', 'core', 'memory_daemon.py'),
+    path.join(os.homedir(), '.claude', 'scripts', 'core', 'memory_daemon.py'),
+  ];
+
+  for (const daemonScript of possibleLocations) {
+    if (fs.existsSync(daemonScript)) {
+      try {
+        const child = spawn('uv', ['run', 'python', daemonScript, 'start'], {
+          detached: true,
+          stdio: 'ignore',
+          cwd: path.dirname(path.dirname(path.dirname(daemonScript))),
+        });
+        child.unref();
+        return 'Memory daemon: Started';
+      } catch (e) {
+        console.error(`Warning: Failed to start memory daemon: ${e}`);
+      }
+    }
+  }
+
+  return null;
+}
+
 async function main() {
   const input: SessionStartInput = JSON.parse(await readStdin());
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+
+  ensureMemoryDaemon();
 
   // Support both 'source' (per docs) and 'type' (legacy) fields
   const sessionType = input.source || input.type;

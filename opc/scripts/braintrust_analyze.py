@@ -323,7 +323,7 @@ def list_sessions(project_id: str, api_key: str, limit: int = 5):
             MIN(created) as started,
             MAX(created) as ended,
             COUNT(*) as span_count,
-            COUNT(*) FILTER (WHERE span_attributes['type'] = 'tool') as tool_count
+            SUM(CASE WHEN span_attributes['type'] = 'tool' THEN 1 ELSE 0 END) as tool_count
         FROM logs
         GROUP BY root_span_id
         ORDER BY started DESC

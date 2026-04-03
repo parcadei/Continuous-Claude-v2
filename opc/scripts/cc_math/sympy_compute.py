@@ -1435,8 +1435,11 @@ def safe_solve(equation: str, var: str = "x", domain: str = "complex", timeout: 
     Returns:
         dict with solutions on success, or error dict on failure/timeout
     """
+    import multiprocessing
+
+    ctx = multiprocessing.get_context("spawn")
     try:
-        with ProcessPoolExecutor(max_workers=1) as executor:
+        with ProcessPoolExecutor(max_workers=1, mp_context=ctx) as executor:
             future = executor.submit(_solve_internal, equation, var, domain)
             try:
                 return future.result(timeout=timeout)

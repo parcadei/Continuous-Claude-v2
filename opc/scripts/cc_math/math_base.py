@@ -24,7 +24,7 @@ import sys
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from functools import wraps
-from typing import Any, Dict, List, Optional, TypeVar, Union
+from typing import Any, TypeVar
 
 # Type variables for generic decorators
 T = TypeVar("T")
@@ -45,7 +45,7 @@ class MathCommand:
     category: str
     description: str
     latex_template: str | None = None
-    args: list[Dict[str, Any]] = field(default_factory=list)
+    args: list[dict[str, Any]] = field(default_factory=list)
 
 
 # Global registry per script - use module-level dict
@@ -57,7 +57,7 @@ def math_command(
     category: str,
     description: str = "",
     latex_template: str | None = None,
-    args: List[Dict[str, Any]] | None = None,
+    args: list[dict[str, Any]] | None = None,
 ) -> Callable[[F], F]:
     """Decorator to register a math command.
 
@@ -130,7 +130,7 @@ def clear_registry() -> None:
 # =============================================================================
 
 
-def format_output(result: dict[str, Any], latex_template: str | None = None) -> Dict[str, Any]:
+def format_output(result: dict[str, Any], latex_template: str | None = None) -> dict[str, Any]:
     """Format computation result as standardized JSON.
 
     Output structure:
@@ -719,7 +719,7 @@ def register_commands(
 
 def run_command(
     args: argparse.Namespace, registry: dict[str, MathCommand] | None = None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Run command based on parsed arguments.
 
     Args:
@@ -764,15 +764,14 @@ def safe_compute(func: Callable, *args, timeout: int = 30, **kwargs) -> dict[str
     Returns:
         Result dict or error dict
     """
+    import multiprocessing
     from concurrent.futures import ProcessPoolExecutor
     from concurrent.futures import TimeoutError as FuturesTimeout
 
-    def _wrapper():
-        return func(*args, **kwargs)
-
+    ctx = multiprocessing.get_context("spawn")
     try:
-        with ProcessPoolExecutor(max_workers=1) as executor:
-            future = executor.submit(_wrapper)
+        with ProcessPoolExecutor(max_workers=1, mp_context=ctx) as executor:
+            future = executor.submit(func, *args, **kwargs)
             try:
                 return future.result(timeout=timeout)
             except FuturesTimeout:
