@@ -8,6 +8,10 @@ user-invocable: false
 
 Standard multi-agent pipeline for implementation tasks.
 
+## When to Use
+
+This skill is invoked when setting up multi-agent workflows. Not user-invocable directly.
+
 ## Architecture Principles
 
 - Use `run_in_background: true` for all agents to keep main context minimal

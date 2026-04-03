@@ -8,6 +8,10 @@ user-invocable: false
 
 Prevent agent output from polluting the main context window.
 
+## When to Use
+
+This skill is invoked when coordinating with sub-agents. Not user-invocable directly.
+
 ## Rules
 
 ### 1. Use Background Agents with File-Based Coordination
