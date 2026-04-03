@@ -1054,31 +1054,13 @@ async def run_setup_wizard() -> None:
     console.print("")
     console.print("  [dim]Free and open source - no API key needed.[/dim]")
 
-    # Check if qlty is already installed (via uv tool or ~/.qlty/bin)
-    qlty_found = False
-    qlty_check = subprocess.run(
-        ["uv", "tool", "run", "qlty", "--version"],
-        capture_output=True,
-        text=True,
-        timeout=10,
-    )
-    if qlty_check.returncode == 0:
-        qlty_found = True
-    else:
-        # Check ~/.qlty/bin directly
-        qlty_path = Path.home() / ".qlty" / "bin" / "qlty"
-        if qlty_path.exists():
-            qlty_check = subprocess.run(
-                [str(qlty_path), "--version"],
-                capture_output=True,
-                text=True,
-                timeout=10,
-            )
-            if qlty_check.returncode == 0:
-                qlty_found = True
-
-    if qlty_found:
+    # Check if qlty is already installed (standalone binary, not uv tool)
+    qlty_path = Path.home() / ".qlty" / "bin" / "qlty"
+    if qlty_path.exists():
         console.print("  [green]OK[/green] qlty is already installed")
+    elif shutil.which("qlty"):
+        console.print("  [green]OK[/green] qlty is already installed")
+    elif Confirm.ask("\nInstall qlty code quality tool?", default=True):
     elif Confirm.ask("\nInstall qlty code quality tool?", default=True):
         console.print("  Installing qlty...")
         try:
