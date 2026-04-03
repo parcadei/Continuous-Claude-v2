@@ -722,7 +722,7 @@ async def run_setup_wizard() -> None:
     # Step 6: Migrations
     console.print("\n[bold]Step 7/13: Database Setup[/bold]")
     if db_mode == "embedded":
-        console.print("  [dim]Skipped - embedded PostgreSQL handles migrations automatically[/dim]")
+        console.print("  [dim]Skipped - run manually after starting server[/dim]")
     elif db_mode == "sqlite":
         console.print("  [dim]Skipped - SQLite does not need migrations[/dim]")
     elif Confirm.ask("Run database migrations?", default=True):
