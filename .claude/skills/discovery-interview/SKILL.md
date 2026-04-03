@@ -2,7 +2,6 @@
 name: discovery-interview
 description: Deep interview process to transform vague ideas into detailed specs. Works for technical and non-technical users.
 user-invocable: true
-model: claude-opus-4-5-20251101
 ---
 
 # Discovery Interview
