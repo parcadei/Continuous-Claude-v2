@@ -1098,7 +1098,10 @@ async def run_setup_wizard() -> None:
     console.print("")
     console.print("  [dim]Free and open source - no API key needed.[/dim]")
 
-    if Confirm.ask("\nInstall ast-grep code analysis tool?", default=True):
+    # Check if ast-grep is already installed
+    if shutil.which("ast-grep"):
+        console.print("  [green]OK[/green] ast-grep is already installed")
+    elif Confirm.ask("\nInstall ast-grep code analysis tool?", default=True):
         console.print("  Installing ast-grep...")
         try:
             result = subprocess.run(
@@ -1141,7 +1144,22 @@ async def run_setup_wizard() -> None:
     console.print("")
     console.print("  [dim]Note: First semantic search downloads ~1.3GB embedding model.[/dim]")
 
-    if Confirm.ask("\nInstall TLDR code analysis tool?", default=True):
+    # Check if tldr is already installed (llm-tldr, not tldr-pages)
+    tldr_path = Path.home() / ".local" / "bin" / "tldr"
+    tldr_check = shutil.which("tldr")
+    is_llm_tldr = False
+    if tldr_check:
+        verify_result = subprocess.run(
+            [tldr_check, "--help"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        is_llm_tldr = any(cmd in verify_result.stdout for cmd in ["tree", "structure", "daemon"])
+
+    if is_llm_tldr:
+        console.print("  [green]OK[/green] TLDR is already installed")
+    elif Confirm.ask("\nInstall TLDR code analysis tool?", default=True):
         console.print("  Installing TLDR...")
         import subprocess
 
