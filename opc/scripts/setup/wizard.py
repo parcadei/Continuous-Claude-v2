@@ -1264,15 +1264,22 @@ async def run_setup_wizard() -> None:
                         )
 
                         # Offer to pre-download embedding model
+                        # Note: We only download the model here, not index any directory.
+                        # Indexing happens per-project when user runs `tldr semantic index .`
                         if Confirm.ask("\n  Pre-download embedding model now?", default=False):
                             console.print(f"  Downloading {model} embedding model...")
                             try:
-                                tldr_exe = shutil.which("tldr")
+                                # Just load the model to trigger download (no indexing)
                                 download_result = subprocess.run(
-                                    [tldr_exe, "semantic", "index", "--model", model],
+                                    [
+                                        sys.executable,
+                                        "-c",
+                                        f"from tldr.semantic import get_model; get_model('{model}')",
+                                    ],
                                     capture_output=True,
                                     text=True,
-                                    timeout=300,
+                                    timeout=timeout,
+                                    env={**os.environ, "TLDR_AUTO_DOWNLOAD": "1"},
                                 )
                                 if download_result.returncode == 0:
                                     console.print("  [green]OK[/green] Embedding model downloaded")
