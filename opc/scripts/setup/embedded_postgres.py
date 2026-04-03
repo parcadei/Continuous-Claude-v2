@@ -34,54 +34,51 @@ def start_embedded_postgres(pgdata: Path, venv_path: Path | None = None) -> dict
             - server: PostgresServer instance (for cleanup)
     """
     import sys
-    from pathlib import Path as Pathlib
 
-    pgserver = None
-
-    # Try direct import first
-    try:
-        import pgserver
-    except ImportError:
-        pass
-
-    # If import failed and venv_path provided, add venv site-packages to sys.path
-    if pgserver is None and venv_path is not None:
-        # Add venv site-packages to sys.path so we can import pgserver
+    # Determine Python executable to use
+    if venv_path is not None:
         if sys.platform == "win32":
-            site_packages = venv_path / "Lib" / "site-packages"
+            python_exe = venv_path / "Scripts" / "python.exe"
         else:
-            site_packages = (
-                venv_path
-                / "lib"
-                / f"python{'.'.join(map(str, sys.version_info[:2]))}"
-                / "site-packages"
-            )
+            python_exe = venv_path / "bin" / "python"
+    else:
+        python_exe = sys.executable
 
-        if site_packages.exists():
-            sys.path.insert(0, str(site_packages))
-            try:
-                import pgserver
-            except ImportError:
-                pass
+    # Build script to start pgserver and get URI
+    start_script = f"""
+import sys
+sys.path.insert(0, '{venv_path}/lib/python3.12/site-packages')
+from pgserver import get_server
+server = get_server('{pgdata}')
+print(server.get_uri())
+"""
 
-    if pgserver is None:
+    import subprocess
+
+    try:
+        proc = subprocess.Popen(
+            [str(python_exe), "-c", start_script],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        stdout, stderr = proc.communicate(timeout=30)
+
+        if proc.returncode == 0:
+            uri = stdout.decode().strip()
+            return {
+                "success": True,
+                "uri": uri,
+            }
+        else:
+            error_msg = stderr.decode().strip() if stderr else "Unknown error"
+            return {
+                "success": False,
+                "error": f"Failed to start pgserver: {error_msg[:200]}",
+            }
+    except subprocess.TimeoutExpired:
         return {
             "success": False,
-            "error": "pgserver not installed. Install with: pip install pgserver",
-        }
-
-    try:
-        # Ensure pgdata directory exists
-        pgdata.mkdir(parents=True, exist_ok=True)
-
-        # Start server (pgserver handles init if needed)
-        server = pgserver.get_server(str(pgdata))
-        uri = server.get_uri()
-
-        return {
-            "success": True,
-            "uri": uri,
-            "server": server,
+            "error": "pgserver start timed out",
         }
     except Exception as e:
         return {
