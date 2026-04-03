@@ -41,7 +41,7 @@ Your task prompt will include structured context:
 [Current progress on any multi-phase work]
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 Parse this carefully - it's the input for your documentation.
@@ -61,17 +61,17 @@ docs/                        # User-facing documentation
 
 **Handoffs go to:**
 ```
-$CLAUDE_PROJECT_DIR/thoughts/shared/handoffs/{session-name}/current.md
+$CLAUDE_CC_DIR/thoughts/shared/handoffs/{session-name}/current.md
 ```
 
 **Ledger updates go to:**
 ```
-$CLAUDE_PROJECT_DIR/thoughts/ledgers/CONTINUITY_CLAUDE-{session-name}.md
+$CLAUDE_CC_DIR/thoughts/ledgers/CONTINUITY_CLAUDE-{session-name}.md
 ```
 
 **Session summaries can also go to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/scribe/latest-summary.md
+$CLAUDE_CC_DIR/.claude/cache/scribe/latest-summary.md
 ```
 
 ## Output Formats

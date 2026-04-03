@@ -33,7 +33,7 @@ Your task prompt will include:
 [Why this is needed, what's already known]
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 ## Step 2: External Search Tools
@@ -103,7 +103,7 @@ uv run python -m runtime.harness scripts/llm_query.py \
 
 **ALWAYS write findings to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/oracle/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/oracle/output-{timestamp}.md
 ```
 
 ## Output Format

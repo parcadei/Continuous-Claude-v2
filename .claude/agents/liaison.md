@@ -31,7 +31,7 @@ Your task prompt will include:
 [Files implementing the integration]
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 ## Step 2: Analyze Integration
@@ -85,7 +85,7 @@ rp-cli -e 'search "retry|backoff|circuit|timeout"'
 
 **ALWAYS write review to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/liaison/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/liaison/output-{timestamp}.md
 ```
 
 ## Output Format

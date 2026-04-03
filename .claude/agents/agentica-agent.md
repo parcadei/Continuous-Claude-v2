@@ -180,7 +180,7 @@ class ResearchCoordinator:
 
 **ALWAYS write your implementation to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/agentica-agent/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/agentica-agent/output-{timestamp}.md
 ```
 
 Include:

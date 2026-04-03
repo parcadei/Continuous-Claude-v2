@@ -33,7 +33,7 @@ Your task prompt will include structured context:
 [What's been attempted so far]
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 ## Step 3: Investigate with MCP Tools
@@ -82,7 +82,7 @@ git log -p --all -S 'search_term' -- '*.ts'
 
 **ALWAYS write your findings to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/debug-agent/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/debug-agent/output-{timestamp}.md
 ```
 
 ## Output Format

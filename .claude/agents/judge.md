@@ -31,7 +31,7 @@ Your task prompt will include:
 [Original and refactored code locations]
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 ## Step 2: Compare Before/After
@@ -77,7 +77,7 @@ npm test 2>&1 | tail -20
 
 **ALWAYS write review to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/judge/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/judge/output-{timestamp}.md
 ```
 
 ## Output Format

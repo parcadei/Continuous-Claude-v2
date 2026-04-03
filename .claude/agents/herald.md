@@ -32,7 +32,7 @@ Your task prompt will include:
 [What's being released - full release, specific packages]
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 ## Step 2: Gather Changes
@@ -86,12 +86,12 @@ npm version <version> --no-git-tag-version
 
 **ALWAYS write release notes to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/herald/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/herald/output-{timestamp}.md
 ```
 
 **Also update:**
 ```
-$CLAUDE_PROJECT_DIR/CHANGELOG.md
+$CLAUDE_CC_DIR/CHANGELOG.md
 ```
 
 ## Output Format

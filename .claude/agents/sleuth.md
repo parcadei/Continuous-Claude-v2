@@ -31,7 +31,7 @@ Your task prompt will include:
 [What's been attempted so far]
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 ## Step 2: Form Hypotheses
@@ -78,7 +78,7 @@ grep -A 10 "Traceback" logs/*.log
 
 **ALWAYS write findings to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/sleuth/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/sleuth/output-{timestamp}.md
 ```
 
 ## Output Format

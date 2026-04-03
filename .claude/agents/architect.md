@@ -32,7 +32,7 @@ Your task prompt will include:
 [Technical constraints, deadlines, dependencies]
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 ## Step 2: Codebase Analysis
@@ -74,12 +74,12 @@ Break down into phases:
 
 **ALWAYS write plan to:**
 ```
-$CLAUDE_PROJECT_DIR/thoughts/shared/plans/[feature-name]-plan.md
+$CLAUDE_CC_DIR/thoughts/shared/plans/[feature-name]-plan.md
 ```
 
 **Also write summary to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/architect/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/architect/output-{timestamp}.md
 ```
 
 ## Output Format

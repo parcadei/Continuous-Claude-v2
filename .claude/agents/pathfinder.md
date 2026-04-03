@@ -47,7 +47,7 @@ rp-cli -e 'structure .'
 
 ## Step 3: Output
 
-Write to `$CLAUDE_PROJECT_DIR/.claude/cache/agents/pathfinder/output-{timestamp}.md`:
+Write to `$CLAUDE_CC_DIR/.claude/cache/agents/pathfinder/output-{timestamp}.md`:
 
 ```markdown
 # Repository Analysis: [repo]

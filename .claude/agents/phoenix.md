@@ -31,7 +31,7 @@ Your task prompt will include:
 [Must maintain, backward compatibility, time budget]
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 ## Step 2: Analyze Current State
@@ -83,12 +83,12 @@ For each refactoring:
 
 **ALWAYS write plan to:**
 ```
-$CLAUDE_PROJECT_DIR/thoughts/shared/plans/refactor-[target]-plan.md
+$CLAUDE_CC_DIR/thoughts/shared/plans/refactor-[target]-plan.md
 ```
 
 **Also write summary to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/phoenix/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/phoenix/output-{timestamp}.md
 ```
 
 ## Output Format

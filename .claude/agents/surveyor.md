@@ -32,7 +32,7 @@ Your task prompt will include:
 [Link to or summary of migration plan]
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 ## Step 2: Verify Migration Completeness
@@ -79,7 +79,7 @@ rp-cli -e 'search "TODO.*migration|FIXME.*upgrade"'
 
 **ALWAYS write review to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/surveyor/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/surveyor/output-{timestamp}.md
 ```
 
 ## Output Format

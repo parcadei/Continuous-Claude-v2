@@ -31,7 +31,7 @@ Your task prompt will include:
 [Any specific vulnerabilities or patterns to check]
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 ## Step 2: Security Checklist
@@ -103,7 +103,7 @@ uv run python -m runtime.harness scripts/perplexity_ask.py \
 
 **ALWAYS write findings to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/aegis/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/aegis/output-{timestamp}.md
 ```
 
 ## Output Format

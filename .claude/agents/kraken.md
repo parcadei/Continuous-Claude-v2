@@ -17,7 +17,7 @@ You are a specialized implementation agent. Your job is to implement features an
 
 ```bash
 # Check if resuming from a checkpoint
-HANDOFF_DIR="$CLAUDE_PROJECT_DIR/thoughts/shared/handoffs"
+HANDOFF_DIR="$CLAUDE_CC_DIR/thoughts/shared/handoffs"
 CHECKPOINT_FILE=$(ls -t $HANDOFF_DIR/*/current.md 2>/dev/null | head -1)
 ```
 
@@ -49,7 +49,7 @@ Your task prompt will include structured context:
 - Use TDD approach
 
 ## Codebase
-$CLAUDE_PROJECT_DIR = /path/to/project
+$CLAUDE_CC_DIR = /path/to/project
 ```
 
 Parse this carefully - it defines the scope of your implementation.
@@ -107,7 +107,7 @@ uv run python -m runtime.harness scripts/morph_search.py --query "function_name"
 
 **ALWAYS write your summary to:**
 ```
-$CLAUDE_PROJECT_DIR/.claude/cache/agents/kraken/output-{timestamp}.md
+$CLAUDE_CC_DIR/.claude/cache/agents/kraken/output-{timestamp}.md
 ```
 
 ## Output Format
@@ -154,7 +154,7 @@ Create a checkpoint after completing each major phase:
 
 ### 5.2 Checkpoint Format
 
-Write checkpoints to the handoff file at `$CLAUDE_PROJECT_DIR/thoughts/shared/handoffs/<task-name>/current.md`:
+Write checkpoints to the handoff file at `$CLAUDE_CC_DIR/thoughts/shared/handoffs/<task-name>/current.md`:
 
 ```markdown
 ## Checkpoints
@@ -211,7 +211,7 @@ After completing a phase:
 
 ```bash
 # Get current handoff or create new one
-HANDOFF_DIR="$CLAUDE_PROJECT_DIR/thoughts/shared/handoffs/kraken-$(date +%Y%m%d)"
+HANDOFF_DIR="$CLAUDE_CC_DIR/thoughts/shared/handoffs/kraken-$(date +%Y%m%d)"
 mkdir -p "$HANDOFF_DIR"
 
 # Update checkpoint in handoff
