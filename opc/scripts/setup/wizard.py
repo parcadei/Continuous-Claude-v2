@@ -1036,7 +1036,7 @@ async def run_setup_wizard() -> None:
                 ["uv", "tool", "install", "qlty"],
                 capture_output=True,
                 text=True,
-                timeout=60,
+                timeout=120,
             )
             if result.returncode == 0:
                 console.print("  [green]OK[/green] qlty installed via uv")
