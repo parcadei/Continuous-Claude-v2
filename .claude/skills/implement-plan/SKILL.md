@@ -179,7 +179,7 @@ Handoffs persist on disk. If compaction happens, you re-read handoffs and contin
 
 2. **Read the implementation agent skill:**
    ```bash
-   cat .claude/skills/implement_task/SKILL.md
+   cat .claude/skills/implement-task/SKILL.md
    ```
    This defines how agents should behave.
 
@@ -215,7 +215,7 @@ For each task in the plan:
      subagent_type="general-purpose",
      model="claude-opus-4-5-20251101",
      prompt="""
-     [Paste contents of .claude/skills/implement_task/SKILL.md here]
+     [Paste contents of .claude/skills/implement-task/SKILL.md here]
 
      ---
 

@@ -395,7 +395,7 @@ Plain text stdout is added as context.
         "hooks": [
           {
             "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/my-hook.sh",
+            "command": "$CLAUDE_CC_DIR/.claude/hooks/my-hook.sh",
             "timeout": 60
           }
         ]
@@ -451,7 +451,7 @@ Default type. Executes bash commands or scripts.
 ```json
 {
   "type": "command",
-  "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/my-hook.sh",
+  "command": "$CLAUDE_CC_DIR/.claude/hooks/my-hook.sh",
   "timeout": 60
 }
 ```
@@ -538,7 +538,7 @@ MCP tools use pattern `mcp__<server>__<tool>`:
 ```bash
 #!/bin/bash
 set -e
-cd "$CLAUDE_PROJECT_DIR/.claude/hooks"
+cd "$CLAUDE_CC_DIR/.claude/hooks"
 cat | npx tsx src/my-hook.ts
 ```
 
@@ -709,7 +709,7 @@ else:
 - [ ] Using `tool_response` not `tool_result`?
 - [ ] Output is valid JSON (or plain text)?
 - [ ] Checking `stop_hook_active` in Stop hooks?
-- [ ] Using `$CLAUDE_PROJECT_DIR` for paths?
+- [ ] Using `$CLAUDE_CC_DIR` for paths?
 
 ---
 

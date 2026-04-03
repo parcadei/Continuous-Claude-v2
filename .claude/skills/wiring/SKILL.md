@@ -149,7 +149,7 @@ pytest tests/integration/  # Verify full call path
       "matcher": ["Task"],
       "hooks": [{
         "type": "command",
-        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/orchestration.sh"
+        "command": "$CLAUDE_CC_DIR/.claude/hooks/orchestration.sh"
       }]
     }]
   }

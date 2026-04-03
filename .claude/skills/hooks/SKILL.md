@@ -15,7 +15,7 @@ Shell wrapper (.sh) → TypeScript (.ts) via `npx tsx`
 ```bash
 #!/bin/bash
 set -e
-cd "$CLAUDE_PROJECT_DIR/.claude/hooks"
+cd "$CLAUDE_CC_DIR/.claude/hooks"
 cat | npx tsx <handler>.ts
 ```
 
@@ -62,7 +62,7 @@ Add hooks to `.claude/settings.json`:
       "matcher": ["pattern"],  // Optional
       "hooks": [{
         "type": "command",
-        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/hook.sh"
+        "command": "$CLAUDE_CC_DIR/.claude/hooks/hook.sh"
       }]
     }]
   }

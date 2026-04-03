@@ -22,10 +22,10 @@ Transform ephemeral session learnings into permanent, compounding capabilities.
 
 ```bash
 # List learnings (most recent first)
-ls -t $CLAUDE_PROJECT_DIR/.claude/cache/learnings/*.md | head -20
+ls -t $CLAUDE_CC_DIR/.claude/cache/learnings/*.md | head -20
 
 # Count total
-ls $CLAUDE_PROJECT_DIR/.claude/cache/learnings/*.md | wc -l
+ls $CLAUDE_CC_DIR/.claude/cache/learnings/*.md | wc -l
 ```
 
 Read the most recent 5-10 files (or specify a date range).
@@ -147,7 +147,7 @@ Use `AskUserQuestion` to get approval for each artifact (or batch approval).
 #### For Rules:
 ```bash
 # Write to rules directory
-cat > $CLAUDE_PROJECT_DIR/.claude/rules/<name>.md << 'EOF'
+cat > $CLAUDE_CC_DIR/.claude/rules/<name>.md << 'EOF'
 # Rule Name
 
 [Context: why this rule exists, based on N sessions]
@@ -181,13 +181,13 @@ Create shell wrapper + TypeScript handler:
 
 ```bash
 # Shell wrapper
-cat > $CLAUDE_PROJECT_DIR/.claude/hooks/<name>.sh << 'EOF'
+cat > $CLAUDE_CC_DIR/.claude/hooks/<name>.sh << 'EOF'
 #!/bin/bash
 set -e
-cd "$CLAUDE_PROJECT_DIR/.claude/hooks"
+cd "$CLAUDE_CC_DIR/.claude/hooks"
 cat | node dist/<name>.mjs
 EOF
-chmod +x $CLAUDE_PROJECT_DIR/.claude/hooks/<name>.sh
+chmod +x $CLAUDE_CC_DIR/.claude/hooks/<name>.sh
 ```
 
 Then create `src/<name>.ts`, build with esbuild, and register in `settings.json`:
@@ -198,7 +198,7 @@ Then create `src/<name>.ts`, build with esbuild, and register in `settings.json`
     "EventName": [{
       "hooks": [{
         "type": "command",
-        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/<name>.sh"
+        "command": "$CLAUDE_CC_DIR/.claude/hooks/<name>.sh"
       }]
     }]
   }
