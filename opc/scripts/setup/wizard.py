@@ -1054,11 +1054,8 @@ async def run_setup_wizard() -> None:
     console.print("")
     console.print("  [dim]Free and open source - no API key needed.[/dim]")
 
-    # Check if qlty is already installed (standalone binary, not uv tool)
-    qlty_path = Path.home() / ".qlty" / "bin" / "qlty"
-    if qlty_path.exists():
-        console.print("  [green]OK[/green] qlty is already installed")
-    elif shutil.which("qlty"):
+    # Check if qlty is already installed
+    if shutil.which("qlty"):
         console.print("  [green]OK[/green] qlty is already installed")
     elif Confirm.ask("\nInstall qlty code quality tool?", default=True):
         console.print("  Installing qlty via curl...")
@@ -1145,9 +1142,8 @@ async def run_setup_wizard() -> None:
     console.print("  [dim]Note: First semantic search downloads ~1.3GB embedding model.[/dim]")
 
     # Check if tldr is already installed (llm-tldr, not tldr-pages)
-    tldr_path = Path.home() / ".local" / "bin" / "tldr"
-    tldr_check = shutil.which("tldr")
     is_llm_tldr = False
+    tldr_check = shutil.which("tldr")
     if tldr_check:
         verify_result = subprocess.run(
             [tldr_check, "--help"],
