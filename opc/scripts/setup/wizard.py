@@ -1269,25 +1269,11 @@ async def run_setup_wizard() -> None:
                             try:
                                 tldr_exe = shutil.which("tldr")
                                 download_result = subprocess.run(
-                                    [tldr_exe, "semantic", "download-model", "--model", model],
+                                    [tldr_exe, "semantic", "index", "--model", model],
                                     capture_output=True,
                                     text=True,
                                     timeout=300,
                                 )
-                                if download_result.returncode == 0:
-                                    console.print("  [green]OK[/green] Embedding model downloaded")
-                                else:
-                                    console.print("  [yellow]WARN[/yellow] Download had issues")
-                                    if download_result.stderr:
-                                        console.print(f"       {download_result.stderr[:200]}")
-                            except subprocess.TimeoutExpired:
-                                console.print("  [yellow]WARN[/yellow] Download timed out")
-                            except Exception as e:
-                                console.print(f"  [yellow]WARN[/yellow] {e}")
-                        else:
-                            console.print(
-                                "  [dim]Model downloads on first use of: tldr semantic index .[/dim]"
-                            )
                                 if download_result.returncode == 0:
                                     console.print("  [green]OK[/green] Embedding model downloaded")
                                 else:
