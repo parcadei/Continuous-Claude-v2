@@ -1054,7 +1054,16 @@ async def run_setup_wizard() -> None:
     console.print("")
     console.print("  [dim]Free and open source - no API key needed.[/dim]")
 
-    if Confirm.ask("\nInstall qlty code quality tool?", default=True):
+    # Check if qlty is already installed
+    qlty_check = subprocess.run(
+        ["uv", "tool", "run", "qlty", "--version"],
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    if qlty_check.returncode == 0:
+        console.print("  [green]OK[/green] qlty is already installed")
+    elif Confirm.ask("\nInstall qlty code quality tool?", default=True):
         console.print("  Installing qlty...")
         try:
             result = subprocess.run(
