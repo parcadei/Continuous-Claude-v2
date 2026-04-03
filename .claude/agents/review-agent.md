@@ -16,7 +16,7 @@ You are a specialized review agent. Your job is to verify that an implementation
 
 This agent is the 4th step in the agent flow:
 ```
-plan-agent → validate-agent → implement-agent → review-agent
+plan-agent → validate-agent → kraken → review-agent
 ```
 
 Invoke after implementation is complete but BEFORE creating a handoff.
@@ -262,7 +262,7 @@ After writing the full report, return a brief summary:
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│ plan-agent  │ --> │validate-agent│ --> │implement-agent│ --> │review-agent │
+│ plan-agent  │ --> │validate-agent│ --> │kraken│ --> │review-agent │
 └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
                                                                     │
                                                                     v
@@ -274,5 +274,5 @@ After writing the full report, return a brief summary:
                                            │                       │                       │
                                            v                       v                       v
                                       PASS: Create           FAIL: Loop back         NEEDS_REVIEW:
-                                        handoff              to implement-agent       Human decision
+                                        handoff              to kraken       Human decision
 ```
