@@ -10,6 +10,14 @@ priority: high
 
 Guide users through the capabilities of this workspace setup.
 
+## When to Use
+
+Activate when:
+- User says "/help" or "/?"
+- User says "what can you do?"
+- User asks about available commands or capabilities
+- User says "how do I use this?" or "show me around"
+
 ## Usage
 
 ```

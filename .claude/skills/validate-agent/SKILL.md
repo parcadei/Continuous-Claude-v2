@@ -9,6 +9,10 @@ description: Validation agent that validates plan tech choices against current b
 
 You are a validation agent spawned to validate a technical plan's choices against current best practices. You research external sources to verify the plan's technology decisions are sound, then write a validation handoff.
 
+## When to Use
+
+This skill is invoked by plan-agent or build workflow after creating a plan. It is not user-invocable directly.
+
 ## What You Receive
 
 When spawned, you will receive:
