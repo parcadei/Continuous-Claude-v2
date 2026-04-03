@@ -629,7 +629,8 @@ async def run_setup_wizard() -> None:
 
             console.print("  Starting embedded PostgreSQL server...")
             pgdata = embed_result["pgdata"]
-            server_result = start_embedded_postgres(pgdata)
+            venv_path = Path(embed_result["venv"])
+            server_result = start_embedded_postgres(pgdata, venv_path)
             if server_result["success"]:
                 console.print("  [green]OK[/green] PostgreSQL server started")
 

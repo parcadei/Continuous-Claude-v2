@@ -17,12 +17,14 @@ from typing import Any
 from urllib.parse import quote_plus
 
 
-def start_embedded_postgres(pgdata: Path) -> dict[str, Any]:
+def start_embedded_postgres(pgdata: Path, venv_path: Path | None = None) -> dict[str, Any]:
     """Start embedded postgres server using pgserver.
 
     Args:
         pgdata: Directory to store postgres data files.
                 Will be created if it doesn't exist.
+        venv_path: Optional path to venv with pgserver installed.
+                   If not provided, tries to import pgserver directly.
 
     Returns:
         dict with keys:
@@ -31,9 +33,61 @@ def start_embedded_postgres(pgdata: Path) -> dict[str, Any]:
             - error: str (if failed)
             - server: PostgresServer instance (for cleanup)
     """
+    import sys
+
+    pgserver = None
+    python_exe = None
+
+    # Try direct import first
     try:
         import pgserver
     except ImportError:
+        pass
+
+    # If import failed and venv_path provided, use venv Python
+    if pgserver is None and venv_path is not None:
+        if sys.platform == "win32":
+            python_exe = venv_path / "Scripts" / "python.exe"
+        else:
+            python_exe = venv_path / "bin" / "python"
+
+        if python_exe.exists():
+            # Use subprocess to run pgserver from venv
+            import subprocess
+            import time
+
+            proc = subprocess.Popen(
+                [str(python_exe), "-m", "pgserver", str(pgdata)],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            # Wait for server to start
+            time.sleep(3)
+
+            # Check if process is still running
+            if proc.poll() is not None:
+                stderr = proc.stderr.read().decode() if proc.stderr else ""
+                return {
+                    "success": False,
+                    "error": f"pgserver failed to start: {stderr[:200]}",
+                }
+
+            # Default URI - pgserver uses port 28814 by default
+            uri = "postgresql://postgres:@127.0.0.1:28814/postgres"
+
+            return {
+                "success": True,
+                "uri": uri,
+                "process": proc,
+            }
+        else:
+            return {
+                "success": False,
+                "error": f"Python not found at {python_exe}",
+            }
+
+    if pgserver is None:
         return {
             "success": False,
             "error": "pgserver not installed. Install with: pip install pgserver",
@@ -260,7 +314,9 @@ async def setup_embedded_environment() -> dict[str, Any]:
         if venv_path.exists() and python_exe.exists():
             # Verify pgserver is installed
             proc = await asyncio.create_subprocess_exec(
-                str(python_exe), "-c", "import pgserver",
+                str(python_exe),
+                "-c",
+                "import pgserver",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -270,7 +326,11 @@ async def setup_embedded_environment() -> dict[str, Any]:
 
         # Create venv with Python 3.12
         proc = await asyncio.create_subprocess_exec(
-            "uv", "venv", str(venv_path), "--python", "3.12",
+            "uv",
+            "venv",
+            str(venv_path),
+            "--python",
+            "3.12",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
@@ -280,8 +340,13 @@ async def setup_embedded_environment() -> dict[str, Any]:
 
         # Install pgserver and psycopg2
         proc = await asyncio.create_subprocess_exec(
-            "uv", "pip", "install", "pgserver", "psycopg2-binary",
-            "--python", str(python_exe),
+            "uv",
+            "pip",
+            "install",
+            "pgserver",
+            "psycopg2-binary",
+            "--python",
+            str(python_exe),
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
         )
