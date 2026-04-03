@@ -39,6 +39,7 @@ try:
     console = Console()
 except ImportError:
     rich_escape = lambda x: x  # No escaping needed without Rich
+
     # Fallback for minimal environments
     class Console:
         def print(self, *args, **kwargs):
@@ -200,7 +201,9 @@ async def check_prerequisites_with_install_offers() -> dict[str, Any]:
     if not runtime_info["installed"]:
         await offer_docker_install()
     elif not runtime_info.get("daemon_running", False):
-        console.print(f"  [yellow]{runtime_name.title()} is installed but the daemon is not running.[/yellow]")
+        console.print(
+            f"  [yellow]{runtime_name.title()} is installed but the daemon is not running.[/yellow]"
+        )
         if runtime_name == "docker":
             console.print("  Please start Docker Desktop or the Docker service.")
         else:
@@ -209,24 +212,33 @@ async def check_prerequisites_with_install_offers() -> dict[str, Any]:
         # Retry loop for daemon startup
         max_retries = 3
         for attempt in range(max_retries):
-            if Confirm.ask(f"\n  Retry checking {runtime_name} daemon? (attempt {attempt + 1}/{max_retries})", default=True):
+            if Confirm.ask(
+                f"\n  Retry checking {runtime_name} daemon? (attempt {attempt + 1}/{max_retries})",
+                default=True,
+            ):
                 console.print(f"  Checking {runtime_name} daemon...")
                 await asyncio.sleep(2)  # Give daemon time to start
                 runtime_info = await check_runtime_installed(runtime_name)
                 if runtime_info.get("daemon_running", False):
                     result["docker"] = True
                     result["docker_daemon_running"] = True
-                    console.print(f"  [green]OK[/green] {runtime_name.title()} daemon is now running!")
+                    console.print(
+                        f"  [green]OK[/green] {runtime_name.title()} daemon is now running!"
+                    )
                     break
                 else:
-                    console.print(f"  [yellow]{runtime_name.title()} daemon still not running.[/yellow]")
+                    console.print(
+                        f"  [yellow]{runtime_name.title()} daemon still not running.[/yellow]"
+                    )
             else:
                 break
 
     # Check elan/Lean4 (optional, for theorem proving with /prove skill)
     if not result["elan"]:
         console.print("\n  [dim]Optional: Lean4/elan not found (needed for /prove skill)[/dim]")
-        console.print("  [dim]Install with: curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh[/dim]")
+        console.print(
+            "  [dim]Install with: curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh[/dim]"
+        )
 
     # elan is optional, so exclude from all_present check
     result["all_present"] = all([result["docker"], result["python"], result["uv"]])
@@ -390,7 +402,9 @@ async def prompt_embedding_config() -> dict[str, str]:
     console.print("    3. openai - OpenAI API (requires API key)")
     console.print("    4. voyage - Voyage AI API (requires API key)")
 
-    provider = Prompt.ask("Embedding provider", choices=["local", "ollama", "openai", "voyage"], default="local")
+    provider = Prompt.ask(
+        "Embedding provider", choices=["local", "ollama", "openai", "voyage"], default="local"
+    )
 
     config = {"provider": provider}
 
@@ -448,11 +462,11 @@ def generate_env_file(config: dict[str, Any], env_path: Path) -> None:
         lines.append(f"# Database Mode: {mode}")
 
         if mode == "docker":
-            host = db.get('host', 'localhost')
-            port = db.get('port', 5432)
-            database = db.get('database', 'continuous_claude')
-            user = db.get('user', 'claude')
-            password = db.get('password', '')
+            host = db.get("host", "localhost")
+            port = db.get("port", 5432)
+            database = db.get("database", "continuous_claude")
+            user = db.get("user", "claude")
+            password = db.get("password", "")
             lines.append(f"POSTGRES_HOST={host}")
             lines.append(f"POSTGRES_PORT={port}")
             lines.append(f"POSTGRES_DB={database}")
@@ -461,7 +475,9 @@ def generate_env_file(config: dict[str, Any], env_path: Path) -> None:
                 lines.append(f"POSTGRES_PASSWORD={password}")
             lines.append("")
             lines.append("# Connection string for scripts (canonical name)")
-            lines.append(f"CONTINUOUS_CLAUDE_DB_URL=postgresql://{user}:{password}@{host}:{port}/{database}")
+            lines.append(
+                f"CONTINUOUS_CLAUDE_DB_URL=postgresql://{user}:{password}@{host}:{port}/{database}"
+            )
         elif mode == "embedded":
             pgdata = db.get("pgdata", "")
             venv = db.get("venv", "")
@@ -570,15 +586,24 @@ async def run_setup_wizard() -> None:
     console.print("    [bold]docker[/bold]    - PostgreSQL in Docker (recommended)")
     console.print("    [bold]embedded[/bold]  - Embedded PostgreSQL (no Docker needed)")
     console.print("    [bold]sqlite[/bold]    - SQLite fallback (simplest, no cross-terminal)")
-    db_mode = Prompt.ask("\n  Database mode", choices=["docker", "embedded", "sqlite"], default="docker")
+    db_mode = Prompt.ask(
+        "\n  Database mode", choices=["docker", "embedded", "sqlite"], default="docker"
+    )
 
     if db_mode == "embedded":
         from scripts.setup.embedded_postgres import setup_embedded_environment
+
         console.print("  Setting up embedded postgres (creates Python 3.12 environment)...")
         embed_result = await setup_embedded_environment()
         if embed_result["success"]:
-            console.print(f"  [green]OK[/green] Embedded environment ready at {embed_result['venv']}")
-            db_config = {"mode": "embedded", "pgdata": str(embed_result["pgdata"]), "venv": str(embed_result["venv"])}
+            console.print(
+                f"  [green]OK[/green] Embedded environment ready at {embed_result['venv']}"
+            )
+            db_config = {
+                "mode": "embedded",
+                "pgdata": str(embed_result["pgdata"]),
+                "venv": str(embed_result["venv"]),
+            }
         else:
             console.print(f"  [red]ERROR[/red] {embed_result.get('error', 'Unknown')}")
             console.print("  Falling back to Docker mode")
@@ -586,10 +611,14 @@ async def run_setup_wizard() -> None:
 
     if db_mode == "sqlite":
         db_config = {"mode": "sqlite"}
-        console.print("  [yellow]Note:[/yellow] Cross-terminal coordination disabled in SQLite mode")
+        console.print(
+            "  [yellow]Note:[/yellow] Cross-terminal coordination disabled in SQLite mode"
+        )
 
     if db_mode == "docker":
-        console.print("  [dim]Customize host/port for containers (podman, nerdctl) or remote postgres.[/dim]")
+        console.print(
+            "  [dim]Customize host/port for containers (podman, nerdctl) or remote postgres.[/dim]"
+        )
         if Confirm.ask("Configure database connection?", default=True):
             db_config = await prompt_database_config()
             password = Prompt.ask("Database password", password=True, default="claude_dev")
@@ -633,12 +662,19 @@ async def run_setup_wizard() -> None:
     console.print("  - Build cache and LSP index storage")
     console.print("  - Real-time agent status")
     if Confirm.ask(f"Start {runtime} stack (PostgreSQL, Redis)?", default=True):
-        from scripts.setup.docker_setup import run_migrations, set_container_runtime, start_docker_stack, wait_for_services
+        from scripts.setup.docker_setup import (
+            run_migrations,
+            set_container_runtime,
+            start_docker_stack,
+            wait_for_services,
+        )
 
         # Set the detected runtime before starting
         set_container_runtime(runtime)
 
-        console.print(f"  [dim]Starting containers (first run downloads ~500MB, may take a few minutes)...[/dim]")
+        console.print(
+            f"  [dim]Starting containers (first run downloads ~500MB, may take a few minutes)...[/dim]"
+        )
         result = await start_docker_stack(env_file=env_path)
         if result["success"]:
             console.print(f"  [green]OK[/green] {runtime.title()} stack started")
@@ -739,7 +775,12 @@ async def run_setup_wizard() -> None:
                 console.print(f"  [green]OK[/green] Installed {result['installed_skills']} skills")
                 console.print(f"  [green]OK[/green] Installed {result['installed_rules']} rules")
                 console.print(f"  [green]OK[/green] Installed {result['installed_agents']} agents")
-                console.print(f"  [green]OK[/green] Installed {result['installed_servers']} MCP servers")
+                console.print(
+                    f"  [green]OK[/green] Installed {result['installed_servers']} MCP servers"
+                )
+                console.print(
+                    f"  [green]OK[/green] Installed {result['installed_scripts']} scripts"
+                )
                 if result["merged_items"]:
                     console.print(
                         f"  [green]OK[/green] Merged {len(result['merged_items'])} custom items"
@@ -753,7 +794,9 @@ async def run_setup_wizard() -> None:
                     console.print(f"  [green]OK[/green] {build_msg}")
                 else:
                     console.print(f"  [yellow]WARN[/yellow] {build_msg}")
-                    console.print("  [dim]You can build manually: cd ~/.claude/hooks && npm install && npm run build[/dim]")
+                    console.print(
+                        "  [dim]You can build manually: cd ~/.claude/hooks && npm install && npm run build[/dim]"
+                    )
             else:
                 console.print(f"  [red]ERROR[/red] {result.get('error', 'Unknown error')}")
         elif choice == "3":
@@ -761,9 +804,13 @@ async def run_setup_wizard() -> None:
             result = install_opc_integration_symlink(claude_dir, opc_source)
 
             if result["success"]:
-                console.print(f"  [green]OK[/green] Symlinked: {', '.join(result['symlinked_dirs'])}")
+                console.print(
+                    f"  [green]OK[/green] Symlinked: {', '.join(result['symlinked_dirs'])}"
+                )
                 if result["backed_up_dirs"]:
-                    console.print(f"  [green]OK[/green] Backed up: {', '.join(result['backed_up_dirs'])}")
+                    console.print(
+                        f"  [green]OK[/green] Backed up: {', '.join(result['backed_up_dirs'])}"
+                    )
                 console.print("  [dim]Changes in ~/.claude/ now sync to repo automatically[/dim]")
 
                 # Build TypeScript hooks
@@ -774,7 +821,9 @@ async def run_setup_wizard() -> None:
                     console.print(f"  [green]OK[/green] {build_msg}")
                 else:
                     console.print(f"  [yellow]WARN[/yellow] {build_msg}")
-                    console.print("  [dim]You can build manually: cd ~/.claude/hooks && npm install && npm run build[/dim]")
+                    console.print(
+                        "  [dim]You can build manually: cd ~/.claude/hooks && npm install && npm run build[/dim]"
+                    )
             else:
                 console.print(f"  [red]ERROR[/red] {result.get('error', 'Unknown error')}")
         else:
@@ -801,7 +850,9 @@ async def run_setup_wizard() -> None:
                 console.print(f"  [green]OK[/green] Installed {result['installed_skills']} skills")
                 console.print(f"  [green]OK[/green] Installed {result['installed_rules']} rules")
                 console.print(f"  [green]OK[/green] Installed {result['installed_agents']} agents")
-                console.print(f"  [green]OK[/green] Installed {result['installed_servers']} MCP servers")
+                console.print(
+                    f"  [green]OK[/green] Installed {result['installed_servers']} MCP servers"
+                )
 
                 # Build TypeScript hooks
                 console.print("  Building TypeScript hooks...")
@@ -811,7 +862,9 @@ async def run_setup_wizard() -> None:
                     console.print(f"  [green]OK[/green] {build_msg}")
                 else:
                     console.print(f"  [yellow]WARN[/yellow] {build_msg}")
-                    console.print("  [dim]You can build manually: cd ~/.claude/hooks && npm install && npm run build[/dim]")
+                    console.print(
+                        "  [dim]You can build manually: cd ~/.claude/hooks && npm install && npm run build[/dim]"
+                    )
             else:
                 console.print(f"  [red]ERROR[/red] {result.get('error', 'Unknown error')}")
         elif choice == "2":
@@ -819,7 +872,9 @@ async def run_setup_wizard() -> None:
             result = install_opc_integration_symlink(claude_dir, opc_source)
 
             if result["success"]:
-                console.print(f"  [green]OK[/green] Symlinked: {', '.join(result['symlinked_dirs'])}")
+                console.print(
+                    f"  [green]OK[/green] Symlinked: {', '.join(result['symlinked_dirs'])}"
+                )
                 console.print("  [dim]Changes in ~/.claude/ now sync to repo automatically[/dim]")
 
                 # Build TypeScript hooks
@@ -830,7 +885,9 @@ async def run_setup_wizard() -> None:
                     console.print(f"  [green]OK[/green] {build_msg}")
                 else:
                     console.print(f"  [yellow]WARN[/yellow] {build_msg}")
-                    console.print("  [dim]You can build manually: cd ~/.claude/hooks && npm install && npm run build[/dim]")
+                    console.print(
+                        "  [dim]You can build manually: cd ~/.claude/hooks && npm install && npm run build[/dim]"
+                    )
             else:
                 console.print(f"  [red]ERROR[/red] {result.get('error', 'Unknown error')}")
         else:
@@ -851,7 +908,9 @@ async def run_setup_wizard() -> None:
         export_line = f'export CLAUDE_OPC_DIR="{opc_dir}"'
         if "CLAUDE_OPC_DIR" not in content:
             with open(shell_config, "a") as f:
-                f.write(f"\n# Continuous-Claude OPC directory (for skills to find scripts)\n{export_line}\n")
+                f.write(
+                    f"\n# Continuous-Claude OPC directory (for skills to find scripts)\n{export_line}\n"
+                )
             console.print(f"  [green]OK[/green] Added CLAUDE_OPC_DIR to {shell_config.name}")
         else:
             console.print(f"  [dim]CLAUDE_OPC_DIR already in {shell_config.name}[/dim]")
@@ -957,13 +1016,21 @@ async def run_setup_wizard() -> None:
                     timeout=10,
                 )
                 # Check if this is llm-tldr (has 'tree', 'structure', 'daemon') not tldr-pages
-                is_llm_tldr = any(cmd in verify_result.stdout for cmd in ["tree", "structure", "daemon"])
+                is_llm_tldr = any(
+                    cmd in verify_result.stdout for cmd in ["tree", "structure", "daemon"]
+                )
                 if verify_result.returncode == 0 and is_llm_tldr:
                     console.print("  [green]OK[/green] TLDR CLI available")
                 elif verify_result.returncode == 0 and not is_llm_tldr:
-                    console.print("  [yellow]WARN[/yellow] Wrong tldr detected (tldr-pages, not llm-tldr)")
-                    console.print("  [yellow]    [/yellow] The 'tldr' command is shadowed by tldr-pages.")
-                    console.print("  [yellow]    [/yellow] Uninstall tldr-pages: pip uninstall tldr")
+                    console.print(
+                        "  [yellow]WARN[/yellow] Wrong tldr detected (tldr-pages, not llm-tldr)"
+                    )
+                    console.print(
+                        "  [yellow]    [/yellow] The 'tldr' command is shadowed by tldr-pages."
+                    )
+                    console.print(
+                        "  [yellow]    [/yellow] Uninstall tldr-pages: pip uninstall tldr"
+                    )
                     console.print("  [yellow]    [/yellow] Or use full path: ~/.local/bin/tldr")
 
                 if is_llm_tldr:
@@ -977,14 +1044,15 @@ async def run_setup_wizard() -> None:
                     console.print("")
                     console.print("  [bold]Semantic Search Configuration[/bold]")
                     console.print("  Natural language code search using AI embeddings.")
-                    console.print("  [dim]First run downloads ~1.3GB model and indexes your codebase.[/dim]")
+                    console.print(
+                        "  [dim]First run downloads ~1.3GB model and indexes your codebase.[/dim]"
+                    )
                     console.print("  [dim]Auto-reindexes in background when files change.[/dim]")
 
                     if Confirm.ask("\n  Enable semantic search?", default=True):
                         # Get threshold
                         threshold_str = Prompt.ask(
-                            "  Auto-reindex after how many file changes?",
-                            default="20"
+                            "  Auto-reindex after how many file changes?", default="20"
                         )
                         try:
                             threshold = int(threshold_str)
@@ -1005,6 +1073,7 @@ async def run_setup_wizard() -> None:
                         has_gpu = False
                         try:
                             import torch
+
                             has_gpu = torch.cuda.is_available() or torch.backends.mps.is_available()
                         except ImportError:
                             pass  # No torch = assume no GPU
@@ -1025,7 +1094,9 @@ async def run_setup_wizard() -> None:
 
                         settings_path.parent.mkdir(parents=True, exist_ok=True)
                         settings_path.write_text(json.dumps(settings, indent=2))
-                        console.print(f"  [green]OK[/green] Semantic search enabled (threshold: {threshold})")
+                        console.print(
+                            f"  [green]OK[/green] Semantic search enabled (threshold: {threshold})"
+                        )
 
                         # Offer to pre-download embedding model
                         # Note: We only download the model here, not index any directory.
@@ -1035,7 +1106,11 @@ async def run_setup_wizard() -> None:
                             try:
                                 # Just load the model to trigger download (no indexing)
                                 download_result = subprocess.run(
-                                    [sys.executable, "-c", f"from tldr.semantic import get_model; get_model('{model}')"],
+                                    [
+                                        sys.executable,
+                                        "-c",
+                                        f"from tldr.semantic import get_model; get_model('{model}')",
+                                    ],
                                     capture_output=True,
                                     text=True,
                                     timeout=timeout,
@@ -1052,7 +1127,9 @@ async def run_setup_wizard() -> None:
                             except Exception as e:
                                 console.print(f"  [yellow]WARN[/yellow] {e}")
                         else:
-                            console.print("  [dim]Model downloads on first use of: tldr semantic index .[/dim]")
+                            console.print(
+                                "  [dim]Model downloads on first use of: tldr semantic index .[/dim]"
+                            )
                     else:
                         console.print("  Semantic search disabled")
                         console.print("  [dim]Enable later in .claude/settings.json[/dim]")
@@ -1073,10 +1150,14 @@ async def run_setup_wizard() -> None:
         console.print("  [dim]Install later with: uv tool install llm-tldr[/dim]")
 
         # Ask to disable hooks since they are pre-configured in settings.json
-        if Confirm.ask("\n  Disable TLDR hooks in settings.json? (Avoids crashes if TLDR missing)", default=False):
+        if Confirm.ask(
+            "\n  Disable TLDR hooks in settings.json? (Avoids crashes if TLDR missing)",
+            default=False,
+        ):
             settings_path = get_global_claude_dir() / "settings.json"
             if settings_path.exists():
                 from scripts.setup.claude_integration import strip_tldr_hooks_from_settings
+
                 if strip_tldr_hooks_from_settings(settings_path):
                     console.print("  [green]OK[/green] TLDR hooks disabled")
 
@@ -1133,7 +1214,9 @@ async def run_setup_wizard() -> None:
         # Check elan prerequisite
         if not shutil.which("elan"):
             console.print("  [yellow]WARN[/yellow] Lean 4 (elan) not installed")
-            console.print("  Install with: curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh")
+            console.print(
+                "  Install with: curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh"
+            )
             console.print("  Then re-run the wizard to install Loogle.")
         else:
             console.print("  [green]OK[/green] elan found")
@@ -1161,7 +1244,9 @@ async def run_setup_wizard() -> None:
                     if result.returncode == 0:
                         console.print("  [green]OK[/green] Updated")
                     else:
-                        console.print(f"  [yellow]WARN[/yellow] Update failed: {result.stderr[:100]}")
+                        console.print(
+                            f"  [yellow]WARN[/yellow] Update failed: {result.stderr[:100]}"
+                        )
             else:
                 console.print(f"  Cloning Loogle to {loogle_home}...")
                 loogle_home.parent.mkdir(parents=True, exist_ok=True)
@@ -1198,10 +1283,16 @@ async def run_setup_wizard() -> None:
                     else:
                         console.print(f"  [red]ERROR[/red] Build failed")
                         console.print(f"       {result.stderr[:200]}")
-                        console.print("  You can build manually: cd ~/.local/share/loogle && lake build")
+                        console.print(
+                            "  You can build manually: cd ~/.local/share/loogle && lake build"
+                        )
                 except subprocess.TimeoutExpired:
-                    console.print("  [yellow]WARN[/yellow] Build timed out (this is normal for first build)")
-                    console.print("  Continue building manually: cd ~/.local/share/loogle && lake build")
+                    console.print(
+                        "  [yellow]WARN[/yellow] Build timed out (this is normal for first build)"
+                    )
+                    console.print(
+                        "  Continue building manually: cd ~/.local/share/loogle && lake build"
+                    )
                 except Exception as e:
                     console.print(f"  [red]ERROR[/red] {e}")
 
@@ -1254,7 +1345,7 @@ async def run_setup_wizard() -> None:
                 console.print(f"  [yellow]WARN[/yellow] loogle_search.py not found at {src_script}")
 
             console.print("")
-            console.print("  [dim]Usage: loogle-search \"Nontrivial _ ↔ _\"[/dim]")
+            console.print('  [dim]Usage: loogle-search "Nontrivial _ ↔ _"[/dim]')
             console.print("  [dim]Or use /prove skill which calls it automatically[/dim]")
     else:
         console.print("  Skipped Loogle installation")
@@ -1344,9 +1435,7 @@ async def main():
 
     # Show menu if no args
     if len(sys.argv) == 1:
-        console.print(
-            Panel.fit("[bold]CLAUDE CONTINUITY KIT v3[/bold]", border_style="blue")
-        )
+        console.print(Panel.fit("[bold]CLAUDE CONTINUITY KIT v3[/bold]", border_style="blue"))
         console.print("\n[bold]Options:[/bold]")
         console.print("  [bold]1[/bold] - Install / Update")
         console.print("  [bold]2[/bold] - Uninstall (restore backup)")

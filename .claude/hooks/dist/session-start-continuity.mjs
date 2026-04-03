@@ -1,7 +1,8 @@
 // src/session-start-continuity.ts
 import * as fs from "fs";
 import * as path from "path";
-import { execSync } from "child_process";
+import * as os from "os";
+import { execSync, spawn } from "child_process";
 function buildHandoffDirName(sessionName, sessionId) {
   const uuidShort = sessionId.replace(/-/g, "").slice(0, 8);
   return `${sessionName}-${uuidShort}`;
@@ -159,9 +160,42 @@ function getUnmarkedHandoffs() {
     return [];
   }
 }
+function ensureMemoryDaemon() {
+  const pidFile = path.join(os.homedir(), ".claude", "memory-daemon.pid");
+  if (fs.existsSync(pidFile)) {
+    try {
+      const pid = parseInt(fs.readFileSync(pidFile, "utf-8").trim(), 10);
+      process.kill(pid, 0);
+      return null;
+    } catch {
+      fs.unlinkSync(pidFile);
+    }
+  }
+  const possibleLocations = [
+    path.join(os.homedir(), ".claude", "opc", "scripts", "core", "memory_daemon.py"),
+    path.join(os.homedir(), ".claude", "scripts", "core", "memory_daemon.py")
+  ];
+  for (const daemonScript of possibleLocations) {
+    if (fs.existsSync(daemonScript)) {
+      try {
+        const child = spawn("uv", ["run", "python", daemonScript, "start"], {
+          detached: true,
+          stdio: "ignore",
+          cwd: path.dirname(path.dirname(path.dirname(daemonScript)))
+        });
+        child.unref();
+        return "Memory daemon: Started";
+      } catch (e) {
+        console.error(`Warning: Failed to start memory daemon: ${e}`);
+      }
+    }
+  }
+  return null;
+}
 async function main() {
   const input = JSON.parse(await readStdin());
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  ensureMemoryDaemon();
   const sessionType = input.source || input.type;
   let message = "";
   let additionalContext = "";

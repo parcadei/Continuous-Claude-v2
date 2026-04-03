@@ -382,12 +382,12 @@ def generate_migration_guidance(
 
 # Root scripts used by skills/hooks - shared between copy and symlink install
 ROOT_SCRIPTS = [
-    "ast_grep_find.py",          # /ast-grep-find skill
-    "braintrust_analyze.py",     # session-end-cleanup hook
-    "qlty_check.py",             # /qlty-check skill
+    "ast_grep_find.py",  # /ast-grep-find skill
+    "braintrust_analyze.py",  # session-end-cleanup hook
+    "qlty_check.py",  # /qlty-check skill
     "research_implement_pipeline.py",  # /mcp-chaining skill
-    "test_research_pipeline.py", # /mcp-chaining skill
-    "multi_tool_pipeline.py",    # /skill-developer example
+    "test_research_pipeline.py",  # /mcp-chaining skill
+    "multi_tool_pipeline.py",  # /skill-developer example
     "recall_temporal_facts.py",  # /system_overview skill
 ]
 
@@ -426,6 +426,36 @@ def _copy_scripts(opc_source: Path, target_dir: Path) -> int:
         src = scripts_root / script_name
         if src.exists():
             shutil.copy2(src, target_scripts / script_name)
+            count += 1
+
+    return count
+
+
+def _copy_dotfile_scripts(opc_source: Path, target_dir: Path) -> int:
+    """Copy root-level scripts from .claude/scripts/ to target.
+
+    These are scripts like status.py and tldr_stats.py that live in
+    .claude/scripts/ at the repo root, not in opc/scripts/.
+
+    Args:
+        opc_source: Source OPC .claude directory
+        target_dir: Target .claude directory
+
+    Returns:
+        Count of scripts copied
+    """
+    count = 0
+    source_scripts = opc_source.parent / ".claude" / "scripts"
+    target_scripts = target_dir / "scripts"
+    target_scripts.mkdir(parents=True, exist_ok=True)
+
+    if not source_scripts.exists():
+        return 0
+
+    for pattern in ["*.py", "*.sh"]:
+        for src in source_scripts.glob(pattern):
+            dst = target_scripts / src.name
+            shutil.copy2(src, dst)
             count += 1
 
     return count
@@ -538,6 +568,9 @@ def install_opc_integration(
 
         # Copy scripts (core, math, tldr directories + root scripts)
         result["installed_scripts"] = _copy_scripts(opc_source, target_dir)
+
+        # Copy root-level scripts from .claude/scripts/ (e.g. status.py)
+        result["installed_scripts"] += _copy_dotfile_scripts(opc_source, target_dir)
 
         # Merge user items if requested
         if merge_user_items and existing and conflicts:
@@ -670,6 +703,9 @@ def install_opc_integration_symlink(
         # Copy scripts (core, math, tldr directories + root scripts)
         _copy_scripts(opc_source, target_dir)
 
+        # Copy root-level scripts from .claude/scripts/ (e.g. status.py)
+        _copy_dotfile_scripts(opc_source, target_dir)
+
         result["success"] = True
 
     except Exception as e:
@@ -754,9 +790,7 @@ def strip_tldr_hooks_from_settings(settings_path: Path) -> bool:
                 if "startup" in matcher or "resume" in matcher:
                     hooks = hook_group.get("hooks", [])
                     new_hooks = [
-                        h
-                        for h in hooks
-                        if "session-start-tldr-cache" not in h.get("command", "")
+                        h for h in hooks if "session-start-tldr-cache" not in h.get("command", "")
                     ]
                     if len(new_hooks) != len(hooks):
                         modified = True
@@ -780,7 +814,6 @@ def strip_tldr_hooks_from_settings(settings_path: Path) -> bool:
 
     except Exception:
         return False
-
 
 
 def get_platform_info() -> dict[str, str]:
@@ -812,15 +845,15 @@ def find_latest_backup(claude_dir: Path) -> Path | None:
 
 # Files to preserve during uninstall (user data accumulated since install)
 PRESERVE_FILES = [
-    "history.jsonl",      # Command history
-    "mcp_config.json",    # MCP server configs
-    ".env",               # API keys and settings
-    "projects.json",      # Project configs
+    "history.jsonl",  # Command history
+    "mcp_config.json",  # MCP server configs
+    ".env",  # API keys and settings
+    "projects.json",  # Project configs
 ]
 
 PRESERVE_DIRS = [
-    "file-history",       # File edit history
-    "projects",           # Project-specific data
+    "file-history",  # File edit history
+    "projects",  # Project-specific data
 ]
 
 

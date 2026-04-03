@@ -1,6 +1,6 @@
 // src/tldr-read-enforcer.ts
 import { readFileSync as readFileSync2, existsSync as existsSync2, statSync } from "fs";
-import { basename, extname } from "path";
+import { basename, extname, isAbsolute, join as join2 } from "path";
 
 // src/daemon-client.ts
 import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs";
@@ -520,7 +520,8 @@ async function main() {
     console.log("{}");
     return;
   }
-  const filePath = input.tool_input.file_path || "";
+  const rawFilePath = input.tool_input.file_path || "";
+  const filePath = isAbsolute(rawFilePath) ? rawFilePath : join2(input.cwd, rawFilePath);
   if (!isCodeFile(filePath)) {
     console.log("{}");
     return;
