@@ -126,6 +126,19 @@ async def check_container_runtime() -> dict[str, Any]:
             - version: str | None - Version string
             - daemon_running: bool - True if service is responding
     """
+    import socket
+
+    def is_port_in_use(port: int, host: str = "localhost") -> bool:
+        """Check if a port is already in use."""
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(1)
+        try:
+            result = sock.connect_ex((host, port))
+            sock.close()
+            return result == 0
+        except (socket.timeout, OSError):
+            return False
+
     # Try Docker first (most common)
     result = await check_runtime_installed("docker")
     if result["installed"]:
@@ -663,13 +676,15 @@ async def run_setup_wizard() -> None:
     console.print(f"  [green]OK[/green] Generated {env_path}")
 
     # Step 5: Container stack (Sandbox Infrastructure)
+    # Skip if using embedded PostgreSQL or SQLite
     runtime = prereqs.get("container_runtime", "docker")
     console.print(f"\n[bold]Step 6/13: Container Stack (Sandbox Infrastructure)[/bold]")
-    console.print("  The sandbox requires PostgreSQL and Redis for:")
-    console.print("  - Agent coordination and scheduling")
-    console.print("  - Build cache and LSP index storage")
-    console.print("  - Real-time agent status")
-    if Confirm.ask(f"Start {runtime} stack (PostgreSQL, Redis)?", default=True):
+
+    if db_mode == "embedded":
+        console.print("  [dim]Skipped - using embedded PostgreSQL (no Docker needed)[/dim]")
+    elif db_mode == "sqlite":
+        console.print("  [dim]Skipped - using SQLite (no Docker needed)[/dim]")
+    elif Confirm.ask(f"Start {runtime} stack (PostgreSQL, Redis)?", default=True):
         from scripts.setup.docker_setup import (
             run_migrations,
             set_container_runtime,
@@ -700,7 +715,11 @@ async def run_setup_wizard() -> None:
 
     # Step 6: Migrations
     console.print("\n[bold]Step 7/13: Database Setup[/bold]")
-    if Confirm.ask("Run database migrations?", default=True):
+    if db_mode == "embedded":
+        console.print("  [dim]Skipped - embedded PostgreSQL handles migrations automatically[/dim]")
+    elif db_mode == "sqlite":
+        console.print("  [dim]Skipped - SQLite does not need migrations[/dim]")
+    elif Confirm.ask("Run database migrations?", default=True):
         from scripts.setup.docker_setup import run_migrations, set_container_runtime
 
         # Ensure runtime is set (in case step 5 was skipped)
