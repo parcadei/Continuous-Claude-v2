@@ -2,12 +2,12 @@
 """Cross-platform status line for Claude Code.
 
 Output Format:
-    {tokens} {context}% | {branch} S:{staged} U:{unstaged} A:{added} | {goal} → {now}
+    CONTEXT: {tokens} {context}% | GIT: {branch} S:{staged} U:{unstaged} A:{added} | GOAL: {goal} → NOW: {now}
 
 Examples:
-    78K 39% | main A:4 | Fix wizard → Update timeout
-    145K 72% | main S:2 U:1 | Refactor OPC → Add validation
-    ⚠ 160K 80% | dev U:6 | Critical bug fix
+    CONTEXT: 78K 39% | GIT: main A:4 | GOAL: Fix wizard → NOW: Update timeout
+    CONTEXT: 145K 72% | GIT: main S:2 U:1 | GOAL: Refactor OPC → NOW: Add validation
+    ⚠ CONTEXT: 160K 80% | GIT: dev U:6 | NOW: Critical bug fix
 
 Color Coding:
     Green  (ctx < 60%): Normal operation
@@ -420,37 +420,37 @@ def build_output(
     """Build the final colored output string."""
     # Build continuity string
     if goal and now_focus:
-        continuity = f"{goal} → {now_focus}"
+        continuity = f"GOAL: {goal} → NOW: {now_focus}"
     elif now_focus:
-        continuity = now_focus
+        continuity = f"NOW: {now_focus}"
     elif goal:
-        continuity = goal
+        continuity = f"GOAL: {goal}"
     else:
         continuity = ""
 
     # Color based on context usage
     if context_pct >= 80:
         # CRITICAL - Red warning
-        ctx_display = f"\033[31m⚠ {token_display} {context_pct}%\033[0m"
+        ctx_display = f"\033[31m⚠ CONTEXT: {token_display} {context_pct}%\033[0m"
         parts = [ctx_display]
         if git_info:
-            parts.append(git_info)
+            parts.append(f"GIT: {git_info}")
         if now_focus:  # Only show now_focus when critical
-            parts.append(now_focus)
+            parts.append(continuity)
     elif context_pct >= 60:
         # WARNING - Yellow
-        ctx_display = f"\033[33m{token_display} {context_pct}%\033[0m"
+        ctx_display = f"\033[33mCONTEXT: {token_display} {context_pct}%\033[0m"
         parts = [ctx_display]
         if git_info:
-            parts.append(git_info)
+            parts.append(f"GIT: {git_info}")
         if continuity:
             parts.append(continuity)
     else:
         # NORMAL - Green
-        ctx_display = f"\033[32m{token_display} {context_pct}%\033[0m"
+        ctx_display = f"\033[32mCONTEXT: {token_display} {context_pct}%\033[0m"
         parts = [ctx_display]
         if git_info:
-            parts.append(git_info)
+            parts.append(f"GIT: {git_info}")
         if continuity:
             parts.append(continuity)
 
