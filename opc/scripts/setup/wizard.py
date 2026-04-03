@@ -896,20 +896,30 @@ async def run_setup_wizard() -> None:
     # Set CLAUDE_OPC_DIR environment variable for skills to find scripts
     console.print("  Setting CLAUDE_OPC_DIR environment variable...")
     shell_config = None
+    shell_export = None
     shell = os.environ.get("SHELL", "")
     if "zsh" in shell:
         shell_config = Path.home() / ".zshrc"
+        shell_export = f'export CLAUDE_OPC_DIR="{opc_dir}"'
     elif "bash" in shell:
         shell_config = Path.home() / ".bashrc"
+        shell_export = f'export CLAUDE_OPC_DIR="{opc_dir}"'
+    elif "fish" in shell:
+        fish_config_dir = Path.home() / ".config" / "fish"
+        fish_config_dir.mkdir(parents=True, exist_ok=True)
+        shell_config = fish_config_dir / "config.fish"
+        shell_export = f'set -gx CLAUDE_OPC_DIR "{opc_dir}"'
 
     opc_dir = _project_root  # Use script location, not cwd (robust if invoked from elsewhere)
-    if shell_config and shell_config.exists():
-        content = shell_config.read_text()
-        export_line = f'export CLAUDE_OPC_DIR="{opc_dir}"'
+    if shell_config and (shell_config.exists() or "fish" in shell):
+        if shell_config.exists():
+            content = shell_config.read_text()
+        else:
+            content = ""
         if "CLAUDE_OPC_DIR" not in content:
             with open(shell_config, "a") as f:
                 f.write(
-                    f"\n# Continuous-Claude OPC directory (for skills to find scripts)\n{export_line}\n"
+                    f"\n# Continuous-Claude OPC directory (for skills to find scripts)\n{shell_export}\n"
                 )
             console.print(f"  [green]OK[/green] Added CLAUDE_OPC_DIR to {shell_config.name}")
         else:

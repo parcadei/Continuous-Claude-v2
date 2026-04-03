@@ -964,6 +964,32 @@ def uninstall_opc_integration(
     if result["preserved"]:
         msg_parts.append(f"  Preserved user data: {', '.join(result['preserved'])}")
 
+    # Clean up CLAUDE_OPC_DIR from shell configs
+    import os as _os
+
+    shell = _os.environ.get("SHELL", "")
+    configs_to_clean = []
+    if "zsh" in shell:
+        configs_to_clean.append(_os.path.expanduser("~/.zshrc"))
+    elif "bash" in shell:
+        configs_to_clean.append(_os.path.expanduser("~/.bashrc"))
+    elif "fish" in shell:
+        fish_config = _os.path.expanduser("~/.config/fish/config.fish")
+        if _os.path.exists(fish_config):
+            configs_to_clean.append(fish_config)
+
+    for config_path in configs_to_clean:
+        try:
+            with open(config_path, "r") as f:
+                lines = f.readlines()
+            new_lines = [l for l in lines if "CLAUDE_OPC_DIR" not in l]
+            if len(new_lines) < len(lines):
+                with open(config_path, "w") as f:
+                    f.writelines(new_lines)
+                msg_parts.append(f"  Removed CLAUDE_OPC_DIR from {_os.path.basename(config_path)}")
+        except Exception:
+            pass
+
     result["message"] = "\n".join(msg_parts)
     result["success"] = True
     return result
