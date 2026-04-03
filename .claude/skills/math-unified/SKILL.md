@@ -1,5 +1,5 @@
 ---
-name: math
+name: math-unified
 description: Unified math capabilities - computation, solving, and explanation. I route to the right tool.
 triggers:
   [
