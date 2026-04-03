@@ -7,6 +7,14 @@ description: Create handoff document for transferring work to another session
 
 You are tasked with writing a handoff document to hand off your work to another agent in a new session. You will create a handoff document that is thorough, but also **concise**. The goal is to compact and summarize your context without losing any of the key details of what you're working on.
 
+## When to Use
+
+Activate when:
+- User says "/handoff" or "/create-handoff"
+- User says "create a handoff" or "hand off this work"
+- Before ending a session with incomplete work
+- User says "I need to continue this later"
+- Before a long break during complex work
 
 ## Process
 ### 1. Filepath & Metadata

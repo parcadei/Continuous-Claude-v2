@@ -7,6 +7,15 @@ description: Debug issues by investigating logs, database state, and git history
 
 You are tasked with helping debug issues during manual testing or implementation. This command allows you to investigate problems by examining logs, database state, and git history without editing files. Think of this as a way to bootstrap a debugging session without using the primary window's context.
 
+## When to Use
+
+Activate when:
+- User says "/debug"
+- User says "debug this" or "help me debug X"
+- User is investigating an issue but doesn't need file edits
+- User wants to check logs, git history, or database state
+- User says "what happened?" or "why did X fail?"
+
 ## Initial Response
 
 When invoked WITH a plan/ticket file:

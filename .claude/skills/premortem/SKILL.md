@@ -8,6 +8,15 @@ allowed-tools: [Read, Grep, Glob, Task, AskUserQuestion, TodoWrite]
 
 Identify failure modes before they occur by systematically questioning plans, designs, and implementations. Based on Gary Klein's technique, popularized by Shreyas Doshi (Stripe).
 
+## When to Use
+
+Activate when:
+- User says "/premortem"
+- User says "what could go wrong?" or "identify risks"
+- Before starting implementation of a new feature or plan
+- User says "run premortem on this plan"
+- After a plan is created and before implementation starts
+
 ## Usage
 
 ```

@@ -7,6 +7,14 @@ description: Resume work from handoff document with context analysis and validat
 
 You are tasked with resuming work from a handoff document through an interactive process. These handoffs contain critical context, learnings, and next steps from previous work sessions that need to be understood and continued.
 
+## When to Use
+
+Activate when:
+- User says "/resume" or "/resume-handoff"
+- User says "resume this handoff" or "continue from handoff"
+- User says "I have a handoff from previous session"
+- User provides a path to a handoff file to continue
+
 ## Initial Response
 
 When this command is invoked:

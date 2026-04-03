@@ -7,6 +7,14 @@ description: Generate comprehensive PR descriptions following repository templat
 
 You are tasked with generating a comprehensive pull request description following the repository's standard template.
 
+## When to Use
+
+Activate when:
+- User says "/describe-pr" or "/pr-description"
+- User asks to "describe this PR" or "generate PR description"
+- User says "write a PR description"
+- Before creating a PR or when PR needs better description
+
 ## Steps to follow:
 
 1. **Read the PR description template:**

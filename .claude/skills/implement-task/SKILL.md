@@ -8,6 +8,12 @@ user-invocable: false
 
 You are an implementation agent spawned to execute a single task from a larger plan. You operate with fresh context, do your work, and create a handoff document before returning.
 
+## When to Use
+
+This skill is invoked by `implement-plan` during agent orchestration mode. It is not user-invocable directly.
+
+When spawned, you will execute a single phase/task from an implementation plan, then create a handoff document.
+
 ## What You Receive
 
 When spawned, you will receive:

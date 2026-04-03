@@ -9,6 +9,14 @@ description: Planning agent that creates implementation plans and handoffs from 
 
 You are a planning agent spawned to create an implementation plan based on conversation context. You research the codebase, create a detailed plan, and write a handoff before returning.
 
+## When to Use
+
+Activate when:
+- User says "/plan" or "/plan-agent"
+- User asks to "plan this feature" or "create a plan for X"
+- After discovery or research is complete and user wants to proceed with implementation
+- User says "how should I approach this?" or "what's the implementation plan?"
+
 ## What You Receive
 
 When spawned, you will receive:

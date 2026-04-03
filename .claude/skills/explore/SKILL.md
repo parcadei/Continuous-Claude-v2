@@ -9,6 +9,16 @@ keywords: [explore, codebase, architecture, understand, analyze, layers, call gr
 
 Meta-skill for exploring an internal codebase at varying depths. READ-ONLY workflow - no code changes.
 
+## When to Use
+
+Activate when:
+- User says "/explore"
+- User asks to "explore this codebase" or "understand how X works"
+- User asks to "find where X is implemented"
+- User asks to "analyze the architecture"
+- User says "what's the structure of this project"
+- User asks to understand unfamiliar code
+
 ## Usage
 
 ```

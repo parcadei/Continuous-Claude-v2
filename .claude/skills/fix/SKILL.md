@@ -8,6 +8,15 @@ allowed-tools: [Bash, Read, Grep, Write, Edit, Task]
 
 Workflow orchestrator for bug investigation and resolution. Chains specialized skills based on issue scope.
 
+## When to Use
+
+Activate when:
+- User says "/fix"
+- User says "fix this bug" or "debug this issue"
+- User says "something is broken" or "not working"
+- User says "error in X" or "bug in Y"
+- User reports a failing test or exception
+
 ## Usage
 
 ```

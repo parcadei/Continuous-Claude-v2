@@ -139,8 +139,8 @@ Add to `.claude/skills/skill-rules.json`:
 For full details, read:
 
 ```bash
-cat $CLAUDE_CC_DIR/.claude/rules/skill-development.md
-cat $CLAUDE_CC_DIR/.claude/rules/mcp-scripts.md
+cat $CLAUDE_CC_DIR/.claude/skills/skill-development/SKILL.md
+cat $CLAUDE_CC_DIR/.claude/skills/mcp-scripts/SKILL.md
 ```
 
 ## Quick Checklist

@@ -8,6 +8,16 @@ user-invocable: false
 
 You are tasked with implementing an approved technical plan from `thoughts/shared/plans/`. These plans contain phases with specific changes and success criteria.
 
+## When to Use
+
+Activate when:
+- User says "/implement_plan" or similar
+- User provides a path to a plan file
+- After `plan-agent` or `validate-agent` has created a plan that needs implementation
+- User says "implement this plan" or "start implementing"
+
+This skill is typically invoked by other agents or after planning is complete. It is not user-invocable directly.
+
 ## Execution Modes
 
 You have two execution modes:
