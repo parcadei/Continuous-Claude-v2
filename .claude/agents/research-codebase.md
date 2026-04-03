@@ -14,12 +14,12 @@ Create comprehensive technical documentation of existing code by spawning specia
 
 ## Sub-Agents to Use
 
-| Agent | Purpose |
-|-------|---------|
-| codebase-locator | Find WHERE files and components live |
-| codebase-analyzer | Understand HOW specific code works |
-| codebase-pattern-finder | Find examples of existing patterns |
-| research-agent | External docs (only if explicitly asked) |
+| Agent                   | Purpose                                  |
+| ----------------------- | ---------------------------------------- |
+| codebase-locator        | Find WHERE files and components live     |
+| codebase-analyzer       | Understand HOW specific code works       |
+| codebase-pattern-finder | Find examples of existing patterns       |
+| research-agent          | External docs (only if explicitly asked) |
 
 ## Core Principles
 

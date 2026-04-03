@@ -2,7 +2,13 @@
 import { readFileSync as readFileSync2, existsSync as existsSync2 } from "fs";
 
 // src/shared/spec-context.ts
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "fs";
+import {
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+} from "fs";
 import { join, dirname } from "path";
 var SPEC_CONTEXT_VERSION = "1.0";
 function getSpecContextPath(projectDir) {
@@ -13,8 +19,7 @@ function loadSpecContext(projectDir) {
   if (existsSync(path)) {
     try {
       return JSON.parse(readFileSync(path, "utf-8"));
-    } catch {
-    }
+    } catch {}
   }
   return { version: SPEC_CONTEXT_VERSION, sessions: {} };
 }
@@ -34,10 +39,10 @@ function createEmptySessionContext() {
   return {
     active_spec: null,
     current_phase: null,
-    activated_at: (/* @__PURE__ */ new Date()).toISOString(),
+    activated_at: /* @__PURE__ */ new Date().toISOString(),
     edit_count: 0,
     last_checkpoint: 0,
-    agents: {}
+    agents: {},
   };
 }
 function setSessionSpec(projectDir, sessionId, specPath, phase) {
@@ -47,9 +52,9 @@ function setSessionSpec(projectDir, sessionId, specPath, phase) {
     ...existing,
     active_spec: specPath,
     current_phase: phase || existing.current_phase,
-    activated_at: (/* @__PURE__ */ new Date()).toISOString(),
+    activated_at: /* @__PURE__ */ new Date().toISOString(),
     edit_count: 0,
-    last_checkpoint: 0
+    last_checkpoint: 0,
   };
   saveSpecContext(projectDir, context);
 }
@@ -65,7 +70,7 @@ function findSpecFile(projectDir, specName) {
     join(projectDir, "thoughts", "shared", "specs"),
     join(projectDir, "thoughts", "shared", "plans"),
     join(projectDir, "specs"),
-    join(projectDir, "plans")
+    join(projectDir, "plans"),
   ];
   for (const dir of specDirs) {
     if (!existsSync(dir)) continue;
@@ -73,7 +78,8 @@ function findSpecFile(projectDir, specName) {
     const exact = files.find((f) => f === specName || f === `${specName}.md`);
     if (exact) return join(dir, exact);
     const partial = files.find(
-      (f) => f.toLowerCase().includes(specName.toLowerCase()) && f.endsWith(".md")
+      (f) =>
+        f.toLowerCase().includes(specName.toLowerCase()) && f.endsWith(".md"),
     );
     if (partial) return join(dir, partial);
   }
@@ -105,17 +111,22 @@ var ACTION_WORDS = [
   "do",
   "doing",
   "follow",
-  "following"
+  "following",
 ];
 var SPEC_INDICATORS = ["spec", "plan", "feature", "requirement", "design"];
 var PHASE_PATTERNS = [
   /(?:phase|step|part|section)\s*(\d+|[a-z]+)/i,
   /(?:start|begin|work on|do)\s+(?:phase|step|part)\s*(\d+|[a-z]+)/i,
-  /(\d+)(?:st|nd|rd|th)?\s+phase/i
+  /(\d+)(?:st|nd|rd|th)?\s+phase/i,
 ];
 function detectIntent(prompt, projectDir) {
   const lower = prompt.toLowerCase();
-  if (lower.includes("clear spec") || lower.includes("reset spec") || lower.includes("stop implementing") || lower.includes("done with spec")) {
+  if (
+    lower.includes("clear spec") ||
+    lower.includes("reset spec") ||
+    lower.includes("stop implementing") ||
+    lower.includes("done with spec")
+  ) {
     return { type: "clear" };
   }
   const fileMatch = prompt.match(/(\S+\.md)/);
@@ -129,7 +140,7 @@ function detectIntent(prompt, projectDir) {
           type: "spec",
           specName: fileMatch[1],
           filePath,
-          phaseName: phaseMatch2
+          phaseName: phaseMatch2,
         };
       }
     }
@@ -145,7 +156,7 @@ function detectIntent(prompt, projectDir) {
         type: "spec",
         specName,
         filePath: filePath || void 0,
-        phaseName: phaseMatch2
+        phaseName: phaseMatch2,
       };
     }
   }
@@ -172,7 +183,7 @@ function extractSpecName(prompt) {
   const patterns = [
     /(?:implement|build|work on|start|execute)\s+(?:the\s+)?([a-z0-9_-]+)\s+(?:spec|plan|feature)/i,
     /(?:spec|plan|feature)\s+(?:for\s+)?([a-z0-9_-]+)/i,
-    /([a-z0-9_-]+)\s+(?:spec|plan|feature)/i
+    /([a-z0-9_-]+)\s+(?:spec|plan|feature)/i,
   ];
   for (const pattern of patterns) {
     const match = prompt.match(pattern);
@@ -194,34 +205,46 @@ async function main() {
     const context = loadSpecContext(projectDir);
     delete context.sessions[input.session_id];
     saveSpecContext(projectDir, context);
-    console.log(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: "UserPromptSubmit",
-        additionalContext: "\u{1F4CB} Spec context cleared. No active spec."
-      }
-    }));
+    console.log(
+      JSON.stringify({
+        hookSpecificOutput: {
+          hookEventName: "UserPromptSubmit",
+          additionalContext: "\u{1F4CB} Spec context cleared. No active spec.",
+        },
+      }),
+    );
     return;
   }
   if (intent.type === "phase") {
     const current = getSessionContext(projectDir, input.session_id);
     if (current?.active_spec && intent.phaseName) {
       setSessionPhase(projectDir, input.session_id, intent.phaseName);
-      console.log(JSON.stringify({
-        hookSpecificOutput: {
-          hookEventName: "UserPromptSubmit",
-          additionalContext: `\u{1F4CB} Phase updated: Now working on ${intent.phaseName}`
-        }
-      }));
+      console.log(
+        JSON.stringify({
+          hookSpecificOutput: {
+            hookEventName: "UserPromptSubmit",
+            additionalContext: `\u{1F4CB} Phase updated: Now working on ${intent.phaseName}`,
+          },
+        }),
+      );
       return;
     }
     console.log("{}");
     return;
   }
   if (intent.filePath && existsSync2(intent.filePath)) {
-    setSessionSpec(projectDir, input.session_id, intent.filePath, intent.phaseName ?? void 0);
+    setSessionSpec(
+      projectDir,
+      input.session_id,
+      intent.filePath,
+      intent.phaseName ?? void 0,
+    );
     const specContent = readFileSync2(intent.filePath, "utf-8");
     const title = specContent.match(/^#\s+(.+)$/m)?.[1] || intent.specName;
-    const overview = specContent.match(/## Overview[\s\S]*?(?=\n## |$)/i)?.[0]?.slice(0, 300) || "";
+    const overview =
+      specContent
+        .match(/## Overview[\s\S]*?(?=\n## |$)/i)?.[0]
+        ?.slice(0, 300) || "";
     let message = `\u{1F4CB} Spec Activated: ${title}`;
     if (intent.phaseName) {
       message += `
@@ -235,25 +258,29 @@ ${overview.slice(0, 200)}...`;
     message += `
 
 \u2705 Drift detection enabled. I'll remind you of requirements during edits.`;
-    console.log(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: "UserPromptSubmit",
-        additionalContext: message
-      }
-    }));
+    console.log(
+      JSON.stringify({
+        hookSpecificOutput: {
+          hookEventName: "UserPromptSubmit",
+          additionalContext: message,
+        },
+      }),
+    );
   } else if (intent.specName) {
-    console.log(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: "UserPromptSubmit",
-        additionalContext: `\u26A0\uFE0F Could not find spec "${intent.specName}". Looked in:
+    console.log(
+      JSON.stringify({
+        hookSpecificOutput: {
+          hookEventName: "UserPromptSubmit",
+          additionalContext: `\u26A0\uFE0F Could not find spec "${intent.specName}". Looked in:
 - thoughts/shared/specs/
 - thoughts/shared/plans/
 - specs/
 - plans/
 
-Create the spec first or provide the full path.`
-      }
-    }));
+Create the spec first or provide the full path.`,
+        },
+      }),
+    );
   } else {
     console.log("{}");
   }

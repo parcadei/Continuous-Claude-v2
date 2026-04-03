@@ -12,7 +12,6 @@ Use this skill when working on proof-theory problems in mathematical logic.
 
 ## Decision Tree
 
-
 1. **Proof Strategy Selection**
    - Direct proof: assume premises, derive conclusion
    - Proof by contradiction: assume negation, derive false
@@ -40,25 +39,28 @@ Use this skill when working on proof-theory problems in mathematical logic.
    - Verify dependencies are satisfied
    - `math_scratchpad.py verify "proof_steps"`
 
-
 ## Tool Commands
 
 ### Z3_Induction_Base
+
 ```bash
 uv run python -m runtime.harness scripts/cc_math/z3_solve.py prove "P(0)"
 ```
 
 ### Z3_Induction_Step
+
 ```bash
 uv run python -m runtime.harness scripts/cc_math/z3_solve.py prove "ForAll([n], Implies(P(n), P(n+1)))"
 ```
 
 ### Z3_Soundness
+
 ```bash
 uv run python -m runtime.harness scripts/cc_math/z3_solve.py prove "Implies(derivable(phi), valid(phi))"
 ```
 
 ### Math_Verify
+
 ```bash
 uv run python -m runtime.harness scripts/cc_math/math_scratchpad.py verify "proof_structure"
 ```

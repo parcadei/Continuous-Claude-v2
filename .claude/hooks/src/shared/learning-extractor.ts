@@ -5,20 +5,26 @@
  * Used by PostToolUse, UserPromptSubmit, and SubagentStop hooks.
  */
 
-import { spawnSync } from 'child_process';
-import { getOpcDir } from './opc-path.js';
+import { spawnSync } from "child_process";
+import { getOpcDir } from "./opc-path.js";
 
 export interface Learning {
-  what: string;      // What happened
-  why: string;       // Why it worked/failed
-  how: string;       // Procedural steps (for replication)
-  outcome: 'success' | 'failure' | 'partial';
+  what: string; // What happened
+  why: string; // Why it worked/failed
+  how: string; // Procedural steps (for replication)
+  outcome: "success" | "failure" | "partial";
   tags: string[];
-  context?: string;  // Additional context (file paths, error messages, etc.)
+  context?: string; // Additional context (file paths, error messages, etc.)
 }
 
 export interface LearningEvent {
-  type: 'edit' | 'test_pass' | 'test_fail' | 'user_confirm' | 'periodic' | 'agent_complete';
+  type:
+    | "edit"
+    | "test_pass"
+    | "test_fail"
+    | "user_confirm"
+    | "periodic"
+    | "agent_complete";
   tool_name?: string;
   tool_input?: Record<string, unknown>;
   tool_response?: Record<string, unknown>;
@@ -32,40 +38,43 @@ export interface LearningEvent {
 export async function storeLearning(
   learning: Learning,
   sessionId: string,
-  projectDir: string
+  projectDir: string,
 ): Promise<boolean> {
   const opcDir = getOpcDir();
-  if (!opcDir) return false;  // Graceful degradation
+  if (!opcDir) return false; // Graceful degradation
 
   // Build args based on outcome
   const args = [
-    'run', 'python', 'scripts/core/store_learning.py',
-    '--session-id', sessionId
+    "run",
+    "python",
+    "scripts/core/store_learning.py",
+    "--session-id",
+    sessionId,
   ];
 
   // Map learning to store_learning.py interface
-  if (learning.outcome === 'success') {
-    args.push('--worked', `${learning.what}. ${learning.how}`);
-  } else if (learning.outcome === 'failure') {
-    args.push('--failed', `${learning.what}. ${learning.why}`);
+  if (learning.outcome === "success") {
+    args.push("--worked", `${learning.what}. ${learning.how}`);
+  } else if (learning.outcome === "failure") {
+    args.push("--failed", `${learning.what}. ${learning.why}`);
   } else {
     // Partial/progress - use patterns
-    args.push('--patterns', `${learning.what}: ${learning.how}`);
+    args.push("--patterns", `${learning.what}: ${learning.how}`);
   }
 
   // Add decisions if there's a why
-  if (learning.why && learning.outcome !== 'failure') {
-    args.push('--decisions', learning.why);
+  if (learning.why && learning.outcome !== "failure") {
+    args.push("--decisions", learning.why);
   }
 
-  const result = spawnSync('uv', args, {
-    encoding: 'utf-8',
+  const result = spawnSync("uv", args, {
+    encoding: "utf-8",
     cwd: opcDir,
     env: {
       ...process.env,
-      PYTHONPATH: opcDir
+      PYTHONPATH: opcDir,
     },
-    timeout: 10000
+    timeout: 10000,
   });
 
   return result.status === 0;
@@ -86,7 +95,7 @@ function formatLearningContent(learning: Learning): string {
     lines.push(`Context: ${learning.context}`);
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 /**
@@ -94,11 +103,11 @@ function formatLearningContent(learning: Learning): string {
  */
 export function extractTestPassLearning(
   event: LearningEvent,
-  recentEdits: Array<{ file: string; description: string }>
+  recentEdits: Array<{ file: string; description: string }>,
 ): Learning | null {
   if (!event.tool_response) return null;
 
-  const output = String(event.tool_response.output || '');
+  const output = String(event.tool_response.output || "");
 
   // Detect test pass patterns
   const passPatterns = [
@@ -106,26 +115,27 @@ export function extractTestPassLearning(
     /tests? passed/i,
     /ok \(/i,
     /success/i,
-    /\u2713/,  // checkmark
+    /\u2713/, // checkmark
   ];
 
-  const isPass = passPatterns.some(p => p.test(output));
+  const isPass = passPatterns.some((p) => p.test(output));
   if (!isPass) return null;
 
   // Build learning from recent edits
   const editSummary = recentEdits
-    .map(e => `${e.file}: ${e.description}`)
-    .join('; ');
+    .map((e) => `${e.file}: ${e.description}`)
+    .join("; ");
 
   return {
-    what: `Tests passed after: ${editSummary || 'recent changes'}`,
-    why: 'Changes addressed the failing tests',
-    how: recentEdits.length > 0
-      ? `Files modified: ${recentEdits.map(e => e.file).join(', ')}`
-      : 'See recent edit history',
-    outcome: 'success',
-    tags: ['test_pass', 'fix', 'auto_extracted'],
-    context: output.slice(0, 200)
+    what: `Tests passed after: ${editSummary || "recent changes"}`,
+    why: "Changes addressed the failing tests",
+    how:
+      recentEdits.length > 0
+        ? `Files modified: ${recentEdits.map((e) => e.file).join(", ")}`
+        : "See recent edit history",
+    outcome: "success",
+    tags: ["test_pass", "fix", "auto_extracted"],
+    context: output.slice(0, 200),
   };
 }
 
@@ -134,7 +144,7 @@ export function extractTestPassLearning(
  */
 export function extractConfirmationLearning(
   prompt: string,
-  recentContext: string
+  recentContext: string,
 ): Learning | null {
   // Detect confirmation patterns
   const confirmPatterns = [
@@ -145,7 +155,7 @@ export function extractConfirmationLearning(
     /\bthat('s| is) (it|right|correct)\b/i,
   ];
 
-  const isConfirmation = confirmPatterns.some(p => p.test(prompt));
+  const isConfirmation = confirmPatterns.some((p) => p.test(prompt));
   if (!isConfirmation) return null;
 
   // Need some recent context to make this meaningful
@@ -153,10 +163,10 @@ export function extractConfirmationLearning(
 
   return {
     what: `User confirmed: "${prompt.slice(0, 50)}"`,
-    why: 'Approach/solution worked for user',
+    why: "Approach/solution worked for user",
     how: recentContext.slice(0, 300),
-    outcome: 'success',
-    tags: ['user_confirmed', 'solution', 'auto_extracted']
+    outcome: "success",
+    tags: ["user_confirmed", "solution", "auto_extracted"],
   };
 }
 
@@ -166,14 +176,14 @@ export function extractConfirmationLearning(
 export function extractPeriodicLearning(
   turnCount: number,
   recentActions: string[],
-  sessionGoal?: string
+  sessionGoal?: string,
 ): Learning {
   return {
     what: `Turn ${turnCount} checkpoint: ${recentActions.length} actions`,
-    why: sessionGoal || 'Session progress tracking',
-    how: recentActions.join('; ').slice(0, 500),
-    outcome: 'partial',
-    tags: ['periodic', 'progress', 'procedural', 'auto_extracted']
+    why: sessionGoal || "Session progress tracking",
+    how: recentActions.join("; ").slice(0, 500),
+    outcome: "partial",
+    tags: ["periodic", "progress", "procedural", "auto_extracted"],
   };
 }
 
@@ -183,14 +193,16 @@ export function extractPeriodicLearning(
 export function extractAgentLearning(
   agentType: string,
   agentPrompt: string,
-  agentResult: string
+  agentResult: string,
 ): Learning {
   return {
     what: `Agent ${agentType} completed task`,
     why: agentPrompt.slice(0, 200),
     how: `Result: ${agentResult.slice(0, 300)}`,
-    outcome: agentResult.toLowerCase().includes('error') ? 'failure' : 'success',
-    tags: ['agent', agentType, 'auto_extracted'],
-    context: agentPrompt
+    outcome: agentResult.toLowerCase().includes("error")
+      ? "failure"
+      : "success",
+    tags: ["agent", agentType, "auto_extracted"],
+    context: agentPrompt,
   };
 }

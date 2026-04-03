@@ -14,6 +14,7 @@ This skill is invoked when implementing technical plans from thoughts/shared/pla
 ## Multimodal Logic Integration
 
 Five modal logics via fusion with bridge principles:
+
 - **JL**: Justification Logic - evidence-backed claims
 - **IEL**: Inferential Erotetic Logic - question handling
 - **TEL**: Temporal Epistemic Logic - phase sequencing
@@ -159,17 +160,18 @@ tracking:
 
 ## Mode Selection
 
-| Tasks | Context Critical | Mode |
-|-------|------------------|------|
-| 1-3 | No | Direct |
-| 1-3 | Yes | Orchestration |
-| 4+ | Any | Orchestration |
+| Tasks | Context Critical | Mode          |
+| ----- | ---------------- | ------------- |
+| 1-3   | No               | Direct        |
+| 1-3   | Yes              | Orchestration |
+| 4+    | Any              | Orchestration |
 
 User preference overrides.
 
 ## Templates
 
 **Mismatch:**
+
 ```
 Issue in Phase [N]:
 Expected: [plan says]
@@ -178,6 +180,7 @@ How should I proceed?
 ```
 
 **Manual Verification Pause:**
+
 ```
 Phase [N] Complete - Ready for Manual Verification
 Automated passed: [list]
@@ -186,6 +189,7 @@ Let me know when done.
 ```
 
 **Agent Spawn:**
+
 ```
 Task(subagent_type="general-purpose", model="claude-opus-4-5-20251101", prompt="""
 [implement_task SKILL.md]
@@ -199,6 +203,7 @@ Task(subagent_type="general-purpose", model="claude-opus-4-5-20251101", prompt="
 ```
 
 **Recovery (post-compaction):**
+
 1. Ledger auto-loaded by SessionStart
 2. `ls thoughts/handoffs/<session>/`
 3. Read last handoff

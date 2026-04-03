@@ -22,12 +22,14 @@ CHECKPOINT_FILE=$(ls -t $HANDOFF_DIR/*/current.md 2>/dev/null | head -1)
 ```
 
 If a checkpoint exists with your task:
+
 1. Read the `## Checkpoints` section from the handoff
 2. Find the last `✓ VALIDATED` phase
 3. Find the `→ IN_PROGRESS` phase (if any)
 4. **Resume from the IN_PROGRESS phase** or start the next pending phase
 
 **Resume detection keywords in task prompt:**
+
 - `resume: "<session-id>"` → Explicit resume request
 - `continue from checkpoint` → Resume from last validated
 - `retry phase N` → Restart specific phase
@@ -61,6 +63,7 @@ Parse this carefully - it defines the scope of your implementation.
 ### 2.1 Write Failing Tests First
 
 Before implementing any code:
+
 1. Create or update test file in `tests/unit/` or `tests/integration/`
 2. Write tests that define expected behavior
 3. Run tests to confirm they fail
@@ -76,6 +79,7 @@ uv run pytest -k "test_specific_function" -v
 ### 2.2 Implement Minimum Code
 
 After tests fail:
+
 1. Write the minimum code needed to pass tests
 2. Focus on functionality, not perfection
 3. Iterate until tests pass
@@ -83,6 +87,7 @@ After tests fail:
 ### 2.3 Refactor
 
 Once tests pass:
+
 1. Clean up implementation
 2. Remove duplication
 3. Improve naming
@@ -106,6 +111,7 @@ uv run python -m runtime.harness scripts/morph_search.py --query "function_name"
 ## Step 4: Write Output
 
 **ALWAYS write your summary to:**
+
 ```
 $CLAUDE_CC_DIR/.claude/cache/agents/kraken/output-{timestamp}.md
 ```
@@ -114,29 +120,36 @@ $CLAUDE_CC_DIR/.claude/cache/agents/kraken/output-{timestamp}.md
 
 ```markdown
 # Implementation Report: [Feature/Task Name]
+
 Generated: [timestamp]
 
 ## Task
+
 [What was implemented]
 
 ## TDD Summary
 
 ### Tests Written
+
 - `tests/unit/test_file.py::TestClass::test_method` - [what it tests]
 
 ### Implementation
+
 - `path/to/file.py` - [what was added/changed]
 
 ## Test Results
+
 - Total: X tests
 - Passed: Y
 - Failed: Z (if any, with details)
 
 ## Changes Made
+
 1. [Specific change]
 2. [Specific change]
 
 ## Notes
+
 [Any issues, decisions, or follow-up needed]
 ```
 
@@ -147,6 +160,7 @@ Generated: [timestamp]
 ### 5.1 When to Create Checkpoints
 
 Create a checkpoint after completing each major phase:
+
 - After writing tests (Phase: Tests Written)
 - After implementation passes tests (Phase: Implementation Complete)
 - After refactoring (Phase: Refactored)
@@ -156,20 +170,24 @@ Create a checkpoint after completing each major phase:
 
 Write checkpoints to the handoff file at `$CLAUDE_CC_DIR/thoughts/shared/handoffs/<task-name>/current.md`:
 
-```markdown
+````markdown
 ## Checkpoints
+
 <!-- Resumable state for kraken agent -->
+
 **Task:** [Task description]
 **Started:** [ISO timestamp]
 **Last Updated:** [ISO timestamp]
 
 ### Phase Status
+
 - Phase 1 (Tests Written): ✓ VALIDATED (15 tests passing)
 - Phase 2 (Implementation): ✓ VALIDATED (all tests green)
 - Phase 3 (Refactoring): → IN_PROGRESS (started 2025-12-31T14:00:00Z)
 - Phase 4 (Documentation): ○ PENDING
 
 ### Validation State
+
 ```json
 {
   "test_count": 15,
@@ -179,12 +197,15 @@ Write checkpoints to the handoff file at `$CLAUDE_CC_DIR/thoughts/shared/handoff
   "last_test_exit_code": 0
 }
 ```
+````
 
 ### Resume Context
+
 - Current focus: [Exact step within phase]
 - Next action: [What to do next]
 - Blockers: [Any blockers encountered]
-```
+
+````
 
 ### 5.3 Validation Before Advancing
 
@@ -216,13 +237,14 @@ mkdir -p "$HANDOFF_DIR"
 
 # Update checkpoint in handoff
 # (Use Write tool to update the ## Checkpoints section)
-```
+````
 
 ### 5.5 Resuming from Checkpoint
 
 When resuming (via `resume: "session-id"` in task prompt):
 
 1. **Read checkpoint state:**
+
    ```bash
    cat "$HANDOFF_DIR/current.md" | grep -A 20 "## Checkpoints"
    ```
@@ -248,6 +270,7 @@ When resuming (via `resume: "session-id"` in task prompt):
 ```
 
 **State symbols:**
+
 - `○` PENDING - Not yet started
 - `→` IN_PROGRESS - Currently working
 - `✓` VALIDATED - Completed and verified

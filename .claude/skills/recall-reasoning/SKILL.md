@@ -56,6 +56,7 @@ bash "$CLAUDE_CC_DIR/.claude/scripts/search-reasoning.sh" "TypeError"
 ## What Gets Searched
 
 **Artifact Index** (handoffs, plans, ledgers):
+
 - Task summaries and status
 - **What worked** - Successful approaches
 - **What failed** - Dead ends and why
@@ -63,6 +64,7 @@ bash "$CLAUDE_CC_DIR/.claude/scripts/search-reasoning.sh" "TypeError"
 - Goal and constraints from ledgers
 
 **Reasoning Files** (`.git/claude/`):
+
 - Failed build attempts and error output
 - Successful builds after failures
 - Commit context and branch info
@@ -70,12 +72,14 @@ bash "$CLAUDE_CC_DIR/.claude/scripts/search-reasoning.sh" "TypeError"
 ## Interpreting Results
 
 **From Artifact Index:**
+
 - `✓` = SUCCEEDED outcome (pattern to follow)
 - `✗` = FAILED outcome (pattern to avoid)
 - `?` = UNKNOWN outcome (not yet marked)
 - Post-mortem sections show distilled learnings
 
 **From Reasoning:**
+
 - `build_fail` = approach that didn't work
 - `build_pass` = what finally succeeded
 - Multiple failures before success = non-trivial problem
@@ -90,9 +94,11 @@ bash "$CLAUDE_CC_DIR/.claude/scripts/search-reasoning.sh" "TypeError"
 ## No Results?
 
 **Artifact Index empty:**
+
 - Run `uv run python scripts/core/artifact_index.py --all` to index existing handoffs
 - Create handoffs with post-mortem sections for future recall
 
 **Reasoning files empty:**
+
 - Use `/commit` after builds to capture reasoning
 - Check if `.git/claude/` directory exists

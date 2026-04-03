@@ -39,7 +39,7 @@ function main() {
     const child = spawn("tldr", ["daemon", "warm", "--project", projectDir], {
       detached: true,
       stdio: "ignore",
-      shell: process.platform === "win32"
+      shell: process.platform === "win32",
       // Shell needed on Windows
     });
     child.unref();

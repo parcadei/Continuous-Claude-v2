@@ -5,6 +5,7 @@ How we built this system and how to extend it.
 ## Philosophy: Cognitive Prosthetics
 
 LLMs make arithmetic errors. These tools don't replace thinking—they augment it:
+
 - **SymPy**: Exact symbolic computation (no floating point drift)
 - **Z3**: Exhaustive constraint checking
 - **Lean 4**: Compiler IS the proof checker
@@ -38,12 +39,12 @@ Main: Gets 200-token summary (not 2000+ token transcript)
 
 ## Key Decisions Log
 
-| Decision | Why | Alternative Rejected |
-|----------|-----|---------------------|
-| Lean 4 for category theory | Z3 can't do abstract algebra | Keep broken Z3 commands |
-| Remove Key Techniques | RAG chunks were noisy | Jury pattern (too complex) |
-| SymPy over NumPy | Exact symbolic, not floating point | Numerical approximations |
-| Compiler-in-the-loop | Lean compiler = proof verifier | Manual proof checking |
+| Decision                   | Why                                | Alternative Rejected       |
+| -------------------------- | ---------------------------------- | -------------------------- |
+| Lean 4 for category theory | Z3 can't do abstract algebra       | Keep broken Z3 commands    |
+| Remove Key Techniques      | RAG chunks were noisy              | Jury pattern (too complex) |
+| SymPy over NumPy           | Exact symbolic, not floating point | Numerical approximations   |
+| Compiler-in-the-loop       | Lean compiler = proof verifier     | Manual proof checking      |
 
 ## Extending the System
 
@@ -65,11 +66,13 @@ Main: Gets 200-token summary (not 2000+ token transcript)
 ## Session Continuity
 
 Before clearing context:
+
 1. Update ledger: `thoughts/ledgers/CONTINUITY_CLAUDE-<session>.md`
 2. Create handoff: `thoughts/shared/handoffs/<session>/`
 3. Mark checkboxes for completed phases
 
 After resuming:
+
 1. SessionStart hook loads ledger automatically
 2. Find `[→]` to see current phase
 3. Continue from where you left off

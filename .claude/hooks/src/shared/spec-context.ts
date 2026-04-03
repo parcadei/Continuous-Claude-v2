@@ -5,8 +5,14 @@
  * that tracks which spec/phase each session is implementing.
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
-import { join, dirname } from 'path';
+import {
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+} from "fs";
+import { join, dirname } from "path";
 
 export interface AgentScope {
   section: string;
@@ -29,18 +35,18 @@ export interface SpecContext {
   sessions: Record<string, SessionContext>;
 }
 
-const SPEC_CONTEXT_VERSION = '1.0';
+const SPEC_CONTEXT_VERSION = "1.0";
 const CHECKPOINT_INTERVAL = 5;
 
 export function getSpecContextPath(projectDir: string): string {
-  return join(projectDir, '.claude', 'cache', 'spec-context.json');
+  return join(projectDir, ".claude", "cache", "spec-context.json");
 }
 
 export function loadSpecContext(projectDir: string): SpecContext {
   const path = getSpecContextPath(projectDir);
   if (existsSync(path)) {
     try {
-      return JSON.parse(readFileSync(path, 'utf-8'));
+      return JSON.parse(readFileSync(path, "utf-8"));
     } catch {
       // Corrupted file, start fresh
     }
@@ -48,7 +54,10 @@ export function loadSpecContext(projectDir: string): SpecContext {
   return { version: SPEC_CONTEXT_VERSION, sessions: {} };
 }
 
-export function saveSpecContext(projectDir: string, context: SpecContext): void {
+export function saveSpecContext(
+  projectDir: string,
+  context: SpecContext,
+): void {
   const path = getSpecContextPath(projectDir);
   const dir = dirname(path);
   if (!existsSync(dir)) {
@@ -57,7 +66,10 @@ export function saveSpecContext(projectDir: string, context: SpecContext): void 
   writeFileSync(path, JSON.stringify(context, null, 2));
 }
 
-export function getSessionContext(projectDir: string, sessionId: string): SessionContext | null {
+export function getSessionContext(
+  projectDir: string,
+  sessionId: string,
+): SessionContext | null {
   const context = loadSpecContext(projectDir);
   return context.sessions[sessionId] || null;
 }
@@ -69,7 +81,7 @@ export function createEmptySessionContext(): SessionContext {
     activated_at: new Date().toISOString(),
     edit_count: 0,
     last_checkpoint: 0,
-    agents: {}
+    agents: {},
   };
 }
 
@@ -77,7 +89,7 @@ export function setSessionSpec(
   projectDir: string,
   sessionId: string,
   specPath: string,
-  phase?: string
+  phase?: string,
 ): void {
   const context = loadSpecContext(projectDir);
   const existing = context.sessions[sessionId] || createEmptySessionContext();
@@ -88,13 +100,17 @@ export function setSessionSpec(
     current_phase: phase || existing.current_phase,
     activated_at: new Date().toISOString(),
     edit_count: 0,
-    last_checkpoint: 0
+    last_checkpoint: 0,
   };
 
   saveSpecContext(projectDir, context);
 }
 
-export function setSessionPhase(projectDir: string, sessionId: string, phase: string): void {
+export function setSessionPhase(
+  projectDir: string,
+  sessionId: string,
+  phase: string,
+): void {
   const context = loadSpecContext(projectDir);
   if (context.sessions[sessionId]) {
     context.sessions[sessionId].current_phase = phase;
@@ -106,12 +122,14 @@ export function registerAgent(
   projectDir: string,
   sessionId: string,
   parentSessionId: string | undefined,
-  scope: Omit<AgentScope, 'registered_at' | 'parent_session'>
+  scope: Omit<AgentScope, "registered_at" | "parent_session">,
 ): void {
   const context = loadSpecContext(projectDir);
 
   // Find parent's spec context
-  const parentContext = parentSessionId ? context.sessions[parentSessionId] : null;
+  const parentContext = parentSessionId
+    ? context.sessions[parentSessionId]
+    : null;
 
   // Create agent's session entry
   context.sessions[sessionId] = {
@@ -120,7 +138,7 @@ export function registerAgent(
     activated_at: new Date().toISOString(),
     edit_count: 0,
     last_checkpoint: 0,
-    agents: {}
+    agents: {},
   };
 
   // Also register in parent's agents list if parent exists
@@ -128,7 +146,7 @@ export function registerAgent(
     context.sessions[parentSessionId].agents[sessionId] = {
       ...scope,
       registered_at: new Date().toISOString(),
-      parent_session: parentSessionId
+      parent_session: parentSessionId,
     };
   }
 
@@ -151,9 +169,12 @@ export function unregisterAgent(projectDir: string, sessionId: string): void {
   saveSpecContext(projectDir, context);
 }
 
-export function incrementEditCount(projectDir: string, sessionId: string): {
+export function incrementEditCount(
+  projectDir: string,
+  sessionId: string,
+): {
   count: number;
-  needsCheckpoint: boolean
+  needsCheckpoint: boolean;
 } {
   const context = loadSpecContext(projectDir);
   const session = context.sessions[sessionId];
@@ -183,12 +204,15 @@ export function clearSession(projectDir: string, sessionId: string): void {
 
 // Spec file utilities
 
-export function findSpecFile(projectDir: string, specName: string): string | null {
+export function findSpecFile(
+  projectDir: string,
+  specName: string,
+): string | null {
   const specDirs = [
-    join(projectDir, 'thoughts', 'shared', 'specs'),
-    join(projectDir, 'thoughts', 'shared', 'plans'),
-    join(projectDir, 'specs'),
-    join(projectDir, 'plans')
+    join(projectDir, "thoughts", "shared", "specs"),
+    join(projectDir, "thoughts", "shared", "plans"),
+    join(projectDir, "specs"),
+    join(projectDir, "plans"),
   ];
 
   for (const dir of specDirs) {
@@ -197,28 +221,32 @@ export function findSpecFile(projectDir: string, specName: string): string | nul
     const files = readdirSync(dir) as string[];
 
     // Exact match first
-    const exact = files.find(f => f === specName || f === `${specName}.md`);
+    const exact = files.find((f) => f === specName || f === `${specName}.md`);
     if (exact) return join(dir, exact);
 
     // Partial match
-    const partial = files.find(f =>
-      f.toLowerCase().includes(specName.toLowerCase()) && f.endsWith('.md')
+    const partial = files.find(
+      (f) =>
+        f.toLowerCase().includes(specName.toLowerCase()) && f.endsWith(".md"),
     );
     if (partial) return join(dir, partial);
   }
 
   // Check if it's already a full path
-  if (specName.endsWith('.md') && existsSync(join(projectDir, specName))) {
+  if (specName.endsWith(".md") && existsSync(join(projectDir, specName))) {
     return join(projectDir, specName);
   }
 
   return null;
 }
 
-export function extractSpecRequirements(specContent: string, section?: string): string {
+export function extractSpecRequirements(
+  specContent: string,
+  section?: string,
+): string {
   // If a section is specified, extract just that section
   if (section) {
-    const sectionRegex = new RegExp(`## ${section}[\\s\\S]*?(?=\\n## |$)`, 'i');
+    const sectionRegex = new RegExp(`## ${section}[\\s\\S]*?(?=\\n## |$)`, "i");
     const match = specContent.match(sectionRegex);
     if (match) {
       return extractCriteria(match[0]);
@@ -231,19 +259,22 @@ export function extractSpecRequirements(specContent: string, section?: string): 
 
 function extractCriteria(content: string): string {
   const sections = [
-    '## Requirements',
-    '## Functional Requirements',
-    '## Must Have',
-    '## Success Criteria',
-    '## Acceptance Criteria',
-    '### Success Criteria',
-    '### Acceptance Criteria'
+    "## Requirements",
+    "## Functional Requirements",
+    "## Must Have",
+    "## Success Criteria",
+    "## Acceptance Criteria",
+    "### Success Criteria",
+    "### Acceptance Criteria",
   ];
 
   const extracted: string[] = [];
 
   for (const section of sections) {
-    const regex = new RegExp(`${section.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*?(?=\\n## |\\n### |$)`, 'i');
+    const regex = new RegExp(
+      `${section.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?(?=\\n## |\\n### |$)`,
+      "i",
+    );
     const match = content.match(regex);
     if (match) {
       extracted.push(match[0].slice(0, 600));
@@ -253,18 +284,23 @@ function extractCriteria(content: string): string {
   // Also extract checkbox items
   const checkboxes = content.match(/- \[ \] .+/g) || [];
   if (checkboxes.length > 0) {
-    extracted.push('Acceptance Criteria:\n' + checkboxes.slice(0, 10).join('\n'));
+    extracted.push(
+      "Acceptance Criteria:\n" + checkboxes.slice(0, 10).join("\n"),
+    );
   }
 
   if (extracted.length > 0) {
-    return extracted.join('\n\n').slice(0, 1500);
+    return extracted.join("\n\n").slice(0, 1500);
   }
 
   // Fallback: first 800 chars
   return content.slice(0, 800);
 }
 
-export function extractAcceptanceCriteria(specContent: string, section?: string): string[] {
+export function extractAcceptanceCriteria(
+  specContent: string,
+  section?: string,
+): string[] {
   const content = section
     ? extractSpecRequirements(specContent, section)
     : specContent;

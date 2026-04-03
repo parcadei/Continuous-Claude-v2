@@ -40,12 +40,12 @@ Multi-perspective code review with parallel specialists.
 
 ## Agent Sequence
 
-| # | Agent | Focus | Execution |
-|---|-------|-------|-----------|
-| 1 | **critic** | Code quality, patterns, readability | Parallel |
-| 1 | **plan-reviewer** | Architecture, plan adherence | Parallel |
-| 1 | **plan-reviewer** | Change impact, risk assessment | Parallel |
-| 2 | **review-agent** | Synthesize all reviews, final verdict | After 1 |
+| #   | Agent             | Focus                                 | Execution |
+| --- | ----------------- | ------------------------------------- | --------- |
+| 1   | **critic**        | Code quality, patterns, readability   | Parallel  |
+| 1   | **plan-reviewer** | Architecture, plan adherence          | Parallel  |
+| 1   | **plan-reviewer** | Change impact, risk assessment        | Parallel  |
+| 2   | **review-agent**  | Synthesize all reviews, final verdict | After 1   |
 
 ## Review Perspectives
 
@@ -141,24 +141,28 @@ Task(
 ## Review Modes
 
 ### Full Review
+
 ```
 User: /review
 → All four agents, comprehensive review
 ```
 
 ### Quick Review
+
 ```
 User: /review --quick
 → critic only, fast feedback
 ```
 
 ### Security Focus
+
 ```
 User: /review --security
 → Add aegis (security agent) to parallel phase
 ```
 
 ### PR Review
+
 ```
 User: /review PR #123
 → Fetch PR diff, review changes

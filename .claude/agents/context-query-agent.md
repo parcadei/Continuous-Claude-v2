@@ -11,6 +11,7 @@ You are a specialized agent for querying the Artifact Index to find relevant pre
 ## Your Task
 
 Given a question about past work, search across:
+
 1. Handoffs (completed tasks with post-mortems)
 2. Plans (design documents)
 3. Continuity ledgers (session states)
@@ -19,6 +20,7 @@ Given a question about past work, search across:
 ## Tools Available
 
 Use Bash to run:
+
 ```bash
 uv run python scripts/artifact_query.py "<query>" --json
 ```

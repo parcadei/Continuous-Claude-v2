@@ -60,8 +60,8 @@ export interface StopInput {
  */
 export interface PreToolUseHookOutput {
   hookSpecificOutput: {
-    hookEventName: 'PreToolUse';
-    permissionDecision: 'allow' | 'deny' | 'ask';
+    hookEventName: "PreToolUse";
+    permissionDecision: "allow" | "deny" | "ask";
     permissionDecisionReason?: string;
     updatedInput?: Record<string, unknown>;
   };
@@ -72,7 +72,7 @@ export interface PreToolUseHookOutput {
  * Prefer PreToolUseHookOutput for new hooks.
  */
 export interface LegacyHookOutput {
-  result: 'continue' | 'block';
+  result: "continue" | "block";
   message?: string;
   reason?: string;
 }

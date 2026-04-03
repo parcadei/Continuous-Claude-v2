@@ -8,14 +8,14 @@
  * will use the warmed cache or trigger on-demand indexing.
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
-import { spawn } from 'child_process';
+import { readFileSync, existsSync } from "fs";
+import { join } from "path";
+import { spawn } from "child_process";
 
 interface SessionStartInput {
   session_id: string;
   hook_event_name: string;
-  source: 'startup' | 'resume' | 'clear' | 'compact';
+  source: "startup" | "resume" | "clear" | "compact";
   cwd: string;
 }
 
@@ -25,15 +25,15 @@ interface TldrCacheMeta {
 }
 
 function readStdin(): string {
-  return readFileSync(0, 'utf-8');
+  return readFileSync(0, "utf-8");
 }
 
 function getCacheAge(projectDir: string): number | undefined {
-  const metaPath = join(projectDir, '.claude', 'cache', 'tldr', 'meta.json');
+  const metaPath = join(projectDir, ".claude", "cache", "tldr", "meta.json");
   if (!existsSync(metaPath)) return undefined;
 
   try {
-    const meta: TldrCacheMeta = JSON.parse(readFileSync(metaPath, 'utf-8'));
+    const meta: TldrCacheMeta = JSON.parse(readFileSync(metaPath, "utf-8"));
     const cachedAt = new Date(meta.cached_at);
     return Math.round((Date.now() - cachedAt.getTime()) / (1000 * 60 * 60));
   } catch {
@@ -42,7 +42,7 @@ function getCacheAge(projectDir: string): number | undefined {
 }
 
 function isCacheStale(projectDir: string): boolean {
-  const cacheDir = join(projectDir, '.claude', 'cache', 'tldr');
+  const cacheDir = join(projectDir, ".claude", "cache", "tldr");
   if (!existsSync(cacheDir)) return true;
 
   const age = getCacheAge(projectDir);
@@ -54,13 +54,13 @@ function main() {
   try {
     input = JSON.parse(readStdin());
   } catch {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
   // Only run on startup/resume (not clear/compact)
-  if (!['startup', 'resume'].includes(input.source)) {
-    console.log('{}');
+  if (!["startup", "resume"].includes(input.source)) {
+    console.log("{}");
     return;
   }
 
@@ -70,16 +70,16 @@ function main() {
   // Uses spawn with detached:true so process exits immediately
   if (isCacheStale(projectDir)) {
     // Cross-platform: use tldr daemon warm command
-    const child = spawn('tldr', ['daemon', 'warm', '--project', projectDir], {
+    const child = spawn("tldr", ["daemon", "warm", "--project", projectDir], {
       detached: true,
-      stdio: 'ignore',
-      shell: process.platform === 'win32', // Shell needed on Windows
+      stdio: "ignore",
+      shell: process.platform === "win32", // Shell needed on Windows
     });
     child.unref(); // Allow parent to exit immediately
   }
 
   // Return immediately - don't block startup
-  console.log('{}');
+  console.log("{}");
 }
 
 main();

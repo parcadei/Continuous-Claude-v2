@@ -8,7 +8,7 @@
  * See: docs/handoffs/resource-limits-plan.md
  */
 
-import * as os from 'os';
+import * as os from "os";
 
 /**
  * System resource information.

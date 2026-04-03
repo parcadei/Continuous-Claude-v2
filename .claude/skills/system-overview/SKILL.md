@@ -68,22 +68,22 @@ Options:
 
 ## Key Files
 
-| Component | Location |
-|-----------|----------|
-| Hook registration | `.claude/settings.json` |
-| Hook implementations | `.claude/hooks/src/*.ts` |
-| Rules (auto-injected) | `.claude/rules/*.md` |
-| Skills | `.claude/skills/*/SKILL.md` |
-| Setup wizard | `opc/scripts/setup/wizard.py` |
-| Recall script | `opc/scripts/recall_temporal_facts.py` |
-| Store learning | `opc/scripts/core/store_learning.py` |
-| Symbol index builder | `opc/scripts/build_symbol_index.py` |
+| Component             | Location                               |
+| --------------------- | -------------------------------------- |
+| Hook registration     | `.claude/settings.json`                |
+| Hook implementations  | `.claude/hooks/src/*.ts`               |
+| Rules (auto-injected) | `.claude/rules/*.md`                   |
+| Skills                | `.claude/skills/*/SKILL.md`            |
+| Setup wizard          | `opc/scripts/setup/wizard.py`          |
+| Recall script         | `opc/scripts/recall_temporal_facts.py` |
+| Store learning        | `opc/scripts/core/store_learning.py`   |
+| Symbol index builder  | `opc/scripts/build_symbol_index.py`    |
 
 ## Environment Variables
 
-| Variable | Purpose |
-|----------|---------|
-| `CONTINUOUS_CLAUDE_DB_URL` | PostgreSQL connection |
-| `VOYAGE_API_KEY` | Embeddings (optional) |
-| `BRAINTRUST_API_KEY` | Tracing (optional) |
-| `CLAUDE_PROJECT_DIR` | Auto-set by Claude Code |
+| Variable                   | Purpose                 |
+| -------------------------- | ----------------------- |
+| `CONTINUOUS_CLAUDE_DB_URL` | PostgreSQL connection   |
+| `VOYAGE_API_KEY`           | Embeddings (optional)   |
+| `BRAINTRUST_API_KEY`       | Tracing (optional)      |
+| `CLAUDE_PROJECT_DIR`       | Auto-set by Claude Code |

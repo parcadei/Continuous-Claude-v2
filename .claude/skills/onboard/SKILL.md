@@ -53,6 +53,7 @@ Onboard me to this project at $CLAUDE_PROJECT_DIR.
 ## Why an Agent?
 
 The onboard process:
+
 - Requires multiple exploration steps
 - Should not pollute main context with codebase dumps
 - Returns a clean summary + creates the handoff

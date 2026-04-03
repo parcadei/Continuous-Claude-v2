@@ -36,7 +36,7 @@ async function main() {
     ".claude",
     "cache",
     "agentica-coordination",
-    "coordination.db"
+    "coordination.db",
   );
   if (!existsSync(dbPath)) {
     console.log(JSON.stringify({ result: "continue" }));
@@ -86,10 +86,14 @@ total_count = cursor.fetchone()[0]
 conn.close()
 print(json.dumps({'done': done_count, 'total': total_count}))
 `;
-    const result = spawnSync("python3", ["-c", query, dbPath, swarmId, agentId], {
-      encoding: "utf-8",
-      maxBuffer: 1024 * 1024
-    });
+    const result = spawnSync(
+      "python3",
+      ["-c", query, dbPath, swarmId, agentId],
+      {
+        encoding: "utf-8",
+        maxBuffer: 1024 * 1024,
+      },
+    );
     if (result.status !== 0) {
       console.error("SubagentStop Python error:", result.stderr);
       console.log(JSON.stringify({ result: "continue" }));
@@ -102,11 +106,14 @@ print(json.dumps({'done': done_count, 'total': total_count}))
       console.log(JSON.stringify({ result: "continue" }));
       return;
     }
-    console.error(`[subagent-stop] Agent ${agentId} done. Progress: ${counts.done}/${counts.total}`);
+    console.error(
+      `[subagent-stop] Agent ${agentId} done. Progress: ${counts.done}/${counts.total}`,
+    );
     if (counts.done >= counts.total && counts.total > 0) {
       const output = {
         result: "continue",
-        message: "All agents complete. Consider synthesizing findings into final report."
+        message:
+          "All agents complete. Consider synthesizing findings into final report.",
       };
       console.log(JSON.stringify(output));
     } else {

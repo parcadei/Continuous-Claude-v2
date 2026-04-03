@@ -12,15 +12,14 @@ Use this skill when working on connectedness problems in topology.
 
 ## Decision Tree
 
-
 1. **Is X connected?**
    - Strategy 1 - Contradiction:
-     * Assume X = U union V where U, V are disjoint, non-empty, and open
-     * Derive a contradiction
+     - Assume X = U union V where U, V are disjoint, non-empty, and open
+     - Derive a contradiction
    - Strategy 2 - Path connectedness:
-     * Show for all x,y in X, exists continuous path f: [0,1] -> X with f(0)=x, f(1)=y
+     - Show for all x,y in X, exists continuous path f: [0,1] -> X with f(0)=x, f(1)=y
    - Strategy 3 - Fan lemma:
-     * If {A_i} are connected sharing a common point, then union A_i is connected
+     - If {A_i} are connected sharing a common point, then union A_i is connected
 
 2. **Connectedness Proofs**
    - Show no separation exists
@@ -35,27 +34,29 @@ Use this skill when working on connectedness problems in topology.
    - Connected component: maximal connected subset containing x
    - Path component: maximal path-connected subset containing x
 
-
 ## Tool Commands
 
 ### Z3_No_Separation
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "no_separation"
 ```
 
 ### Sympy_Path
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py simplify "(1-t)*x + t*y"
 ```
 
 ### Z3_Ivt
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "intermediate_value"
 ```
 
 ## Key Techniques
 
-*From indexed textbooks:*
+_From indexed textbooks:_
 
 - [Introduction to Topological Manifolds... (Z-Library)] Connectedness One of the most important elementary facts about continuous functions is the intermediate value theorem: If f is a continuous real-valued function dened on a closed bounded interval [a, b], then f takes on every value be- tween f (a) and f (b). The key idea here is the “connectedness” of intervals. In this section we generalize this concept to topological spaces.
 - [Topology (Munkres, James Raymond) (Z-Library)] A b× lb× cb×0π1(A)×0π1(A)×0 156ConnectednessandCompactnessCh. DenetheunitballBninRnbytheequationBn={x|x≤1},wherex=(x1,. Theunitballispathconnected;givenanytwopointsxandyofBn,thestraight-linepathf:[0,1]→Rndenedbyf(t)=(1−t)x+tyliesinBn.

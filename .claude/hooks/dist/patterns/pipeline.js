@@ -26,94 +26,91 @@
  *   "output_dir": "/path/to/outputs"
  * }
  */
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
-import { spawn } from 'child_process';
-import { join, dirname } from 'path';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
+import { spawn } from "child_process";
+import { join, dirname } from "path";
 // Import shared utilities
-import { getDbPath, runPythonQuery, isValidId } from '../shared/db-utils.js';
+import { getDbPath, runPythonQuery, isValidId } from "../shared/db-utils.js";
 /**
  * Load pipeline config from JSON file.
  */
 function loadPipelineConfig() {
-    const configPath = process.env.PIPELINE_CONFIG_PATH;
-    if (!configPath || !existsSync(configPath)) {
-        return null;
-    }
-    try {
-        return JSON.parse(readFileSync(configPath, 'utf-8'));
-    }
-    catch (err) {
-        console.error('[pipeline] Failed to load config:', err);
-        return null;
-    }
+  const configPath = process.env.PIPELINE_CONFIG_PATH;
+  if (!configPath || !existsSync(configPath)) {
+    return null;
+  }
+  try {
+    return JSON.parse(readFileSync(configPath, "utf-8"));
+  } catch (err) {
+    console.error("[pipeline] Failed to load config:", err);
+    return null;
+  }
 }
 /**
  * Update pipeline config (e.g., current stage).
  */
 function savePipelineConfig(config) {
-    const configPath = process.env.PIPELINE_CONFIG_PATH;
-    if (!configPath)
-        return;
-    try {
-        const dir = dirname(configPath);
-        if (!existsSync(dir)) {
-            mkdirSync(dir, { recursive: true });
-        }
-        writeFileSync(configPath, JSON.stringify(config, null, 2));
+  const configPath = process.env.PIPELINE_CONFIG_PATH;
+  if (!configPath) return;
+  try {
+    const dir = dirname(configPath);
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
     }
-    catch (err) {
-        console.error('[pipeline] Failed to save config:', err);
-    }
+    writeFileSync(configPath, JSON.stringify(config, null, 2));
+  } catch (err) {
+    console.error("[pipeline] Failed to save config:", err);
+  }
 }
 /**
  * Spawn the next stage agent.
  * Runs detached so the current process can exit.
  */
 function spawnNextStage(config, nextIndex) {
-    const stage = config.stages[nextIndex];
-    if (!stage) {
-        console.error('[pipeline] No stage found at index', nextIndex);
-        return;
+  const stage = config.stages[nextIndex];
+  if (!stage) {
+    console.error("[pipeline] No stage found at index", nextIndex);
+    return;
+  }
+  const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  const configPath = process.env.PIPELINE_CONFIG_PATH;
+  // Build environment for next stage
+  const env = {
+    ...process.env,
+    PATTERN_TYPE: "pipeline",
+    PIPELINE_ID: config.id,
+    PIPELINE_STAGE_INDEX: nextIndex.toString(),
+    PIPELINE_TOTAL_STAGES: config.stages.length.toString(),
+    PIPELINE_CONFIG_PATH: configPath,
+  };
+  // Inject upstream context into prompt
+  let prompt = stage.prompt;
+  // Read previous stage output if available
+  if (nextIndex > 0) {
+    const prevStage = config.stages[nextIndex - 1];
+    const prevOutputPath =
+      prevStage.output_file ||
+      join(config.output_dir, `stage-${nextIndex - 1}-output.md`);
+    if (existsSync(prevOutputPath)) {
+      const prevOutput = readFileSync(prevOutputPath, "utf-8");
+      prompt = `## Previous Stage Output\n${prevOutput.slice(0, 8000)}\n\n---\n\n${prompt}`;
     }
-    const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-    const configPath = process.env.PIPELINE_CONFIG_PATH;
-    // Build environment for next stage
-    const env = {
-        ...process.env,
-        PATTERN_TYPE: 'pipeline',
-        PIPELINE_ID: config.id,
-        PIPELINE_STAGE_INDEX: nextIndex.toString(),
-        PIPELINE_TOTAL_STAGES: config.stages.length.toString(),
-        PIPELINE_CONFIG_PATH: configPath,
-    };
-    // Inject upstream context into prompt
-    let prompt = stage.prompt;
-    // Read previous stage output if available
-    if (nextIndex > 0) {
-        const prevStage = config.stages[nextIndex - 1];
-        const prevOutputPath = prevStage.output_file ||
-            join(config.output_dir, `stage-${nextIndex - 1}-output.md`);
-        if (existsSync(prevOutputPath)) {
-            const prevOutput = readFileSync(prevOutputPath, 'utf-8');
-            prompt = `## Previous Stage Output\n${prevOutput.slice(0, 8000)}\n\n---\n\n${prompt}`;
-        }
-    }
-    // Update config with current stage
-    config.current_stage = nextIndex;
-    savePipelineConfig(config);
-    console.error(`[pipeline] Spawning stage ${nextIndex + 1}/${config.stages.length}: ${stage.agent}`);
-    // Spawn claude with the agent
-    const child = spawn('claude', [
-        '-p', prompt,
-        '--agent', stage.agent,
-    ], {
-        env,
-        cwd: projectDir,
-        detached: true,
-        stdio: 'ignore',
-    });
-    // Unref so parent can exit
-    child.unref();
+  }
+  // Update config with current stage
+  config.current_stage = nextIndex;
+  savePipelineConfig(config);
+  console.error(
+    `[pipeline] Spawning stage ${nextIndex + 1}/${config.stages.length}: ${stage.agent}`,
+  );
+  // Spawn claude with the agent
+  const child = spawn("claude", ["-p", prompt, "--agent", stage.agent], {
+    env,
+    cwd: projectDir,
+    detached: true,
+    stdio: "ignore",
+  });
+  // Unref so parent can exit
+  child.unref();
 }
 // =============================================================================
 // onSubagentStart Handler
@@ -124,34 +121,37 @@ function spawnNextStage(config, nextIndex) {
  * Always returns 'continue' - never blocks agent start.
  */
 export async function onSubagentStart(input) {
-    const pipelineId = process.env.PIPELINE_ID;
-    // If no PIPELINE_ID, continue silently (not in a pipeline)
-    if (!pipelineId) {
-        return { result: 'continue' };
-    }
-    // Validate PIPELINE_ID format
-    if (!isValidId(pipelineId)) {
-        return { result: 'continue' };
-    }
-    const stageIndex = parseInt(process.env.PIPELINE_STAGE_INDEX || '0', 10);
-    const totalStages = parseInt(process.env.PIPELINE_TOTAL_STAGES || '1', 10);
-    // Log for debugging - this goes to stderr, not stdout
-    console.error(`[pipeline] Stage ${stageIndex} of ${totalStages} starting for pipeline ${pipelineId}`);
-    // Inject stage context message
-    let message = `You are Stage ${stageIndex + 1} of ${totalStages} in a pipeline.`;
-    if (stageIndex === 0) {
-        message += ' This is the first stage. Process the initial input and pass your output to the next stage.';
-    }
-    else if (stageIndex === totalStages - 1) {
-        message += ' This is the final stage. Process the upstream outputs and produce the final result.';
-    }
-    else {
-        message += ' Process the upstream outputs and pass your results to the next stage.';
-    }
-    return {
-        result: 'continue',
-        message
-    };
+  const pipelineId = process.env.PIPELINE_ID;
+  // If no PIPELINE_ID, continue silently (not in a pipeline)
+  if (!pipelineId) {
+    return { result: "continue" };
+  }
+  // Validate PIPELINE_ID format
+  if (!isValidId(pipelineId)) {
+    return { result: "continue" };
+  }
+  const stageIndex = parseInt(process.env.PIPELINE_STAGE_INDEX || "0", 10);
+  const totalStages = parseInt(process.env.PIPELINE_TOTAL_STAGES || "1", 10);
+  // Log for debugging - this goes to stderr, not stdout
+  console.error(
+    `[pipeline] Stage ${stageIndex} of ${totalStages} starting for pipeline ${pipelineId}`,
+  );
+  // Inject stage context message
+  let message = `You are Stage ${stageIndex + 1} of ${totalStages} in a pipeline.`;
+  if (stageIndex === 0) {
+    message +=
+      " This is the first stage. Process the initial input and pass your output to the next stage.";
+  } else if (stageIndex === totalStages - 1) {
+    message +=
+      " This is the final stage. Process the upstream outputs and produce the final result.";
+  } else {
+    message +=
+      " Process the upstream outputs and pass your results to the next stage.";
+  }
+  return {
+    result: "continue",
+    message,
+  };
 }
 // =============================================================================
 // onSubagentStop Handler
@@ -162,29 +162,29 @@ export async function onSubagentStart(input) {
  * Injects next stage or completion message.
  */
 export async function onSubagentStop(input) {
-    const pipelineId = process.env.PIPELINE_ID;
-    // If no PIPELINE_ID, continue silently
-    if (!pipelineId) {
-        return { result: 'continue' };
-    }
-    // Validate PIPELINE_ID format
-    if (!isValidId(pipelineId)) {
-        return { result: 'continue' };
-    }
-    const agentId = input.agent_id ?? 'unknown';
-    // Validate agent_id format
-    if (!isValidId(agentId)) {
-        return { result: 'continue' };
-    }
-    const stageIndex = parseInt(process.env.PIPELINE_STAGE_INDEX || '0', 10);
-    const totalStages = parseInt(process.env.PIPELINE_TOTAL_STAGES || '1', 10);
-    const dbPath = getDbPath();
-    if (!existsSync(dbPath)) {
-        return { result: 'continue' };
-    }
-    try {
-        // Mark stage as completed and check pipeline progress
-        const query = `
+  const pipelineId = process.env.PIPELINE_ID;
+  // If no PIPELINE_ID, continue silently
+  if (!pipelineId) {
+    return { result: "continue" };
+  }
+  // Validate PIPELINE_ID format
+  if (!isValidId(pipelineId)) {
+    return { result: "continue" };
+  }
+  const agentId = input.agent_id ?? "unknown";
+  // Validate agent_id format
+  if (!isValidId(agentId)) {
+    return { result: "continue" };
+  }
+  const stageIndex = parseInt(process.env.PIPELINE_STAGE_INDEX || "0", 10);
+  const totalStages = parseInt(process.env.PIPELINE_TOTAL_STAGES || "1", 10);
+  const dbPath = getDbPath();
+  if (!existsSync(dbPath)) {
+    return { result: "continue" };
+  }
+  try {
+    // Mark stage as completed and check pipeline progress
+    const query = `
 import sqlite3
 import json
 import sys
@@ -236,52 +236,57 @@ completed_count = cursor.fetchone()[0]
 conn.close()
 print(json.dumps({'completed': completed_count}))
 `;
-        const result = runPythonQuery(query, [dbPath, pipelineId, stageIndex.toString(), agentId]);
-        if (!result.success) {
-            console.error('SubagentStop Python error:', result.stderr);
-            return { result: 'continue' };
-        }
-        // Parse Python output
-        let counts;
-        try {
-            counts = JSON.parse(result.stdout);
-        }
-        catch (parseErr) {
-            return { result: 'continue' };
-        }
-        // Log for debugging
-        console.error(`[pipeline] Stage ${stageIndex} done. Progress: ${counts.completed}/${totalStages}`);
-        // Check if this is the final stage
-        if (stageIndex === totalStages - 1) {
-            return {
-                result: 'continue',
-                message: 'Pipeline complete! All stages have finished execution. Review the final output.'
-            };
-        }
-        // AUTO-SPAWN: Load config and spawn next stage
-        const nextIndex = stageIndex + 1;
-        const config = loadPipelineConfig();
-        if (config && nextIndex < config.stages.length) {
-            // Spawn next stage in detached process
-            spawnNextStage(config, nextIndex);
-            return {
-                result: 'continue',
-                message: `Stage ${stageIndex + 1} complete. Auto-spawning stage ${nextIndex + 1}/${totalStages}: ${config.stages[nextIndex].agent}`
-            };
-        }
-        else if (!config) {
-            // No config - manual mode, just report progress
-            return {
-                result: 'continue',
-                message: `Stage ${stageIndex + 1} complete. Pipeline progress: ${counts.completed}/${totalStages}. No config found for auto-spawn - proceed manually.`
-            };
-        }
-        return { result: 'continue' };
+    const result = runPythonQuery(query, [
+      dbPath,
+      pipelineId,
+      stageIndex.toString(),
+      agentId,
+    ]);
+    if (!result.success) {
+      console.error("SubagentStop Python error:", result.stderr);
+      return { result: "continue" };
     }
-    catch (err) {
-        console.error('SubagentStop hook error:', err);
-        return { result: 'continue' };
+    // Parse Python output
+    let counts;
+    try {
+      counts = JSON.parse(result.stdout);
+    } catch (parseErr) {
+      return { result: "continue" };
     }
+    // Log for debugging
+    console.error(
+      `[pipeline] Stage ${stageIndex} done. Progress: ${counts.completed}/${totalStages}`,
+    );
+    // Check if this is the final stage
+    if (stageIndex === totalStages - 1) {
+      return {
+        result: "continue",
+        message:
+          "Pipeline complete! All stages have finished execution. Review the final output.",
+      };
+    }
+    // AUTO-SPAWN: Load config and spawn next stage
+    const nextIndex = stageIndex + 1;
+    const config = loadPipelineConfig();
+    if (config && nextIndex < config.stages.length) {
+      // Spawn next stage in detached process
+      spawnNextStage(config, nextIndex);
+      return {
+        result: "continue",
+        message: `Stage ${stageIndex + 1} complete. Auto-spawning stage ${nextIndex + 1}/${totalStages}: ${config.stages[nextIndex].agent}`,
+      };
+    } else if (!config) {
+      // No config - manual mode, just report progress
+      return {
+        result: "continue",
+        message: `Stage ${stageIndex + 1} complete. Pipeline progress: ${counts.completed}/${totalStages}. No config found for auto-spawn - proceed manually.`,
+      };
+    }
+    return { result: "continue" };
+  } catch (err) {
+    console.error("SubagentStop hook error:", err);
+    return { result: "continue" };
+  }
 }
 // =============================================================================
 // onPreToolUse Handler
@@ -292,27 +297,27 @@ print(json.dumps({'completed': completed_count}))
  * Allows all tools (no blocking).
  */
 export async function onPreToolUse(input) {
-    const pipelineId = process.env.PIPELINE_ID;
-    // If no PIPELINE_ID, continue silently
-    if (!pipelineId) {
-        return { result: 'continue' };
-    }
-    // Validate PIPELINE_ID format
-    if (!isValidId(pipelineId)) {
-        return { result: 'continue' };
-    }
-    const stageIndex = parseInt(process.env.PIPELINE_STAGE_INDEX || '0', 10);
-    const dbPath = getDbPath();
-    // First stage has no upstream artifacts
-    if (stageIndex === 0) {
-        return { result: 'continue' };
-    }
-    if (!existsSync(dbPath)) {
-        return { result: 'continue' };
-    }
-    try {
-        // Fetch upstream stage outputs
-        const query = `
+  const pipelineId = process.env.PIPELINE_ID;
+  // If no PIPELINE_ID, continue silently
+  if (!pipelineId) {
+    return { result: "continue" };
+  }
+  // Validate PIPELINE_ID format
+  if (!isValidId(pipelineId)) {
+    return { result: "continue" };
+  }
+  const stageIndex = parseInt(process.env.PIPELINE_STAGE_INDEX || "0", 10);
+  const dbPath = getDbPath();
+  // First stage has no upstream artifacts
+  if (stageIndex === 0) {
+    return { result: "continue" };
+  }
+  if (!existsSync(dbPath)) {
+    return { result: "continue" };
+  }
+  try {
+    // Fetch upstream stage outputs
+    const query = `
 import sqlite3
 import json
 import sys
@@ -344,36 +349,38 @@ for row in cursor.fetchall():
 conn.close()
 print(json.dumps({'upstream': upstream}))
 `;
-        const result = runPythonQuery(query, [dbPath, pipelineId, stageIndex.toString()]);
-        if (!result.success) {
-            return { result: 'continue' };
-        }
-        // Parse Python output
-        let data;
-        try {
-            data = JSON.parse(result.stdout);
-        }
-        catch (parseErr) {
-            return { result: 'continue' };
-        }
-        // Inject upstream outputs as context
-        if (data.upstream.length > 0) {
-            let message = 'UPSTREAM STAGE OUTPUTS:\n';
-            for (const stage of data.upstream) {
-                message += `\nStage ${stage.stage + 1}: ${stage.output || '(no output recorded)'}\n`;
-            }
-            message += '\nUse these outputs to inform your stage processing.';
-            return {
-                result: 'continue',
-                message
-            };
-        }
-        return { result: 'continue' };
+    const result = runPythonQuery(query, [
+      dbPath,
+      pipelineId,
+      stageIndex.toString(),
+    ]);
+    if (!result.success) {
+      return { result: "continue" };
     }
-    catch (err) {
-        console.error('PreToolUse hook error:', err);
-        return { result: 'continue' };
+    // Parse Python output
+    let data;
+    try {
+      data = JSON.parse(result.stdout);
+    } catch (parseErr) {
+      return { result: "continue" };
     }
+    // Inject upstream outputs as context
+    if (data.upstream.length > 0) {
+      let message = "UPSTREAM STAGE OUTPUTS:\n";
+      for (const stage of data.upstream) {
+        message += `\nStage ${stage.stage + 1}: ${stage.output || "(no output recorded)"}\n`;
+      }
+      message += "\nUse these outputs to inform your stage processing.";
+      return {
+        result: "continue",
+        message,
+      };
+    }
+    return { result: "continue" };
+  } catch (err) {
+    console.error("PreToolUse hook error:", err);
+    return { result: "continue" };
+  }
 }
 // =============================================================================
 // onPostToolUse Handler
@@ -383,8 +390,8 @@ print(json.dumps({'upstream': upstream}))
  * Currently no-op for pipeline pattern.
  */
 export async function onPostToolUse(input) {
-    // No special handling needed for pipeline pattern
-    return { result: 'continue' };
+  // No special handling needed for pipeline pattern
+  return { result: "continue" };
 }
 // =============================================================================
 // onStop Handler
@@ -395,26 +402,26 @@ export async function onPostToolUse(input) {
  * Does not block - pipeline stages are sequential, not parallel.
  */
 export async function onStop(input) {
-    // Prevent infinite loops - if we're already in a stop hook, continue
-    if (input.stop_hook_active) {
-        return { result: 'continue' };
-    }
-    const pipelineId = process.env.PIPELINE_ID;
-    if (!pipelineId) {
-        return { result: 'continue' };
-    }
-    // Validate PIPELINE_ID format
-    if (!isValidId(pipelineId)) {
-        return { result: 'continue' };
-    }
-    const totalStages = parseInt(process.env.PIPELINE_TOTAL_STAGES || '0', 10);
-    const dbPath = getDbPath();
-    if (!existsSync(dbPath)) {
-        return { result: 'continue' };
-    }
-    try {
-        // Query pipeline status
-        const query = `
+  // Prevent infinite loops - if we're already in a stop hook, continue
+  if (input.stop_hook_active) {
+    return { result: "continue" };
+  }
+  const pipelineId = process.env.PIPELINE_ID;
+  if (!pipelineId) {
+    return { result: "continue" };
+  }
+  // Validate PIPELINE_ID format
+  if (!isValidId(pipelineId)) {
+    return { result: "continue" };
+  }
+  const totalStages = parseInt(process.env.PIPELINE_TOTAL_STAGES || "0", 10);
+  const dbPath = getDbPath();
+  if (!existsSync(dbPath)) {
+    return { result: "continue" };
+  }
+  try {
+    // Query pipeline status
+    const query = `
 import sqlite3
 import json
 import sys
@@ -453,40 +460,37 @@ for row in cursor.fetchall():
 conn.close()
 print(json.dumps({'completed': completed_count, 'stages': stages}))
 `;
-        const result = runPythonQuery(query, [dbPath, pipelineId]);
-        if (!result.success) {
-            return { result: 'continue' };
-        }
-        // Parse Python output
-        let data;
-        try {
-            data = JSON.parse(result.stdout);
-        }
-        catch (parseErr) {
-            return { result: 'continue' };
-        }
-        // Provide status summary
-        let message = `Pipeline Status: ${data.completed}/${totalStages} stages completed.\n\n`;
-        if (data.stages.length > 0) {
-            message += 'STAGE STATUS:\n';
-            for (const stage of data.stages) {
-                const statusSymbol = stage.status === 'completed' ? '✓' : '○';
-                message += `${statusSymbol} Stage ${stage.index + 1}: ${stage.status}\n`;
-            }
-        }
-        if (data.completed >= totalStages) {
-            message += '\nAll stages complete!';
-        }
-        else {
-            message += `\n${totalStages - data.completed} stage(s) remaining.`;
-        }
-        return {
-            result: 'continue',
-            message
-        };
+    const result = runPythonQuery(query, [dbPath, pipelineId]);
+    if (!result.success) {
+      return { result: "continue" };
     }
-    catch (err) {
-        console.error('Stop hook error:', err);
-        return { result: 'continue' };
+    // Parse Python output
+    let data;
+    try {
+      data = JSON.parse(result.stdout);
+    } catch (parseErr) {
+      return { result: "continue" };
     }
+    // Provide status summary
+    let message = `Pipeline Status: ${data.completed}/${totalStages} stages completed.\n\n`;
+    if (data.stages.length > 0) {
+      message += "STAGE STATUS:\n";
+      for (const stage of data.stages) {
+        const statusSymbol = stage.status === "completed" ? "✓" : "○";
+        message += `${statusSymbol} Stage ${stage.index + 1}: ${stage.status}\n`;
+      }
+    }
+    if (data.completed >= totalStages) {
+      message += "\nAll stages complete!";
+    } else {
+      message += `\n${totalStages - data.completed} stage(s) remaining.`;
+    }
+    return {
+      result: "continue",
+      message,
+    };
+  } catch (err) {
+    console.error("Stop hook error:", err);
+    return { result: "continue" };
+  }
 }

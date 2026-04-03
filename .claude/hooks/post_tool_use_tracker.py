@@ -289,7 +289,7 @@ def main() -> None:
     except json.JSONDecodeError:
         tool_info = {}
 
-    result = process_tool_use(tool_info)
+    process_tool_use(tool_info)
 
     # Always exit 0 (don't break the hook chain)
     sys.exit(0)

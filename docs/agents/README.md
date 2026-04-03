@@ -4,31 +4,32 @@ This guide helps you choose the right agent for your task and understand how to 
 
 ## Quick Selection
 
-| I want to... | Use Agent | Alternative |
-|--------------|-----------|-------------|
-| Understand the codebase | scout | research-codebase |
-| Research best practices | oracle | - |
-| Design a new feature | architect | plan-agent |
-| Plan a refactoring | phoenix | - |
-| Validate a plan | plan-reviewer | validate-agent |
-| Implement with tests | kraken | - |
-| Make a quick fix | spark | - |
-| Debug an issue | sleuth | debug-agent |
-| Run unit tests | arbiter | - |
-| Run E2E tests | atlas | - |
-| Review feature code | critic | - |
-| Review refactoring | judge | - |
-| Review migration | surveyor | - |
-| Audit security | aegis | - |
-| Prepare a release | herald | - |
-| Create handoff docs | scribe | - |
-| Orchestrate complex work | maestro | - |
+| I want to...             | Use Agent     | Alternative       |
+| ------------------------ | ------------- | ----------------- |
+| Understand the codebase  | scout         | research-codebase |
+| Research best practices  | oracle        | -                 |
+| Design a new feature     | architect     | plan-agent        |
+| Plan a refactoring       | phoenix       | -                 |
+| Validate a plan          | plan-reviewer | validate-agent    |
+| Implement with tests     | kraken        | -                 |
+| Make a quick fix         | spark         | -                 |
+| Debug an issue           | sleuth        | debug-agent       |
+| Run unit tests           | arbiter       | -                 |
+| Run E2E tests            | atlas         | -                 |
+| Review feature code      | critic        | -                 |
+| Review refactoring       | judge         | -                 |
+| Review migration         | surveyor      | -                 |
+| Audit security           | aegis         | -                 |
+| Prepare a release        | herald        | -                 |
+| Create handoff docs      | scribe        | -                 |
+| Orchestrate complex work | maestro       | -                 |
 
 ## Agent Categories
 
 ### 1. Orchestrators
 
 #### maestro
+
 - **Model:** Opus
 - **Purpose:** Coordinate multiple agents for complex multi-phase work
 - **When to use:** Task requires multiple agents in sequence or parallel
@@ -40,6 +41,7 @@ This guide helps you choose the right agent for your task and understand how to 
   - **Jury:** Majority vote (critic₁ + critic₂ + critic₃ → decision)
 
 **Example:**
+
 ```
 Task: "Design and implement user authentication"
 maestro decomposes into:
@@ -52,6 +54,7 @@ maestro decomposes into:
 ```
 
 #### kraken
+
 - **Model:** Opus
 - **Purpose:** Implementation using strict TDD workflow
 - **When to use:** Need to implement with test-first discipline
@@ -63,6 +66,7 @@ maestro decomposes into:
 - **Checkpoints:** `thoughts/shared/handoffs/<task>/current.md`
 
 **Example:**
+
 ```
 /build tdd "user registration endpoint"
 → kraken writes failing test
@@ -74,6 +78,7 @@ maestro decomposes into:
 ### 2. Planners
 
 #### architect
+
 - **Model:** Opus
 - **Purpose:** Feature planning + API integration planning
 - **When to use:**
@@ -89,6 +94,7 @@ maestro decomposes into:
   - Integration plan (for APIs): auth strategies, error handling matrix, resilience patterns
 
 **Example:**
+
 ```
 Task: "Plan GitHub API integration"
 architect produces:
@@ -99,6 +105,7 @@ architect produces:
 ```
 
 #### phoenix
+
 - **Model:** Opus
 - **Purpose:** Refactoring planning + framework migration planning
 - **When to use:**
@@ -115,6 +122,7 @@ architect produces:
   - Codemods for automated transformation
 
 **Example:**
+
 ```
 Task: "Migrate from React Class components to Hooks"
 phoenix produces:
@@ -126,6 +134,7 @@ phoenix produces:
 ```
 
 #### plan-agent
+
 - **Model:** Opus
 - **Purpose:** Lightweight planning with research and codebase analysis
 - **When to use:** Need a plan with external research (docs, best practices)
@@ -133,6 +142,7 @@ phoenix produces:
 - **Output:** `.claude/cache/agents/plan-agent/latest-output.md`
 
 **Example:**
+
 ```
 Task: "Plan rate limiting for API"
 plan-agent:
@@ -142,6 +152,7 @@ plan-agent:
 ```
 
 #### validate-agent
+
 - **Model:** (not specified)
 - **Purpose:** Validate plans against best practices and codebase
 - **When to use:** After creating a plan, before implementation
@@ -154,6 +165,7 @@ plan-agent:
 ### 3. Explorers
 
 #### scout
+
 - **Model:** Sonnet
 - **Purpose:** Comprehensive codebase exploration and pattern finding
 - **When to use:** Need to understand project structure, find conventions, map architecture
@@ -168,6 +180,7 @@ plan-agent:
 **Use scout instead of Explore.** Scout uses Sonnet with a 197-line detailed prompt and produces accurate results. Explore used Haiku and was less accurate.
 
 **Example:**
+
 ```
 Task: "Find all authentication patterns in codebase"
 scout:
@@ -178,6 +191,7 @@ scout:
 ```
 
 #### oracle
+
 - **Model:** Opus
 - **Purpose:** External research (web, docs, APIs)
 - **When to use:** Need best practices, library documentation, or external knowledge
@@ -189,6 +203,7 @@ scout:
   - Compares alternatives
 
 **Example:**
+
 ```
 Task: "Research best practices for async Python error handling"
 oracle:
@@ -199,6 +214,7 @@ oracle:
 ```
 
 #### pathfinder
+
 - **Model:** Opus
 - **Purpose:** Analyze external repositories
 - **When to use:** Need to understand how another project solves a problem
@@ -210,6 +226,7 @@ oracle:
 - **Output:** `.claude/cache/agents/pathfinder/latest-output.md`
 
 **Example:**
+
 ```
 Task: "How does FastAPI handle dependency injection?"
 pathfinder:
@@ -220,6 +237,7 @@ pathfinder:
 ```
 
 #### research-codebase
+
 - **Model:** (spawns sub-agents)
 - **Purpose:** Document codebase as-is without evaluation
 - **When to use:** Need comprehensive technical documentation
@@ -237,6 +255,7 @@ pathfinder:
 #### kraken (see Orchestrators above)
 
 #### spark
+
 - **Model:** Sonnet
 - **Purpose:** Lightweight fixes and quick tweaks
 - **When to use:** Small, focused changes without TDD overhead
@@ -245,6 +264,7 @@ pathfinder:
 - **Knows limits:** Escalates to kraken if scope grows
 
 **Example:**
+
 ```
 Task: "Fix typo in error message"
 spark:
@@ -255,6 +275,7 @@ spark:
 ```
 
 #### agentica-agent
+
 - **Model:** Sonnet
 - **Purpose:** Build Python agents using Agentica SDK
 - **When to use:** Implementing Python agents with agentic functions, spawn, or custom agent classes
@@ -268,6 +289,7 @@ spark:
 ### 5. Debuggers
 
 #### sleuth
+
 - **Model:** Opus
 - **Purpose:** General bug investigation and root cause analysis
 - **When to use:** Need to investigate issues and identify root causes
@@ -280,6 +302,7 @@ spark:
 - **Output:** `.claude/cache/agents/sleuth/latest-output.md`
 
 **Example:**
+
 ```
 Task: "Login fails silently"
 sleuth:
@@ -291,6 +314,7 @@ sleuth:
 ```
 
 #### debug-agent
+
 - **Model:** Opus
 - **Purpose:** Issue investigation via logs/code search with MCP tools
 - **When to use:** Need debugging with access to MCP tools and external docs
@@ -300,6 +324,7 @@ sleuth:
 **Similar to sleuth but with MCP tool access.**
 
 #### profiler
+
 - **Model:** Opus
 - **Purpose:** Performance profiling, race conditions, memory issues
 - **When to use:** Need to identify bottlenecks, concurrency issues, or memory leaks
@@ -317,6 +342,7 @@ sleuth:
 ### 6. Validators
 
 #### arbiter
+
 - **Model:** Opus
 - **Purpose:** Unit and integration test execution and validation
 - **When to use:** Need to run tests, analyze failures, validate acceptance criteria
@@ -329,6 +355,7 @@ sleuth:
 - **Output:** `.claude/cache/agents/arbiter/latest-output.md`
 
 **Example:**
+
 ```
 Task: "Run tests and validate auth feature"
 arbiter:
@@ -340,6 +367,7 @@ arbiter:
 ```
 
 #### atlas
+
 - **Model:** Opus
 - **Purpose:** End-to-end and acceptance test execution
 - **When to use:** Need to run E2E tests, browser automation, full-stack validation
@@ -354,6 +382,7 @@ arbiter:
 ### 7. Reviewers
 
 #### critic
+
 - **Model:** Sonnet
 - **Purpose:** Feature and implementation code review
 - **When to use:** Need code quality review for features or implementations
@@ -367,6 +396,7 @@ arbiter:
 - **Output:** `.claude/cache/agents/critic/latest-output.md`
 
 **Example:**
+
 ```
 Task: "Review auth implementation"
 critic:
@@ -377,6 +407,7 @@ critic:
 ```
 
 #### judge
+
 - **Model:** Sonnet
 - **Purpose:** Refactoring and code transformation review
 - **When to use:** Verify refactoring preserves behavior and improves quality
@@ -389,6 +420,7 @@ critic:
 - **Output:** `.claude/cache/agents/judge/latest-output.md`
 
 #### surveyor
+
 - **Model:** Sonnet
 - **Purpose:** Migration and upgrade review
 - **When to use:** Verify migrations are complete, safe, and consistent
@@ -403,6 +435,7 @@ critic:
 - **Output:** `.claude/cache/agents/surveyor/latest-output.md`
 
 #### liaison
+
 - **Model:** Sonnet
 - **Purpose:** Integration and API review
 - **When to use:** Verify integrations are robust, secure, and resilient
@@ -417,6 +450,7 @@ critic:
 - **Output:** `.claude/cache/agents/liaison/latest-output.md`
 
 #### plan-reviewer
+
 - **Model:** Sonnet
 - **Purpose:** Reviews feature plans and change plans before implementation
 - **When to use:** After architect or phoenix creates a plan
@@ -434,6 +468,7 @@ critic:
 - **Output:** `.claude/cache/agents/plan-reviewer/latest-output.md`
 
 #### review-agent
+
 - **Model:** Opus
 - **Purpose:** Compare plan (intent) vs session (reality) vs git diff (changes)
 - **When to use:** After implementation, verify code matches plan
@@ -450,6 +485,7 @@ critic:
 ### 8. Specialized
 
 #### aegis
+
 - **Model:** Opus
 - **Purpose:** Security vulnerability analysis and audits
 - **When to use:** Need to identify vulnerabilities, analyze security risks
@@ -464,6 +500,7 @@ critic:
 - **Produces:** Risk-prioritized findings with remediation steps
 
 #### herald
+
 - **Model:** Sonnet
 - **Purpose:** Release prep, version bumps, changelog generation
 - **When to use:** Need to prepare releases, update versions, generate changelogs
@@ -479,6 +516,7 @@ critic:
 - **Produces:** Release notes with breaking change migrations
 
 #### scribe
+
 - **Model:** Sonnet
 - **Purpose:** Documentation, handoffs, session summaries, ledger management
 - **When to use:** Need to document work, create handoffs, update ledgers
@@ -489,6 +527,7 @@ critic:
 - **Follows:** create_handoff and continuity_ledger skill methodologies
 
 #### chronicler
+
 - **Model:** Opus
 - **Purpose:** Session analysis, precedent lookup, learning extraction
 - **When to use:** Need to analyze past sessions or find relevant precedent
@@ -502,24 +541,28 @@ critic:
   - Recommendations based on history
 
 #### session-analyst
+
 - **Model:** Opus
 - **Purpose:** Analyze Claude Code sessions via Braintrust
 - **When to use:** Need to analyze session data from Braintrust
 - **Output:** `.claude/cache/agents/session-analyst/latest-output.md`
 
 #### braintrust-analyst
+
 - **Model:** (not specified)
 - **Purpose:** Execute Braintrust analysis scripts
 - **When to use:** Need to run analysis scripts
 - **Output:** `.claude/cache/agents/braintrust-analyst/latest-output.md`
 
 #### memory-extractor
+
 - **Model:** (not specified)
 - **Purpose:** Extract learnings from sessions for storage
 - **When to use:** After completing work, extract learnings for memory system
 - **Output:** Learnings stored in archival_memory table
 
 #### onboard
+
 - **Model:** Sonnet
 - **Purpose:** Analyze brownfield codebase and create initial continuity ledger
 - **When to use:** Starting work on an existing project for the first time
@@ -531,6 +574,7 @@ critic:
 - **Output:** `thoughts/ledgers/CONTINUITY_CLAUDE-<session>.md`
 
 #### context-query-agent
+
 - **Model:** (not specified)
 - **Purpose:** Query Artifact Index to find relevant precedent
 - **When to use:** Need to find past work related to current task
@@ -541,39 +585,49 @@ critic:
 ## Agent Composition Patterns
 
 ### Linear Pipeline
+
 ```
 scout → architect → plan-reviewer → kraken → arbiter → scribe
 ```
+
 **When:** Each phase depends on previous output
 **Example:** Feature development with research
 
 ### Parallel Research
+
 ```
 scout ─┐
        ├─→ synthesize → architect
 oracle ┘
 ```
+
 **When:** Independent research streams
 **Example:** Gather internal patterns + external best practices
 
 ### Iterative Refinement
+
 ```
 architect → critic → architect (revised) → plan-reviewer
 ```
+
 **When:** Need peer review during planning
 **Example:** Complex feature with high stakes
 
 ### Test-Fix Loop
+
 ```
 arbiter → (failures) → spark → arbiter → (pass) → scribe
 ```
+
 **When:** Fixing test failures
 **Example:** CI/CD pipeline failures
 
 ### Full Validation Chain
+
 ```
 kraken → review-agent → arbiter → judge/critic → scribe
 ```
+
 **When:** Need comprehensive validation
 **Example:** Production-critical feature
 
@@ -628,38 +682,48 @@ What needs validation?
 ## Best Practices
 
 ### 1. Choose the Right Model
+
 - **Sonnet agents** (faster, cheaper): scout, spark, critic, judge, surveyor, liaison, scribe, herald, onboard, agentica-agent
 - **Opus agents** (thorough, expensive): oracle, pathfinder, architect, phoenix, kraken, arbiter, sleuth, profiler, aegis, maestro, atlas, chronicler
 
 **Rule:** Use Sonnet for routine tasks, Opus for complex/critical work.
 
 ### 2. Scout, Not Explore
+
 Always use `scout` for codebase exploration. The deprecated `Explore` agent used Haiku and produced inaccurate results.
 
 ### 3. Plan Before Implementing
+
 ```
 WRONG: /build greenfield "feature" → kraken (no plan)
 RIGHT: /build greenfield "feature" → architect → plan-reviewer → kraken
 ```
 
 ### 4. Validate Plans
+
 Always run `plan-reviewer` or `validate-agent` after creating a plan. Catches issues before implementation.
 
 ### 5. Use Maestro for Complexity
+
 Don't manually chain 5+ agents. Let maestro orchestrate:
+
 ```
 WRONG: scout → oracle → architect → plan-reviewer → kraken (manual)
 RIGHT: maestro "Design and implement auth system" (automatic)
 ```
 
 ### 6. Check Output Files
+
 Always read the agent's output file, don't just rely on the summary:
+
 ```bash
 cat .claude/cache/agents/scout/latest-output.md
 ```
 
 ### 7. Resume Kraken Sessions
+
 Kraken supports checkpoints. If context clears mid-implementation:
+
 ```
 Task(
     prompt="Continue user registration implementation",
@@ -669,9 +733,11 @@ Task(
 ```
 
 ### 8. Cite Sources in Reviews
+
 All review agents (critic, judge, surveyor, liaison) should reference specific files and line numbers.
 
 ### 9. Spark for Small, Kraken for Big
+
 ```
 Typo fix → spark
 New feature → kraken
@@ -680,61 +746,68 @@ API implementation → kraken
 ```
 
 ### 10. Validate After Implementation
+
 ```
 kraken (implement) → review-agent (verify) → arbiter (test)
 ```
 
 ## Agent Models Summary
 
-| Agent | Model | Speed | Cost | When to Use |
-|-------|-------|-------|------|-------------|
-| scout | Sonnet | Fast | Low | Routine exploration |
-| oracle | Opus | Slow | High | Critical research |
-| architect | Opus | Slow | High | Feature planning |
-| phoenix | Opus | Slow | High | Refactoring planning |
-| plan-agent | Opus | Slow | High | Research-backed planning |
-| kraken | Opus | Slow | High | Implementation |
-| spark | Sonnet | Fast | Low | Quick fixes |
-| sleuth | Opus | Slow | High | Bug investigation |
-| profiler | Opus | Slow | High | Performance analysis |
-| arbiter | Opus | Slow | High | Test execution |
-| atlas | Opus | Slow | High | E2E tests |
-| critic | Sonnet | Fast | Low | Code review |
-| judge | Sonnet | Fast | Low | Refactoring review |
-| surveyor | Sonnet | Fast | Low | Migration review |
-| liaison | Sonnet | Fast | Low | Integration review |
-| plan-reviewer | Sonnet | Fast | Low | Plan validation |
-| review-agent | Opus | Slow | High | Implementation verification |
-| scribe | Sonnet | Fast | Low | Documentation |
-| herald | Sonnet | Fast | Low | Release prep |
-| aegis | Opus | Slow | High | Security audit |
-| maestro | Opus | Slow | High | Orchestration |
+| Agent         | Model  | Speed | Cost | When to Use                 |
+| ------------- | ------ | ----- | ---- | --------------------------- |
+| scout         | Sonnet | Fast  | Low  | Routine exploration         |
+| oracle        | Opus   | Slow  | High | Critical research           |
+| architect     | Opus   | Slow  | High | Feature planning            |
+| phoenix       | Opus   | Slow  | High | Refactoring planning        |
+| plan-agent    | Opus   | Slow  | High | Research-backed planning    |
+| kraken        | Opus   | Slow  | High | Implementation              |
+| spark         | Sonnet | Fast  | Low  | Quick fixes                 |
+| sleuth        | Opus   | Slow  | High | Bug investigation           |
+| profiler      | Opus   | Slow  | High | Performance analysis        |
+| arbiter       | Opus   | Slow  | High | Test execution              |
+| atlas         | Opus   | Slow  | High | E2E tests                   |
+| critic        | Sonnet | Fast  | Low  | Code review                 |
+| judge         | Sonnet | Fast  | Low  | Refactoring review          |
+| surveyor      | Sonnet | Fast  | Low  | Migration review            |
+| liaison       | Sonnet | Fast  | Low  | Integration review          |
+| plan-reviewer | Sonnet | Fast  | Low  | Plan validation             |
+| review-agent  | Opus   | Slow  | High | Implementation verification |
+| scribe        | Sonnet | Fast  | Low  | Documentation               |
+| herald        | Sonnet | Fast  | Low  | Release prep                |
+| aegis         | Opus   | Slow  | High | Security audit              |
+| maestro       | Opus   | Slow  | High | Orchestration               |
 
 ## Troubleshooting
 
 ### Agent fails with "context too large"
+
 - **Cause:** Agent trying to read too many files
 - **Fix:** Use scout to narrow scope first, then spawn specific agent
 
 ### Agent produces inaccurate results
+
 - **Cause:** Using wrong model (e.g., Explore instead of Scout)
 - **Fix:** Check agent model in `.claude/agents/<agent>.md`
 
 ### Agent doesn't have access to tool
+
 - **Cause:** Agent definition missing tool in tools list
 - **Fix:** Update agent prompt in `.claude/agents/<agent>.md`
 
 ### Kraken checkpoint not found
+
 - **Cause:** Checkpoint file moved or renamed
 - **Fix:** Check `thoughts/shared/handoffs/<task>/current.md` exists
 
 ### Agent output file empty
+
 - **Cause:** Agent failed before writing output
 - **Fix:** Check Claude Code logs for error
 
 ## Migration Notes
 
 Recent agent consolidations:
+
 - **nexus** → **architect** (integration planning now in architect)
 - **pioneer** → **phoenix** (migration planning now in phoenix)
 - **validator, sentinel, warden** → **plan-reviewer** (consolidated reviews)

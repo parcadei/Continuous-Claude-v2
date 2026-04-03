@@ -1,6 +1,5 @@
-from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field
-from typing import Literal
+from typing import Any, Dict, Optional
+from pydantic import BaseModel
 
 class GetGithubFileTreeParams(BaseModel):
     """Parameters for get_github_file_tree"""

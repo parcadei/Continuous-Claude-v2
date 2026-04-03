@@ -15,7 +15,7 @@
  *   client.store('User prefers async/await', { type: 'preference' });
  */
 
-import { spawnSync } from 'child_process';
+import { spawnSync } from "child_process";
 
 /**
  * Result from a memory search operation.
@@ -70,12 +70,11 @@ export class MemoryClient {
   private readonly projectDir: string;
 
   constructor(options: MemoryClientOptions = {}) {
-    this.sessionId = options.sessionId || 'default';
+    this.sessionId = options.sessionId || "default";
     this.agentId = options.agentId || null;
     this.timeoutMs = options.timeoutMs || 5000;
-    this.projectDir = options.projectDir ||
-      process.env.CLAUDE_PROJECT_DIR ||
-      process.cwd();
+    this.projectDir =
+      options.projectDir || process.env.CLAUDE_PROJECT_DIR || process.cwd();
   }
 
   /**
@@ -105,7 +104,7 @@ export class MemoryClient {
     if (!result.success) {
       // Log error for debugging but don't crash
       if (process.env.DEBUG) {
-        console.error('Memory search failed:', result.stderr);
+        console.error("Memory search failed:", result.stderr);
       }
       return [];
     }
@@ -128,17 +127,16 @@ export class MemoryClient {
    * @param metadata - Optional metadata to attach
    * @returns Memory ID if successful, null on failure
    */
-  store(content: string, metadata: Record<string, unknown> = {}): string | null {
+  store(
+    content: string,
+    metadata: Record<string, unknown> = {},
+  ): string | null {
     if (!content || !content.trim()) {
       return null;
     }
 
     const pythonScript = this.buildStoreScript();
-    const args = [
-      content,
-      JSON.stringify(metadata),
-      this.sessionId,
-    ];
+    const args = [content, JSON.stringify(metadata), this.sessionId];
 
     if (this.agentId) {
       args.push(this.agentId);
@@ -148,7 +146,7 @@ export class MemoryClient {
 
     if (!result.success) {
       if (process.env.DEBUG) {
-        console.error('Memory store failed:', result.stderr);
+        console.error("Memory store failed:", result.stderr);
       }
       return null;
     }
@@ -287,8 +285,8 @@ asyncio.run(store())
    */
   private runPython(script: string, args: string[]): SubprocessResult {
     try {
-      const result = spawnSync('python3', ['-c', script, ...args], {
-        encoding: 'utf-8',
+      const result = spawnSync("python3", ["-c", script, ...args], {
+        encoding: "utf-8",
         maxBuffer: 1024 * 1024,
         timeout: this.timeoutMs,
         cwd: this.projectDir,
@@ -300,13 +298,13 @@ asyncio.run(store())
 
       return {
         success: result.status === 0,
-        stdout: result.stdout?.trim() || '',
-        stderr: result.stderr || '',
+        stdout: result.stdout?.trim() || "",
+        stderr: result.stderr || "",
       };
     } catch (err) {
       return {
         success: false,
-        stdout: '',
+        stdout: "",
         stderr: String(err),
       };
     }
@@ -317,8 +315,8 @@ asyncio.run(store())
    */
   private normalizeResult(raw: Record<string, unknown>): MemorySearchResult {
     return {
-      content: String(raw.content || ''),
-      similarity: typeof raw.similarity === 'number' ? raw.similarity : 0,
+      content: String(raw.content || ""),
+      similarity: typeof raw.similarity === "number" ? raw.similarity : 0,
       metadata: (raw.metadata as Record<string, unknown>) || {},
     };
   }
@@ -337,7 +335,7 @@ asyncio.run(store())
 export function searchMemory(
   query: string,
   limit = 5,
-  options: MemoryClientOptions = {}
+  options: MemoryClientOptions = {},
 ): MemorySearchResult[] {
   const client = new MemoryClient(options);
   return client.searchSimilar(query, limit);
@@ -356,7 +354,7 @@ export function searchMemory(
 export function storeMemory(
   content: string,
   metadata: Record<string, unknown> = {},
-  options: MemoryClientOptions = {}
+  options: MemoryClientOptions = {},
 ): string | null {
   const client = new MemoryClient(options);
   return client.store(content, metadata);
@@ -378,11 +376,11 @@ export function isMemoryAvailable(options: MemoryClientOptions = {}): boolean {
  */
 export interface UsageRecord {
   /** Type of usage event */
-  type: 'skill_match' | 'memory_match' | 'jit_generation';
+  type: "skill_match" | "memory_match" | "jit_generation";
   /** Name of the skill used (if applicable) */
   skillName?: string;
   /** Source of the match */
-  source: 'keyword' | 'intent' | 'memory' | 'jit';
+  source: "keyword" | "intent" | "memory" | "jit";
   /** Confidence score */
   confidence: number;
   /** Timestamp of usage */
@@ -407,11 +405,11 @@ export interface UsageRecord {
  */
 export function trackUsage(
   record: UsageRecord,
-  options: MemoryClientOptions = {}
+  options: MemoryClientOptions = {},
 ): string | null {
-  const content = `Skill usage: ${record.skillName || 'unknown'} via ${record.source} (confidence: ${record.confidence.toFixed(2)})`;
+  const content = `Skill usage: ${record.skillName || "unknown"} via ${record.source} (confidence: ${record.confidence.toFixed(2)})`;
   const metadata = {
-    type: 'skill_usage',
+    type: "skill_usage",
     usageType: record.type,
     skillName: record.skillName,
     source: record.source,
@@ -438,13 +436,13 @@ export function trackUsage(
  */
 export function recordSkillUsage(
   skillName: string,
-  source: 'keyword' | 'intent' | 'memory',
+  source: "keyword" | "intent" | "memory",
   confidence: number,
   sessionId: string,
-  options: MemoryClientOptions = {}
+  options: MemoryClientOptions = {},
 ): string | null {
   const record: UsageRecord = {
-    type: 'skill_match',
+    type: "skill_match",
     skillName,
     source,
     confidence,

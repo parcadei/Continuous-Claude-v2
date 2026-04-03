@@ -16,6 +16,7 @@ The memory system provides cross-session knowledge persistence through:
 ### Storage Layer
 
 **archival_memory table** - Session learnings
+
 ```sql
 CREATE TABLE archival_memory (
     id SERIAL PRIMARY KEY,
@@ -31,6 +32,7 @@ CREATE TABLE archival_memory (
 ```
 
 **temporal_facts table** - Turn-by-turn facts (for temporal memory)
+
 ```sql
 CREATE TABLE temporal_facts (
     id SERIAL PRIMARY KEY,
@@ -48,12 +50,14 @@ CREATE TABLE temporal_facts (
 The system automatically selects the appropriate backend:
 
 **SQLite** (default)
+
 - Location: `opc/.claude/cache/agentica-memory/memory.db`
 - Search: BM25 full-text search (FTS5)
 - No dependencies: Works offline
 - Good for: Keyword-based recall
 
 **PostgreSQL** (when DATABASE_URL is set)
+
 - Search: Vector similarity with pgvector
 - Requires: PostgreSQL with pgvector extension
 - Good for: Semantic similarity search
@@ -72,6 +76,7 @@ Store knowledge for future sessions:
 ```
 
 The skill automatically categorizes your learning into:
+
 - **What worked**: Solutions and approaches that succeeded
 - **What failed**: Mistakes and pitfalls to avoid
 - **Decisions**: Architectural choices with rationale
@@ -90,6 +95,7 @@ cd opc && uv run python scripts/store_learning.py \
 ```
 
 **Parameters**:
+
 - `--session-id`: Unique session identifier (include timestamp)
 - `--worked`: What succeeded (use "None" if not applicable)
 - `--failed`: What failed (use "None" if not applicable)
@@ -100,6 +106,7 @@ cd opc && uv run python scripts/store_learning.py \
 ### Examples
 
 **Simple success**:
+
 ```bash
 cd opc && uv run python scripts/store_learning.py \
   --session-id "remember-20260108-143022" \
@@ -111,6 +118,7 @@ cd opc && uv run python scripts/store_learning.py \
 ```
 
 **Architectural decision**:
+
 ```bash
 cd opc && uv run python scripts/store_learning.py \
   --session-id "remember-20260108-143055" \
@@ -122,6 +130,7 @@ cd opc && uv run python scripts/store_learning.py \
 ```
 
 **Reusable pattern**:
+
 ```bash
 cd opc && uv run python scripts/store_learning.py \
   --session-id "remember-20260108-143112" \
@@ -148,6 +157,7 @@ Semantic search through stored memories:
 ### Direct CLI Recall
 
 Basic syntax:
+
 ```bash
 cd opc && PYTHONPATH=. uv run python scripts/recall_learnings.py \
   --query "your search terms"
@@ -156,12 +166,14 @@ cd opc && PYTHONPATH=. uv run python scripts/recall_learnings.py \
 ### Search Modes
 
 **SQLite (BM25 text search)**:
+
 ```bash
 cd opc && PYTHONPATH=. uv run python scripts/recall_learnings.py \
   --query "authentication patterns"
 ```
 
 **PostgreSQL - Hybrid RRF (default, recommended)**:
+
 ```bash
 # Combines text and vector search with Reciprocal Rank Fusion
 cd opc && PYTHONPATH=. uv run python scripts/recall_learnings.py \
@@ -170,6 +182,7 @@ cd opc && PYTHONPATH=. uv run python scripts/recall_learnings.py \
 ```
 
 **PostgreSQL - Vector-only**:
+
 ```bash
 # Pure semantic similarity
 cd opc && PYTHONPATH=. uv run python scripts/recall_learnings.py \
@@ -179,6 +192,7 @@ cd opc && PYTHONPATH=. uv run python scripts/recall_learnings.py \
 ```
 
 **PostgreSQL - Text-only (fast)**:
+
 ```bash
 # Fast keyword search, no embeddings
 cd opc && PYTHONPATH=. uv run python scripts/recall_learnings.py \
@@ -188,30 +202,33 @@ cd opc && PYTHONPATH=. uv run python scripts/recall_learnings.py \
 
 ### Search Parameters
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `--query` | Search terms | Required |
-| `--k` | Number of results | 5 |
-| `--provider` | Embedding provider (local, openai, voyage) | local |
-| `--similarity-threshold` | Minimum similarity score (0.0-1.0) | 0.2 |
-| `--recency-weight` | Boost recent results (0.0-1.0) | 0.0 |
-| `--text-fallback` | Use text-only search (PostgreSQL) | False |
+| Parameter                | Description                                | Default  |
+| ------------------------ | ------------------------------------------ | -------- |
+| `--query`                | Search terms                               | Required |
+| `--k`                    | Number of results                          | 5        |
+| `--provider`             | Embedding provider (local, openai, voyage) | local    |
+| `--similarity-threshold` | Minimum similarity score (0.0-1.0)         | 0.2      |
+| `--recency-weight`       | Boost recent results (0.0-1.0)             | 0.0      |
+| `--text-fallback`        | Use text-only search (PostgreSQL)          | False    |
 
 ### Embedding Providers
 
 **local** (default)
+
 - Model: sentence-transformers/all-MiniLM-L6-v2
 - Dimension: 384
 - No API key required
 - Good for: Offline use, privacy
 
 **openai**
+
 - Model: text-embedding-3-small
 - Dimension: 1536
 - Requires: OPENAI_API_KEY environment variable
 - Good for: High-quality semantic search
 
 **voyage**
+
 - Model: voyage-3
 - Dimension: 1024
 - Requires: VOYAGE_API_KEY environment variable
@@ -229,12 +246,14 @@ cd opc && PYTHONPATH=. uv run python scripts/recall_learnings.py \
 ```
 
 **How RRF works**:
+
 1. Run text search (BM25) → ranked results
 2. Run vector search → ranked results
 3. Fuse rankings: `score = 1/(k + rank_text) + 1/(k + rank_vector)`
 4. Return top k by combined score
 
 **Benefits**:
+
 - Better coverage than vector-only or text-only
 - Finds exact matches AND semantic matches
 - Resilient to embedding quality issues
@@ -269,12 +288,14 @@ DATABASE_URL=postgresql://...       # PostgreSQL connection (enables vector sear
 ### Database Setup
 
 **SQLite** (automatic):
+
 ```bash
 # Database created automatically at:
 # opc/.claude/cache/agentica-memory/memory.db
 ```
 
 **PostgreSQL** (manual setup):
+
 ```sql
 -- Enable pgvector extension
 CREATE EXTENSION IF NOT EXISTS vector;
@@ -309,6 +330,7 @@ USING gin(to_tsvector('english', content));
 ### When to Store
 
 Store learnings when:
+
 - You solve a tricky problem
 - You make an architectural decision
 - You discover a pattern that worked well
@@ -318,6 +340,7 @@ Store learnings when:
 ### When to Recall
 
 Query memory when:
+
 - Starting work on something you may have done before
 - Encountering an error or unfamiliar situation
 - Making architectural or design decisions
@@ -344,20 +367,26 @@ Query memory when:
 ## Search Strategies
 
 ### Keyword Search
+
 Use when you know specific terms:
+
 ```bash
 /recall "pytest fixture"
 ```
 
 ### Semantic Search
+
 Use when searching by concept:
+
 ```bash
 /recall "handling user authentication securely"
 # Finds: oauth2, session management, JWT, etc.
 ```
 
 ### Filtering by Category
+
 Structure queries to target specific categories:
+
 ```bash
 /recall "decision about database schema"  # Targets decisions
 /recall "pattern for error handling"      # Targets patterns
@@ -367,30 +396,34 @@ Structure queries to target specific categories:
 ### Adjusting Sensitivity
 
 **Broad search** (low threshold):
+
 ```bash
 --similarity-threshold 0.2  # Default, more results
 ```
 
 **Precise search** (high threshold):
+
 ```bash
 --similarity-threshold 0.8  # Fewer, more relevant results
 ```
 
 **Boost recent learnings**:
+
 ```bash
 --recency-weight 0.3  # 30% boost for recent entries
 ```
 
 ## Performance Characteristics
 
-| Mode | Speed | Quality | Requires |
-|------|-------|---------|----------|
-| SQLite BM25 | Fast | Good for keywords | Nothing |
-| PostgreSQL text-only | Fast | Good for keywords | PostgreSQL |
-| PostgreSQL vector | Medium | Great for semantics | PostgreSQL + embeddings |
-| PostgreSQL Hybrid RRF | Medium | Best overall | PostgreSQL + embeddings |
+| Mode                  | Speed  | Quality             | Requires                |
+| --------------------- | ------ | ------------------- | ----------------------- |
+| SQLite BM25           | Fast   | Good for keywords   | Nothing                 |
+| PostgreSQL text-only  | Fast   | Good for keywords   | PostgreSQL              |
+| PostgreSQL vector     | Medium | Great for semantics | PostgreSQL + embeddings |
+| PostgreSQL Hybrid RRF | Medium | Best overall        | PostgreSQL + embeddings |
 
 **Recommendations**:
+
 - **Offline/local**: Use SQLite
 - **Production/team**: Use PostgreSQL with Hybrid RRF
 - **High precision**: Use vector-only with high threshold
@@ -401,12 +434,14 @@ Structure queries to target specific categories:
 ### No Results Found
 
 **Check backend**:
+
 ```bash
 cd opc && uv run python scripts/recall_learnings.py --query "test"
 # Output shows which backend is being used
 ```
 
 **SQLite troubleshooting**:
+
 ```bash
 # Check database exists
 ls -l opc/.claude/cache/agentica-memory/memory.db
@@ -416,6 +451,7 @@ sqlite3 opc/.claude/cache/agentica-memory/memory.db "SELECT COUNT(*) FROM archiv
 ```
 
 **PostgreSQL troubleshooting**:
+
 ```bash
 # Check connection
 psql $DATABASE_URL -c "SELECT COUNT(*) FROM archival_memory"
@@ -427,6 +463,7 @@ psql $DATABASE_URL -c "SELECT COUNT(*) FROM archival_memory WHERE embedding IS N
 ### Embeddings Not Generated
 
 **Check provider configuration**:
+
 ```bash
 # For OpenAI
 echo $OPENAI_API_KEY
@@ -442,6 +479,7 @@ cd opc && uv run python scripts/store_learning.py \
 ```
 
 **Regenerate embeddings**:
+
 ```bash
 cd opc && uv run python scripts/embed_temporal_facts.py
 ```
@@ -449,6 +487,7 @@ cd opc && uv run python scripts/embed_temporal_facts.py
 ### Performance Issues
 
 **SQLite - Rebuild FTS index**:
+
 ```bash
 sqlite3 opc/.claude/cache/agentica-memory/memory.db <<EOF
 INSERT INTO archival_memory_fts(archival_memory_fts) VALUES('rebuild');
@@ -456,6 +495,7 @@ EOF
 ```
 
 **PostgreSQL - Rebuild vector index**:
+
 ```sql
 DROP INDEX IF EXISTS idx_archival_memory_embedding;
 CREATE INDEX idx_archival_memory_embedding
@@ -469,6 +509,7 @@ WITH (lists = 100);
 ### Batch Storage
 
 Store multiple learnings:
+
 ```bash
 for learning in "learning1" "learning2" "learning3"; do
   cd opc && uv run python scripts/store_learning.py \
@@ -484,6 +525,7 @@ done
 ### Custom Session IDs
 
 Use descriptive session IDs for tracking:
+
 ```bash
 --session-id "auth-refactor-2026-01-08"
 --session-id "bug-fix-issue-123"
@@ -493,6 +535,7 @@ Use descriptive session IDs for tracking:
 ### Programmatic Access
 
 Python API:
+
 ```python
 from opc.scripts.recall_learnings import search_learnings
 

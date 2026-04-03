@@ -76,49 +76,63 @@ tldr dead src/ --entry main cli
 ## Codebase Analysis Commands
 
 ### Impact Analysis
+
 ```bash
 tldr impact <function> [path] --depth N --file <filter>
 ```
+
 Shows reverse call graph - all functions that call the target. Useful before refactoring.
 
 ### Dead Code Detection
+
 ```bash
 tldr dead [path] --entry <patterns>
 ```
-Finds functions never called (excluding entry points like main, test_, etc.)
+
+Finds functions never called (excluding entry points like main, test\_, etc.)
 
 ### Architecture Detection
+
 ```bash
 tldr arch [path]
 ```
+
 Analyzes call patterns to detect:
+
 - Entry layer (controllers/handlers)
 - Middle layer (services)
 - Leaf layer (utilities)
 - Circular dependencies
 
 ### Import Analysis
+
 ```bash
 tldr imports <file> [--lang python]
 ```
+
 Parses all import statements from a file. Returns JSON with module names, imported names, aliases.
 
 ### Reverse Import Lookup
+
 ```bash
 tldr importers <module> [path] [--lang python]
 ```
-Finds all files that import a given module. Complements `tldr impact` which tracks function *calls* - this tracks *imports*.
+
+Finds all files that import a given module. Complements `tldr impact` which tracks function _calls_ - this tracks _imports_.
 
 ### Diagnostics (Type Check + Lint)
+
 ```bash
 tldr diagnostics <file>              # Single file
 tldr diagnostics . --project         # Whole project
 tldr diagnostics src/ --format text  # Human-readable output
 tldr diagnostics src/ --no-lint      # Type check only
 ```
+
 Runs pyright (types) + ruff (lint) and returns structured errors. Use before tests to catch type errors early.
 
 ### Change Impact (Selective Testing)
+
 ```bash
 tldr change-impact                   # Auto-detect (session/git)
 tldr change-impact src/foo.py        # Explicit files
@@ -126,6 +140,7 @@ tldr change-impact --session         # Session-modified files
 tldr change-impact --git             # Git diff files
 tldr change-impact --run             # Actually run affected tests
 ```
+
 Finds which tests to run based on changed code. Uses call graph + import analysis.
 
 ## Output

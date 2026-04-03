@@ -10,10 +10,10 @@ Stop burning context windows. Start shipping features.
 
 Your codebase is 100,000 lines. Claude can read ~200,000 tokens. Math says you're already in trouble.
 
-| Approach | Tokens | What You Get |
-|----------|--------|--------------|
-| Read raw files | 23,314 | Full code, zero context window left |
-| Grep results | ~5,000 | File paths. No understanding. |
+| Approach           | Tokens    | What You Get                                                            |
+| ------------------ | --------- | ----------------------------------------------------------------------- |
+| Read raw files     | 23,314    | Full code, zero context window left                                     |
+| Grep results       | ~5,000    | File paths. No understanding.                                           |
 | **TLDR summaries** | **1,189** | Structure + call graph + complexity—everything needed to edit correctly |
 
 **Measured with tiktoken on real codebases.** TLDR gives you 95% token savings while preserving the information LLMs actually need to write correct code.
@@ -43,13 +43,14 @@ That's it. The daemon auto-starts and keeps indexes in memory for instant querie
 
 **The old way:** Search for `authentication` → find variable names, comments, log messages.
 
-**TLDR semantic search:** Understands what code *does*, not just what it says.
+**TLDR semantic search:** Understands what code _does_, not just what it says.
 
 ```bash
 tldr semantic "validate JWT tokens and check expiration" /path/to/project
 ```
 
 Finds functions by behavior because **every function is embedded with:**
+
 - **L1:** Signature + docstring
 - **L2:** What it calls + who calls it (forward & backward call graph)
 - **L3:** Complexity metrics (branches, loops, cyclomatic complexity)
@@ -72,10 +73,11 @@ hash_password()  # <-- called by: login, reset_password, register
 ```
 
 TLDR indexes **both directions** so you can:
+
 - Trace execution flow (forward: "what does this call?")
 - Impact analysis (backward: "what calls this?")
 
-Both are embedded together, so semantic search like `"password hashing"` finds relevant functions whether they *perform* hashing or *use* hashing.
+Both are embedded together, so semantic search like `"password hashing"` finds relevant functions whether they _perform_ hashing or _use_ hashing.
 
 #### No Filtering: Everything Gets Indexed
 
@@ -107,6 +109,7 @@ tldr slice src/auth.py login 42
 ```
 
 **Output:** 6 lines (out of 150 in the function) that actually matter:
+
 ```python
 3:   user = db.get_user(username)
 7:   if user is None:
@@ -127,11 +130,11 @@ tldr slice src/auth.py login 42
 
 **TLDR's daemon:** Long-running background process with indexes in RAM.
 
-| Method | Query Time | What Happens |
-|--------|------------|--------------|
-| CLI spawn | ~30 seconds | Parse entire codebase, build indexes, analyze, return result, exit |
-| Daemon query | ~100ms | Read from in-memory index, return result |
-| **Speedup** | **300x** | Measured on a 50-file Python project |
+| Method       | Query Time  | What Happens                                                       |
+| ------------ | ----------- | ------------------------------------------------------------------ |
+| CLI spawn    | ~30 seconds | Parse entire codebase, build indexes, analyze, return result, exit |
+| Daemon query | ~100ms      | Read from in-memory index, return result                           |
+| **Speedup**  | **300x**    | Measured on a 50-file Python project                               |
 
 #### How It Works
 
@@ -145,6 +148,7 @@ tldr cfg src/auth.py login   # <10ms if cached
 ```
 
 **Per-project isolation:** Each project gets its own daemon via deterministic socket names:
+
 ```bash
 /tmp/tldr-{md5(project_path)[:8]}.sock
 ```
@@ -152,6 +156,7 @@ tldr cfg src/auth.py login   # <10ms if cached
 No cross-contamination. Work on 5 projects simultaneously without conflicts.
 
 **Auto-lifecycle management:**
+
 - Starts on first query
 - Auto-shuts down after 5 minutes idle
 - Restarts on next query (loads from `.tldr/cache/`)
@@ -197,24 +202,24 @@ tldr warm /path/to/project
 
 Tree-sitter parsers under the hood mean **one interface, 16 languages:**
 
-| Language | AST | Call Graph | CFG | DFG | PDG | Semantic |
-|----------|-----|------------|-----|-----|-----|----------|
-| Python | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| TypeScript | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| JavaScript | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Go | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Rust | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Java | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| C | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| C++ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Ruby | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| PHP | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| C# | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Kotlin | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Scala | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Swift | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Lua | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Elixir | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Language   | AST | Call Graph | CFG | DFG | PDG | Semantic |
+| ---------- | --- | ---------- | --- | --- | --- | -------- |
+| Python     | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| TypeScript | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| JavaScript | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| Go         | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| Rust       | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| Java       | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| C          | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| C++        | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| Ruby       | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| PHP        | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| C#         | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| Kotlin     | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| Scala      | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| Swift      | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| Lua        | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
+| Elixir     | ✅  | ✅         | ✅  | ✅  | ✅  | ✅       |
 
 ```bash
 # Same commands, different languages
@@ -237,6 +242,7 @@ tldr extract src/auth.py
 ```
 
 **Output:**
+
 ```json
 {
   "functions": [
@@ -297,10 +303,10 @@ tldr impact hash_password /path/to/project
 {
   "function": "hash_password",
   "called_by": [
-    {"file": "auth.py", "function": "login", "line": 47},
-    {"file": "auth.py", "function": "reset_password", "line": 89},
-    {"file": "registration.py", "function": "register", "line": 23},
-    {"file": "tests/test_auth.py", "function": "test_login", "line": 15}
+    { "file": "auth.py", "function": "login", "line": 47 },
+    { "file": "auth.py", "function": "reset_password", "line": 89 },
+    { "file": "registration.py", "function": "register", "line": 23 },
+    { "file": "tests/test_auth.py", "function": "test_login", "line": 15 }
   ]
 }
 ```
@@ -318,21 +324,35 @@ tldr cfg src/auth.py login
 ```
 
 **Output:**
+
 ```json
 {
   "function": "login",
   "blocks": [
-    {"id": 0, "statements": ["user = db.get_user(username)"]},
-    {"id": 1, "statements": ["if user is None:", "    raise NotFound"]},
-    {"id": 2, "statements": ["if not verify_password(...):", "    raise AuthError"]},
-    {"id": 3, "statements": ["session = create_session(user)", "return session"]}
+    { "id": 0, "statements": ["user = db.get_user(username)"] },
+    { "id": 1, "statements": ["if user is None:", "    raise NotFound"] },
+    {
+      "id": 2,
+      "statements": ["if not verify_password(...):", "    raise AuthError"]
+    },
+    {
+      "id": 3,
+      "statements": ["session = create_session(user)", "return session"]
+    }
   ],
-  "edges": [[0,1], [1,2], [2,3], [1,3], [2,3]],
+  "edges": [
+    [0, 1],
+    [1, 2],
+    [2, 3],
+    [1, 3],
+    [2, 3]
+  ],
   "complexity": 3
 }
 ```
 
 **What you learn:**
+
 - **Complexity: 3** → This function has 3 decision points (2 if statements = 3 paths)
 - **Blocks:** 4 basic blocks (straight-line code between branches)
 - **Edges:** Shows which blocks can follow which (for tracing execution)
@@ -350,18 +370,19 @@ tldr dfg src/auth.py login
 ```
 
 **Output:**
+
 ```json
 {
   "function": "login",
   "variables": [
-    {"name": "user", "defined_at": [3], "used_at": [5, 8, 15]},
-    {"name": "token", "defined_at": [12], "used_at": [18]},
-    {"name": "session", "defined_at": [15], "used_at": [18]}
+    { "name": "user", "defined_at": [3], "used_at": [5, 8, 15] },
+    { "name": "token", "defined_at": [12], "used_at": [18] },
+    { "name": "session", "defined_at": [15], "used_at": [18] }
   ],
   "flows": [
-    {"from": "username", "to": "user", "via": "db.get_user"},
-    {"from": "user", "to": "session", "via": "create_session"},
-    {"from": "session", "to": "token", "via": "session.token"}
+    { "from": "username", "to": "user", "via": "db.get_user" },
+    { "from": "user", "to": "session", "via": "create_session" },
+    { "from": "session", "to": "token", "via": "session.token" }
   ]
 }
 ```
@@ -382,6 +403,7 @@ tldr slice src/auth.py login 42
 ```
 
 **Output:**
+
 ```json
 {
   "target_line": 42,
@@ -412,6 +434,7 @@ Traditional search finds syntax. TLDR semantic search finds behavior.
 
 1. **Extract all functions** (no filtering—getters, utilities, everything)
 2. **Build rich embeddings** from all 5 layers:
+
    ```
    Function: validate_token
    Signature: def validate_token(token: str, secret: str) -> dict
@@ -445,6 +468,7 @@ tldr semantic "query postgres with SQL and parse results" .
 ```
 
 **Why it works:** The embedding includes:
+
 - What the function does (docstring)
 - What it calls (behavior inference)
 - Who calls it (usage patterns)
@@ -498,13 +522,13 @@ Daemon: Auto-shuts down, writes state to .tldr/cache/
 
 ### Daemon Lifecycle
 
-| Event | What Happens |
-|-------|--------------|
-| First query | Hook auto-starts daemon, indexes load into RAM |
-| Subsequent queries | Daemon serves from memory (100ms) |
-| File edit | Daemon detects change, incrementally updates affected indexes |
-| 5min idle | Daemon auto-shuts down to save resources |
-| Next query | Daemon restarts, loads from cache (still faster than parsing) |
+| Event              | What Happens                                                  |
+| ------------------ | ------------------------------------------------------------- |
+| First query        | Hook auto-starts daemon, indexes load into RAM                |
+| Subsequent queries | Daemon serves from memory (100ms)                             |
+| File edit          | Daemon detects change, incrementally updates affected indexes |
+| 5min idle          | Daemon auto-shuts down to save resources                      |
+| Next query         | Daemon restarts, loads from cache (still faster than parsing) |
 
 ### Per-Project Isolation
 
@@ -542,25 +566,25 @@ Semantic index: 1,247 functions
 
 ### Available Daemon Commands
 
-| Command | Purpose | Latency |
-|---------|---------|---------|
-| `ping` | Health check | <1ms |
-| `status` | Stats (uptime, cache hits, files) | <1ms |
-| `search` | Pattern search in code | ~50ms |
-| `extract` | Full file analysis (AST) | ~10ms |
-| `impact` | Reverse call graph | ~20ms |
-| `dead` | Dead code detection | ~100ms |
-| `arch` | Architecture layers | ~150ms |
-| `cfg` | Control flow graph | ~15ms |
-| `dfg` | Data flow graph | ~20ms |
-| `slice` | Program slicing | ~30ms |
-| `calls` | Cross-file call graph | ~80ms |
-| `semantic` | Embedding-based search | ~100ms |
-| `tree` | File tree structure | ~20ms |
-| `structure` | Code structure (codemaps) | ~30ms |
-| `context` | LLM-ready context | ~50ms |
-| `imports` | Parse file imports | ~10ms |
-| `importers` | Reverse import lookup | ~100ms |
+| Command     | Purpose                           | Latency |
+| ----------- | --------------------------------- | ------- |
+| `ping`      | Health check                      | <1ms    |
+| `status`    | Stats (uptime, cache hits, files) | <1ms    |
+| `search`    | Pattern search in code            | ~50ms   |
+| `extract`   | Full file analysis (AST)          | ~10ms   |
+| `impact`    | Reverse call graph                | ~20ms   |
+| `dead`      | Dead code detection               | ~100ms  |
+| `arch`      | Architecture layers               | ~150ms  |
+| `cfg`       | Control flow graph                | ~15ms   |
+| `dfg`       | Data flow graph                   | ~20ms   |
+| `slice`     | Program slicing                   | ~30ms   |
+| `calls`     | Cross-file call graph             | ~80ms   |
+| `semantic`  | Embedding-based search            | ~100ms  |
+| `tree`      | File tree structure               | ~20ms   |
+| `structure` | Code structure (codemaps)         | ~30ms   |
+| `context`   | LLM-ready context                 | ~50ms   |
+| `imports`   | Parse file imports                | ~10ms   |
+| `importers` | Reverse import lookup             | ~100ms  |
 
 Compare to **30 seconds** per CLI spawn.
 
@@ -570,27 +594,27 @@ Compare to **30 seconds** per CLI spawn.
 
 TLDR integrates via TypeScript hooks that query the daemon for zero-overhead code understanding:
 
-| Hook | Triggers On | TLDR Operation |
-|------|-------------|----------------|
-| `session-start-tldr-cache` | Session start | Auto-start daemon, warm indexes |
-| `session-start-dead-code` | Session start | Detect unreachable functions |
-| `tldr-context-inject` | Before Task/Read | Inject function context into prompt |
-| `smart-search-router` | Before Grep | Use TLDR pattern search instead |
-| `edit-context-inject` | Before Edit | Extract file structure for safer edits |
-| `signature-helper` | Before Edit | Find function signatures in scope |
-| `arch-context-inject` | Before Task | Inject architecture layer info |
-| `post-edit-diagnostics` | After Edit/Write | **Shift-left validation** - catch type errors immediately |
+| Hook                       | Triggers On      | TLDR Operation                                            |
+| -------------------------- | ---------------- | --------------------------------------------------------- |
+| `session-start-tldr-cache` | Session start    | Auto-start daemon, warm indexes                           |
+| `session-start-dead-code`  | Session start    | Detect unreachable functions                              |
+| `tldr-context-inject`      | Before Task/Read | Inject function context into prompt                       |
+| `smart-search-router`      | Before Grep      | Use TLDR pattern search instead                           |
+| `edit-context-inject`      | Before Edit      | Extract file structure for safer edits                    |
+| `signature-helper`         | Before Edit      | Find function signatures in scope                         |
+| `arch-context-inject`      | Before Task      | Inject architecture layer info                            |
+| `post-edit-diagnostics`    | After Edit/Write | **Shift-left validation** - catch type errors immediately |
 
 ### Hook Implementation Pattern
 
 ```typescript
 // .claude/hooks/src/any-hook.ts
-import { queryDaemonSync } from './daemon-client.js';
+import { queryDaemonSync } from "./daemon-client.js";
 
 // Query daemon (100ms, in-memory indexes)
 const result = queryDaemonSync(projectDir, {
-  cmd: 'dead',
-  language: 'python'
+  cmd: "dead",
+  language: "python",
 });
 
 // Fallback: If daemon not running, client auto-spawns CLI
@@ -603,18 +627,21 @@ const result = queryDaemonSync(projectDir, {
 The `post-edit-diagnostics` hook enables **shift-left validation**—catching type errors at edit time, not test time.
 
 **Traditional flow:**
+
 ```
 Edit → Run tests → Tests fail → "Oh, type error" → Fix → Run tests again
        └─────────────────── 30-60 seconds wasted ───────────────────┘
 ```
 
 **With shift-left:**
+
 ```
 Edit → [hook: diagnostics] → "Type error line 42" → Fix immediately
        └── 200ms ──┘
 ```
 
 **Why it matters:**
+
 - Type errors are deterministic—no need to "test" them
 - Pyright catches errors tests miss (unreachable code, wrong types in unexecuted paths)
 - Faster iteration = more attempts per session = better results
@@ -699,7 +726,7 @@ tldr importers validate_input src/
 # → {"module": "validate_input", "importers": [{"file": "api/routes.py", ...}, ...]}
 ```
 
-This complements `tldr impact` which tracks function *calls*—`tldr importers` tracks *imports*.
+This complements `tldr impact` which tracks function _calls_—`tldr importers` tracks _imports_.
 
 ### Diagnostics (Type Check + Lint)
 
@@ -721,21 +748,21 @@ tldr diagnostics src/ --no-lint
 
 Wraps language-specific type checkers and linters:
 
-| Language | Type Checker | Linter |
-|----------|--------------|--------|
-| Python | pyright | ruff |
-| TypeScript | tsc | - |
-| Go | go vet | golangci-lint |
-| Rust | cargo check | clippy |
-| Java | javac | checkstyle |
-| C/C++ | gcc/clang | cppcheck |
-| Ruby | - | rubocop |
-| PHP | - | phpstan |
-| Kotlin | kotlinc | ktlint |
-| Swift | swiftc | swiftlint |
-| C# | dotnet build | - |
-| Scala | scalac | - |
-| Elixir | mix compile | credo |
+| Language   | Type Checker | Linter        |
+| ---------- | ------------ | ------------- |
+| Python     | pyright      | ruff          |
+| TypeScript | tsc          | -             |
+| Go         | go vet       | golangci-lint |
+| Rust       | cargo check  | clippy        |
+| Java       | javac        | checkstyle    |
+| C/C++      | gcc/clang    | cppcheck      |
+| Ruby       | -            | rubocop       |
+| PHP        | -            | phpstan       |
+| Kotlin     | kotlinc      | ktlint        |
+| Swift      | swiftc       | swiftlint     |
+| C#         | dotnet build | -             |
+| Scala      | scalac       | -             |
+| Elixir     | mix compile  | credo         |
 
 Tools are optional - if not installed, silently skipped.
 
@@ -817,14 +844,14 @@ print(context)  # LLM-ready text with structure + call graph + complexity
 
 **What we measured:** Time to complete identical queries via (a) spawning `tldr` CLI vs (b) querying the daemon via Unix socket.
 
-| Command | Daemon | CLI | Speedup |
-|---------|--------|-----|---------|
-| `search` | 0.2ms | 72ms | **302x** |
-| `extract` | 9ms | 97ms | **11x** |
-| `impact` | 0.2ms | 1,129ms | **7,374x** |
-| `tree` | 0.3ms | 76ms | **217x** |
-| `structure` | 0.6ms | 181ms | **285x** |
-| **Total** | **10ms** | **1,555ms** | **155x** |
+| Command     | Daemon   | CLI         | Speedup    |
+| ----------- | -------- | ----------- | ---------- |
+| `search`    | 0.2ms    | 72ms        | **302x**   |
+| `extract`   | 9ms      | 97ms        | **11x**    |
+| `impact`    | 0.2ms    | 1,129ms     | **7,374x** |
+| `tree`      | 0.3ms    | 76ms        | **217x**   |
+| `structure` | 0.6ms    | 181ms       | **285x**   |
+| **Total**   | **10ms** | **1,555ms** | **155x**   |
 
 **Why `impact` shows 7,374x speedup:** The CLI must rebuild the entire call graph from scratch on every invocation (~1.1 seconds). The daemon keeps the call graph in memory, so queries return in <1ms. This is the primary value proposition of the daemon architecture.
 
@@ -843,6 +870,7 @@ print(context)  # LLM-ready text with structure + call graph + complexity
 ```
 
 **Reproduce it yourself:**
+
 ```bash
 cd opc/packages/tldr-code
 source .venv/bin/activate
@@ -856,35 +884,35 @@ python /path/to/opc/scripts/benchmark_daemon.py
 
 **What we measured:** Tokens required to understand code at different granularities, comparing raw file reads vs TLDR structured output.
 
-| Scenario | Raw Tokens | TLDR Tokens | Savings |
-|----------|------------|-------------|---------|
-| Single file analysis | 9,114 | 7,074 | 22% |
-| Function + callees | 21,271 | 175 | **99%** |
-| Codebase overview (26 files) | 103,901 | 11,664 | 89% |
-| Deep call chain (7 files) | 53,474 | 2,667 | 95% |
-| **Total** | **187,760** | **21,580** | **89%** |
+| Scenario                     | Raw Tokens  | TLDR Tokens | Savings |
+| ---------------------------- | ----------- | ----------- | ------- |
+| Single file analysis         | 9,114       | 7,074       | 22%     |
+| Function + callees           | 21,271      | 175         | **99%** |
+| Codebase overview (26 files) | 103,901     | 11,664      | 89%     |
+| Deep call chain (7 files)    | 53,474      | 2,667       | 95%     |
+| **Total**                    | **187,760** | **21,580**  | **89%** |
 
 #### What Each Scenario Measures
 
 1. **Single file analysis (22% savings)**
    - Raw: `cat api.py` → 9,114 tokens
    - TLDR: `tldr extract api.py` → 7,074 tokens
-   - *Note: Modest savings because extract includes full file structure. Better use case is when you need overview, not full code.*
+   - _Note: Modest savings because extract includes full file structure. Better use case is when you need overview, not full code._
 
 2. **Function + callees (99% savings)** ← The killer feature
    - Raw: Read 3 files that contain the function and everything it calls → 21,271 tokens
    - TLDR: `tldr context extract_file --depth 2` → 175 tokens
-   - *Why so dramatic:* TLDR's call graph navigates directly to relevant code. You don't read irrelevant functions in those files.
+   - _Why so dramatic:_ TLDR's call graph navigates directly to relevant code. You don't read irrelevant functions in those files.
 
 3. **Codebase overview (89% savings)**
    - Raw: Read all 26 Python files → 103,901 tokens
    - TLDR: `tldr structure . --lang python` → 11,664 tokens
-   - *Trade-off:* You get function signatures and structure, not full implementations.
+   - _Trade-off:_ You get function signatures and structure, not full implementations.
 
 4. **Deep call chain (95% savings)**
    - Raw: Read 7 files in the call chain → 53,474 tokens
    - TLDR: `tldr context get_relevant_context --depth 3` → 2,667 tokens
-   - *Same principle as #2, deeper traversal.*
+   - _Same principle as #2, deeper traversal._
 
 #### Methodology
 
@@ -899,11 +927,13 @@ python /path/to/opc/scripts/benchmark_daemon.py
 ```
 
 **Important caveats:**
+
 - "Raw" assumes reading entire files. In practice, you might grep + read specific sections, which would be somewhere between raw and TLDR.
 - Scenarios are chosen to represent real use cases (understanding a function, getting codebase overview), not to maximize savings.
 - The 99% savings on "function context" is real but represents the best case (call graph navigation).
 
 **Reproduce it yourself:**
+
 ```bash
 cd opc/packages/tldr-code
 source .venv/bin/activate
@@ -915,11 +945,11 @@ python /path/to/opc/scripts/benchmark_tokens.py
 
 ### Summary
 
-| Metric | Before TLDR | After TLDR | Improvement |
-|--------|-------------|------------|-------------|
-| Query latency | 1.5s | 10ms | **155x faster** |
-| Tokens for function context | 21K | 175 | **99% savings** |
-| Tokens for codebase overview | 104K | 12K | **89% savings** |
+| Metric                       | Before TLDR | After TLDR | Improvement     |
+| ---------------------------- | ----------- | ---------- | --------------- |
+| Query latency                | 1.5s        | 10ms       | **155x faster** |
+| Tokens for function context  | 21K         | 175        | **99% savings** |
+| Tokens for codebase overview | 104K        | 12K        | **89% savings** |
 
 **Cost impact:** At Claude Sonnet rates (~$3/M input tokens), saving 166K tokens per session = ~$0.50/session. Over 1,000 sessions, that's $500.
 
@@ -929,17 +959,17 @@ python /path/to/opc/scripts/benchmark_tokens.py
 
 These are older measurements on different projects, kept for reference:
 
-| File Size | Raw Tokens | TLDR Tokens | Savings |
-|-----------|------------|-------------|---------|
-| 500-line Python | ~4,000 | ~200 | 95% |
-| 1000-line TypeScript | ~8,000 | ~400 | 95% |
-| 10-file context | ~40,000 | ~2,000 | 95% |
+| File Size            | Raw Tokens | TLDR Tokens | Savings |
+| -------------------- | ---------- | ----------- | ------- |
+| 500-line Python      | ~4,000     | ~200        | 95%     |
+| 1000-line TypeScript | ~8,000     | ~400        | 95%     |
+| 10-file context      | ~40,000    | ~2,000      | 95%     |
 
-| Operation | CLI Spawn | Daemon (Cold) | Daemon (Cached) |
-|-----------|-----------|---------------|-----------------|
-| `extract <file>` | ~50ms | ~10ms | ~2ms |
-| `impact <func>` | ~100ms | ~20ms | <1ms |
-| `search <pattern>` | 2-5s | ~100ms | ~50ms |
+| Operation          | CLI Spawn | Daemon (Cold) | Daemon (Cached) |
+| ------------------ | --------- | ------------- | --------------- |
+| `extract <file>`   | ~50ms     | ~10ms         | ~2ms            |
+| `impact <func>`    | ~100ms    | ~20ms         | <1ms            |
+| `search <pattern>` | 2-5s      | ~100ms        | ~50ms           |
 
 ---
 
@@ -981,6 +1011,7 @@ tldr warm .
 ```
 
 **How dirty detection works:**
+
 1. Compute SHA256 hash of each file's content
 2. Store in `file_hashes.json`
 3. On next `warm`, compare hashes
@@ -1009,13 +1040,13 @@ tldr warm .
 
 Different questions need different analysis depths:
 
-| Question | Layer | Why |
-|----------|-------|-----|
-| "What functions exist?" | L1 (AST) | Fast, lightweight |
-| "Who calls this?" | L2 (Call Graph) | Need cross-file analysis |
-| "Is this function complex?" | L3 (CFG) | Need branching logic |
-| "Where does this variable come from?" | L4 (DFG) | Need data dependencies |
-| "What affects this line?" | L5 (PDG) | Need full dependency graph |
+| Question                              | Layer           | Why                        |
+| ------------------------------------- | --------------- | -------------------------- |
+| "What functions exist?"               | L1 (AST)        | Fast, lightweight          |
+| "Who calls this?"                     | L2 (Call Graph) | Need cross-file analysis   |
+| "Is this function complex?"           | L3 (CFG)        | Need branching logic       |
+| "Where does this variable come from?" | L4 (DFG)        | Need data dependencies     |
+| "What affects this line?"             | L5 (PDG)        | Need full dependency graph |
 
 **Pay for what you need.** Don't compute CFGs when you just need function names.
 
@@ -1039,13 +1070,14 @@ tldr semantic "validate JWT tokens"  # Finds: functions that actually validate J
 ```
 
 Embeddings encode:
+
 - What the function does (docstring)
 - What it calls (behavior)
 - Who calls it (usage)
 - Data flow patterns
 - Complexity
 
-So you find code by *what it does*, not just *what it says*.
+So you find code by _what it does_, not just _what it says_.
 
 ---
 

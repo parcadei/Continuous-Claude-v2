@@ -170,12 +170,12 @@ Output: Your vote as {RETURN_TYPE}
 
 ## Verb Mappings
 
-| Action | Bad (ambiguous) | Good (explicit) |
-|--------|-----------------|-----------------|
-| Read | "Read the file at X" | "RETRIEVE contents of: X" |
-| Write | "Put this in the file" | "WRITE to X: {content}" |
-| Check | "See if file has X" | "RETRIEVE contents of: X. Contains Y? YES/NO." |
-| Edit | "Change X to Y" | "EDIT file X: replace 'old' with 'new'" |
+| Action | Bad (ambiguous)        | Good (explicit)                                |
+| ------ | ---------------------- | ---------------------------------------------- |
+| Read   | "Read the file at X"   | "RETRIEVE contents of: X"                      |
+| Write  | "Put this in the file" | "WRITE to X: {content}"                        |
+| Check  | "See if file has X"    | "RETRIEVE contents of: X. Contains Y? YES/NO." |
+| Edit   | "Change X to Y"        | "EDIT file X: replace 'old' with 'new'"        |
 
 ## Directory Handoff Mechanism
 
@@ -201,14 +201,14 @@ def chain_agents(phase1_id: str, phase2_id: str):
 
 ## Anti-Patterns
 
-| Pattern | Problem | Fix |
-|---------|---------|-----|
-| "Tell me what X contains" | May summarize or hallucinate | "Return the exact text" |
-| "Check the file" | Ambiguous action | Specify RETRIEVE or VERIFY |
-| Question form | Invites generation | Use imperative "RETRIEVE" |
-| "Read and confirm" | May just say "confirmed" | "Return the exact text" |
-| TaskOutput for handoff | Floods context with transcript | Directory-based handoff |
-| "Be thorough" | Subjective, inconsistent | Specify exact output format |
+| Pattern                   | Problem                        | Fix                         |
+| ------------------------- | ------------------------------ | --------------------------- |
+| "Tell me what X contains" | May summarize or hallucinate   | "Return the exact text"     |
+| "Check the file"          | Ambiguous action               | Specify RETRIEVE or VERIFY  |
+| Question form             | Invites generation             | Use imperative "RETRIEVE"   |
+| "Read and confirm"        | May just say "confirmed"       | "Return the exact text"     |
+| TaskOutput for handoff    | Floods context with transcript | Directory-based handoff     |
+| "Be thorough"             | Subjective, inconsistent       | Specify exact output format |
 
 ## Expected Improvement
 

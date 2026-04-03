@@ -12,7 +12,6 @@ Use this skill when working on first-order-odes problems in odes pdes.
 
 ## Decision Tree
 
-
 1. **Classify the ODE**
    - Linear: y' + P(x)y = Q(x)?
    - Separable: y' = f(x)g(y)?
@@ -38,31 +37,33 @@ Use this skill when working on first-order-odes problems in odes pdes.
    - `sympy_compute.py dsolve "y' + y = x" --ics "{y(0): 1}"`
 
 5. **Phase Portrait (Autonomous)**
-   - Find equilibria: f(y*) = 0
-   - Analyze stability: sign of f'(y*)
+   - Find equilibria: f(y\*) = 0
+   - Analyze stability: sign of f'(y\*)
    - `z3_solve.py solve "dy/dt == 0"`
-
 
 ## Tool Commands
 
 ### Scipy_Solve_Ivp
+
 ```bash
 uv run python -c "from scipy.integrate import solve_ivp; sol = solve_ivp(lambda t, y: -y, [0, 5], [1]); print('y(5) =', sol.y[0][-1])"
 ```
 
 ### Sympy_Dsolve
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py dsolve "Derivative(y,x) + y" --ics "{y(0): 1}"
 ```
 
 ### Z3_Equilibrium
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py solve "f(y_star) == 0"
 ```
 
 ## Key Techniques
 
-*From indexed textbooks:*
+_From indexed textbooks:_
 
 - [Elementary Differential Equations and... (Z-Library)] Solving ODEs with MATLAB (New York: Cambridge REFERENCES cyan black NJ: Prentice-Hall, 1971). Mattheij, Robert, and Molenaar, Jaap, Ordinary Differential Equations in Theory and Practice Shampine, Lawrence F. Numerical Solution of Ordinary Differential Equations (New York: Chapman and Shampine, L.
 - [Elementary Differential Equations and... (Z-Library)] Differential Equations: An Introduction to Modern Methods and Applications (2nd ed. Use the Laplace transform to solve the system 2e−t 3t α1 α2 , where α1 and α2 are arbitrary. How must α1 and α2 be chosen so that the solution is identical to Eq.

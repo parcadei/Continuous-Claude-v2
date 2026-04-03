@@ -2,7 +2,13 @@
 import { readFileSync, existsSync } from "fs";
 import { basename, join } from "path";
 import { homedir } from "os";
-var SYMBOL_INDEX_FILE = join(homedir(), ".claude", "cache", "symbol-index", "symbols.json");
+var SYMBOL_INDEX_FILE = join(
+  homedir(),
+  ".claude",
+  "cache",
+  "symbol-index",
+  "symbols.json",
+);
 var symbolIndex = null;
 function loadSymbolIndex() {
   if (symbolIndex !== null) return symbolIndex;
@@ -11,8 +17,7 @@ function loadSymbolIndex() {
       symbolIndex = JSON.parse(readFileSync(SYMBOL_INDEX_FILE, "utf-8"));
       return symbolIndex;
     }
-  } catch {
-  }
+  } catch {}
   symbolIndex = {};
   return symbolIndex;
 }
@@ -20,7 +25,10 @@ function getFileSymbols(filePath) {
   const index = loadSymbolIndex();
   const result = { functions: [], classes: [], variables: [] };
   for (const [name, entry] of Object.entries(index)) {
-    if (entry.location.includes(filePath) || entry.location.includes(basename(filePath))) {
+    if (
+      entry.location.includes(filePath) ||
+      entry.location.includes(basename(filePath))
+    ) {
       if (entry.type === "function") result.functions.push(name);
       else if (entry.type === "class") result.classes.push(name);
       else if (entry.type === "variable") result.variables.push(name);
@@ -66,7 +74,7 @@ var SKIP_KEYWORDS = /* @__PURE__ */ new Set([
   "async",
   "await",
   "try",
-  "raise"
+  "raise",
 ]);
 function extractFunctionCalls(code) {
   const callRe = /\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/g;
@@ -89,7 +97,11 @@ function getSignature(funcName, location) {
     const startLine = parseInt(lineNum, 10) - 1;
     let sig = "";
     let foundDef = false;
-    for (let i = Math.max(0, startLine - 2); i < Math.min(startLine + 10, lines.length); i++) {
+    for (
+      let i = Math.max(0, startLine - 2);
+      i < Math.min(startLine + 10, lines.length);
+      i++
+    ) {
       const line = lines[i];
       if (!foundDef && (line.includes("def ") || line.includes("async def "))) {
         foundDef = true;
@@ -100,12 +112,13 @@ function getSignature(funcName, location) {
       }
     }
     if (!foundDef) return null;
-    const match = sig.match(/((?:async\s+)?def\s+\w+\s*\([^)]*\)(?:\s*->\s*[^:]+)?)/s);
+    const match = sig.match(
+      /((?:async\s+)?def\s+\w+\s*\([^)]*\)(?:\s*->\s*[^:]+)?)/s,
+    );
     if (match) {
       return match[1].replace(/\s+/g, " ").trim();
     }
-  } catch {
-  }
+  } catch {}
   return null;
 }
 async function main() {
@@ -122,14 +135,21 @@ async function main() {
   const contextParts = [];
   const index = loadSymbolIndex();
   const symbols = getFileSymbols(filePath);
-  const totalSymbols = symbols.functions.length + symbols.classes.length + symbols.variables.length;
+  const totalSymbols =
+    symbols.functions.length +
+    symbols.classes.length +
+    symbols.variables.length;
   if (totalSymbols > 0) {
     const symbolParts = [];
     if (symbols.classes.length > 0) {
-      symbolParts.push(`Classes: ${symbols.classes.slice(0, 10).join(", ")}${symbols.classes.length > 10 ? "..." : ""}`);
+      symbolParts.push(
+        `Classes: ${symbols.classes.slice(0, 10).join(", ")}${symbols.classes.length > 10 ? "..." : ""}`,
+      );
     }
     if (symbols.functions.length > 0) {
-      symbolParts.push(`Functions: ${symbols.functions.slice(0, 15).join(", ")}${symbols.functions.length > 15 ? "..." : ""}`);
+      symbolParts.push(
+        `Functions: ${symbols.functions.slice(0, 15).join(", ")}${symbols.functions.length > 15 ? "..." : ""}`,
+      );
     }
     if (symbols.variables.length > 0 && symbols.variables.length <= 10) {
       symbolParts.push(`Variables: ${symbols.variables.join(", ")}`);
@@ -162,8 +182,8 @@ ${signatures.join("\n")}`);
   const output = {
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
-      additionalContext: contextParts.join("\n\n")
-    }
+      additionalContext: contextParts.join("\n\n"),
+    },
   };
   console.log(JSON.stringify(output));
 }

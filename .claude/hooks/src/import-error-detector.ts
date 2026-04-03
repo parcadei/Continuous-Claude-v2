@@ -10,7 +10,7 @@
  *
  * Returns a system reminder suggesting the skill when errors are detected.
  */
-import { readFileSync } from 'fs';
+import { readFileSync } from "fs";
 
 interface PostToolUseInput {
   tool_name: string;
@@ -20,7 +20,7 @@ interface PostToolUseInput {
 }
 
 interface HookOutput {
-  result: 'continue' | 'block';
+  result: "continue" | "block";
   message?: string;
 }
 
@@ -34,7 +34,10 @@ const IMPORT_ERROR_PATTERNS = [
   /circular import/i,
 ];
 
-function detectImportError(output: string): { detected: boolean; module?: string } {
+function detectImportError(output: string): {
+  detected: boolean;
+  module?: string;
+} {
   for (const pattern of IMPORT_ERROR_PATTERNS) {
     const match = pattern.exec(output);
     if (match) {
@@ -51,34 +54,36 @@ async function main() {
   let input: PostToolUseInput;
 
   try {
-    const rawInput = readFileSync(0, 'utf-8');
+    const rawInput = readFileSync(0, "utf-8");
     input = JSON.parse(rawInput) as PostToolUseInput;
   } catch {
     // Malformed input - continue silently
-    console.log(JSON.stringify({ result: 'continue' }));
+    console.log(JSON.stringify({ result: "continue" }));
     return;
   }
 
   // Only process Bash tool output
-  if (input.tool_name !== 'Bash') {
-    console.log(JSON.stringify({ result: 'continue' }));
+  if (input.tool_name !== "Bash") {
+    console.log(JSON.stringify({ result: "continue" }));
     return;
   }
 
   // Check both output and error fields
-  const textToCheck = [input.tool_output, input.error].filter(Boolean).join('\n');
+  const textToCheck = [input.tool_output, input.error]
+    .filter(Boolean)
+    .join("\n");
 
   if (!textToCheck) {
-    console.log(JSON.stringify({ result: 'continue' }));
+    console.log(JSON.stringify({ result: "continue" }));
     return;
   }
 
   const result = detectImportError(textToCheck);
 
   if (result.detected) {
-    const moduleName = result.module ? ` (module: ${result.module})` : '';
+    const moduleName = result.module ? ` (module: ${result.module})` : "";
     const output: HookOutput = {
-      result: 'continue',
+      result: "continue",
       message: `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔧 IMPORT ERROR DETECTED${moduleName}
@@ -87,18 +92,18 @@ async function main() {
 Consider using /dependency-preflight skill to diagnose:
 
 1. Check Python version: uv run python --version
-2. Check if installed: uv pip show ${result.module || '<module>'}
-3. Verify import: uv run python -c "import ${result.module || '<module>'}"
+2. Check if installed: uv pip show ${result.module || "<module>"}
+3. Verify import: uv run python -c "import ${result.module || "<module>"}"
 
 Or invoke the skill: /dependency-preflight
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
     };
     console.log(JSON.stringify(output));
   } else {
-    console.log(JSON.stringify({ result: 'continue' }));
+    console.log(JSON.stringify({ result: "continue" }));
   }
 }
 
 main().catch(() => {
-  console.log(JSON.stringify({ result: 'continue' }));
+  console.log(JSON.stringify({ result: "continue" }));
 });

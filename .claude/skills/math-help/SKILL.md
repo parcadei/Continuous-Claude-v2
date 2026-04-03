@@ -1,7 +1,17 @@
 ---
 name: math-help
 description: Guide to the math cognitive stack - what tools exist and when to use each
-triggers: ["help", "guide", "how do I", "what math", "math help", "math tools", "which tool", "math tutorial"]
+triggers:
+  [
+    "help",
+    "guide",
+    "how do I",
+    "what math",
+    "math help",
+    "math tools",
+    "which tool",
+    "math tutorial",
+  ]
 user-invocable: false
 ---
 
@@ -15,23 +25,23 @@ This skill is invoked when choosing which math tool to use for a given task. Not
 
 ## Quick Reference
 
-| I want to... | Use this | Example |
-|--------------|----------|---------|
-| Solve equations | sympy_compute.py solve | `solve "x**2 - 4 = 0" --var x` |
-| Integrate/differentiate | sympy_compute.py | `integrate "sin(x)" --var x` |
-| Compute limits | sympy_compute.py limit | `limit "sin(x)/x" --var x --to 0` |
-| Matrix operations | sympy_compute.py / numpy_compute.py | `det "[[1,2],[3,4]]"` |
-| Verify a reasoning step | math_scratchpad.py verify | `verify "x = 2 implies x^2 = 4"` |
-| Check a proof chain | math_scratchpad.py chain | `chain --steps '[...]'` |
-| Get progressive hints | math_tutor.py hint | `hint "Solve x^2 - 4 = 0" --level 2` |
-| Generate practice problems | math_tutor.py generate | `generate --topic algebra --difficulty 2` |
-| Prove a theorem (constraints) | z3_solve.py prove | `prove "x + y == y + x" --vars x y` |
-| Check satisfiability | z3_solve.py sat | `sat "x > 0, x < 10, x*x == 49"` |
-| Optimize with constraints | z3_solve.py optimize | `optimize "x + y" --constraints "..."` |
-| Plot 2D/3D functions | math_plot.py | `plot2d "sin(x)" --range -10 10` |
-| Arbitrary precision | mpmath_compute.py | `pi --dps 100` |
-| Numerical optimization | scipy_compute.py | `minimize "x**2 + 2*x" "5"` |
-| Formal machine proof | Lean 4 (lean4 skill) | `/lean4` |
+| I want to...                  | Use this                            | Example                                   |
+| ----------------------------- | ----------------------------------- | ----------------------------------------- |
+| Solve equations               | sympy_compute.py solve              | `solve "x**2 - 4 = 0" --var x`            |
+| Integrate/differentiate       | sympy_compute.py                    | `integrate "sin(x)" --var x`              |
+| Compute limits                | sympy_compute.py limit              | `limit "sin(x)/x" --var x --to 0`         |
+| Matrix operations             | sympy_compute.py / numpy_compute.py | `det "[[1,2],[3,4]]"`                     |
+| Verify a reasoning step       | math_scratchpad.py verify           | `verify "x = 2 implies x^2 = 4"`          |
+| Check a proof chain           | math_scratchpad.py chain            | `chain --steps '[...]'`                   |
+| Get progressive hints         | math_tutor.py hint                  | `hint "Solve x^2 - 4 = 0" --level 2`      |
+| Generate practice problems    | math_tutor.py generate              | `generate --topic algebra --difficulty 2` |
+| Prove a theorem (constraints) | z3_solve.py prove                   | `prove "x + y == y + x" --vars x y`       |
+| Check satisfiability          | z3_solve.py sat                     | `sat "x > 0, x < 10, x*x == 49"`          |
+| Optimize with constraints     | z3_solve.py optimize                | `optimize "x + y" --constraints "..."`    |
+| Plot 2D/3D functions          | math_plot.py                        | `plot2d "sin(x)" --range -10 10`          |
+| Arbitrary precision           | mpmath_compute.py                   | `pi --dps 100`                            |
+| Numerical optimization        | scipy_compute.py                    | `minimize "x**2 + 2*x" "5"`               |
+| Formal machine proof          | Lean 4 (lean4 skill)                | `/lean4`                                  |
 
 ## The Five Layers
 
@@ -40,6 +50,7 @@ This skill is invoked when choosing which math tool to use for a given task. Not
 **When:** Exact algebraic computation - solving, calculus, simplification, matrix algebra.
 
 **Key Commands:**
+
 ```bash
 # Solve equation
 uv run python -m runtime.harness scripts/sympy_compute.py \
@@ -77,6 +88,7 @@ uv run python -m runtime.harness scripts/sympy_compute.py \
 **When:** Proving theorems, checking satisfiability, constraint optimization.
 
 **Key Commands:**
+
 ```bash
 # Prove commutativity
 uv run python -m runtime.harness scripts/cc_math/z3_solve.py \
@@ -99,6 +111,7 @@ uv run python -m runtime.harness scripts/cc_math/z3_solve.py \
 **When:** Verifying step-by-step reasoning, checking derivation chains.
 
 **Key Commands:**
+
 ```bash
 # Verify single step
 uv run python -m runtime.harness scripts/cc_math/math_scratchpad.py \
@@ -124,6 +137,7 @@ uv run python -m runtime.harness scripts/cc_math/math_scratchpad.py \
 **When:** Learning, getting hints, generating practice problems.
 
 **Key Commands:**
+
 ```bash
 # Step-by-step solution
 uv run python scripts/cc_math/math_tutor.py steps "x**2 - 5*x + 6 = 0" --operation solve
@@ -150,6 +164,7 @@ uv run python scripts/cc_math/math_tutor.py generate --topic algebra --difficult
 For numerical (not symbolic) computation:
 
 ### NumPy (160 functions)
+
 ```bash
 # Matrix operations
 uv run python scripts/cc_math/numpy_compute.py det "[[1,2],[3,4]]"
@@ -162,6 +177,7 @@ uv run python scripts/cc_math/numpy_compute.py solve "[[3,1],[1,2]]" "[9,8]"
 ```
 
 ### SciPy (289 functions)
+
 ```bash
 # Minimize function
 uv run python scripts/cc_math/scipy_compute.py minimize "x**2 + 2*x" "5"
@@ -174,6 +190,7 @@ uv run python scripts/cc_math/scipy_compute.py curve_fit "a*exp(-b*x)" "0,1,2,3"
 ```
 
 ### mpmath (153 functions, arbitrary precision)
+
 ```bash
 # Pi to 100 decimal places
 uv run python scripts/cc_math/mpmath_compute.py pi --dps 100
@@ -185,6 +202,7 @@ uv run python -m scripts.mpmath_compute mp_sqrt "2" --dps 100
 ## Visualization
 
 ### math_plot.py
+
 ```bash
 # 2D plot
 uv run python scripts/cc_math/math_plot.py plot2d "sin(x)" \
@@ -206,15 +224,16 @@ uv run python scripts/cc_math/math_plot.py latex "\\int e^{-x^2} dx" --output eq
 
 ### 5-Level Hint System
 
-| Level | Category | What You Get |
-|-------|----------|--------------|
-| 1 | Conceptual | General direction, topic identification |
-| 2 | Strategic | Approach to use, technique selection |
-| 3 | Tactical | Specific steps, intermediate goals |
-| 4 | Computational | Intermediate results, partial solutions |
-| 5 | Answer | Full solution with explanation |
+| Level | Category      | What You Get                            |
+| ----- | ------------- | --------------------------------------- |
+| 1     | Conceptual    | General direction, topic identification |
+| 2     | Strategic     | Approach to use, technique selection    |
+| 3     | Tactical      | Specific steps, intermediate goals      |
+| 4     | Computational | Intermediate results, partial solutions |
+| 5     | Answer        | Full solution with explanation          |
 
 **Usage:**
+
 ```bash
 # Start with conceptual hint
 uv run python scripts/cc_math/math_tutor.py hint "integrate x*sin(x)" --level 1
@@ -230,6 +249,7 @@ uv run python scripts/cc_math/math_tutor.py steps "x**2 - 5*x + 6 = 0" --operati
 ```
 
 Returns structured steps with:
+
 - Step number and type
 - From/to expressions
 - Rule applied
@@ -238,6 +258,7 @@ Returns structured steps with:
 ## Common Workflows
 
 ### Workflow 1: Solve and Verify
+
 1. Solve with sympy_compute.py
 2. Verify solution with math_scratchpad.py
 3. Plot to visualize (optional)
@@ -253,6 +274,7 @@ uv run python -m runtime.harness scripts/cc_math/math_scratchpad.py \
 ```
 
 ### Workflow 2: Learn a Concept
+
 1. Generate practice problem with math_tutor.py
 2. Use progressive hints (level 1, then 2, etc.)
 3. Get full solution if stuck
@@ -270,6 +292,7 @@ uv run python scripts/cc_math/math_tutor.py steps "..." --operation integrate
 ```
 
 ### Workflow 3: Prove and Formalize
+
 1. Check theorem with z3_solve.py (constraint-level proof)
 2. If rigorous proof needed, use Lean 4
 
@@ -327,6 +350,7 @@ Need MACHINE-VERIFIED formal proof?
 ## Requirements
 
 All math scripts are installed via:
+
 ```bash
 uv sync
 ```

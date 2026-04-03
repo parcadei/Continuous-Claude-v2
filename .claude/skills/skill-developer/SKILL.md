@@ -95,6 +95,7 @@ allowed-tools: [Bash, Read]
 # My Pipeline Skill
 
 ## When to Use
+
 - [Trigger conditions]
 
 ## Instructions
@@ -106,9 +107,11 @@ uv run python -m runtime.harness scripts/my_pipeline.py --arg1 "value"
 \`\`\`
 
 ### Parameters
+
 - `--arg1`: Description
 
 ## MCP Servers Required
+
 - server1: For tool1
 - server2: For tool2
 ```

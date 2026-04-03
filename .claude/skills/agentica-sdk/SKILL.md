@@ -11,6 +11,7 @@ Build AI agents in Python using the Agentica framework. Agents can implement fun
 ## When to Use
 
 Use this skill when:
+
 - Building new Python agents
 - Adding agentic capabilities to existing code
 - Integrating MCP tools with agents
@@ -153,6 +154,7 @@ async def analyze(text: str) -> dict:
 ```
 
 **Available models:**
+
 - `openai:gpt-3.5-turbo`, `openai:gpt-4o`, `openai:gpt-4.1`, `openai:gpt-5`
 - `anthropic:claude-sonnet-4`, `anthropic:claude-opus-4.1`
 - `anthropic:claude-sonnet-4.5`, `anthropic:claude-opus-4.5`
@@ -260,6 +262,7 @@ async def tool_user(query: str) -> str:
 ```
 
 **mcp_config.json format:**
+
 ```json
 {
   "mcpServers": {
@@ -274,6 +277,7 @@ async def tool_user(query: str) -> str:
 ## Logging
 
 ### Default Behavior
+
 - Prints to stdout with colors
 - Writes to `./logs/agent-<id>.log`
 
@@ -485,6 +489,7 @@ from agentica import (
 ## Checklist
 
 Before using Agentica:
+
 - [ ] Functions with `@agentic()` MUST be `async`
 - [ ] `spawn()` returns awaitable - use `await spawn(...)`
 - [ ] `agent.call()` is awaitable - use `await agent.call(...)`

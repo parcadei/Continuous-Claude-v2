@@ -13,9 +13,11 @@ When working with files in `.claude/hooks/`:
 This skill is invoked when developing or debugging hooks. Not user-invocable directly.
 
 ## Pattern
+
 Shell wrapper (.sh) → TypeScript (.ts) via `npx tsx`
 
 ## Shell Wrapper Template
+
 ```bash
 #!/bin/bash
 set -e
@@ -24,6 +26,7 @@ cat | npx tsx <handler>.ts
 ```
 
 ## TypeScript Handler Pattern
+
 ```typescript
 interface HookInput {
   // Event-specific fields
@@ -35,8 +38,8 @@ async function main() {
   // Process input
 
   const output = {
-    result: 'continue',  // or 'block'
-    message: 'Optional system reminder'
+    result: "continue", // or 'block'
+    message: "Optional system reminder",
   };
 
   console.log(JSON.stringify(output));
@@ -44,6 +47,7 @@ async function main() {
 ```
 
 ## Hook Events
+
 - **PreToolUse** - Before tool execution (can block)
 - **PostToolUse** - After tool execution
 - **UserPromptSubmit** - Before processing user prompt
@@ -52,23 +56,31 @@ async function main() {
 - **Stop** - When agent finishes
 
 ## Testing
+
 Test hooks manually:
+
 ```bash
 echo '{"type": "resume"}' | .claude/hooks/session-start-continuity.sh
 ```
 
 ## Registration
+
 Add hooks to `.claude/settings.json`:
+
 ```json
 {
   "hooks": {
-    "EventName": [{
-      "matcher": ["pattern"],  // Optional
-      "hooks": [{
-        "type": "command",
-        "command": "$CLAUDE_CC_DIR/.claude/hooks/hook.sh"
-      }]
-    }]
+    "EventName": [
+      {
+        "matcher": ["pattern"], // Optional
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_CC_DIR/.claude/hooks/hook.sh"
+          }
+        ]
+      }
+    ]
   }
 }
 ```

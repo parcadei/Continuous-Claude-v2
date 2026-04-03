@@ -1,2093 +1,2093 @@
 {
-    "version": "1.0",
-    "description": "Skill activation triggers for Claude Code. Controls when skills automatically suggest or block actions.",
-    "skills": {
-        "compound-learnings": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Transform session learnings into permanent capabilities (skills, rules, agents)",
-            "promptTriggers": {
-                "keywords": [
-                    "compound learnings",
-                    "improve setup",
-                    "learn from sessions",
-                    "what patterns",
-                    "turn learnings into",
-                    "make permanent",
-                    "extract patterns",
-                    "create skill from",
-                    "create rule from"
-                ],
-                "intentPatterns": [
-                    "(compound|consolidate|extract).*?learning",
-                    "(improve|enhance|upgrade).*?(setup|config)",
-                    "(what|which).*?pattern.*?(skill|rule|permanent)",
-                    "learn.*?from.*?session",
-                    "(turn|convert|transform).*?learning.*?(skill|rule|agent)"
-                ]
-            }
-        },
-        "mot": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "System health check (MOT) for skills, agents, hooks, and memory",
-            "promptTriggers": {
-                "keywords": [
-                    "health check",
-                    "system audit",
-                    "mot",
-                    "check hooks",
-                    "check skills",
-                    "check agents",
-                    "validate setup",
-                    "audit system",
-                    "system health"
-                ],
-                "intentPatterns": [
-                    "(health|system).*(check|audit|status)",
-                    "(check|validate|audit).*(hook|skill|agent|memory)",
-                    "mot",
-                    "(what|is).*(broken|missing|wrong).*?(hook|skill|agent)",
-                    "run.*diagnostic"
-                ]
-            }
-        },
-        "debug-hooks": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Systematic hook debugging workflow for Claude Code hooks",
-            "promptTriggers": {
-                "keywords": [
-                    "hook not firing",
-                    "hook not working",
-                    "debug hook",
-                    "SessionEnd not",
-                    "PostToolUse not",
-                    "hook doesn't run",
-                    "why didn't hook"
-                ],
-                "intentPatterns": [
-                    "hook.*(not|isn't|doesn't|didn't).*(fire|work|run|trigger)",
-                    "debug.*hook",
-                    "(SessionEnd|PostToolUse|UserPromptSubmit).*(not|fail|broken)",
-                    "why.*(hook|SessionEnd|PostToolUse)"
-                ]
-            }
-        },
-        "hook-developer": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Complete Claude Code hooks reference - input/output schemas, registration, testing",
-            "promptTriggers": {
-                "keywords": [
-                    "create hook",
-                    "write hook",
-                    "new hook",
-                    "hook input",
-                    "hook output",
-                    "hook schema",
-                    "PreToolUse",
-                    "PostToolUse",
-                    "SessionStart",
-                    "SessionEnd",
-                    "UserPromptSubmit",
-                    "PermissionRequest",
-                    "Stop hook",
-                    "SubagentStop",
-                    "PreCompact",
-                    "Notification hook",
-                    "hook reference",
-                    "hook documentation",
-                    "hook format",
-                    "settings.json hooks",
-                    "register hook",
-                    "hook matcher"
-                ],
-                "intentPatterns": [
-                    "(create|write|build|make|develop).*?hook",
-                    "hook.*(input|output|schema|format|reference)",
-                    "(how|what).*(hook|PreToolUse|PostToolUse|SessionStart)",
-                    "(register|add).*hook.*(settings|config)",
-                    "(PreToolUse|PostToolUse|SessionStart|SessionEnd|UserPromptSubmit).*(input|output|schema)",
-                    "hook.*(block|allow|deny|continue)",
-                    "(what|which).*fields.*hook"
-                ]
-            }
-        },
-        "implement-plan": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "critical",
-            "description": "Implement technical plans using agent orchestration (compaction-resistant)",
-            "promptTriggers": {
-                "keywords": [
-                    "implement plan",
-                    "execute plan",
-                    "follow plan",
-                    "implement phase",
-                    "run the plan",
-                    "start phase",
-                    "continue phase",
-                    "orchestrate",
-                    "agent orchestration",
-                    "PLAN-"
-                ],
-                "intentPatterns": [
-                    "(implement|execute|follow|run).*?plan",
-                    "(start|continue|resume).*?phase",
-                    "thoughts/shared/plans",
-                    "PLAN-.*\\.md",
-                    "(use|with).*?agent.*?orchestration"
-                ]
-            }
-        },
-        "commit": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Create git commits with user approval and no Claude attribution",
-            "promptTriggers": {
-                "keywords": [
-                    "commit",
-                    "git commit",
-                    "save changes",
-                    "commit changes",
-                    "make commit",
-                    "push",
-                    "push to github",
-                    "push changes"
-                ],
-                "intentPatterns": [
-                    "(commit|save|push).*?(changes|work|code)",
-                    "(git|version control).*?(commit|push)",
-                    "(create|make).*?commit",
-                    "push.*?(to|github|remote|origin)"
-                ]
-            }
-        },
-        "describe-pr": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Generate comprehensive PR descriptions following repository templates",
-            "promptTriggers": {
-                "keywords": [
-                    "describe pr",
-                    "pr description",
-                    "pull request description",
-                    "write pr",
-                    "create pr",
-                    "pr body"
-                ],
-                "intentPatterns": [
-                    "(create|write|generate|describe).*?(pr|pull request)",
-                    "(pr|pull request).*?(description|body)",
-                    "describe.*?(changes|pr)"
-                ]
-            }
-        },
-        "fix": {
-            "type": "workflow",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Meta-skill for bug investigation and resolution. Routes to scout → premortem → spark → arbiter.",
-            "promptTriggers": {
-                "keywords": [
-                    "/fix",
-                    "fix the bug",
-                    "fix this",
-                    "broken",
-                    "not working",
-                    "failing test",
-                    "error in",
-                    "bug in",
-                    "quick fix"
-                ],
-                "intentPatterns": [
-                    "fix.*?(bug|error|issue|problem)",
-                    "(broken|not working|failing)",
-                    "(this|that).*(broken|not working)",
-                    "why.*?(failing|broken|error)"
-                ]
-            }
-        },
-        "build": {
-            "type": "workflow",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Meta-skill for feature implementation. Routes based on mode: greenfield, brownfield, or TDD.",
-            "promptTriggers": {
-                "keywords": [
-                    "/build",
-                    "build a",
-                    "build this",
-                    "implement feature",
-                    "add feature",
-                    "create feature",
-                    "new feature",
-                    "greenfield",
-                    "brownfield"
-                ],
-                "intentPatterns": [
-                    "(build|create|implement|add).*?(feature|component|module|system)",
-                    "(new|add).*?(functionality|capability)",
-                    "greenfield|brownfield"
-                ]
-            }
-        },
-        "explore": {
-            "type": "workflow",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Meta-skill for codebase exploration. Supports quick, deep, and architecture modes.",
-            "promptTriggers": {
-                "keywords": [
-                    "/explore",
-                    "explore the codebase",
-                    "explore this",
-                    "how does this work",
-                    "understand the code",
-                    "what does this do",
-                    "architecture overview",
-                    "codebase structure"
-                ],
-                "intentPatterns": [
-                    "explore.*?(codebase|code|project)",
-                    "how.*?(work|function|operate)",
-                    "understand.*?(code|architecture|structure)",
-                    "what.*?(this|does|do).*?(do|work)",
-                    "(show|explain).*?(architecture|structure)"
-                ]
-            }
-        },
-        "debug": {
-            "type": "workflow",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Deep investigation workflow for complex bugs. Routes to sleuth → debug-agent → profiler.",
-            "promptTriggers": {
-                "keywords": [
-                    "/debug",
-                    "debug this",
-                    "investigate",
-                    "root cause",
-                    "why is this happening",
-                    "strange behavior",
-                    "intermittent",
-                    "race condition"
-                ],
-                "intentPatterns": [
-                    "debug.*?(this|issue|problem)",
-                    "(investigate|find).*?(cause|reason|why)",
-                    "root.*?cause",
-                    "(strange|weird|unexpected).*?behavior"
-                ]
-            }
-        },
-        "create-handoff": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "critical",
-            "description": "Create handoff document for transferring work to a NEW session",
-            "promptTriggers": {
-                "keywords": [
-                    "create handoff",
-                    "make handoff",
-                    "write handoff",
-                    "handoff document",
-                    "hand off",
-                    "done for today",
-                    "end session",
-                    "switching tasks",
-                    "pick this up later",
-                    "wrap up"
-                ],
-                "intentPatterns": [
-                    "(create|make|write).*?handoff",
-                    "(hand|transfer).*?(off|over)",
-                    "(done|finished|stopping).*?(today|now|session)",
-                    "(end|close|wrap).*?session",
-                    "(pick|continue).*?later"
-                ]
-            }
-        },
-        "resume-handoff": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "critical",
-            "description": "Resume work from handoff document with context analysis",
-            "promptTriggers": {
-                "keywords": [
-                    "resume handoff",
-                    "continue handoff",
-                    "pick up handoff",
-                    "resume work",
-                    "continue work",
-                    "pick up where",
-                    "new session"
-                ],
-                "intentPatterns": [
-                    "(resume|continue|pick up).*?(handoff|work|session)",
-                    "(new|fresh|another).*?session",
-                    "where.*?(left off|stopped)"
-                ]
-            }
-        },
-        "continuity-ledger": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "critical",
-            "description": "Create/update continuity ledger for state preservation across compactions (within session)",
-            "promptTriggers": {
-                "keywords": [
-                    "continuity",
-                    "ledger",
-                    "save state",
-                    "update state",
-                    "before compact",
-                    "high context",
-                    "context usage",
-                    "running low",
-                    "low on context",
-                    "context warning",
-                    "about to compact"
-                ],
-                "intentPatterns": [
-                    "(save|preserve|update).*?(state|ledger)",
-                    "(before|prepare|about to).*?compact",
-                    "(context|running).*?(low|high|limit|warning)",
-                    "(continuity|ledger).*?(create|update)",
-                    "(low|running out).*?context"
-                ]
-            }
-        },
-        "skill-developer": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Meta-skill for creating and managing Claude Code skills",
-            "promptTriggers": {
-                "keywords": [
-                    "skill system",
-                    "create skill",
-                    "add skill",
-                    "skill triggers",
-                    "skill rules",
-                    "hook system",
-                    "skill development",
-                    "skill-rules.json"
-                ],
-                "intentPatterns": [
-                    "(how do|how does|explain).*?skill",
-                    "(create|add|modify|build).*?skill",
-                    "skill.*?(work|trigger|activate|system)"
-                ]
-            }
-        },
-        "github-search": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Search GitHub code, repos, issues, PRs via MCP code execution",
-            "promptTriggers": {
-                "keywords": [
-                    "github",
-                    "search github",
-                    "find repo",
-                    "search code",
-                    "github issue",
-                    "pull request",
-                    "PR",
-                    "repository"
-                ],
-                "intentPatterns": [
-                    "(search|find|look.*?up).*?(github|repo|code|issue|PR)",
-                    "(github|repo).*?(search|find)",
-                    "(list|show|get).*?(issues|PRs|pull requests)"
-                ]
-            }
-        },
-        "firecrawl-scrape": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Scrape web pages and search via Firecrawl MCP",
-            "promptTriggers": {
-                "keywords": [
-                    "scrape",
-                    "web scrape",
-                    "fetch url",
-                    "get page",
-                    "crawl",
-                    "extract from url",
-                    "firecrawl"
-                ],
-                "intentPatterns": [
-                    "(scrape|fetch|get|crawl).*?(url|page|website|site)",
-                    "(extract|get).*?(content|data).*?from.*?(url|page|website)"
-                ]
-            }
-        },
-        "nia-docs": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Search library documentation via Nia API",
-            "promptTriggers": {
-                "keywords": [
-                    "documentation",
-                    "docs",
-                    "library docs",
-                    "API reference",
-                    "how to use",
-                    "package docs",
-                    "nia"
-                ],
-                "intentPatterns": [
-                    "(get|find|show|look.*?up).*?(docs|documentation)",
-                    "(how|what).*?(library|package|module).*?(work|use)",
-                    "(docs|documentation).*?for.*?(library|package)"
-                ]
-            }
-        },
-        "ast-grep-find": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "STRUCTURAL code search - use for semantic patterns (find function calls, class usages, refactoring). Understands code structure, not just text.",
-            "promptTriggers": {
-                "keywords": [
-                    "ast",
-                    "ast-grep",
-                    "code pattern",
-                    "find pattern",
-                    "refactor",
-                    "codemod",
-                    "find all calls",
-                    "find all usages",
-                    "find all functions",
-                    "replace all"
-                ],
-                "intentPatterns": [
-                    "(find|search).*?(pattern|all.*?calls|all.*?uses|all.*?functions)",
-                    "(refactor|replace|rename).*?(all|everywhere)",
-                    "ast.*?(search|find|pattern)",
-                    "find.*?(calls|usages|implementations).*?of"
-                ]
-            }
-        },
-        "repoprompt": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Explore codebase via RepoPrompt CLI",
-            "promptTriggers": {
-                "keywords": [
-                    "repoprompt",
-                    "codebase structure",
-                    "file tree",
-                    "code context",
-                    "code structure",
-                    "signatures"
-                ],
-                "intentPatterns": [
-                    "(explore|show|get).*?(codebase|structure|tree)",
-                    "(what|how).*?(codebase|project).*?(structure|organized)"
-                ]
-            }
-        },
-        "recall-reasoning": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Search past work (Artifact Index + reasoning files) for decisions and approaches",
-            "promptTriggers": {
-                "keywords": [
-                    "recall",
-                    "past reasoning",
-                    "what was tried",
-                    "previous attempts",
-                    "search reasoning",
-                    "past decisions",
-                    "similar problem",
-                    "tried before",
-                    "done before",
-                    "last time",
-                    "precedent",
-                    "what worked",
-                    "what failed",
-                    "past work",
-                    "similar work",
-                    "search handoffs",
-                    "artifact index"
-                ],
-                "intentPatterns": [
-                    "(recall|search|find).*?(reasoning|attempts|decisions|precedent|handoffs)",
-                    "(what|how).*?(tried|done|worked|failed).*?before",
-                    "(similar|past).*?(problem|issue|approach|work|session)",
-                    "(previous|past|last).*?(attempts|work|reasoning|time)",
-                    "what did we do.*?(with|for|last)",
-                    "(find|search).*?(past|previous).*?(work|sessions)"
-                ]
-            }
-        },
-        "morph-search": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "TEXT search (20x faster than grep) - DEFAULT for finding strings in code. Use for keywords, error messages, TODOs. Falls back to Grep if no API key.",
-            "promptTriggers": {
-                "keywords": [
-                    "warpgrep",
-                    "morph",
-                    "fast search",
-                    "codebase search",
-                    "search code",
-                    "grep",
-                    "find in code",
-                    "search for",
-                    "find text",
-                    "find string"
-                ],
-                "intentPatterns": [
-                    "(search|find|grep).*?(code|codebase|files|text|string)",
-                    "(fast|quick).*?search",
-                    "warpgrep.*?(search|find)",
-                    "find.*?(files|code).*?(containing|mentioning|with)"
-                ]
-            }
-        },
-        "morph-apply": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "FAST file editing (10,500 tokens/sec, 98% accuracy) - Edit files without reading them first. Use // ... existing code ... markers.",
-            "promptTriggers": {
-                "keywords": [
-                    "morph apply",
-                    "morph edit",
-                    "fast edit",
-                    "edit file",
-                    "apply edit",
-                    "code edit",
-                    "smart edit",
-                    "apply changes",
-                    "batch edit"
-                ],
-                "intentPatterns": [
-                    "(fast|quick|smart).*?edit",
-                    "(edit|modify).*?(file|code).*?(fast|without reading)",
-                    "(apply|make).*?(edit|change).*?(file|code)",
-                    "morph.*?(edit|apply)",
-                    "batch.*?edit"
-                ]
-            }
-        },
-        "perplexity-search": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "AI-powered web search, research, and reasoning via Perplexity",
-            "promptTriggers": {
-                "keywords": [
-                    "perplexity",
-                    "web search",
-                    "search the web",
-                    "look up",
-                    "current information",
-                    "latest",
-                    "research topic"
-                ],
-                "intentPatterns": [
-                    "(search|look up|find).*?(web|online|internet)",
-                    "(what is|how does).*?(latest|current|new)",
-                    "perplexity.*?(search|ask|research)",
-                    "(research|investigate).*?(topic|question)"
-                ]
-            }
-        },
-        "qlty-check": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Code quality checks, auto-fix, formatting, metrics via qlty CLI (70+ linters, 40+ languages)",
-            "promptTriggers": {
-                "keywords": [
-                    "qlty",
-                    "code quality",
-                    "lint",
-                    "linting",
-                    "code check",
-                    "quality check",
-                    "auto-fix",
-                    "code metrics",
-                    "complexity",
-                    "code smells",
-                    "format code",
-                    "check code"
-                ],
-                "intentPatterns": [
-                    "(check|lint|analyze).*?(code|quality)",
-                    "(code|quality).*?(check|lint|issues)",
-                    "(auto|fix).*?(lint|format|issues)",
-                    "(code|complexity).*?metrics",
-                    "(find|detect).*?(smells|issues|problems)",
-                    "format.*?(code|files)"
-                ]
-            }
-        },
-        "braintrust-analyze": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Analyze Claude Code sessions via Braintrust - session replay, agent stats, loop detection",
-            "promptTriggers": {
-                "keywords": [
-                    "braintrust",
-                    "analyze session",
-                    "session analysis",
-                    "session review",
-                    "what agents",
-                    "what skills",
-                    "agent stats",
-                    "skill stats",
-                    "detect loops",
-                    "token usage",
-                    "session replay",
-                    "last session",
-                    "weekly summary"
-                ],
-                "intentPatterns": [
-                    "analyze.*(session|braintrust|logs)",
-                    "session.*(analysis|review|summary)",
-                    "(what|which).*(agents?|skills?).*(use|run|activate)",
-                    "(detect|find|check).*(loops|repeated)",
-                    "(show|get|see).*?(last|recent|my).*?session",
-                    "(token|usage).*(trends?|stats?|analysis)",
-                    "weekly.*(summary|report|review)"
-                ]
-            }
-        },
-        "onboard": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Onboard to a brownfield project - analyze codebase and create initial continuity ledger",
-            "promptTriggers": {
-                "keywords": [
-                    "onboard",
-                    "onboarding",
-                    "new to this project",
-                    "first time",
-                    "get familiar",
-                    "understand this project",
-                    "analyze this project",
-                    "new project",
-                    "just cloned",
-                    "just started",
-                    "initialize project",
-                    "set up project"
-                ],
-                "intentPatterns": [
-                    "(onboard|familiarize).*?(me|project|codebase)",
-                    "(new|first time).*?(project|codebase|repo)",
-                    "(get|become).*?familiar.*?(with|codebase|project)",
-                    "(understand|learn).*?(this|project|codebase)",
-                    "(just|recently).*?(cloned|started|joined)",
-                    "(set up|initialize).*?(continuity|project)"
-                ]
-            }
-        },
-        "tdd": {
-            "type": "process",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "TDD workflow: Write failing test FIRST, then minimal code to pass. Agent pipeline: plan → arbiter → kraken → arbiter.",
-            "promptTriggers": {
-                "keywords": [
-                    "tdd",
-                    "test-driven",
-                    "test first",
-                    "write tests first",
-                    "red green refactor",
-                    "failing test first",
-                    "/tdd"
-                ],
-                "intentPatterns": [
-                    "(use|with|using).*?tdd",
-                    "test.*(driven|first)",
-                    "(implement|build|create).*?(with|using).*?test.*?first",
-                    "red.?green.?refactor"
-                ]
-            }
-        },
-        "tdd-migrate": {
-            "type": "workflow",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "TDD workflow for migrations - orchestrate agents, zero main context growth",
-            "promptTriggers": {
-                "keywords": [
-                    "/tdd-migrate",
-                    "tdd migrate",
-                    "port to typescript",
-                    "port to ts",
-                    "create adapters",
-                    "migrate with tdd",
-                    "multiple similar items",
-                    "batch tdd",
-                    "parallel tdd",
-                    "orchestrate agents",
-                    "zero context growth"
-                ],
-                "intentPatterns": [
-                    "(port|migrate|convert).*?(to|from).*?(typescript|ts|python|py)",
-                    "(create|implement).*?(multiple|several|many).*?(adapters|items|modules)",
-                    "(tdd|test.?driven).*?(migrate|migration|port)",
-                    "(batch|parallel).*?(tdd|implement|create)",
-                    "orchestrate.*?agents",
-                    "zero.*?context.*?growth"
-                ]
-            }
-        },
-        "tdd-migration-pipeline": {
-            "type": "workflow",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Orchestrator-only migration workflow - ZERO context growth, all work delegated to agents with TDD",
-            "promptTriggers": {
-                "keywords": [
-                    "/tdd-migration-pipeline",
-                    "migration pipeline",
-                    "rewrite codebase",
-                    "orchestrator mode",
-                    "full tdd migration",
-                    "spec-driven migration",
-                    "behavioral contracts",
-                    "adversarial review",
-                    "zero orchestrator",
-                    "pipe context only"
-                ],
-                "intentPatterns": [
-                    "(migration|rewrite).*?pipeline",
-                    "orchestrator.*?(only|mode)",
-                    "(full|complete|comprehensive).*?tdd.*?(migration|rewrite)",
-                    "(behavioral|spec).*?(contract|driven)",
-                    "(adversarial|premortem).*?(review|pass)",
-                    "zero.*?(context|orchestrator).*?(growth|execution)"
-                ]
-            }
-        },
-        "workflow-router": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Guided workflow for selecting and launching agents based on your goal",
-            "promptTriggers": {
-                "keywords": [
-                    "how should i approach",
-                    "where do i start",
-                    "help me with",
-                    "what agent",
-                    "which agent",
-                    "workflow",
-                    "orchestrate",
-                    "start a task",
-                    "new task",
-                    "begin work",
-                    "get started",
-                    "implement with agents",
-                    "use agents",
-                    "pick the workflow",
-                    "pick best workflow",
-                    "best approach",
-                    "route to agents",
-                    "spawn agents",
-                    "proceed with agents",
-                    "approved proceed"
-                ],
-                "intentPatterns": [
-                    "(how|where).*(start|begin|approach)",
-                    "(which|what).*(agent|workflow|approach)",
-                    "(help|guide).*(me|with|through)",
-                    "i want to.*(research|plan|build|fix)",
-                    "need to.*(understand|implement|debug|design)",
-                    "(implement|proceed|go|do).*(with|using).*?agent",
-                    "(pick|choose|select).*(best|right|appropriate).*(workflow|approach|agent)",
-                    "(approved|i approve|go ahead).*(proceed|implement|do it)",
-                    "(use|spawn|launch).*?agent"
-                ]
-            }
-        },
-        "environment-triage": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Diagnose Python environment issues - uv sync, pip install, import errors",
-            "promptTriggers": {
-                "keywords": [
-                    "uv sync",
-                    "pip install",
-                    "import error",
-                    "module not found",
-                    "package not found",
-                    "ModuleNotFoundError",
-                    "ImportError",
-                    "python version",
-                    "wrong python",
-                    "venv",
-                    ".python-version"
-                ],
-                "intentPatterns": [
-                    "(uv|pip).*?(sync|install).*?(fail|error|problem)",
-                    "(import|module).*?(error|not found)",
-                    "(wrong|different).*?(python|version|interpreter)",
-                    "(package|module).*?(not|missing|can't)",
-                    "ModuleNotFoundError",
-                    "ImportError"
-                ]
-            }
-        },
-        "modular-code": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Guidelines for modular Python code organization and file size",
-            "promptTriggers": {
-                "keywords": [
-                    "refactor",
-                    "split file",
-                    "file too large",
-                    "too many lines",
-                    "module organization",
-                    "package structure",
-                    "organize code",
-                    "split module"
-                ],
-                "intentPatterns": [
-                    "(split|break up|organize).*?(file|module|code)",
-                    "(file|module).*?(too|very).*?(large|big|long)",
-                    "(refactor|reorganize).*?(code|module|package)",
-                    "(how|should).*?(organize|structure).*?(code|module)"
-                ]
-            }
-        },
-        "parallel-agent-contracts": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Prevent type duplication when launching parallel TypeScript agents",
-            "promptTriggers": {
-                "keywords": [
-                    "parallel agents",
-                    "spawn parallel",
-                    "type duplication",
-                    "type conflict",
-                    "TypeScript agents",
-                    "multiple agents TypeScript",
-                    "agent type contract"
-                ],
-                "intentPatterns": [
-                    "(parallel|multiple).*?agents.*?(TypeScript|ts)",
-                    "(type|interface).*?(duplicate|conflict|collision)",
-                    "(spawn|launch).*?(parallel|multiple).*?(ts|TypeScript)",
-                    "(TypeScript|ts).*?(agents?|parallel)"
-                ]
-            }
-        },
-        "reference-sdk": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Check reference SDK implementations using btca ask",
-            "promptTriggers": {
-                "keywords": [
-                    "btca ask",
-                    "reference SDK",
-                    "check Vercel",
-                    "check Anthropic SDK",
-                    "how does SDK",
-                    "SDK implementation",
-                    "reference implementation"
-                ],
-                "intentPatterns": [
-                    "(check|how does).*?(SDK|Vercel|Anthropic)",
-                    "(reference|other).*?(SDK|implementation)",
-                    "btca.*?(ask|check)",
-                    "(how|what).*?(SDK|library).*?(do|implement|handle)"
-                ]
-            }
-        },
-        "search-router": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Choose the right search tool for each query type",
-            "promptTriggers": {
-                "keywords": [
-                    "which search tool",
-                    "search tool",
-                    "how to search",
-                    "LEANN vs grep",
-                    "ast-grep vs",
-                    "best way to search",
-                    "code search"
-                ],
-                "intentPatterns": [
-                    "(which|what).*?(search|tool).*?(use|best)",
-                    "(how|best).*?(search|find).*?(code|pattern)",
-                    "(LEANN|ast-grep|grep|morph).*?(vs|or|versus)",
-                    "(token|efficient).*?search"
-                ]
-            }
-        },
-        "tldr-code": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "critical",
-            "description": "Token-efficient code context (95% savings) - AST, call graph, CFG, DFG, PDG analysis. Install: uv tool install llm-tldr",
-            "promptTriggers": {
-                "keywords": [
-                    "tldr",
-                    "tldr tree",
-                    "tldr structure",
-                    "tldr search",
-                    "tldr daemon",
-                    "tldr cfg",
-                    "tldr dfg",
-                    "tldr slice",
-                    "tldr impact",
-                    "tldr semantic",
-                    "tldr calls",
-                    "tldr extract",
-                    "call graph",
-                    "what calls",
-                    "who calls",
-                    "calls what",
-                    "how complex",
-                    "complexity",
-                    "cyclomatic",
-                    "data flow",
-                    "where does variable",
-                    "variable come from",
-                    "what affects",
-                    "dependencies",
-                    "understand function",
-                    "understand code",
-                    "how does function",
-                    "trace through",
-                    "control flow",
-                    "program slice",
-                    "code analysis",
-                    "token efficient"
-                ],
-                "intentPatterns": [
-                    "tldr.*?(tree|structure|search|daemon|cfg|dfg|slice|impact)",
-                    "(what|who).*?calls.*?(this|function|method)",
-                    "(how|very).*?complex.*?(is|function|code)",
-                    "(where|what).*?(does|sets).*?variable",
-                    "(data|control).*?flow",
-                    "(what|which).*?affects.*?(line|code)",
-                    "(understand|explain).*?(function|method|code)",
-                    "(trace|follow).*?(calls|execution)",
-                    "(cyclomatic|complexity).*?(of|for|is)",
-                    "(run|use).*?tldr"
-                ]
-            }
-        },
-        "math-unified": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Unified math entry point - computation, solving, and explanation. Routes to SymPy, Z3, Pint, topic skills.",
-            "promptTriggers": {
-                "keywords": [
-                    "/math",
-                    "solve equation",
-                    "integrate",
-                    "derivative",
-                    "differentiate",
-                    "simplify expression",
-                    "eigenvalue",
-                    "determinant",
-                    "matrix calculation",
-                    "symbolic math",
-                    "factor polynomial",
-                    "taylor series",
-                    "laplace transform",
-                    "linear system"
-                ],
-                "intentPatterns": [
-                    "(solve|compute|calculate|simplify).*?(equation|expression|integral)",
-                    "(find|compute).*?(derivative|integral|limit|eigenvalue)",
-                    "(what is|evaluate).*?(integral|derivative|determinant)",
-                    "symbolic.*?(math|computation|algebra)"
-                ]
-            }
-        },
-        "math-help": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Guide to the math cognitive stack - what tools exist and when to use each",
-            "promptTriggers": {
-                "keywords": [
-                    "math tools",
-                    "math capabilities",
-                    "what math can you do",
-                    "math help",
-                    "how to do math",
-                    "available math",
-                    "math stack"
-                ],
-                "intentPatterns": [
-                    "(what|which).*?math.*?(tools?|capabilit|can you)",
-                    "(how|help).*?(do|with).*?math",
-                    "(list|show).*?math.*?(tools?|options)"
-                ]
-            }
-        },
-        "pint-compute": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Unit-aware computation with Pint - convert units, dimensional analysis, unit arithmetic",
-            "promptTriggers": {
-                "keywords": [
-                    "convert units",
-                    "unit conversion",
-                    "meters to feet",
-                    "miles to kilometers",
-                    "celsius to fahrenheit",
-                    "dimensional analysis",
-                    "unit arithmetic",
-                    "physical units",
-                    "how many meters",
-                    "how many feet",
-                    "how many miles"
-                ],
-                "intentPatterns": [
-                    "convert.*?(to|into).*?(meters|feet|miles|km|celsius|fahrenheit|pounds|kg)",
-                    "(how many|what is).*?(meters|feet|miles|km|celsius|fahrenheit).*?(in|to)",
-                    "(unit|dimensional).*?(convert|analysis|arithmetic)",
-                    "[0-9]+.*?(meters|feet|miles|km|celsius|fahrenheit).*?(to|in)"
-                ]
-            }
-        },
-        "shapely-compute": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Computational geometry with Shapely - create geometries, boolean operations, measurements, predicates",
-            "promptTriggers": {
-                "keywords": [
-                    "polygon area",
-                    "polygon intersection",
-                    "geometry intersection",
-                    "convex hull",
-                    "point in polygon",
-                    "buffer geometry",
-                    "shapely",
-                    "computational geometry",
-                    "geometric union",
-                    "geometric difference"
-                ],
-                "intentPatterns": [
-                    "(area|perimeter).*?(polygon|shape|geometry)",
-                    "(intersect|union|difference).*?(polygon|shape|geometry)",
-                    "(point|line).*?(in|inside|within).*?(polygon|shape)",
-                    "(convex|concave).*?hull",
-                    "(buffer|simplify).*?(geometry|shape|polygon)"
-                ]
-            }
-        },
-        "math/abstract-algebra": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Abstract algebra topic - groups, rings, fields, homomorphisms",
-            "promptTriggers": {
-                "keywords": [
-                    "group theory",
-                    "ring theory",
-                    "field theory",
-                    "abelian group",
-                    "cyclic group",
-                    "group homomorphism",
-                    "ring homomorphism",
-                    "field extension",
-                    "Sylow theorem",
-                    "quotient group",
-                    "normal subgroup",
-                    "kernel of homomorphism",
-                    "isomorphism theorem"
-                ],
-                "intentPatterns": [
-                    "(prove|show|verify).*?(group|ring|field).*?(homomorphism|isomorphism)",
-                    "(abelian|cyclic|symmetric).*?group",
-                    "(Sylow|Lagrange).*?theorem",
-                    "(normal|quotient).*?(subgroup|group)"
-                ]
-            }
-        },
-        "math/category-theory": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Category theory topic - functors, natural transformations, limits",
-            "promptTriggers": {
-                "keywords": [
-                    "functor",
-                    "natural transformation",
-                    "Yoneda lemma",
-                    "adjoint functor",
-                    "limit colimit",
-                    "pullback pushout",
-                    "monad category",
-                    "morphism composition",
-                    "commutative diagram",
-                    "category equivalence",
-                    "presheaf",
-                    "representable functor"
-                ],
-                "intentPatterns": [
-                    "(prove|show|verify).*?(functor|natural transformation)",
-                    "(Yoneda|adjoint|representable).*?(lemma|functor)",
-                    "(limit|colimit|pullback|pushout).*?(diagram|category)",
-                    "commutative.*?diagram"
-                ]
-            }
-        },
-        "math/complex-analysis": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Complex analysis topic - residues, contour integrals, analytic functions",
-            "promptTriggers": {
-                "keywords": [
-                    "residue theorem",
-                    "contour integral",
-                    "holomorphic function",
-                    "analytic function",
-                    "meromorphic",
-                    "Laurent series",
-                    "Cauchy integral",
-                    "complex pole",
-                    "essential singularity",
-                    "conformal mapping",
-                    "Riemann surface"
-                ],
-                "intentPatterns": [
-                    "(compute|find|evaluate).*?residue",
-                    "(contour|complex|line).*?integral",
-                    "(holomorphic|analytic|meromorphic).*?function",
-                    "(Laurent|Taylor).*?series.*?complex",
-                    "Cauchy.*?(integral|theorem|formula)"
-                ]
-            }
-        },
-        "math/functional-analysis": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Functional analysis topic - Banach spaces, Hilbert spaces, operators",
-            "promptTriggers": {
-                "keywords": [
-                    "Hilbert space",
-                    "Banach space",
-                    "bounded linear operator",
-                    "spectral theorem",
-                    "Riesz representation",
-                    "orthogonal projection",
-                    "adjoint operator",
-                    "compact operator",
-                    "Parseval identity",
-                    "inner product space",
-                    "dual space"
-                ],
-                "intentPatterns": [
-                    "(Hilbert|Banach).*?space",
-                    "(bounded|linear|compact).*?operator",
-                    "(Riesz|spectral).*?(representation|theorem)",
-                    "(orthogonal|orthonormal).*?(projection|basis)",
-                    "adjoint.*?operator"
-                ]
-            }
-        },
-        "math/graph-number-theory": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Graph theory and number theory - primes, modular arithmetic, graph algorithms",
-            "promptTriggers": {
-                "keywords": [
-                    "prime factorization",
-                    "modular arithmetic",
-                    "Fermat little theorem",
-                    "Euler phi function",
-                    "Chinese remainder theorem",
-                    "graph coloring",
-                    "spanning tree",
-                    "Dijkstra algorithm",
-                    "Hamilton path",
-                    "Euler path",
-                    "primality test"
-                ],
-                "intentPatterns": [
-                    "(prime|factor).*?(number|integer|factorization)",
-                    "(modular|mod).*?(arithmetic|inverse|exponentiation)",
-                    "(Fermat|Euler|Wilson).*?theorem",
-                    "(graph|tree).*?(coloring|spanning|path|cycle)",
-                    "(Hamilton|Euler).*?(path|cycle|circuit)"
-                ]
-            }
-        },
-        "math/information-theory": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Information theory topic - entropy, channel capacity, coding",
-            "promptTriggers": {
-                "keywords": [
-                    "Shannon entropy",
-                    "mutual information",
-                    "channel capacity",
-                    "Kullback-Leibler divergence",
-                    "source coding theorem",
-                    "information bits",
-                    "entropy rate",
-                    "conditional entropy",
-                    "joint entropy",
-                    "data compression theory"
-                ],
-                "intentPatterns": [
-                    "(Shannon|information).*?entropy",
-                    "(mutual|conditional|joint).*?information",
-                    "(channel|source).*?(capacity|coding)",
-                    "(Kullback|KL).*?divergence",
-                    "entropy.*?(rate|bits)"
-                ]
-            }
-        },
-        "math/linear-algebra": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Linear algebra topic - eigenvalues, matrices, vector spaces",
-            "promptTriggers": {
-                "keywords": [
-                    "eigenvalue problem",
-                    "eigenvector",
-                    "characteristic polynomial",
-                    "diagonalization",
-                    "Jordan form",
-                    "singular value decomposition",
-                    "QR decomposition",
-                    "LU decomposition",
-                    "matrix rank",
-                    "null space",
-                    "column space",
-                    "linear independence"
-                ],
-                "intentPatterns": [
-                    "(find|compute).*?(eigenvalue|eigenvector)",
-                    "(diagonalize|decompose).*?matrix",
-                    "(SVD|QR|LU).*?decomposition",
-                    "(null|column|row).*?space",
-                    "(characteristic|minimal).*?polynomial"
-                ]
-            }
-        },
-        "math/mathematical-logic": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Mathematical logic topic - propositional, predicate, proof theory",
-            "promptTriggers": {
-                "keywords": [
-                    "propositional logic",
-                    "predicate logic",
-                    "first order logic",
-                    "proof theory",
-                    "natural deduction",
-                    "sequent calculus",
-                    "Godel incompleteness",
-                    "satisfiability",
-                    "tautology",
-                    "modus ponens",
-                    "truth table"
-                ],
-                "intentPatterns": [
-                    "(propositional|predicate|first.?order).*?logic",
-                    "(prove|show).*?(tautology|valid|satisfiable)",
-                    "(natural|sequent).*?(deduction|calculus)",
-                    "(Godel|incompleteness).*?theorem",
-                    "(truth|semantic).*?table"
-                ]
-            }
-        },
-        "math/measure-theory": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Measure theory topic - Lebesgue measure, sigma-algebras, integration",
-            "promptTriggers": {
-                "keywords": [
-                    "Lebesgue measure",
-                    "Lebesgue integral",
-                    "sigma-algebra",
-                    "Borel set",
-                    "measurable function",
-                    "outer measure",
-                    "Caratheodory criterion",
-                    "almost everywhere",
-                    "dominated convergence",
-                    "monotone convergence",
-                    "Fatou lemma"
-                ],
-                "intentPatterns": [
-                    "(Lebesgue|Borel).*?(measure|integral|set)",
-                    "sigma.?algebra",
-                    "(measurable|integrable).*?function",
-                    "(dominated|monotone).*?convergence",
-                    "(Fatou|Fubini).*?(lemma|theorem)"
-                ]
-            }
-        },
-        "math/numerical-methods": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Numerical methods topic - root finding, interpolation, quadrature",
-            "promptTriggers": {
-                "keywords": [
-                    "Newton-Raphson method",
-                    "bisection method",
-                    "Runge-Kutta",
-                    "numerical integration",
-                    "Simpson rule",
-                    "trapezoidal rule",
-                    "interpolation polynomial",
-                    "Lagrange interpolation",
-                    "numerical error",
-                    "floating point",
-                    "iterative method"
-                ],
-                "intentPatterns": [
-                    "(Newton|bisection|secant).*?method",
-                    "(Runge|Kutta|RK4).*?(method|integration)",
-                    "(Simpson|trapezoid).*?rule",
-                    "(Lagrange|polynomial).*?interpolation",
-                    "(numerical|floating).*?(error|precision)"
-                ]
-            }
-        },
-        "math/odes-pdes": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "ODEs and PDEs topic - differential equations, boundary value problems",
-            "promptTriggers": {
-                "keywords": [
-                    "differential equation",
-                    "initial value problem",
-                    "boundary value problem",
-                    "separable ODE",
-                    "linear ODE",
-                    "Laplace transform ODE",
-                    "heat equation",
-                    "wave equation",
-                    "Poisson equation",
-                    "phase portrait",
-                    "equilibrium point"
-                ],
-                "intentPatterns": [
-                    "(solve|find).*?(ODE|PDE|differential equation)",
-                    "(initial|boundary).*?value.*?problem",
-                    "(heat|wave|Laplace|Poisson).*?equation",
-                    "(separable|linear|exact).*?(ODE|differential)",
-                    "phase.*?(portrait|plane|diagram)"
-                ]
-            }
-        },
-        "math/optimization": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Optimization topic - convex optimization, gradient methods, constraints",
-            "promptTriggers": {
-                "keywords": [
-                    "convex optimization",
-                    "gradient descent",
-                    "Lagrange multiplier",
-                    "KKT conditions",
-                    "linear programming",
-                    "quadratic programming",
-                    "constrained optimization",
-                    "conjugate gradient",
-                    "Newton optimization",
-                    "interior point method",
-                    "duality gap"
-                ],
-                "intentPatterns": [
-                    "(convex|constrained|unconstrained).*?optimization",
-                    "(gradient|steepest).*?descent",
-                    "(Lagrange|Lagrangian).*?(multiplier|dual)",
-                    "(KKT|Karush.?Kuhn.?Tucker).*?condition",
-                    "(linear|quadratic|semidefinite).*?programming"
-                ]
-            }
-        },
-        "math/real-analysis": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Real analysis topic - limits, continuity, convergence",
-            "promptTriggers": {
-                "keywords": [
-                    "epsilon delta proof",
-                    "uniform continuity",
-                    "pointwise convergence",
-                    "uniform convergence",
-                    "Cauchy sequence",
-                    "supremum infimum",
-                    "Bolzano-Weierstrass",
-                    "Heine-Borel",
-                    "intermediate value theorem",
-                    "mean value theorem",
-                    "Riemann integral"
-                ],
-                "intentPatterns": [
-                    "epsilon.?delta.*?(proof|definition)",
-                    "(uniform|pointwise).*?(continuity|convergence)",
-                    "(Cauchy|convergent).*?sequence",
-                    "(supremum|infimum|sup|inf).*?(set|sequence)",
-                    "(Bolzano|Weierstrass|Heine|Borel).*?theorem"
-                ]
-            }
-        },
-        "math/topology": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Topology topic - open sets, compactness, connectedness",
-            "promptTriggers": {
-                "keywords": [
-                    "topological space",
-                    "open cover",
-                    "compact space",
-                    "connected space",
-                    "homeomorphism",
-                    "continuous mapping",
-                    "Hausdorff space",
-                    "metric topology",
-                    "product topology",
-                    "quotient topology",
-                    "Tychonoff theorem"
-                ],
-                "intentPatterns": [
-                    "(topological|metric).*?space",
-                    "(open|closed).*?(set|cover|ball)",
-                    "(compact|connected|Hausdorff).*?space",
-                    "(prove|show).*?homeomorphism",
-                    "(product|quotient|subspace).*?topology"
-                ]
-            }
-        },
-        "dead-code": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "medium",
-            "description": "Find unused functions and dead code in the codebase",
-            "promptTriggers": {
-                "keywords": [
-                    "/dead-code",
-                    "dead code",
-                    "unused functions",
-                    "find unused",
-                    "unreachable code",
-                    "cleanup unused",
-                    "remove dead code"
-                ],
-                "intentPatterns": [
-                    "(find|detect|check).*?(dead|unused|unreachable).*?code",
-                    "(dead|unused).*?(code|functions?|methods?)",
-                    "(cleanup|remove).*?(unused|dead)"
-                ]
-            }
-        },
-        "recall": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Query semantic memory for relevant learnings from past sessions",
-            "promptTriggers": {
-                "keywords": [
-                    "/recall",
-                    "recall learnings",
-                    "search memory",
-                    "what did we learn",
-                    "past learnings",
-                    "memory search",
-                    "search learnings",
-                    "find in memory"
-                ],
-                "intentPatterns": [
-                    "/recall.*",
-                    "(recall|search|query).*?(memory|learnings)",
-                    "(what|any).*?(learned|learnings).*?(about|from)",
-                    "(past|previous).*?learnings"
-                ]
-            }
-        },
-        "remember": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Store a learning, pattern, or decision in semantic memory for future recall",
-            "promptTriggers": {
-                "keywords": [
-                    "/remember",
-                    "remember this",
-                    "store learning",
-                    "save this",
-                    "remember that",
-                    "store this pattern",
-                    "save learning"
-                ],
-                "intentPatterns": [
-                    "/remember.*",
-                    "(remember|store|save).*?(this|that|learning|pattern)",
-                    "(add|put).*?(to|in).*?memory"
-                ]
-            }
-        },
-        "migrate": {
-            "type": "workflow",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Migration workflow - research → analyze → plan → implement → review. For frameworks, languages, infrastructure.",
-            "promptTriggers": {
-                "keywords": [
-                    "/migrate",
-                    "migrate to",
-                    "upgrade framework",
-                    "move from",
-                    "upgrade python",
-                    "upgrade node",
-                    "migrate database",
-                    "version upgrade",
-                    "framework migration",
-                    "language migration"
-                ],
-                "intentPatterns": [
-                    "(migrate|migration).*?(to|from|database|framework)",
-                    "(upgrade|update).*?(framework|python|node|version)",
-                    "(move|switch).*?from.*?to",
-                    "(language|infrastructure).*?(migration|change)"
-                ]
-            }
-        },
-        "refactor": {
-            "type": "workflow",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Code refactoring workflow - analyze → plan → implement → review → validate. Safe restructuring with tests.",
-            "promptTriggers": {
-                "keywords": [
-                    "/refactor",
-                    "refactor this",
-                    "clean up this code",
-                    "extract into module",
-                    "improve architecture",
-                    "code restructuring",
-                    "technical debt",
-                    "clean up code"
-                ],
-                "intentPatterns": [
-                    "refactor.*?(this|code|module|class|function)",
-                    "(clean up|cleanup).*?(code|this|module)",
-                    "(extract|split).*?(into|to).*?(module|class|file)",
-                    "(improve|restructure).*?(architecture|code|structure)",
-                    "technical.*?debt"
-                ]
-            }
-        },
-        "release": {
-            "type": "workflow",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Release workflow - security audit → E2E tests → review → changelog → docs. Ship with confidence.",
-            "promptTriggers": {
-                "keywords": [
-                    "/release",
-                    "prepare release",
-                    "ship version",
-                    "release to production",
-                    "cut a release",
-                    "ready to deploy",
-                    "production deployment",
-                    "release prep"
-                ],
-                "intentPatterns": [
-                    "(prepare|cut|create).*?release",
-                    "(ship|deploy|release).*?(version|production|to prod)",
-                    "(ready|preparing).*?(deploy|release|ship)",
-                    "production.*?(deployment|release)"
-                ]
-            }
-        },
-        "review": {
-            "type": "workflow",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Code review workflow - parallel specialized reviews → synthesis. Multi-perspective feedback.",
-            "promptTriggers": {
-                "keywords": [
-                    "/review",
-                    "review this code",
-                    "review my pr",
-                    "check before merge",
-                    "get feedback",
-                    "code review",
-                    "review implementation",
-                    "review changes"
-                ],
-                "intentPatterns": [
-                    "review.*?(this|code|pr|changes|implementation)",
-                    "(check|look at).*?before.*?merge",
-                    "(get|need).*?feedback.*?(on|for)",
-                    "code.*?review"
-                ]
-            }
-        },
-        "security": {
-            "type": "workflow",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Security audit workflow - vulnerability scan → verification. For auth, payments, user data.",
-            "promptTriggers": {
-                "keywords": [
-                    "/security",
-                    "security audit",
-                    "check vulnerabilities",
-                    "is this secure",
-                    "review authentication",
-                    "check injection",
-                    "security review",
-                    "vulnerability scan"
-                ],
-                "intentPatterns": [
-                    "security.*?(audit|review|check|scan)",
-                    "(check|find|scan).*?vulnerabilit",
-                    "(is|are).*?(this|it).*?secure",
-                    "(review|check).*?(auth|authentication|authorization)",
-                    "(injection|xss|csrf).*?(attack|check|vulnerable)"
-                ]
-            }
-        },
-        "test": {
-            "type": "workflow",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Testing workflow - unit tests ∥ integration tests → E2E tests. Comprehensive test suite.",
-            "promptTriggers": {
-                "keywords": [
-                    "/test",
-                    "run all tests",
-                    "test the feature",
-                    "verify everything works",
-                    "full test suite",
-                    "run tests",
-                    "test suite",
-                    "run the tests"
-                ],
-                "intentPatterns": [
-                    "(run|execute).*?(all|full|complete).*?tests",
-                    "test.*?(feature|everything|suite|this)",
-                    "(verify|check).*?(everything|all).*?works",
-                    "full.*?test.*?suite"
-                ]
-            }
-        },
-        "prove": {
-            "type": "workflow",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Formal theorem proving with Lean 4 - research, testing, and verification phases.",
-            "promptTriggers": {
-                "keywords": [
-                    "/prove",
-                    "prove this",
-                    "formal proof",
-                    "lean 4",
-                    "lean4",
-                    "theorem prover",
-                    "formal verification",
-                    "prove theorem",
-                    "mathlib"
-                ],
-                "intentPatterns": [
-                    "(prove|verify).*?(theorem|lemma|proposition)",
-                    "(formal|lean).*?(proof|verification)",
-                    "lean.*?4",
-                    "(use|with).*?(lean|mathlib)"
-                ]
-            }
-        },
-        "braintrust-tracing": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Braintrust tracing for Claude Code - hook architecture, sub-agent correlation, debugging.",
-            "promptTriggers": {
-                "keywords": [
-                    "braintrust tracing",
-                    "trace hooks",
-                    "hook tracing",
-                    "agent correlation",
-                    "sub-agent tracing",
-                    "debug tracing",
-                    "trace spans"
-                ],
-                "intentPatterns": [
-                    "(braintrust|trace).*?(hook|agent|span)",
-                    "(debug|trace).*?(sub-agent|correlation)",
-                    "hook.*?(architecture|tracing)"
-                ]
-            }
-        },
-        "cli-reference": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Claude Code CLI commands, flags, headless mode, and automation patterns.",
-            "promptTriggers": {
-                "keywords": [
-                    "cli reference",
-                    "command line",
-                    "headless mode",
-                    "claude code cli",
-                    "cli flags",
-                    "automation",
-                    "non-interactive",
-                    "scripting claude",
-                    "batch mode"
-                ],
-                "intentPatterns": [
-                    "(cli|command line).*?(reference|flags|options)",
-                    "(headless|non-interactive|batch).*?mode",
-                    "(automate|script).*?claude",
-                    "run.*?claude.*?(headless|automated)"
-                ]
-            }
-        },
-        "premortem": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Identify failure modes before they occur using structured risk analysis.",
-            "promptTriggers": {
-                "keywords": [
-                    "/premortem",
-                    "premortem",
-                    "pre-mortem",
-                    "what could go wrong",
-                    "failure modes",
-                    "risk analysis",
-                    "anticipate problems",
-                    "potential issues"
-                ],
-                "intentPatterns": [
-                    "(pre-?mortem|risk).*?(analysis|assessment)",
-                    "(what|identify).*?(could|might).*?(go wrong|fail)",
-                    "(failure|risk).*?modes?",
-                    "(anticipate|predict).*?(problems|issues|failures)"
-                ]
-            }
-        },
-        "discovery-interview": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Deep interview process to transform vague ideas into detailed specs.",
-            "promptTriggers": {
-                "keywords": [
-                    "/discovery",
-                    "discovery interview",
-                    "figure out what I want",
-                    "help me think through",
-                    "clarify requirements",
-                    "what should I build",
-                    "vague idea",
-                    "not sure what I need"
-                ],
-                "intentPatterns": [
-                    "(discovery|interview).*?(process|session)",
-                    "(figure out|clarify|define).*?(what|requirements|needs)",
-                    "(help|assist).*?(think through|understand|clarify)",
-                    "(vague|unclear).*?(idea|concept|requirements)",
-                    "what.*?should.*?(build|implement|create)"
-                ]
-            }
-        },
-        "loogle-search": {
-            "type": "domain",
-            "enforcement": "suggest",
-            "priority": "high",
-            "description": "Search Mathlib by type signature pattern - find lemmas when you know the shape but not the name.",
-            "promptTriggers": {
-                "keywords": [
-                    "loogle",
-                    "mathlib search",
-                    "find lemma",
-                    "search mathlib",
-                    "type signature",
-                    "lean lemma",
-                    "lean4 lemma",
-                    "mathlib lemma",
-                    "what lemma",
-                    "which theorem"
-                ],
-                "intentPatterns": [
-                    "(search|find|look up).*?(mathlib|lemma|theorem)",
-                    "(what|which).*?(lemma|theorem).*?(for|about|proves)",
-                    "loogle.*?(search|query)",
-                    "(type|signature).*?(search|pattern)",
-                    "(lean|lean4).*?(lemma|theorem|find)"
-                ]
-            }
-        }
+  "version": "1.0",
+  "description": "Skill activation triggers for Claude Code. Controls when skills automatically suggest or block actions.",
+  "skills": {
+    "compound-learnings": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Transform session learnings into permanent capabilities (skills, rules, agents)",
+      "promptTriggers": {
+        "keywords": [
+          "compound learnings",
+          "improve setup",
+          "learn from sessions",
+          "what patterns",
+          "turn learnings into",
+          "make permanent",
+          "extract patterns",
+          "create skill from",
+          "create rule from"
+        ],
+        "intentPatterns": [
+          "(compound|consolidate|extract).*?learning",
+          "(improve|enhance|upgrade).*?(setup|config)",
+          "(what|which).*?pattern.*?(skill|rule|permanent)",
+          "learn.*?from.*?session",
+          "(turn|convert|transform).*?learning.*?(skill|rule|agent)"
+        ]
+      }
     },
-    "agents": {
-        "scout": {
-            "type": "exploration",
-            "enforcement": "suggest",
-            "priority": "critical",
-            "description": "Comprehensive codebase exploration - locating, analyzing, and pattern finding",
-            "promptTriggers": {
-                "keywords": [
-                    "explore codebase",
-                    "find files",
-                    "understand code",
-                    "brownfield",
-                    "existing codebase",
-                    "existing project",
-                    "legacy code",
-                    "understand the codebase",
-                    "current implementation",
-                    "understand how",
-                    "find all usages",
-                    "where is",
-                    "how does",
-                    "search codebase",
-                    "code structure",
-                    "what calls",
-                    "who uses",
-                    "trace through",
-                    "analyze code",
-                    "find patterns"
-                ],
-                "intentPatterns": [
-                    "brownfield.*?(plan|implement|feature)",
-                    "(existing|legacy).*?(codebase|project|code)",
-                    "(explore|understand).*?(codebase|code|system)",
-                    "(find|search|locate).*?(files|usages|references)",
-                    "how.*?(does|is).*?(implemented|work)",
-                    "(what|where|which).*?(calls|uses|imports)",
-                    "(before|first).*?(plan|implement).*?(understand|explore)"
-                ]
-            }
-        },
-        "oracle": {
-            "type": "research",
-            "enforcement": "suggest",
-            "priority": "critical",
-            "description": "Comprehensive external research using MCP tools (nia, perplexity, firecrawl)",
-            "promptTriggers": {
-                "keywords": [
-                    "research",
-                    "investigate",
-                    "find out",
-                    "learn about",
-                    "gather information",
-                    "what are best practices",
-                    "how should we",
-                    "what's the best way",
-                    "how does",
-                    "where is",
-                    "understand",
-                    "explain",
-                    "document",
-                    "codebase",
-                    "architecture"
-                ],
-                "intentPatterns": [
-                    "(research|investigate|explore).*?(topic|approach|options)",
-                    "(find out|learn).*?(about|how)",
-                    "(what|how).*?(best practices|recommended|should)",
-                    "(gather|collect).*?(information|data|knowledge)",
-                    "(how|where).*?(does|is|works|implemented)",
-                    "(understand|explain|document).*?(codebase|code|system|architecture)"
-                ]
-            }
-        },
-        "plan-agent": {
-            "type": "planning",
-            "enforcement": "suggest",
-            "priority": "critical",
-            "description": "Create implementation plans - for brownfield run scout first",
-            "promptTriggers": {
-                "keywords": [
-                    "create plan",
-                    "make plan",
-                    "plan for",
-                    "design",
-                    "architect",
-                    "implementation plan",
-                    "how to implement",
-                    "planning",
-                    "plan feature",
-                    "plan implementation",
-                    "new feature",
-                    "build feature",
-                    "add feature",
-                    "phased approach",
-                    "greenfield",
-                    "new project",
-                    "start fresh",
-                    "from scratch"
-                ],
-                "intentPatterns": [
-                    "(create|make|write|draft).*?plan",
-                    "(plan|design).*?(implementation|feature|system)",
-                    "how.*?(should|would|could).*?implement",
-                    "(architect|design).*?(system|feature|solution)",
-                    "(start|begin).*?planning",
-                    "greenfield.*?(plan|project|feature)",
-                    "(new|fresh|scratch).*?project"
-                ]
-            }
-        },
-        "validate-agent": {
-            "type": "validation",
-            "enforcement": "suggest",
-            "priority": "critical",
-            "description": "PRE-implementation: Validate plan tech choices against current best practices and past precedent",
-            "promptTriggers": {
-                "keywords": [
-                    "validate plan",
-                    "validate the plan",
-                    "check plan",
-                    "review plan",
-                    "validate tech",
-                    "validate choices",
-                    "before implementing",
-                    "ready to implement",
-                    "plan looks good",
-                    "check precedent",
-                    "past handoffs",
-                    "done this before",
-                    "similar tasks",
-                    "rag judge",
-                    "judge plan"
-                ],
-                "intentPatterns": [
-                    "(validate|check|review).*?plan",
-                    "(validate|check).*?(tech|choices|approach)",
-                    "(before|ready).*?implement",
-                    "(is|does).*?plan.*?(good|ready|valid)",
-                    "plan.*?(ready|validated|approved)",
-                    "(check|search).*?precedent",
-                    "(similar|past).*?(task|handoff|implementation)",
-                    "(done|tried).*?before"
-                ]
-            }
-        },
-        "debug-agent": {
-            "type": "debugging",
-            "enforcement": "suggest",
-            "priority": "critical",
-            "description": "Investigate issues using codebase exploration, logs, and code search",
-            "promptTriggers": {
-                "keywords": [
-                    "debug",
-                    "debugging",
-                    "investigate",
-                    "investigate issue",
-                    "find bug",
-                    "why is it",
-                    "what's wrong",
-                    "not working",
-                    "error",
-                    "broken",
-                    "failing",
-                    "issue",
-                    "problem",
-                    "bug",
-                    "logs",
-                    "check logs"
-                ],
-                "intentPatterns": [
-                    "(debug|investigate|diagnose).*?(issue|bug|error|problem)",
-                    "(why|what).*?(not working|broken|failing|wrong)",
-                    "(find|locate|trace).*?(bug|issue|error|cause)",
-                    "(what|why).*?(causing|happened)",
-                    "(check|look at|examine).*?(logs|database|state)",
-                    "(something|it).*?(broke|failed|crashed)"
-                ]
-            }
-        },
-        "pathfinder": {
-            "type": "research",
-            "enforcement": "suggest",
-            "priority": "critical",
-            "description": "Analyze repository structure, patterns, conventions, and documentation",
-            "promptTriggers": {
-                "keywords": [
-                    "research repo",
-                    "research this repo",
-                    "analyze repo",
-                    "analyze this repo",
-                    "understand repo",
-                    "repo structure",
-                    "repo conventions",
-                    "repo patterns",
-                    "clone and analyze",
-                    "new repo",
-                    "new repository",
-                    "contribution guidelines",
-                    "how does this project",
-                    "project conventions",
-                    "find patterns",
-                    "similar implementations"
-                ],
-                "intentPatterns": [
-                    "(research|analyze|understand).*?(repo|repository|project)",
-                    "(clone|fork).*?(and|then).*?(research|analyze)",
-                    "(what|how).*?(conventions|patterns|structure).*?(repo|project)",
-                    "(before|want to).*?contribut",
-                    "(understand|learn).*?(codebase|project)",
-                    "(find|show|get).*?(examples|patterns|similar)"
-                ]
-            }
-        }
+    "mot": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "System health check (MOT) for skills, agents, hooks, and memory",
+      "promptTriggers": {
+        "keywords": [
+          "health check",
+          "system audit",
+          "mot",
+          "check hooks",
+          "check skills",
+          "check agents",
+          "validate setup",
+          "audit system",
+          "system health"
+        ],
+        "intentPatterns": [
+          "(health|system).*(check|audit|status)",
+          "(check|validate|audit).*(hook|skill|agent|memory)",
+          "mot",
+          "(what|is).*(broken|missing|wrong).*?(hook|skill|agent)",
+          "run.*diagnostic"
+        ]
+      }
     },
-    "notes": {
-        "enforcement_types": {
-            "suggest": "Skill suggestion appears but doesn't block execution",
-            "block": "Requires skill to be used before proceeding (guardrail)",
-            "warn": "Shows warning but allows proceeding"
-        },
-        "priority_levels": {
-            "critical": "Highest - Always trigger when matched",
-            "high": "Important - Trigger for most matches",
-            "medium": "Moderate - Trigger for clear matches",
-            "low": "Optional - Trigger only for explicit matches"
-        }
+    "debug-hooks": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Systematic hook debugging workflow for Claude Code hooks",
+      "promptTriggers": {
+        "keywords": [
+          "hook not firing",
+          "hook not working",
+          "debug hook",
+          "SessionEnd not",
+          "PostToolUse not",
+          "hook doesn't run",
+          "why didn't hook"
+        ],
+        "intentPatterns": [
+          "hook.*(not|isn't|doesn't|didn't).*(fire|work|run|trigger)",
+          "debug.*hook",
+          "(SessionEnd|PostToolUse|UserPromptSubmit).*(not|fail|broken)",
+          "why.*(hook|SessionEnd|PostToolUse)"
+        ]
+      }
+    },
+    "hook-developer": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Complete Claude Code hooks reference - input/output schemas, registration, testing",
+      "promptTriggers": {
+        "keywords": [
+          "create hook",
+          "write hook",
+          "new hook",
+          "hook input",
+          "hook output",
+          "hook schema",
+          "PreToolUse",
+          "PostToolUse",
+          "SessionStart",
+          "SessionEnd",
+          "UserPromptSubmit",
+          "PermissionRequest",
+          "Stop hook",
+          "SubagentStop",
+          "PreCompact",
+          "Notification hook",
+          "hook reference",
+          "hook documentation",
+          "hook format",
+          "settings.json hooks",
+          "register hook",
+          "hook matcher"
+        ],
+        "intentPatterns": [
+          "(create|write|build|make|develop).*?hook",
+          "hook.*(input|output|schema|format|reference)",
+          "(how|what).*(hook|PreToolUse|PostToolUse|SessionStart)",
+          "(register|add).*hook.*(settings|config)",
+          "(PreToolUse|PostToolUse|SessionStart|SessionEnd|UserPromptSubmit).*(input|output|schema)",
+          "hook.*(block|allow|deny|continue)",
+          "(what|which).*fields.*hook"
+        ]
+      }
+    },
+    "implement-plan": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "Implement technical plans using agent orchestration (compaction-resistant)",
+      "promptTriggers": {
+        "keywords": [
+          "implement plan",
+          "execute plan",
+          "follow plan",
+          "implement phase",
+          "run the plan",
+          "start phase",
+          "continue phase",
+          "orchestrate",
+          "agent orchestration",
+          "PLAN-"
+        ],
+        "intentPatterns": [
+          "(implement|execute|follow|run).*?plan",
+          "(start|continue|resume).*?phase",
+          "thoughts/shared/plans",
+          "PLAN-.*\\.md",
+          "(use|with).*?agent.*?orchestration"
+        ]
+      }
+    },
+    "commit": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Create git commits with user approval and no Claude attribution",
+      "promptTriggers": {
+        "keywords": [
+          "commit",
+          "git commit",
+          "save changes",
+          "commit changes",
+          "make commit",
+          "push",
+          "push to github",
+          "push changes"
+        ],
+        "intentPatterns": [
+          "(commit|save|push).*?(changes|work|code)",
+          "(git|version control).*?(commit|push)",
+          "(create|make).*?commit",
+          "push.*?(to|github|remote|origin)"
+        ]
+      }
+    },
+    "describe-pr": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Generate comprehensive PR descriptions following repository templates",
+      "promptTriggers": {
+        "keywords": [
+          "describe pr",
+          "pr description",
+          "pull request description",
+          "write pr",
+          "create pr",
+          "pr body"
+        ],
+        "intentPatterns": [
+          "(create|write|generate|describe).*?(pr|pull request)",
+          "(pr|pull request).*?(description|body)",
+          "describe.*?(changes|pr)"
+        ]
+      }
+    },
+    "fix": {
+      "type": "workflow",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Meta-skill for bug investigation and resolution. Routes to scout → premortem → spark → arbiter.",
+      "promptTriggers": {
+        "keywords": [
+          "/fix",
+          "fix the bug",
+          "fix this",
+          "broken",
+          "not working",
+          "failing test",
+          "error in",
+          "bug in",
+          "quick fix"
+        ],
+        "intentPatterns": [
+          "fix.*?(bug|error|issue|problem)",
+          "(broken|not working|failing)",
+          "(this|that).*(broken|not working)",
+          "why.*?(failing|broken|error)"
+        ]
+      }
+    },
+    "build": {
+      "type": "workflow",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Meta-skill for feature implementation. Routes based on mode: greenfield, brownfield, or TDD.",
+      "promptTriggers": {
+        "keywords": [
+          "/build",
+          "build a",
+          "build this",
+          "implement feature",
+          "add feature",
+          "create feature",
+          "new feature",
+          "greenfield",
+          "brownfield"
+        ],
+        "intentPatterns": [
+          "(build|create|implement|add).*?(feature|component|module|system)",
+          "(new|add).*?(functionality|capability)",
+          "greenfield|brownfield"
+        ]
+      }
+    },
+    "explore": {
+      "type": "workflow",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Meta-skill for codebase exploration. Supports quick, deep, and architecture modes.",
+      "promptTriggers": {
+        "keywords": [
+          "/explore",
+          "explore the codebase",
+          "explore this",
+          "how does this work",
+          "understand the code",
+          "what does this do",
+          "architecture overview",
+          "codebase structure"
+        ],
+        "intentPatterns": [
+          "explore.*?(codebase|code|project)",
+          "how.*?(work|function|operate)",
+          "understand.*?(code|architecture|structure)",
+          "what.*?(this|does|do).*?(do|work)",
+          "(show|explain).*?(architecture|structure)"
+        ]
+      }
+    },
+    "debug": {
+      "type": "workflow",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Deep investigation workflow for complex bugs. Routes to sleuth → debug-agent → profiler.",
+      "promptTriggers": {
+        "keywords": [
+          "/debug",
+          "debug this",
+          "investigate",
+          "root cause",
+          "why is this happening",
+          "strange behavior",
+          "intermittent",
+          "race condition"
+        ],
+        "intentPatterns": [
+          "debug.*?(this|issue|problem)",
+          "(investigate|find).*?(cause|reason|why)",
+          "root.*?cause",
+          "(strange|weird|unexpected).*?behavior"
+        ]
+      }
+    },
+    "create-handoff": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "Create handoff document for transferring work to a NEW session",
+      "promptTriggers": {
+        "keywords": [
+          "create handoff",
+          "make handoff",
+          "write handoff",
+          "handoff document",
+          "hand off",
+          "done for today",
+          "end session",
+          "switching tasks",
+          "pick this up later",
+          "wrap up"
+        ],
+        "intentPatterns": [
+          "(create|make|write).*?handoff",
+          "(hand|transfer).*?(off|over)",
+          "(done|finished|stopping).*?(today|now|session)",
+          "(end|close|wrap).*?session",
+          "(pick|continue).*?later"
+        ]
+      }
+    },
+    "resume-handoff": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "Resume work from handoff document with context analysis",
+      "promptTriggers": {
+        "keywords": [
+          "resume handoff",
+          "continue handoff",
+          "pick up handoff",
+          "resume work",
+          "continue work",
+          "pick up where",
+          "new session"
+        ],
+        "intentPatterns": [
+          "(resume|continue|pick up).*?(handoff|work|session)",
+          "(new|fresh|another).*?session",
+          "where.*?(left off|stopped)"
+        ]
+      }
+    },
+    "continuity-ledger": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "Create/update continuity ledger for state preservation across compactions (within session)",
+      "promptTriggers": {
+        "keywords": [
+          "continuity",
+          "ledger",
+          "save state",
+          "update state",
+          "before compact",
+          "high context",
+          "context usage",
+          "running low",
+          "low on context",
+          "context warning",
+          "about to compact"
+        ],
+        "intentPatterns": [
+          "(save|preserve|update).*?(state|ledger)",
+          "(before|prepare|about to).*?compact",
+          "(context|running).*?(low|high|limit|warning)",
+          "(continuity|ledger).*?(create|update)",
+          "(low|running out).*?context"
+        ]
+      }
+    },
+    "skill-developer": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Meta-skill for creating and managing Claude Code skills",
+      "promptTriggers": {
+        "keywords": [
+          "skill system",
+          "create skill",
+          "add skill",
+          "skill triggers",
+          "skill rules",
+          "hook system",
+          "skill development",
+          "skill-rules.json"
+        ],
+        "intentPatterns": [
+          "(how do|how does|explain).*?skill",
+          "(create|add|modify|build).*?skill",
+          "skill.*?(work|trigger|activate|system)"
+        ]
+      }
+    },
+    "github-search": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Search GitHub code, repos, issues, PRs via MCP code execution",
+      "promptTriggers": {
+        "keywords": [
+          "github",
+          "search github",
+          "find repo",
+          "search code",
+          "github issue",
+          "pull request",
+          "PR",
+          "repository"
+        ],
+        "intentPatterns": [
+          "(search|find|look.*?up).*?(github|repo|code|issue|PR)",
+          "(github|repo).*?(search|find)",
+          "(list|show|get).*?(issues|PRs|pull requests)"
+        ]
+      }
+    },
+    "firecrawl-scrape": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Scrape web pages and search via Firecrawl MCP",
+      "promptTriggers": {
+        "keywords": [
+          "scrape",
+          "web scrape",
+          "fetch url",
+          "get page",
+          "crawl",
+          "extract from url",
+          "firecrawl"
+        ],
+        "intentPatterns": [
+          "(scrape|fetch|get|crawl).*?(url|page|website|site)",
+          "(extract|get).*?(content|data).*?from.*?(url|page|website)"
+        ]
+      }
+    },
+    "nia-docs": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Search library documentation via Nia API",
+      "promptTriggers": {
+        "keywords": [
+          "documentation",
+          "docs",
+          "library docs",
+          "API reference",
+          "how to use",
+          "package docs",
+          "nia"
+        ],
+        "intentPatterns": [
+          "(get|find|show|look.*?up).*?(docs|documentation)",
+          "(how|what).*?(library|package|module).*?(work|use)",
+          "(docs|documentation).*?for.*?(library|package)"
+        ]
+      }
+    },
+    "ast-grep-find": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "STRUCTURAL code search - use for semantic patterns (find function calls, class usages, refactoring). Understands code structure, not just text.",
+      "promptTriggers": {
+        "keywords": [
+          "ast",
+          "ast-grep",
+          "code pattern",
+          "find pattern",
+          "refactor",
+          "codemod",
+          "find all calls",
+          "find all usages",
+          "find all functions",
+          "replace all"
+        ],
+        "intentPatterns": [
+          "(find|search).*?(pattern|all.*?calls|all.*?uses|all.*?functions)",
+          "(refactor|replace|rename).*?(all|everywhere)",
+          "ast.*?(search|find|pattern)",
+          "find.*?(calls|usages|implementations).*?of"
+        ]
+      }
+    },
+    "repoprompt": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Explore codebase via RepoPrompt CLI",
+      "promptTriggers": {
+        "keywords": [
+          "repoprompt",
+          "codebase structure",
+          "file tree",
+          "code context",
+          "code structure",
+          "signatures"
+        ],
+        "intentPatterns": [
+          "(explore|show|get).*?(codebase|structure|tree)",
+          "(what|how).*?(codebase|project).*?(structure|organized)"
+        ]
+      }
+    },
+    "recall-reasoning": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Search past work (Artifact Index + reasoning files) for decisions and approaches",
+      "promptTriggers": {
+        "keywords": [
+          "recall",
+          "past reasoning",
+          "what was tried",
+          "previous attempts",
+          "search reasoning",
+          "past decisions",
+          "similar problem",
+          "tried before",
+          "done before",
+          "last time",
+          "precedent",
+          "what worked",
+          "what failed",
+          "past work",
+          "similar work",
+          "search handoffs",
+          "artifact index"
+        ],
+        "intentPatterns": [
+          "(recall|search|find).*?(reasoning|attempts|decisions|precedent|handoffs)",
+          "(what|how).*?(tried|done|worked|failed).*?before",
+          "(similar|past).*?(problem|issue|approach|work|session)",
+          "(previous|past|last).*?(attempts|work|reasoning|time)",
+          "what did we do.*?(with|for|last)",
+          "(find|search).*?(past|previous).*?(work|sessions)"
+        ]
+      }
+    },
+    "morph-search": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "TEXT search (20x faster than grep) - DEFAULT for finding strings in code. Use for keywords, error messages, TODOs. Falls back to Grep if no API key.",
+      "promptTriggers": {
+        "keywords": [
+          "warpgrep",
+          "morph",
+          "fast search",
+          "codebase search",
+          "search code",
+          "grep",
+          "find in code",
+          "search for",
+          "find text",
+          "find string"
+        ],
+        "intentPatterns": [
+          "(search|find|grep).*?(code|codebase|files|text|string)",
+          "(fast|quick).*?search",
+          "warpgrep.*?(search|find)",
+          "find.*?(files|code).*?(containing|mentioning|with)"
+        ]
+      }
+    },
+    "morph-apply": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "FAST file editing (10,500 tokens/sec, 98% accuracy) - Edit files without reading them first. Use // ... existing code ... markers.",
+      "promptTriggers": {
+        "keywords": [
+          "morph apply",
+          "morph edit",
+          "fast edit",
+          "edit file",
+          "apply edit",
+          "code edit",
+          "smart edit",
+          "apply changes",
+          "batch edit"
+        ],
+        "intentPatterns": [
+          "(fast|quick|smart).*?edit",
+          "(edit|modify).*?(file|code).*?(fast|without reading)",
+          "(apply|make).*?(edit|change).*?(file|code)",
+          "morph.*?(edit|apply)",
+          "batch.*?edit"
+        ]
+      }
+    },
+    "perplexity-search": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "AI-powered web search, research, and reasoning via Perplexity",
+      "promptTriggers": {
+        "keywords": [
+          "perplexity",
+          "web search",
+          "search the web",
+          "look up",
+          "current information",
+          "latest",
+          "research topic"
+        ],
+        "intentPatterns": [
+          "(search|look up|find).*?(web|online|internet)",
+          "(what is|how does).*?(latest|current|new)",
+          "perplexity.*?(search|ask|research)",
+          "(research|investigate).*?(topic|question)"
+        ]
+      }
+    },
+    "qlty-check": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Code quality checks, auto-fix, formatting, metrics via qlty CLI (70+ linters, 40+ languages)",
+      "promptTriggers": {
+        "keywords": [
+          "qlty",
+          "code quality",
+          "lint",
+          "linting",
+          "code check",
+          "quality check",
+          "auto-fix",
+          "code metrics",
+          "complexity",
+          "code smells",
+          "format code",
+          "check code"
+        ],
+        "intentPatterns": [
+          "(check|lint|analyze).*?(code|quality)",
+          "(code|quality).*?(check|lint|issues)",
+          "(auto|fix).*?(lint|format|issues)",
+          "(code|complexity).*?metrics",
+          "(find|detect).*?(smells|issues|problems)",
+          "format.*?(code|files)"
+        ]
+      }
+    },
+    "braintrust-analyze": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Analyze Claude Code sessions via Braintrust - session replay, agent stats, loop detection",
+      "promptTriggers": {
+        "keywords": [
+          "braintrust",
+          "analyze session",
+          "session analysis",
+          "session review",
+          "what agents",
+          "what skills",
+          "agent stats",
+          "skill stats",
+          "detect loops",
+          "token usage",
+          "session replay",
+          "last session",
+          "weekly summary"
+        ],
+        "intentPatterns": [
+          "analyze.*(session|braintrust|logs)",
+          "session.*(analysis|review|summary)",
+          "(what|which).*(agents?|skills?).*(use|run|activate)",
+          "(detect|find|check).*(loops|repeated)",
+          "(show|get|see).*?(last|recent|my).*?session",
+          "(token|usage).*(trends?|stats?|analysis)",
+          "weekly.*(summary|report|review)"
+        ]
+      }
+    },
+    "onboard": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Onboard to a brownfield project - analyze codebase and create initial continuity ledger",
+      "promptTriggers": {
+        "keywords": [
+          "onboard",
+          "onboarding",
+          "new to this project",
+          "first time",
+          "get familiar",
+          "understand this project",
+          "analyze this project",
+          "new project",
+          "just cloned",
+          "just started",
+          "initialize project",
+          "set up project"
+        ],
+        "intentPatterns": [
+          "(onboard|familiarize).*?(me|project|codebase)",
+          "(new|first time).*?(project|codebase|repo)",
+          "(get|become).*?familiar.*?(with|codebase|project)",
+          "(understand|learn).*?(this|project|codebase)",
+          "(just|recently).*?(cloned|started|joined)",
+          "(set up|initialize).*?(continuity|project)"
+        ]
+      }
+    },
+    "tdd": {
+      "type": "process",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "TDD workflow: Write failing test FIRST, then minimal code to pass. Agent pipeline: plan → arbiter → kraken → arbiter.",
+      "promptTriggers": {
+        "keywords": [
+          "tdd",
+          "test-driven",
+          "test first",
+          "write tests first",
+          "red green refactor",
+          "failing test first",
+          "/tdd"
+        ],
+        "intentPatterns": [
+          "(use|with|using).*?tdd",
+          "test.*(driven|first)",
+          "(implement|build|create).*?(with|using).*?test.*?first",
+          "red.?green.?refactor"
+        ]
+      }
+    },
+    "tdd-migrate": {
+      "type": "workflow",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "TDD workflow for migrations - orchestrate agents, zero main context growth",
+      "promptTriggers": {
+        "keywords": [
+          "/tdd-migrate",
+          "tdd migrate",
+          "port to typescript",
+          "port to ts",
+          "create adapters",
+          "migrate with tdd",
+          "multiple similar items",
+          "batch tdd",
+          "parallel tdd",
+          "orchestrate agents",
+          "zero context growth"
+        ],
+        "intentPatterns": [
+          "(port|migrate|convert).*?(to|from).*?(typescript|ts|python|py)",
+          "(create|implement).*?(multiple|several|many).*?(adapters|items|modules)",
+          "(tdd|test.?driven).*?(migrate|migration|port)",
+          "(batch|parallel).*?(tdd|implement|create)",
+          "orchestrate.*?agents",
+          "zero.*?context.*?growth"
+        ]
+      }
+    },
+    "tdd-migration-pipeline": {
+      "type": "workflow",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Orchestrator-only migration workflow - ZERO context growth, all work delegated to agents with TDD",
+      "promptTriggers": {
+        "keywords": [
+          "/tdd-migration-pipeline",
+          "migration pipeline",
+          "rewrite codebase",
+          "orchestrator mode",
+          "full tdd migration",
+          "spec-driven migration",
+          "behavioral contracts",
+          "adversarial review",
+          "zero orchestrator",
+          "pipe context only"
+        ],
+        "intentPatterns": [
+          "(migration|rewrite).*?pipeline",
+          "orchestrator.*?(only|mode)",
+          "(full|complete|comprehensive).*?tdd.*?(migration|rewrite)",
+          "(behavioral|spec).*?(contract|driven)",
+          "(adversarial|premortem).*?(review|pass)",
+          "zero.*?(context|orchestrator).*?(growth|execution)"
+        ]
+      }
+    },
+    "workflow-router": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Guided workflow for selecting and launching agents based on your goal",
+      "promptTriggers": {
+        "keywords": [
+          "how should i approach",
+          "where do i start",
+          "help me with",
+          "what agent",
+          "which agent",
+          "workflow",
+          "orchestrate",
+          "start a task",
+          "new task",
+          "begin work",
+          "get started",
+          "implement with agents",
+          "use agents",
+          "pick the workflow",
+          "pick best workflow",
+          "best approach",
+          "route to agents",
+          "spawn agents",
+          "proceed with agents",
+          "approved proceed"
+        ],
+        "intentPatterns": [
+          "(how|where).*(start|begin|approach)",
+          "(which|what).*(agent|workflow|approach)",
+          "(help|guide).*(me|with|through)",
+          "i want to.*(research|plan|build|fix)",
+          "need to.*(understand|implement|debug|design)",
+          "(implement|proceed|go|do).*(with|using).*?agent",
+          "(pick|choose|select).*(best|right|appropriate).*(workflow|approach|agent)",
+          "(approved|i approve|go ahead).*(proceed|implement|do it)",
+          "(use|spawn|launch).*?agent"
+        ]
+      }
+    },
+    "environment-triage": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Diagnose Python environment issues - uv sync, pip install, import errors",
+      "promptTriggers": {
+        "keywords": [
+          "uv sync",
+          "pip install",
+          "import error",
+          "module not found",
+          "package not found",
+          "ModuleNotFoundError",
+          "ImportError",
+          "python version",
+          "wrong python",
+          "venv",
+          ".python-version"
+        ],
+        "intentPatterns": [
+          "(uv|pip).*?(sync|install).*?(fail|error|problem)",
+          "(import|module).*?(error|not found)",
+          "(wrong|different).*?(python|version|interpreter)",
+          "(package|module).*?(not|missing|can't)",
+          "ModuleNotFoundError",
+          "ImportError"
+        ]
+      }
+    },
+    "modular-code": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Guidelines for modular Python code organization and file size",
+      "promptTriggers": {
+        "keywords": [
+          "refactor",
+          "split file",
+          "file too large",
+          "too many lines",
+          "module organization",
+          "package structure",
+          "organize code",
+          "split module"
+        ],
+        "intentPatterns": [
+          "(split|break up|organize).*?(file|module|code)",
+          "(file|module).*?(too|very).*?(large|big|long)",
+          "(refactor|reorganize).*?(code|module|package)",
+          "(how|should).*?(organize|structure).*?(code|module)"
+        ]
+      }
+    },
+    "parallel-agent-contracts": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Prevent type duplication when launching parallel TypeScript agents",
+      "promptTriggers": {
+        "keywords": [
+          "parallel agents",
+          "spawn parallel",
+          "type duplication",
+          "type conflict",
+          "TypeScript agents",
+          "multiple agents TypeScript",
+          "agent type contract"
+        ],
+        "intentPatterns": [
+          "(parallel|multiple).*?agents.*?(TypeScript|ts)",
+          "(type|interface).*?(duplicate|conflict|collision)",
+          "(spawn|launch).*?(parallel|multiple).*?(ts|TypeScript)",
+          "(TypeScript|ts).*?(agents?|parallel)"
+        ]
+      }
+    },
+    "reference-sdk": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Check reference SDK implementations using btca ask",
+      "promptTriggers": {
+        "keywords": [
+          "btca ask",
+          "reference SDK",
+          "check Vercel",
+          "check Anthropic SDK",
+          "how does SDK",
+          "SDK implementation",
+          "reference implementation"
+        ],
+        "intentPatterns": [
+          "(check|how does).*?(SDK|Vercel|Anthropic)",
+          "(reference|other).*?(SDK|implementation)",
+          "btca.*?(ask|check)",
+          "(how|what).*?(SDK|library).*?(do|implement|handle)"
+        ]
+      }
+    },
+    "search-router": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Choose the right search tool for each query type",
+      "promptTriggers": {
+        "keywords": [
+          "which search tool",
+          "search tool",
+          "how to search",
+          "LEANN vs grep",
+          "ast-grep vs",
+          "best way to search",
+          "code search"
+        ],
+        "intentPatterns": [
+          "(which|what).*?(search|tool).*?(use|best)",
+          "(how|best).*?(search|find).*?(code|pattern)",
+          "(LEANN|ast-grep|grep|morph).*?(vs|or|versus)",
+          "(token|efficient).*?search"
+        ]
+      }
+    },
+    "tldr-code": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "Token-efficient code context (95% savings) - AST, call graph, CFG, DFG, PDG analysis. Install: uv tool install llm-tldr",
+      "promptTriggers": {
+        "keywords": [
+          "tldr",
+          "tldr tree",
+          "tldr structure",
+          "tldr search",
+          "tldr daemon",
+          "tldr cfg",
+          "tldr dfg",
+          "tldr slice",
+          "tldr impact",
+          "tldr semantic",
+          "tldr calls",
+          "tldr extract",
+          "call graph",
+          "what calls",
+          "who calls",
+          "calls what",
+          "how complex",
+          "complexity",
+          "cyclomatic",
+          "data flow",
+          "where does variable",
+          "variable come from",
+          "what affects",
+          "dependencies",
+          "understand function",
+          "understand code",
+          "how does function",
+          "trace through",
+          "control flow",
+          "program slice",
+          "code analysis",
+          "token efficient"
+        ],
+        "intentPatterns": [
+          "tldr.*?(tree|structure|search|daemon|cfg|dfg|slice|impact)",
+          "(what|who).*?calls.*?(this|function|method)",
+          "(how|very).*?complex.*?(is|function|code)",
+          "(where|what).*?(does|sets).*?variable",
+          "(data|control).*?flow",
+          "(what|which).*?affects.*?(line|code)",
+          "(understand|explain).*?(function|method|code)",
+          "(trace|follow).*?(calls|execution)",
+          "(cyclomatic|complexity).*?(of|for|is)",
+          "(run|use).*?tldr"
+        ]
+      }
+    },
+    "math-unified": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Unified math entry point - computation, solving, and explanation. Routes to SymPy, Z3, Pint, topic skills.",
+      "promptTriggers": {
+        "keywords": [
+          "/math",
+          "solve equation",
+          "integrate",
+          "derivative",
+          "differentiate",
+          "simplify expression",
+          "eigenvalue",
+          "determinant",
+          "matrix calculation",
+          "symbolic math",
+          "factor polynomial",
+          "taylor series",
+          "laplace transform",
+          "linear system"
+        ],
+        "intentPatterns": [
+          "(solve|compute|calculate|simplify).*?(equation|expression|integral)",
+          "(find|compute).*?(derivative|integral|limit|eigenvalue)",
+          "(what is|evaluate).*?(integral|derivative|determinant)",
+          "symbolic.*?(math|computation|algebra)"
+        ]
+      }
+    },
+    "math-help": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Guide to the math cognitive stack - what tools exist and when to use each",
+      "promptTriggers": {
+        "keywords": [
+          "math tools",
+          "math capabilities",
+          "what math can you do",
+          "math help",
+          "how to do math",
+          "available math",
+          "math stack"
+        ],
+        "intentPatterns": [
+          "(what|which).*?math.*?(tools?|capabilit|can you)",
+          "(how|help).*?(do|with).*?math",
+          "(list|show).*?math.*?(tools?|options)"
+        ]
+      }
+    },
+    "pint-compute": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Unit-aware computation with Pint - convert units, dimensional analysis, unit arithmetic",
+      "promptTriggers": {
+        "keywords": [
+          "convert units",
+          "unit conversion",
+          "meters to feet",
+          "miles to kilometers",
+          "celsius to fahrenheit",
+          "dimensional analysis",
+          "unit arithmetic",
+          "physical units",
+          "how many meters",
+          "how many feet",
+          "how many miles"
+        ],
+        "intentPatterns": [
+          "convert.*?(to|into).*?(meters|feet|miles|km|celsius|fahrenheit|pounds|kg)",
+          "(how many|what is).*?(meters|feet|miles|km|celsius|fahrenheit).*?(in|to)",
+          "(unit|dimensional).*?(convert|analysis|arithmetic)",
+          "[0-9]+.*?(meters|feet|miles|km|celsius|fahrenheit).*?(to|in)"
+        ]
+      }
+    },
+    "shapely-compute": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Computational geometry with Shapely - create geometries, boolean operations, measurements, predicates",
+      "promptTriggers": {
+        "keywords": [
+          "polygon area",
+          "polygon intersection",
+          "geometry intersection",
+          "convex hull",
+          "point in polygon",
+          "buffer geometry",
+          "shapely",
+          "computational geometry",
+          "geometric union",
+          "geometric difference"
+        ],
+        "intentPatterns": [
+          "(area|perimeter).*?(polygon|shape|geometry)",
+          "(intersect|union|difference).*?(polygon|shape|geometry)",
+          "(point|line).*?(in|inside|within).*?(polygon|shape)",
+          "(convex|concave).*?hull",
+          "(buffer|simplify).*?(geometry|shape|polygon)"
+        ]
+      }
+    },
+    "math/abstract-algebra": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Abstract algebra topic - groups, rings, fields, homomorphisms",
+      "promptTriggers": {
+        "keywords": [
+          "group theory",
+          "ring theory",
+          "field theory",
+          "abelian group",
+          "cyclic group",
+          "group homomorphism",
+          "ring homomorphism",
+          "field extension",
+          "Sylow theorem",
+          "quotient group",
+          "normal subgroup",
+          "kernel of homomorphism",
+          "isomorphism theorem"
+        ],
+        "intentPatterns": [
+          "(prove|show|verify).*?(group|ring|field).*?(homomorphism|isomorphism)",
+          "(abelian|cyclic|symmetric).*?group",
+          "(Sylow|Lagrange).*?theorem",
+          "(normal|quotient).*?(subgroup|group)"
+        ]
+      }
+    },
+    "math/category-theory": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Category theory topic - functors, natural transformations, limits",
+      "promptTriggers": {
+        "keywords": [
+          "functor",
+          "natural transformation",
+          "Yoneda lemma",
+          "adjoint functor",
+          "limit colimit",
+          "pullback pushout",
+          "monad category",
+          "morphism composition",
+          "commutative diagram",
+          "category equivalence",
+          "presheaf",
+          "representable functor"
+        ],
+        "intentPatterns": [
+          "(prove|show|verify).*?(functor|natural transformation)",
+          "(Yoneda|adjoint|representable).*?(lemma|functor)",
+          "(limit|colimit|pullback|pushout).*?(diagram|category)",
+          "commutative.*?diagram"
+        ]
+      }
+    },
+    "math/complex-analysis": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Complex analysis topic - residues, contour integrals, analytic functions",
+      "promptTriggers": {
+        "keywords": [
+          "residue theorem",
+          "contour integral",
+          "holomorphic function",
+          "analytic function",
+          "meromorphic",
+          "Laurent series",
+          "Cauchy integral",
+          "complex pole",
+          "essential singularity",
+          "conformal mapping",
+          "Riemann surface"
+        ],
+        "intentPatterns": [
+          "(compute|find|evaluate).*?residue",
+          "(contour|complex|line).*?integral",
+          "(holomorphic|analytic|meromorphic).*?function",
+          "(Laurent|Taylor).*?series.*?complex",
+          "Cauchy.*?(integral|theorem|formula)"
+        ]
+      }
+    },
+    "math/functional-analysis": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Functional analysis topic - Banach spaces, Hilbert spaces, operators",
+      "promptTriggers": {
+        "keywords": [
+          "Hilbert space",
+          "Banach space",
+          "bounded linear operator",
+          "spectral theorem",
+          "Riesz representation",
+          "orthogonal projection",
+          "adjoint operator",
+          "compact operator",
+          "Parseval identity",
+          "inner product space",
+          "dual space"
+        ],
+        "intentPatterns": [
+          "(Hilbert|Banach).*?space",
+          "(bounded|linear|compact).*?operator",
+          "(Riesz|spectral).*?(representation|theorem)",
+          "(orthogonal|orthonormal).*?(projection|basis)",
+          "adjoint.*?operator"
+        ]
+      }
+    },
+    "math/graph-number-theory": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Graph theory and number theory - primes, modular arithmetic, graph algorithms",
+      "promptTriggers": {
+        "keywords": [
+          "prime factorization",
+          "modular arithmetic",
+          "Fermat little theorem",
+          "Euler phi function",
+          "Chinese remainder theorem",
+          "graph coloring",
+          "spanning tree",
+          "Dijkstra algorithm",
+          "Hamilton path",
+          "Euler path",
+          "primality test"
+        ],
+        "intentPatterns": [
+          "(prime|factor).*?(number|integer|factorization)",
+          "(modular|mod).*?(arithmetic|inverse|exponentiation)",
+          "(Fermat|Euler|Wilson).*?theorem",
+          "(graph|tree).*?(coloring|spanning|path|cycle)",
+          "(Hamilton|Euler).*?(path|cycle|circuit)"
+        ]
+      }
+    },
+    "math/information-theory": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Information theory topic - entropy, channel capacity, coding",
+      "promptTriggers": {
+        "keywords": [
+          "Shannon entropy",
+          "mutual information",
+          "channel capacity",
+          "Kullback-Leibler divergence",
+          "source coding theorem",
+          "information bits",
+          "entropy rate",
+          "conditional entropy",
+          "joint entropy",
+          "data compression theory"
+        ],
+        "intentPatterns": [
+          "(Shannon|information).*?entropy",
+          "(mutual|conditional|joint).*?information",
+          "(channel|source).*?(capacity|coding)",
+          "(Kullback|KL).*?divergence",
+          "entropy.*?(rate|bits)"
+        ]
+      }
+    },
+    "math/linear-algebra": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Linear algebra topic - eigenvalues, matrices, vector spaces",
+      "promptTriggers": {
+        "keywords": [
+          "eigenvalue problem",
+          "eigenvector",
+          "characteristic polynomial",
+          "diagonalization",
+          "Jordan form",
+          "singular value decomposition",
+          "QR decomposition",
+          "LU decomposition",
+          "matrix rank",
+          "null space",
+          "column space",
+          "linear independence"
+        ],
+        "intentPatterns": [
+          "(find|compute).*?(eigenvalue|eigenvector)",
+          "(diagonalize|decompose).*?matrix",
+          "(SVD|QR|LU).*?decomposition",
+          "(null|column|row).*?space",
+          "(characteristic|minimal).*?polynomial"
+        ]
+      }
+    },
+    "math/mathematical-logic": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Mathematical logic topic - propositional, predicate, proof theory",
+      "promptTriggers": {
+        "keywords": [
+          "propositional logic",
+          "predicate logic",
+          "first order logic",
+          "proof theory",
+          "natural deduction",
+          "sequent calculus",
+          "Godel incompleteness",
+          "satisfiability",
+          "tautology",
+          "modus ponens",
+          "truth table"
+        ],
+        "intentPatterns": [
+          "(propositional|predicate|first.?order).*?logic",
+          "(prove|show).*?(tautology|valid|satisfiable)",
+          "(natural|sequent).*?(deduction|calculus)",
+          "(Godel|incompleteness).*?theorem",
+          "(truth|semantic).*?table"
+        ]
+      }
+    },
+    "math/measure-theory": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Measure theory topic - Lebesgue measure, sigma-algebras, integration",
+      "promptTriggers": {
+        "keywords": [
+          "Lebesgue measure",
+          "Lebesgue integral",
+          "sigma-algebra",
+          "Borel set",
+          "measurable function",
+          "outer measure",
+          "Caratheodory criterion",
+          "almost everywhere",
+          "dominated convergence",
+          "monotone convergence",
+          "Fatou lemma"
+        ],
+        "intentPatterns": [
+          "(Lebesgue|Borel).*?(measure|integral|set)",
+          "sigma.?algebra",
+          "(measurable|integrable).*?function",
+          "(dominated|monotone).*?convergence",
+          "(Fatou|Fubini).*?(lemma|theorem)"
+        ]
+      }
+    },
+    "math/numerical-methods": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Numerical methods topic - root finding, interpolation, quadrature",
+      "promptTriggers": {
+        "keywords": [
+          "Newton-Raphson method",
+          "bisection method",
+          "Runge-Kutta",
+          "numerical integration",
+          "Simpson rule",
+          "trapezoidal rule",
+          "interpolation polynomial",
+          "Lagrange interpolation",
+          "numerical error",
+          "floating point",
+          "iterative method"
+        ],
+        "intentPatterns": [
+          "(Newton|bisection|secant).*?method",
+          "(Runge|Kutta|RK4).*?(method|integration)",
+          "(Simpson|trapezoid).*?rule",
+          "(Lagrange|polynomial).*?interpolation",
+          "(numerical|floating).*?(error|precision)"
+        ]
+      }
+    },
+    "math/odes-pdes": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "ODEs and PDEs topic - differential equations, boundary value problems",
+      "promptTriggers": {
+        "keywords": [
+          "differential equation",
+          "initial value problem",
+          "boundary value problem",
+          "separable ODE",
+          "linear ODE",
+          "Laplace transform ODE",
+          "heat equation",
+          "wave equation",
+          "Poisson equation",
+          "phase portrait",
+          "equilibrium point"
+        ],
+        "intentPatterns": [
+          "(solve|find).*?(ODE|PDE|differential equation)",
+          "(initial|boundary).*?value.*?problem",
+          "(heat|wave|Laplace|Poisson).*?equation",
+          "(separable|linear|exact).*?(ODE|differential)",
+          "phase.*?(portrait|plane|diagram)"
+        ]
+      }
+    },
+    "math/optimization": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Optimization topic - convex optimization, gradient methods, constraints",
+      "promptTriggers": {
+        "keywords": [
+          "convex optimization",
+          "gradient descent",
+          "Lagrange multiplier",
+          "KKT conditions",
+          "linear programming",
+          "quadratic programming",
+          "constrained optimization",
+          "conjugate gradient",
+          "Newton optimization",
+          "interior point method",
+          "duality gap"
+        ],
+        "intentPatterns": [
+          "(convex|constrained|unconstrained).*?optimization",
+          "(gradient|steepest).*?descent",
+          "(Lagrange|Lagrangian).*?(multiplier|dual)",
+          "(KKT|Karush.?Kuhn.?Tucker).*?condition",
+          "(linear|quadratic|semidefinite).*?programming"
+        ]
+      }
+    },
+    "math/real-analysis": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Real analysis topic - limits, continuity, convergence",
+      "promptTriggers": {
+        "keywords": [
+          "epsilon delta proof",
+          "uniform continuity",
+          "pointwise convergence",
+          "uniform convergence",
+          "Cauchy sequence",
+          "supremum infimum",
+          "Bolzano-Weierstrass",
+          "Heine-Borel",
+          "intermediate value theorem",
+          "mean value theorem",
+          "Riemann integral"
+        ],
+        "intentPatterns": [
+          "epsilon.?delta.*?(proof|definition)",
+          "(uniform|pointwise).*?(continuity|convergence)",
+          "(Cauchy|convergent).*?sequence",
+          "(supremum|infimum|sup|inf).*?(set|sequence)",
+          "(Bolzano|Weierstrass|Heine|Borel).*?theorem"
+        ]
+      }
+    },
+    "math/topology": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Topology topic - open sets, compactness, connectedness",
+      "promptTriggers": {
+        "keywords": [
+          "topological space",
+          "open cover",
+          "compact space",
+          "connected space",
+          "homeomorphism",
+          "continuous mapping",
+          "Hausdorff space",
+          "metric topology",
+          "product topology",
+          "quotient topology",
+          "Tychonoff theorem"
+        ],
+        "intentPatterns": [
+          "(topological|metric).*?space",
+          "(open|closed).*?(set|cover|ball)",
+          "(compact|connected|Hausdorff).*?space",
+          "(prove|show).*?homeomorphism",
+          "(product|quotient|subspace).*?topology"
+        ]
+      }
+    },
+    "dead-code": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Find unused functions and dead code in the codebase",
+      "promptTriggers": {
+        "keywords": [
+          "/dead-code",
+          "dead code",
+          "unused functions",
+          "find unused",
+          "unreachable code",
+          "cleanup unused",
+          "remove dead code"
+        ],
+        "intentPatterns": [
+          "(find|detect|check).*?(dead|unused|unreachable).*?code",
+          "(dead|unused).*?(code|functions?|methods?)",
+          "(cleanup|remove).*?(unused|dead)"
+        ]
+      }
+    },
+    "recall": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Query semantic memory for relevant learnings from past sessions",
+      "promptTriggers": {
+        "keywords": [
+          "/recall",
+          "recall learnings",
+          "search memory",
+          "what did we learn",
+          "past learnings",
+          "memory search",
+          "search learnings",
+          "find in memory"
+        ],
+        "intentPatterns": [
+          "/recall.*",
+          "(recall|search|query).*?(memory|learnings)",
+          "(what|any).*?(learned|learnings).*?(about|from)",
+          "(past|previous).*?learnings"
+        ]
+      }
+    },
+    "remember": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Store a learning, pattern, or decision in semantic memory for future recall",
+      "promptTriggers": {
+        "keywords": [
+          "/remember",
+          "remember this",
+          "store learning",
+          "save this",
+          "remember that",
+          "store this pattern",
+          "save learning"
+        ],
+        "intentPatterns": [
+          "/remember.*",
+          "(remember|store|save).*?(this|that|learning|pattern)",
+          "(add|put).*?(to|in).*?memory"
+        ]
+      }
+    },
+    "migrate": {
+      "type": "workflow",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Migration workflow - research → analyze → plan → implement → review. For frameworks, languages, infrastructure.",
+      "promptTriggers": {
+        "keywords": [
+          "/migrate",
+          "migrate to",
+          "upgrade framework",
+          "move from",
+          "upgrade python",
+          "upgrade node",
+          "migrate database",
+          "version upgrade",
+          "framework migration",
+          "language migration"
+        ],
+        "intentPatterns": [
+          "(migrate|migration).*?(to|from|database|framework)",
+          "(upgrade|update).*?(framework|python|node|version)",
+          "(move|switch).*?from.*?to",
+          "(language|infrastructure).*?(migration|change)"
+        ]
+      }
+    },
+    "refactor": {
+      "type": "workflow",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Code refactoring workflow - analyze → plan → implement → review → validate. Safe restructuring with tests.",
+      "promptTriggers": {
+        "keywords": [
+          "/refactor",
+          "refactor this",
+          "clean up this code",
+          "extract into module",
+          "improve architecture",
+          "code restructuring",
+          "technical debt",
+          "clean up code"
+        ],
+        "intentPatterns": [
+          "refactor.*?(this|code|module|class|function)",
+          "(clean up|cleanup).*?(code|this|module)",
+          "(extract|split).*?(into|to).*?(module|class|file)",
+          "(improve|restructure).*?(architecture|code|structure)",
+          "technical.*?debt"
+        ]
+      }
+    },
+    "release": {
+      "type": "workflow",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Release workflow - security audit → E2E tests → review → changelog → docs. Ship with confidence.",
+      "promptTriggers": {
+        "keywords": [
+          "/release",
+          "prepare release",
+          "ship version",
+          "release to production",
+          "cut a release",
+          "ready to deploy",
+          "production deployment",
+          "release prep"
+        ],
+        "intentPatterns": [
+          "(prepare|cut|create).*?release",
+          "(ship|deploy|release).*?(version|production|to prod)",
+          "(ready|preparing).*?(deploy|release|ship)",
+          "production.*?(deployment|release)"
+        ]
+      }
+    },
+    "review": {
+      "type": "workflow",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Code review workflow - parallel specialized reviews → synthesis. Multi-perspective feedback.",
+      "promptTriggers": {
+        "keywords": [
+          "/review",
+          "review this code",
+          "review my pr",
+          "check before merge",
+          "get feedback",
+          "code review",
+          "review implementation",
+          "review changes"
+        ],
+        "intentPatterns": [
+          "review.*?(this|code|pr|changes|implementation)",
+          "(check|look at).*?before.*?merge",
+          "(get|need).*?feedback.*?(on|for)",
+          "code.*?review"
+        ]
+      }
+    },
+    "security": {
+      "type": "workflow",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Security audit workflow - vulnerability scan → verification. For auth, payments, user data.",
+      "promptTriggers": {
+        "keywords": [
+          "/security",
+          "security audit",
+          "check vulnerabilities",
+          "is this secure",
+          "review authentication",
+          "check injection",
+          "security review",
+          "vulnerability scan"
+        ],
+        "intentPatterns": [
+          "security.*?(audit|review|check|scan)",
+          "(check|find|scan).*?vulnerabilit",
+          "(is|are).*?(this|it).*?secure",
+          "(review|check).*?(auth|authentication|authorization)",
+          "(injection|xss|csrf).*?(attack|check|vulnerable)"
+        ]
+      }
+    },
+    "test": {
+      "type": "workflow",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Testing workflow - unit tests ∥ integration tests → E2E tests. Comprehensive test suite.",
+      "promptTriggers": {
+        "keywords": [
+          "/test",
+          "run all tests",
+          "test the feature",
+          "verify everything works",
+          "full test suite",
+          "run tests",
+          "test suite",
+          "run the tests"
+        ],
+        "intentPatterns": [
+          "(run|execute).*?(all|full|complete).*?tests",
+          "test.*?(feature|everything|suite|this)",
+          "(verify|check).*?(everything|all).*?works",
+          "full.*?test.*?suite"
+        ]
+      }
+    },
+    "prove": {
+      "type": "workflow",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Formal theorem proving with Lean 4 - research, testing, and verification phases.",
+      "promptTriggers": {
+        "keywords": [
+          "/prove",
+          "prove this",
+          "formal proof",
+          "lean 4",
+          "lean4",
+          "theorem prover",
+          "formal verification",
+          "prove theorem",
+          "mathlib"
+        ],
+        "intentPatterns": [
+          "(prove|verify).*?(theorem|lemma|proposition)",
+          "(formal|lean).*?(proof|verification)",
+          "lean.*?4",
+          "(use|with).*?(lean|mathlib)"
+        ]
+      }
+    },
+    "braintrust-tracing": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Braintrust tracing for Claude Code - hook architecture, sub-agent correlation, debugging.",
+      "promptTriggers": {
+        "keywords": [
+          "braintrust tracing",
+          "trace hooks",
+          "hook tracing",
+          "agent correlation",
+          "sub-agent tracing",
+          "debug tracing",
+          "trace spans"
+        ],
+        "intentPatterns": [
+          "(braintrust|trace).*?(hook|agent|span)",
+          "(debug|trace).*?(sub-agent|correlation)",
+          "hook.*?(architecture|tracing)"
+        ]
+      }
+    },
+    "cli-reference": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Claude Code CLI commands, flags, headless mode, and automation patterns.",
+      "promptTriggers": {
+        "keywords": [
+          "cli reference",
+          "command line",
+          "headless mode",
+          "claude code cli",
+          "cli flags",
+          "automation",
+          "non-interactive",
+          "scripting claude",
+          "batch mode"
+        ],
+        "intentPatterns": [
+          "(cli|command line).*?(reference|flags|options)",
+          "(headless|non-interactive|batch).*?mode",
+          "(automate|script).*?claude",
+          "run.*?claude.*?(headless|automated)"
+        ]
+      }
+    },
+    "premortem": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Identify failure modes before they occur using structured risk analysis.",
+      "promptTriggers": {
+        "keywords": [
+          "/premortem",
+          "premortem",
+          "pre-mortem",
+          "what could go wrong",
+          "failure modes",
+          "risk analysis",
+          "anticipate problems",
+          "potential issues"
+        ],
+        "intentPatterns": [
+          "(pre-?mortem|risk).*?(analysis|assessment)",
+          "(what|identify).*?(could|might).*?(go wrong|fail)",
+          "(failure|risk).*?modes?",
+          "(anticipate|predict).*?(problems|issues|failures)"
+        ]
+      }
+    },
+    "discovery-interview": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Deep interview process to transform vague ideas into detailed specs.",
+      "promptTriggers": {
+        "keywords": [
+          "/discovery",
+          "discovery interview",
+          "figure out what I want",
+          "help me think through",
+          "clarify requirements",
+          "what should I build",
+          "vague idea",
+          "not sure what I need"
+        ],
+        "intentPatterns": [
+          "(discovery|interview).*?(process|session)",
+          "(figure out|clarify|define).*?(what|requirements|needs)",
+          "(help|assist).*?(think through|understand|clarify)",
+          "(vague|unclear).*?(idea|concept|requirements)",
+          "what.*?should.*?(build|implement|create)"
+        ]
+      }
+    },
+    "loogle-search": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Search Mathlib by type signature pattern - find lemmas when you know the shape but not the name.",
+      "promptTriggers": {
+        "keywords": [
+          "loogle",
+          "mathlib search",
+          "find lemma",
+          "search mathlib",
+          "type signature",
+          "lean lemma",
+          "lean4 lemma",
+          "mathlib lemma",
+          "what lemma",
+          "which theorem"
+        ],
+        "intentPatterns": [
+          "(search|find|look up).*?(mathlib|lemma|theorem)",
+          "(what|which).*?(lemma|theorem).*?(for|about|proves)",
+          "loogle.*?(search|query)",
+          "(type|signature).*?(search|pattern)",
+          "(lean|lean4).*?(lemma|theorem|find)"
+        ]
+      }
     }
+  },
+  "agents": {
+    "scout": {
+      "type": "exploration",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "Comprehensive codebase exploration - locating, analyzing, and pattern finding",
+      "promptTriggers": {
+        "keywords": [
+          "explore codebase",
+          "find files",
+          "understand code",
+          "brownfield",
+          "existing codebase",
+          "existing project",
+          "legacy code",
+          "understand the codebase",
+          "current implementation",
+          "understand how",
+          "find all usages",
+          "where is",
+          "how does",
+          "search codebase",
+          "code structure",
+          "what calls",
+          "who uses",
+          "trace through",
+          "analyze code",
+          "find patterns"
+        ],
+        "intentPatterns": [
+          "brownfield.*?(plan|implement|feature)",
+          "(existing|legacy).*?(codebase|project|code)",
+          "(explore|understand).*?(codebase|code|system)",
+          "(find|search|locate).*?(files|usages|references)",
+          "how.*?(does|is).*?(implemented|work)",
+          "(what|where|which).*?(calls|uses|imports)",
+          "(before|first).*?(plan|implement).*?(understand|explore)"
+        ]
+      }
+    },
+    "oracle": {
+      "type": "research",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "Comprehensive external research using MCP tools (nia, perplexity, firecrawl)",
+      "promptTriggers": {
+        "keywords": [
+          "research",
+          "investigate",
+          "find out",
+          "learn about",
+          "gather information",
+          "what are best practices",
+          "how should we",
+          "what's the best way",
+          "how does",
+          "where is",
+          "understand",
+          "explain",
+          "document",
+          "codebase",
+          "architecture"
+        ],
+        "intentPatterns": [
+          "(research|investigate|explore).*?(topic|approach|options)",
+          "(find out|learn).*?(about|how)",
+          "(what|how).*?(best practices|recommended|should)",
+          "(gather|collect).*?(information|data|knowledge)",
+          "(how|where).*?(does|is|works|implemented)",
+          "(understand|explain|document).*?(codebase|code|system|architecture)"
+        ]
+      }
+    },
+    "plan-agent": {
+      "type": "planning",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "Create implementation plans - for brownfield run scout first",
+      "promptTriggers": {
+        "keywords": [
+          "create plan",
+          "make plan",
+          "plan for",
+          "design",
+          "architect",
+          "implementation plan",
+          "how to implement",
+          "planning",
+          "plan feature",
+          "plan implementation",
+          "new feature",
+          "build feature",
+          "add feature",
+          "phased approach",
+          "greenfield",
+          "new project",
+          "start fresh",
+          "from scratch"
+        ],
+        "intentPatterns": [
+          "(create|make|write|draft).*?plan",
+          "(plan|design).*?(implementation|feature|system)",
+          "how.*?(should|would|could).*?implement",
+          "(architect|design).*?(system|feature|solution)",
+          "(start|begin).*?planning",
+          "greenfield.*?(plan|project|feature)",
+          "(new|fresh|scratch).*?project"
+        ]
+      }
+    },
+    "validate-agent": {
+      "type": "validation",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "PRE-implementation: Validate plan tech choices against current best practices and past precedent",
+      "promptTriggers": {
+        "keywords": [
+          "validate plan",
+          "validate the plan",
+          "check plan",
+          "review plan",
+          "validate tech",
+          "validate choices",
+          "before implementing",
+          "ready to implement",
+          "plan looks good",
+          "check precedent",
+          "past handoffs",
+          "done this before",
+          "similar tasks",
+          "rag judge",
+          "judge plan"
+        ],
+        "intentPatterns": [
+          "(validate|check|review).*?plan",
+          "(validate|check).*?(tech|choices|approach)",
+          "(before|ready).*?implement",
+          "(is|does).*?plan.*?(good|ready|valid)",
+          "plan.*?(ready|validated|approved)",
+          "(check|search).*?precedent",
+          "(similar|past).*?(task|handoff|implementation)",
+          "(done|tried).*?before"
+        ]
+      }
+    },
+    "debug-agent": {
+      "type": "debugging",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "Investigate issues using codebase exploration, logs, and code search",
+      "promptTriggers": {
+        "keywords": [
+          "debug",
+          "debugging",
+          "investigate",
+          "investigate issue",
+          "find bug",
+          "why is it",
+          "what's wrong",
+          "not working",
+          "error",
+          "broken",
+          "failing",
+          "issue",
+          "problem",
+          "bug",
+          "logs",
+          "check logs"
+        ],
+        "intentPatterns": [
+          "(debug|investigate|diagnose).*?(issue|bug|error|problem)",
+          "(why|what).*?(not working|broken|failing|wrong)",
+          "(find|locate|trace).*?(bug|issue|error|cause)",
+          "(what|why).*?(causing|happened)",
+          "(check|look at|examine).*?(logs|database|state)",
+          "(something|it).*?(broke|failed|crashed)"
+        ]
+      }
+    },
+    "pathfinder": {
+      "type": "research",
+      "enforcement": "suggest",
+      "priority": "critical",
+      "description": "Analyze repository structure, patterns, conventions, and documentation",
+      "promptTriggers": {
+        "keywords": [
+          "research repo",
+          "research this repo",
+          "analyze repo",
+          "analyze this repo",
+          "understand repo",
+          "repo structure",
+          "repo conventions",
+          "repo patterns",
+          "clone and analyze",
+          "new repo",
+          "new repository",
+          "contribution guidelines",
+          "how does this project",
+          "project conventions",
+          "find patterns",
+          "similar implementations"
+        ],
+        "intentPatterns": [
+          "(research|analyze|understand).*?(repo|repository|project)",
+          "(clone|fork).*?(and|then).*?(research|analyze)",
+          "(what|how).*?(conventions|patterns|structure).*?(repo|project)",
+          "(before|want to).*?contribut",
+          "(understand|learn).*?(codebase|project)",
+          "(find|show|get).*?(examples|patterns|similar)"
+        ]
+      }
+    }
+  },
+  "notes": {
+    "enforcement_types": {
+      "suggest": "Skill suggestion appears but doesn't block execution",
+      "block": "Requires skill to be used before proceeding (guardrail)",
+      "warn": "Shows warning but allows proceeding"
+    },
+    "priority_levels": {
+      "critical": "Highest - Always trigger when matched",
+      "high": "Important - Trigger for most matches",
+      "medium": "Moderate - Trigger for clear matches",
+      "low": "Optional - Trigger only for explicit matches"
+    }
+  }
 }

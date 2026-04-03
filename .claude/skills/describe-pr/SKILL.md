@@ -10,6 +10,7 @@ You are tasked with generating a comprehensive pull request description followin
 ## When to Use
 
 Activate when:
+
 - User says "/describe-pr" or "/pr-description"
 - User asks to "describe this PR" or "generate PR description"
 - User says "write a PR description"
@@ -21,7 +22,6 @@ Activate when:
    - First, check if `thoughts/shared/pr_description.md` exists
    - If it doesn't exist, inform the user they need to create a PR description template at `thoughts/shared/pr_description.md`
    - Read the template carefully to understand all sections and requirements
-
 
 2. **Identify the PR to describe:**
    - Check if the current branch has an associated PR: `gh pr view --json url,number,title,state 2>/dev/null`
@@ -41,10 +41,11 @@ Activate when:
    - Get PR metadata: `gh pr view {number} --json url,title,number,state`
 
 4b. **Gather reasoning history (if available):**
-   - Check if reasoning files exist: `ls .git/claude/commits/*/reasoning.md 2>/dev/null`
-   - If they exist, aggregate them: `bash "$CLAUDE_CC_DIR/.claude/scripts/aggregate-reasoning.sh" main`
-   - This shows what approaches were tried before the final solution
-   - Save the output for inclusion in the PR description
+
+- Check if reasoning files exist: `ls .git/claude/commits/*/reasoning.md 2>/dev/null`
+- If they exist, aggregate them: `bash "$CLAUDE_CC_DIR/.claude/scripts/aggregate-reasoning.sh" main`
+- This shows what approaches were tried before the final solution
+- Save the output for inclusion in the PR description
 
 5. **Analyze the changes thoroughly:** (ultrathink about the code changes, their architectural implications, and potential impacts)
    - Read through the entire diff carefully
@@ -85,6 +86,7 @@ Activate when:
    - If any verification steps remain unchecked, remind the user to complete them before merging
 
 ## Important notes:
+
 - This command works across different repositories - always read the local template
 - Be thorough but concise - descriptions should be scannable
 - Focus on the "why" as much as the "what"

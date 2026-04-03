@@ -12,6 +12,7 @@ Complete reference for running Agentica SDK with a local Claude proxy. This enab
 ## When to Use
 
 Use this skill when:
+
 - Starting Agentica development with Claude proxy
 - Debugging connection issues between SDK, server, and proxy
 - Setting up a fresh Agentica environment
@@ -37,12 +38,13 @@ Claude CLI (claude -p)
 
 ## Environment Variables
 
-| Variable | Set By | Used By | Purpose |
-|----------|--------|---------|---------|
-| `INFERENCE_ENDPOINT_URL` | Human | agentica-server | Where server sends LLM inference requests |
-| `S_M_BASE_URL` | Human | Agentica SDK client | Where SDK connects to session manager |
+| Variable                 | Set By | Used By             | Purpose                                   |
+| ------------------------ | ------ | ------------------- | ----------------------------------------- |
+| `INFERENCE_ENDPOINT_URL` | Human  | agentica-server     | Where server sends LLM inference requests |
+| `S_M_BASE_URL`           | Human  | Agentica SDK client | Where SDK connects to session manager     |
 
 **KEY:** These are NOT the same endpoint!
+
 - SDK connects to server (port 2345)
 - Server connects to proxy (port 8080)
 
@@ -90,6 +92,7 @@ curl http://localhost:2345/health
 **Cause:** Claude proxy returning plain JSON instead of SSE format.
 
 **Fix:** Proxy must return Server-Sent Events format:
+
 ```
 data: {"choices": [...]}\n\n
 ```
@@ -109,6 +112,7 @@ data: {"choices": [...]}\n\n
 **Cause:** Missing `--allowedTools` in claude_proxy.py CLI call.
 
 **Fix:** Proxy must pass tool permissions:
+
 ```bash
 claude -p ... --allowedTools Read Write Edit Bash
 ```
@@ -120,6 +124,7 @@ claude -p ... --allowedTools Read Write Edit Bash
 **Cause:** Hallucination - agent describing intended actions without executing.
 
 **Fix:** Added emphatic anti-hallucination prompt in REPL_BASELINE:
+
 ```
 CRITICAL: Use ACTUAL tools. Never DESCRIBE using tools.
 ```
@@ -134,11 +139,11 @@ CRITICAL: Use ACTUAL tools. Never DESCRIBE using tools.
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `scripts/agentica/claude_proxy.py` | OpenAI-compatible proxy with SSE streaming |
-| `workspace/agentica-research/agentica-server/` | Local agentica-server installation |
-| `scripts/agentica/PATTERNS.md` | Multi-agent pattern documentation |
+| File                                           | Purpose                                    |
+| ---------------------------------------------- | ------------------------------------------ |
+| `scripts/agentica/claude_proxy.py`             | OpenAI-compatible proxy with SSE streaming |
+| `workspace/agentica-research/agentica-server/` | Local agentica-server installation         |
+| `scripts/agentica/PATTERNS.md`                 | Multi-agent pattern documentation          |
 
 ## Quick Verification
 
@@ -160,6 +165,7 @@ curl http://localhost:8080/v1/chat/completions \
 ## Checklist
 
 Before running agents:
+
 - [ ] Claude proxy running on port 8080
 - [ ] Agentica server running on port 2345 (from its directory)
 - [ ] `S_M_BASE_URL` set for client scripts

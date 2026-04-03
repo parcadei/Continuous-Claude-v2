@@ -150,10 +150,10 @@ curl http://localhost:2345/health  # Agentica
 
 ## Common Errors
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| "Permission denied" | Missing --allowedTools | Add `--allowedTools Read Write Edit Bash` |
-| Agent claims success but file not created | Hallucination | Add anti-hallucination prompt section |
-| "Cannot access /tmp/..." | Sandbox restriction | Use project-relative paths |
-| "APIConnectionError" | Wrong response format | Use SSE streaming (data: {...}\n\n) |
-| "NameError: view_file" | Agent using REPL functions | Add REPL_BASELINE with native tool examples |
+| Error                                     | Cause                      | Fix                                         |
+| ----------------------------------------- | -------------------------- | ------------------------------------------- |
+| "Permission denied"                       | Missing --allowedTools     | Add `--allowedTools Read Write Edit Bash`   |
+| Agent claims success but file not created | Hallucination              | Add anti-hallucination prompt section       |
+| "Cannot access /tmp/..."                  | Sandbox restriction        | Use project-relative paths                  |
+| "APIConnectionError"                      | Wrong response format      | Use SSE streaming (data: {...}\n\n)         |
+| "NameError: view_file"                    | Agent using REPL functions | Add REPL_BASELINE with native tool examples |

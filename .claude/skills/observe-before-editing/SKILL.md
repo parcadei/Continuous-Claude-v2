@@ -6,7 +6,7 @@ user-invocable: false
 
 # Observe Before Editing
 
-Before editing code to fix a bug, confirm what the system *actually produced*.
+Before editing code to fix a bug, confirm what the system _actually produced_.
 
 ## When to Use
 
@@ -27,7 +27,7 @@ Outputs don't lie. Code might. Check outputs first.
 ## DON'T
 
 - Assume "hook didn't run" without checking outputs
-- Edit code based on what you *think* should happen
+- Edit code based on what you _think_ should happen
 - Confuse global vs project paths (check both: `.claude/` and `~/.claude/`)
 
 ## Source Sessions

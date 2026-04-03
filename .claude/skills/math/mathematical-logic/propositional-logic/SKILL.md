@@ -12,7 +12,6 @@ Use this skill when working on propositional-logic problems in mathematical logi
 
 ## Decision Tree
 
-
 1. **Identify Formula Structure**
    - Classify: tautology, contradiction, or contingent?
    - Main connective: AND, OR, IMPLIES, NOT, IFF?
@@ -33,25 +32,28 @@ Use this skill when working on propositional-logic problems in mathematical logi
    - Closed branches = contradictions
    - All branches closed = valid argument
 
-
 ## Tool Commands
 
 ### Z3_Sat
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py sat "And(p, Implies(p, q), Not(q))"
 ```
 
 ### Z3_Tautology
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "Implies(And(p, Implies(p, q)), q)"
 ```
 
 ### Sympy_Truthtable
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py truthtable "p & (p >> q) >> q"
 ```
 
 ### Z3_Modus_Ponens
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "Implies(And(p, Implies(p,q)), q)"
 ```

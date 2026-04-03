@@ -9,10 +9,10 @@
  * Part of the coordination layer architecture (Phase 1).
  */
 
-import { readFileSync } from 'fs';
-import { checkFileClaim, claimFile } from './shared/db-utils-pg.js';
-import { getSessionId, getProject } from './shared/session-id.js';
-import type { PreToolUseInput, HookOutput } from './shared/types.js';
+import { readFileSync } from "fs";
+import { checkFileClaim, claimFile } from "./shared/db-utils-pg.js";
+import { getSessionId, getProject } from "./shared/session-id.js";
+import type { PreToolUseInput, HookOutput } from "./shared/types.js";
 
 /**
  * Main entry point for the PreToolUse:Edit hook.
@@ -22,24 +22,24 @@ export function main(): void {
   // Read hook input from stdin
   let input: PreToolUseInput;
   try {
-    const stdinContent = readFileSync(0, 'utf-8');
+    const stdinContent = readFileSync(0, "utf-8");
     input = JSON.parse(stdinContent) as PreToolUseInput;
   } catch {
     // If we can't read input, continue silently
-    console.log(JSON.stringify({ result: 'continue' }));
+    console.log(JSON.stringify({ result: "continue" }));
     return;
   }
 
   // Only process Edit tool
-  if (input.tool_name !== 'Edit') {
-    console.log(JSON.stringify({ result: 'continue' }));
+  if (input.tool_name !== "Edit") {
+    console.log(JSON.stringify({ result: "continue" }));
     return;
   }
 
   // Extract file path from input
   const filePath = input.tool_input?.file_path as string;
   if (!filePath) {
-    console.log(JSON.stringify({ result: 'continue' }));
+    console.log(JSON.stringify({ result: "continue" }));
     return;
   }
 
@@ -53,9 +53,9 @@ export function main(): void {
 
   if (claimCheck.claimed) {
     // File is being edited by another session - warn but allow
-    const fileName = filePath.split('/').pop() || filePath;
+    const fileName = filePath.split("/").pop() || filePath;
     output = {
-      result: 'continue',  // Allow edit, just warn
+      result: "continue", // Allow edit, just warn
       message: `\u26A0\uFE0F **File Conflict Warning**
 \`${fileName}\` is being edited by Session ${claimCheck.claimedBy}
 Consider coordinating with the other session to avoid conflicts.`,
@@ -63,7 +63,7 @@ Consider coordinating with the other session to avoid conflicts.`,
   } else {
     // Claim the file for this session
     claimFile(filePath, project, sessionId);
-    output = { result: 'continue' };
+    output = { result: "continue" };
   }
 
   console.log(JSON.stringify(output));

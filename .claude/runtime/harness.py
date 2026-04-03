@@ -87,7 +87,6 @@ def _suppress_asyncgen_errors():
     _suppress_asyncgen_errors._handler = silent_exception_handler
 
     # Monkey-patch asyncio.run to install our exception handler
-    original_run = asyncio.run
 
     def patched_run(main, *, debug=None, **kwargs):
         # Create loop manually so we can set exception handler

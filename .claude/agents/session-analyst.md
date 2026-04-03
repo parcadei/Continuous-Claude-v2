@@ -28,6 +28,7 @@ uv run python -m runtime.harness scripts/braintrust_analyze.py --last-session
 ## Step 3: Write Report
 
 **ALWAYS write to:**
+
 ```
 $CLAUDE_CC_DIR/.claude/cache/agents/session-analyst/output-{timestamp}.md
 ```

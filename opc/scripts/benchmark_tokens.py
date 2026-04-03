@@ -11,8 +11,6 @@ Usage:
     python /path/to/benchmark_tokens.py
 """
 
-import json
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -101,7 +99,7 @@ def main():
     print("TOKEN SAVINGS BENCHMARK: Raw Files vs TLDR")
     print("=" * 70)
     print(f"Project: {project}")
-    print(f"Encoder: cl100k_base (Claude)")
+    print("Encoder: cl100k_base (Claude)")
     print()
 
     results = []

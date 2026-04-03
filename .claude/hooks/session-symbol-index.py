@@ -11,7 +11,6 @@ Uses daemon for cache warming (P0-P4)
 Triggers semantic indexing (P5) if call graph exists but FAISS missing
 """
 import os
-import sys
 import json
 import subprocess
 from pathlib import Path

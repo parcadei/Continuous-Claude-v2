@@ -17,13 +17,13 @@ A multi-layer system for machine-verified mathematical problem solving.
 
 ## When to Use Each Layer
 
-| Problem Type | Layer | Why |
-|--------------|-------|-----|
-| Solve equation | SymPy | Exact symbolic solutions |
-| Prove inequality | Z3 | SAT solver for constraints |
-| Verify derivation | Scratchpad | Step verification |
-| Formal theorem | Lean 4 | Machine-checked proof |
-| Category theory | Lean 4 | Abstract structures |
+| Problem Type      | Layer      | Why                        |
+| ----------------- | ---------- | -------------------------- |
+| Solve equation    | SymPy      | Exact symbolic solutions   |
+| Prove inequality  | Z3         | SAT solver for constraints |
+| Verify derivation | Scratchpad | Step verification          |
+| Formal theorem    | Lean 4     | Machine-checked proof      |
+| Category theory   | Lean 4     | Abstract structures        |
 
 ## Quick Start
 
@@ -64,6 +64,7 @@ lake build  # Compiler-in-the-loop
 ## Domain Skills
 
 Each domain skill contains:
+
 - `SKILL.md` - When to use, key patterns
 - `THEOREMS.md` - Core theorems and definitions
 - `EXAMPLES.md` - Worked examples with verification
@@ -71,6 +72,7 @@ Each domain skill contains:
 ## Learning From Sessions
 
 Agents can query past reasoning:
+
 - Handoffs: `thoughts/shared/handoffs/`
 - Braintrust: `uv run python scripts/braintrust_analyze.py --session-id <id>`
 

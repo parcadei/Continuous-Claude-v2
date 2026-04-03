@@ -17,6 +17,7 @@ allowed-tools: [Bash, Read]
 ## Token Optimization
 
 RepoPrompt is **more token-efficient** than raw file reads:
+
 - `structure` → signatures only (not full content)
 - `read --start-line --limit` → slices instead of full files
 - `search --context-lines` → relevant matches with context
@@ -34,6 +35,7 @@ repoprompt_cli -e 'command'
 ## Commands Reference
 
 ### File Tree
+
 ```bash
 # Full tree
 rp-cli -e 'tree'
@@ -46,6 +48,7 @@ rp-cli -e 'tree --mode selected'
 ```
 
 ### Code Structure (Codemaps) - TOKEN EFFICIENT
+
 ```bash
 # Structure of specific paths
 rp-cli -e 'structure src/auth/'
@@ -58,6 +61,7 @@ rp-cli -e 'structure src/ --max-results 10'
 ```
 
 ### Search
+
 ```bash
 # Basic search
 rp-cli -e 'search "pattern"'
@@ -73,6 +77,7 @@ rp-cli -e 'search "function" --max-results 20'
 ```
 
 ### Read Files - TOKEN EFFICIENT
+
 ```bash
 # Full file
 rp-cli -e 'read path/to/file.ts'
@@ -85,6 +90,7 @@ rp-cli -e 'read path/to/file.ts --start-line -20'
 ```
 
 ### Selection Management
+
 ```bash
 # Add files to selection
 rp-cli -e 'select add src/auth/'
@@ -100,6 +106,7 @@ rp-cli -e 'select get'
 ```
 
 ### Workspace Context
+
 ```bash
 # Get full context
 rp-cli -e 'context'
@@ -109,12 +116,14 @@ rp-cli -e 'context --include prompt,selection,tree'
 ```
 
 ### Chain Commands
+
 ```bash
 # Multiple operations
 rp-cli -e 'select set src/auth/ && structure --scope selected && context'
 ```
 
 ### Workspaces
+
 ```bash
 # List workspaces
 rp-cli -e 'workspace list'
@@ -127,6 +136,7 @@ rp-cli -e 'workspace switch "ProjectName"'
 ```
 
 ### AI Chat (uses RepoPrompt's models)
+
 ```bash
 # Send to chat
 rp-cli -e 'chat "How does the auth system work?"'
@@ -136,6 +146,7 @@ rp-cli -e 'chat "Design a new feature" --mode plan'
 ```
 
 ### Context Builder (AI-powered file selection)
+
 ```bash
 # Auto-select relevant files for a task
 rp-cli -e 'builder "implement user authentication"'
@@ -162,18 +173,19 @@ context --all > ~/exports/frontend.md
 ```
 
 Run with:
+
 ```bash
 rp-cli --exec-file ~/scripts/daily-export.rp
 ```
 
 ## CLI Flags
 
-| Flag | Purpose |
-|------|---------|
-| `-e 'cmd'` | Execute command(s) |
-| `-w <id>` | Target window ID |
-| `-q` | Quiet mode |
-| `-d <cmd>` | Detailed help for command |
+| Flag                  | Purpose                       |
+| --------------------- | ----------------------------- |
+| `-e 'cmd'`            | Execute command(s)            |
+| `-w <id>`             | Target window ID              |
+| `-q`                  | Quiet mode                    |
+| `-d <cmd>`            | Detailed help for command     |
 | `--wait-for-server 5` | Wait for connection (scripts) |
 
 ## Async Operations (tmux)

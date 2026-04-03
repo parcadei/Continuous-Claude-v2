@@ -2,7 +2,8 @@
 name: prove
 description: Formal theorem proving with research, testing, and verification phases
 triggers: ["prove", "verify", "show that", "is it true", "formalize"]
-allowed-tools: [Bash, Read, Write, Edit, WebSearch, WebFetch, AskUserQuestion, Grep, Glob]
+allowed-tools:
+  [Bash, Read, Write, Edit, WebSearch, WebFetch, AskUserQuestion, Grep, Glob]
 priority: high
 ---
 
@@ -24,6 +25,7 @@ command -v lake &>/dev/null && echo "Lean4 installed" || echo "Lean4 NOT install
 ```
 
 **If not installed:**
+
 ```bash
 # Install elan (Lean version manager)
 curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh
@@ -55,6 +57,7 @@ First run of `/prove` will download Mathlib (~2GB) via `lake build`.
 **Goal:** Understand if/how this can be formalized.
 
 1. **Search Mathlib with Loogle** (PRIMARY - type-aware search)
+
    ```bash
    # Use loogle for type signature search - finds lemmas by shape
    loogle-search "pattern_here"
@@ -84,6 +87,7 @@ First run of `/prove` will download Mathlib (~2GB) via `lake build`.
 4. **Output:** Brief summary of proof strategy and obstacles
 
 **CHECKPOINT:** If obstacles found, use AskUserQuestion:
+
 - "This requires [X]. Options: (a) restricted version, (b) accept axiom, (c) abort"
 
 ### Phase 2: DESIGN (skeleton with sorries)
@@ -97,6 +101,7 @@ First run of `/prove` will download Mathlib (~2GB) via `lake build`.
    - Helper lemmas as `sorry`
 
 2. Annotate each sorry:
+
    ```lean
    -- SORRY: needs proof (straightforward)
    -- SORRY: needs proof (complex - ~50 lines)
@@ -114,6 +119,7 @@ First run of `/prove` will download Mathlib (~2GB) via `lake build`.
 For each AXIOM CANDIDATE sorry:
 
 1. **Generate test cases**
+
    ```lean
    -- Create #eval or example statements
    #eval testLemma (randomInput1)  -- should return true
@@ -121,6 +127,7 @@ For each AXIOM CANDIDATE sorry:
    ```
 
 2. **Run tests**
+
    ```bash
    lake env lean test_lemmas.lean
    ```
@@ -136,6 +143,7 @@ For each AXIOM CANDIDATE sorry:
 **Goal:** Complete the proofs.
 
 Standard iteration loop:
+
 1. Pick a sorry
 2. Write proof attempt
 3. Compiler-in-the-loop checks (hook fires automatically)
@@ -144,6 +152,7 @@ Standard iteration loop:
 6. Repeat for all sorries
 
 **Tools active:**
+
 - compiler-in-the-loop hook (on every Write)
 - Godel-Prover suggestions (on errors)
 
@@ -152,19 +161,24 @@ Standard iteration loop:
 **Goal:** Confirm proof quality.
 
 1. **Axiom Audit**
+
    ```bash
    lake build && grep "depends on axioms" output
    ```
+
    - Standard: propext, Classical.choice, Quot.sound ✓
    - Custom axioms: LIST EACH ONE
 
 2. **Sorry Count**
+
    ```bash
    grep -c "sorry" proofs/<file>.lean
    ```
+
    - Must be 0 for "complete" proof
 
 3. **Generate Summary**
+
    ```
    ✓ MACHINE VERIFIED (or ⚠️ PARTIAL - N axioms)
 
@@ -185,13 +199,13 @@ Standard iteration loop:
 
 Use whatever's available, in order:
 
-| Tool | Best For | Command |
-|------|----------|---------|
-| **Loogle** | Type signature search (PRIMARY) | `loogle-search "pattern"` |
-| Nia MCP | Library documentation | `mcp__nia__search` |
-| Perplexity MCP | Proof strategies, papers | `mcp__perplexity__search` |
-| WebSearch | General references | WebSearch tool |
-| WebFetch | Specific paper/page content | WebFetch tool |
+| Tool           | Best For                        | Command                   |
+| -------------- | ------------------------------- | ------------------------- |
+| **Loogle**     | Type signature search (PRIMARY) | `loogle-search "pattern"` |
+| Nia MCP        | Library documentation           | `mcp__nia__search`        |
+| Perplexity MCP | Proof strategies, papers        | `mcp__perplexity__search` |
+| WebSearch      | General references              | WebSearch tool            |
+| WebFetch       | Specific paper/page content     | WebFetch tool             |
 
 **Loogle setup:** Requires `~/tools/loogle` with Mathlib index. Run `loogle-server &` for fast queries.
 
@@ -200,6 +214,7 @@ If no search tools available, proceed with caution and note "research phase skip
 ## Checkpoints (automatic)
 
 The workflow pauses for user input when:
+
 - ⚠️ Research finds obstacles
 - ❌ Testing finds counterexamples
 - 🔄 Implementation hits unfillable sorry after N attempts
@@ -228,13 +243,13 @@ The workflow pauses for user input when:
 
 ## What I Can Prove
 
-| Domain | Examples |
-|--------|----------|
-| Category Theory | Functors, natural transformations, Yoneda |
-| Abstract Algebra | Groups, rings, homomorphisms |
-| Topology | Continuity, compactness, connectedness |
-| Analysis | Limits, derivatives, integrals |
-| Logic | Propositional, first-order |
+| Domain           | Examples                                  |
+| ---------------- | ----------------------------------------- |
+| Category Theory  | Functors, natural transformations, Yoneda |
+| Abstract Algebra | Groups, rings, homomorphisms              |
+| Topology         | Continuity, compactness, connectedness    |
+| Analysis         | Limits, derivatives, integrals            |
+| Logic            | Propositional, first-order                |
 
 ## Limitations
 

@@ -11,14 +11,14 @@ The math capabilities span two domains:
 
 ## Quick Navigation
 
-| Need | Tool | Section |
-|------|------|---------|
-| Formal proof | `/prove` | [Formal Verification](#formal-verification) |
-| Solve equations | SymPy | [Symbolic Math](#symbolic-math-sympy) |
-| Prove theorems | Z3 | [Constraint Solving](#constraint-solving-z3) |
-| Convert units | Pint | [Unit Computation](#unit-computation-pint) |
-| Geometry | Shapely | [Computational Geometry](#computational-geometry-shapely) |
-| Auto-route | Math Router | [Unified Entry Point](#unified-entry-point) |
+| Need            | Tool        | Section                                                   |
+| --------------- | ----------- | --------------------------------------------------------- |
+| Formal proof    | `/prove`    | [Formal Verification](#formal-verification)               |
+| Solve equations | SymPy       | [Symbolic Math](#symbolic-math-sympy)                     |
+| Prove theorems  | Z3          | [Constraint Solving](#constraint-solving-z3)              |
+| Convert units   | Pint        | [Unit Computation](#unit-computation-pint)                |
+| Geometry        | Shapely     | [Computational Geometry](#computational-geometry-shapely) |
+| Auto-route      | Math Router | [Unified Entry Point](#unified-entry-point)               |
 
 ---
 
@@ -47,6 +47,7 @@ Machine-verified mathematical proofs using Lean 4 and Mathlib. For mathematician
 **Goal:** Understand if and how this can be formalized.
 
 1. **Search Mathlib** - Is this already formalized?
+
    ```bash
    grep -r "theorem_name" ~/.elan/toolchains/*/lib/lean4/library/
    ```
@@ -65,6 +66,7 @@ Machine-verified mathematical proofs using Lean 4 and Mathlib. For mathematician
 **Output:** Brief summary of proof strategy and obstacles
 
 **CHECKPOINT:** If obstacles found, workflow pauses for user decision:
+
 - "This requires [X]. Options: (a) restricted version, (b) accept axiom, (c) abort"
 
 #### Phase 2: DESIGN
@@ -72,12 +74,14 @@ Machine-verified mathematical proofs using Lean 4 and Mathlib. For mathematician
 **Goal:** Build proof structure before filling details.
 
 Create Lean file with:
+
 - Imports
 - Definitions needed
 - Main theorem statement
 - Helper lemmas as `sorry` placeholders
 
 Annotate each sorry:
+
 ```lean
 -- SORRY: needs proof (straightforward)
 -- SORRY: needs proof (complex - ~50 lines)
@@ -95,12 +99,14 @@ Verify skeleton compiles (with sorries).
 For each AXIOM CANDIDATE sorry:
 
 1. Generate test cases
+
    ```lean
    #eval testLemma (randomInput1)  -- should return true
    #eval testLemma (randomInput2)  -- should return true
    ```
 
 2. Run tests
+
    ```bash
    lake env lean test_lemmas.lean
    ```
@@ -114,6 +120,7 @@ For each AXIOM CANDIDATE sorry:
 **Goal:** Complete the proofs.
 
 Standard iteration loop:
+
 1. Pick a sorry
 2. Write proof attempt
 3. Compiler-in-the-loop checks (hook fires automatically)
@@ -122,6 +129,7 @@ Standard iteration loop:
 6. Repeat for all sorries
 
 **Tools active:**
+
 - compiler-in-the-loop hook (on every Write)
 - Godel-Prover suggestions (on errors)
 
@@ -130,16 +138,20 @@ Standard iteration loop:
 **Goal:** Confirm proof quality.
 
 1. **Axiom Audit**
+
    ```bash
    lake build && grep "depends on axioms" output
    ```
+
    - Standard: propext, Classical.choice, Quot.sound (acceptable)
    - Custom axioms: LIST EACH ONE
 
 2. **Sorry Count**
+
    ```bash
    grep -c "sorry" proofs/<file>.lean
    ```
+
    - Must be 0 for "complete" proof
 
 3. **Generate Summary**
@@ -168,31 +180,32 @@ Standard iteration loop:
 
 ### What Can Be Proven
 
-| Domain | Examples |
-|--------|----------|
-| Category Theory | Functors, natural transformations, Yoneda lemma |
-| Abstract Algebra | Groups, rings, homomorphisms, field extensions |
-| Topology | Continuity, compactness, connectedness |
-| Analysis | Limits, derivatives, integrals, uniform continuity |
-| Logic | Propositional, first-order, proof theory |
+| Domain           | Examples                                           |
+| ---------------- | -------------------------------------------------- |
+| Category Theory  | Functors, natural transformations, Yoneda lemma    |
+| Abstract Algebra | Groups, rings, homomorphisms, field extensions     |
+| Topology         | Continuity, compactness, connectedness             |
+| Analysis         | Limits, derivatives, integrals, uniform continuity |
+| Logic            | Propositional, first-order, proof theory           |
 
 ### Research Tool Priority
 
 The workflow uses available tools in priority order:
 
-| Tool | Best For |
-|------|----------|
-| Mathlib grep/loogle | Existing formalizations |
-| Nia MCP | Library documentation |
-| Perplexity MCP | Proof strategies, papers |
-| WebSearch | General references |
-| WebFetch | Specific paper/page content |
+| Tool                | Best For                    |
+| ------------------- | --------------------------- |
+| Mathlib grep/loogle | Existing formalizations     |
+| Nia MCP             | Library documentation       |
+| Perplexity MCP      | Proof strategies, papers    |
+| WebSearch           | General references          |
+| WebFetch            | Specific paper/page content |
 
 If no search tools available, workflow proceeds with caution and notes "research phase skipped".
 
 ### Checkpoints
 
 The workflow pauses for user input when:
+
 - Research finds obstacles requiring decisions
 - Testing finds counterexamples
 - Implementation hits unfillable sorry after N attempts
@@ -567,17 +580,17 @@ uv run python opc/scripts/pint_compute.py simplify "1000 m"
 
 ### Common Unit Domains
 
-| Domain | Examples |
-|--------|----------|
-| Length | meter, foot, inch, mile, km, yard |
-| Time | second, minute, hour, day, year |
-| Mass | kg, gram, pound, ounce, ton |
-| Velocity | m/s, km/h, mph, knot |
-| Energy | joule, calorie, eV, kWh, BTU |
-| Force | newton, pound_force, dyne |
-| Temperature | kelvin, celsius, fahrenheit |
-| Pressure | pascal, bar, atmosphere, psi |
-| Power | watt, horsepower |
+| Domain      | Examples                          |
+| ----------- | --------------------------------- |
+| Length      | meter, foot, inch, mile, km, yard |
+| Time        | second, minute, hour, day, year   |
+| Mass        | kg, gram, pound, ounce, ton       |
+| Velocity    | m/s, km/h, mph, knot              |
+| Energy      | joule, calorie, eV, kWh, BTU      |
+| Force       | newton, pound_force, dyne         |
+| Temperature | kelvin, celsius, fahrenheit       |
+| Pressure    | pascal, bar, atmosphere, psi      |
+| Power       | watt, horsepower                  |
 
 ### Error Handling
 
@@ -755,16 +768,16 @@ uv run python opc/scripts/shapely_compute.py makevalid \
 
 ### Common Use Cases
 
-| Use Case | Command |
-|----------|---------|
-| Collision detection | `pred intersects` |
-| Point-in-polygon | `pred contains` |
-| Area calculation | `measure area` |
-| Buffer zones | `op buffer` |
-| Shape combination | `op union` |
-| Shape subtraction | `op difference` |
-| Bounding box | `op envelope` or `measure bounds` |
-| Simplify path | `op simplify` |
+| Use Case            | Command                           |
+| ------------------- | --------------------------------- |
+| Collision detection | `pred intersects`                 |
+| Point-in-polygon    | `pred contains`                   |
+| Area calculation    | `measure area`                    |
+| Buffer zones        | `op buffer`                       |
+| Shape combination   | `op union`                        |
+| Shape subtraction   | `op difference`                   |
+| Bounding box        | `op envelope` or `measure bounds` |
+| Simplify path       | `op simplify`                     |
 
 ### Input Formats
 
@@ -774,6 +787,7 @@ uv run python opc/scripts/shapely_compute.py makevalid \
 ### Output Format
 
 All commands return JSON with:
+
 - `wkt`: WKT representation
 - `type`: Geometry type
 - `bounds`: (minx, miny, maxx, maxy)
@@ -797,13 +811,13 @@ The `/math` skill provides automatic routing to the right tool.
 
 ### Routing Logic
 
-| Your Request | Routes To |
-|--------------|-----------|
-| "solve", "calculate", "compute" | SymPy (exact symbolic) |
-| "is X always true?" | Z3 (constraint proving) |
-| "convert units" | Pint |
-| "area", "polygon", "intersection" | Shapely |
-| "prove formally" | Redirects to `/prove` |
+| Your Request                      | Routes To               |
+| --------------------------------- | ----------------------- |
+| "solve", "calculate", "compute"   | SymPy (exact symbolic)  |
+| "is X always true?"               | Z3 (constraint proving) |
+| "convert units"                   | Pint                    |
+| "area", "polygon", "intersection" | Shapely                 |
+| "prove formally"                  | Redirects to `/prove`   |
 
 ### Auto-Route Script
 
@@ -907,24 +921,26 @@ Phase 5: Verify
 
 ### When to Use Each Tool
 
-| Task | Use | Not |
-|------|-----|-----|
-| Exact equation solving | SymPy | Approximate numeric |
-| Theorem proving (formal) | `/prove` | Z3 |
-| Constraint satisfaction | Z3 | SymPy |
-| Unit conversion | Pint | Manual calculation |
-| Geometry | Shapely | Manual coordinates |
-| Quick check | Z3 | Full `/prove` workflow |
+| Task                     | Use      | Not                    |
+| ------------------------ | -------- | ---------------------- |
+| Exact equation solving   | SymPy    | Approximate numeric    |
+| Theorem proving (formal) | `/prove` | Z3                     |
+| Constraint satisfaction  | Z3       | SymPy                  |
+| Unit conversion          | Pint     | Manual calculation     |
+| Geometry                 | Shapely  | Manual coordinates     |
+| Quick check              | Z3       | Full `/prove` workflow |
 
 ### Computation vs Verification
 
 **Computation** (`/math`, SymPy, Z3, Pint, Shapely):
+
 - Get numeric/symbolic results
 - Solve equations
 - Calculate values
 - Check satisfiability
 
 **Formal Verification** (`/prove`):
+
 - Machine-verified proofs
 - Publication-quality correctness
 - Build on Mathlib theorems
@@ -981,13 +997,13 @@ The `/prove` workflow will use Godel-Prover if available, otherwise uses compile
 
 ## Performance Characteristics
 
-| Tool | Speed | Precision | Best For |
-|------|-------|-----------|----------|
-| SymPy | Fast | Exact | Symbolic algebra, calculus |
-| Z3 | Fast | Exact | Constraints, SAT, SMT |
-| Pint | Fast | Exact | Unit conversion |
-| Shapely | Fast | Floating-point | Geometric computation |
-| `/prove` | Slow | Machine-verified | Rigorous proofs |
+| Tool     | Speed | Precision        | Best For                   |
+| -------- | ----- | ---------------- | -------------------------- |
+| SymPy    | Fast  | Exact            | Symbolic algebra, calculus |
+| Z3       | Fast  | Exact            | Constraints, SAT, SMT      |
+| Pint     | Fast  | Exact            | Unit conversion            |
+| Shapely  | Fast  | Floating-point   | Geometric computation      |
+| `/prove` | Slow  | Machine-verified | Rigorous proofs            |
 
 ---
 
@@ -996,6 +1012,7 @@ The `/prove` workflow will use Godel-Prover if available, otherwise uses compile
 ### SymPy: "Cannot solve equation"
 
 Some equations don't have closed-form solutions. Try:
+
 - Numeric solving with SciPy/NumPy
 - Simplify the equation first
 - Use Z3 for constraint satisfaction
@@ -1009,12 +1026,14 @@ Some equations don't have closed-form solutions. Try:
 ### Pint: "Dimensionality error"
 
 Cannot convert incompatible units. Check:
+
 - Are dimensions compatible? (can't convert length to mass)
 - Compound units must match (m/s to km/h works, m/s to kg fails)
 
 ### Shapely: "Invalid geometry"
 
 Use `makevalid` to fix:
+
 ```bash
 uv run python opc/scripts/shapely_compute.py makevalid --geom "<WKT>"
 ```

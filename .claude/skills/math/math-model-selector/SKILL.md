@@ -8,6 +8,7 @@ description: Routes problems to appropriate mathematical frameworks using expert
 ## When to Use
 
 Trigger on phrases like:
+
 - "what math should I use"
 - "which mathematical framework"
 - "how do I model this"
@@ -21,32 +22,42 @@ Use when user has a problem but doesn't know which mathematical domain applies.
 Guide user through decision tree using Polya-style questions:
 
 ### 1. Identify the quantity
+
 **Ask:** "What quantity or phenomenon are you trying to understand?"
+
 - Physics problem -> conservation laws, differential equations
 - Economics -> equilibrium, optimization
 - Data patterns -> statistics, regression
 
 ### 2. Characterize change
+
 **Ask:** "What changes, and how does it change?"
+
 - Discrete steps -> difference equations, recurrences
 - Continuous rate -> ODEs
 - Rate of rate matters -> 2nd order ODEs
 - Spatial variation -> PDEs
 
 ### 3. Check for uncertainty
+
 **Ask:** "Is there randomness or uncertainty involved?"
+
 - Deterministic -> standard analysis
 - Epistemic uncertainty -> Bayesian methods
 - Random process -> probability theory, stochastic processes
 
 ### 4. Optimization check
+
 **Ask:** "Are you optimizing something?"
+
 - Convex objective -> linear/quadratic programming
 - Non-convex -> gradient descent, evolutionary methods
 - Discrete choices -> combinatorics, integer programming
 
 ### 5. Answer precision
+
 **Ask:** "What level of answer do you need?"
+
 - Rough estimate -> dimensional analysis
 - Qualitative behavior -> phase portraits, stability
 - Numerical answer -> simulation
@@ -120,6 +131,7 @@ Related Skills:
 ## Co-activates
 
 After framework selection, suggest:
+
 - **math-intuition-builder** - to understand the framework
 - **Relevant domain skill** - for actual computation
 - **math-mode** - for symbolic verification

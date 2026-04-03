@@ -1,5 +1,9 @@
 // src/smart-search-router.ts
-import { existsSync as existsSync2, mkdirSync, writeFileSync as writeFileSync2 } from "fs";
+import {
+  existsSync as existsSync2,
+  mkdirSync,
+  writeFileSync as writeFileSync2,
+} from "fs";
 import { execSync as execSync2 } from "child_process";
 import { join as join2 } from "path";
 
@@ -15,12 +19,20 @@ function resolveProjectDir(projectDir) {
 }
 function getLockPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
-  const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(resolvedPath)
+    .digest("hex")
+    .substring(0, 8);
   return `${tmpdir()}/tldr-${hash}.lock`;
 }
 function getPidPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
-  const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(resolvedPath)
+    .digest("hex")
+    .substring(0, 8);
   return `${tmpdir()}/tldr-${hash}.pid`;
 }
 function isDaemonProcessRunning(projectDir) {
@@ -46,8 +58,7 @@ function tryAcquireLock(projectDir) {
       }
       try {
         unlinkSync(lockPath);
-      } catch {
-      }
+      } catch {}
     }
     writeFileSync(lockPath, Date.now().toString(), { flag: "wx" });
     return true;
@@ -58,15 +69,18 @@ function tryAcquireLock(projectDir) {
 function releaseLock(projectDir) {
   try {
     unlinkSync(getLockPath(projectDir));
-  } catch {
-  }
+  } catch {}
 }
 var QUERY_TIMEOUT = 3e3;
 function getConnectionInfo(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
-  const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(resolvedPath)
+    .digest("hex")
+    .substring(0, 8);
   if (process.platform === "win32") {
-    const port = 49152 + parseInt(hash, 16) % 1e4;
+    const port = 49152 + (parseInt(hash, 16) % 1e4);
     return { type: "tcp", host: "127.0.0.1", port };
   } else {
     return { type: "unix", path: `${tmpdir()}/tldr-${hash}.sock` };
@@ -102,8 +116,7 @@ function isDaemonReachable(projectDir) {
       });
       testSocket.connect(connInfo.port, connInfo.host);
       const end = Date.now() + 200;
-      while (Date.now() < end && !connected) {
-      }
+      while (Date.now() < end && !connected) {}
       return connected;
     } catch {
       return false;
@@ -118,7 +131,7 @@ function isDaemonReachable(projectDir) {
           encoding: "utf-8",
           timeout: 1e3,
           // Increased from 500ms
-          stdio: ["pipe", "pipe", "pipe"]
+          stdio: ["pipe", "pipe", "pipe"],
         });
         return true;
       } catch {
@@ -129,14 +142,13 @@ function isDaemonReachable(projectDir) {
       execSync(`echo '{"cmd":"ping"}' | nc -U "${connInfo.path}"`, {
         encoding: "utf-8",
         timeout: 500,
-        stdio: ["pipe", "pipe", "pipe"]
+        stdio: ["pipe", "pipe", "pipe"],
       });
       return true;
     } catch {
       try {
         unlinkSync(connInfo.path);
-      } catch {
-      }
+      } catch {}
       return false;
     }
   }
@@ -152,43 +164,49 @@ function tryStartDaemon(projectDir) {
     if (!tryAcquireLock(projectDir)) {
       const start = Date.now();
       while (Date.now() - start < 5e3) {
-        if (isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir)) {
+        if (
+          isDaemonProcessRunning(projectDir) ||
+          isDaemonReachable(projectDir)
+        ) {
           return true;
         }
         const end = Date.now() + 100;
-        while (Date.now() < end) {
-        }
+        while (Date.now() < end) {}
       }
-      return isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir);
+      return (
+        isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir)
+      );
     }
     try {
       const tldrPath = join(projectDir, "opc", "packages", "tldr-code");
       let started = false;
       if (existsSync(tldrPath)) {
-        const result = spawnSync("uv", ["run", "tldr", "daemon", "start", "--project", projectDir], {
-          timeout: 1e4,
-          stdio: "ignore",
-          cwd: tldrPath
-        });
+        const result = spawnSync(
+          "uv",
+          ["run", "tldr", "daemon", "start", "--project", projectDir],
+          {
+            timeout: 1e4,
+            stdio: "ignore",
+            cwd: tldrPath,
+          },
+        );
         started = result.status === 0;
       }
       if (!started && !process.env.TLDR_DEV) {
         spawnSync("tldr", ["daemon", "start", "--project", projectDir], {
           timeout: 5e3,
-          stdio: "ignore"
+          stdio: "ignore",
         });
       }
       const start = Date.now();
       while (Date.now() - start < 1e4) {
         if (isDaemonReachable(projectDir)) {
           const cooldown = Date.now() + 1e3;
-          while (Date.now() < cooldown) {
-          }
+          while (Date.now() < cooldown) {}
           return true;
         }
         const end = Date.now() + 100;
-        while (Date.now() < end) {
-        }
+        while (Date.now() < end) {}
       }
       return isDaemonReachable(projectDir);
     } finally {
@@ -203,13 +221,16 @@ function queryDaemonSync(query, projectDir) {
     return {
       indexing: true,
       status: "indexing",
-      message: "Daemon is still indexing, results may be incomplete"
+      message: "Daemon is still indexing, results may be incomplete",
     };
   }
   const connInfo = getConnectionInfo(projectDir);
   if (!isDaemonReachable(projectDir)) {
     if (!tryStartDaemon(projectDir)) {
-      return { status: "unavailable", error: "Daemon not running and could not start" };
+      return {
+        status: "unavailable",
+        error: "Daemon not running and could not start",
+      };
     }
   }
   try {
@@ -227,14 +248,17 @@ function queryDaemonSync(query, projectDir) {
         $client.Close()
         Write-Output $response
       `.trim();
-      result = execSync(`powershell -Command "${psCommand.replace(/"/g, '\\"')}"`, {
-        encoding: "utf-8",
-        timeout: QUERY_TIMEOUT
-      });
+      result = execSync(
+        `powershell -Command "${psCommand.replace(/"/g, '\\"')}"`,
+        {
+          encoding: "utf-8",
+          timeout: QUERY_TIMEOUT,
+        },
+      );
     } else {
       result = execSync(`echo '${input}' | nc -U "${connInfo.path}"`, {
         encoding: "utf-8",
-        timeout: QUERY_TIMEOUT
+        timeout: QUERY_TIMEOUT,
       });
     }
     return JSON.parse(result.trim());
@@ -242,20 +266,27 @@ function queryDaemonSync(query, projectDir) {
     if (err.killed) {
       return { status: "error", error: "timeout" };
     }
-    if (err.message?.includes("ECONNREFUSED") || err.message?.includes("ENOENT")) {
+    if (
+      err.message?.includes("ECONNREFUSED") ||
+      err.message?.includes("ENOENT")
+    ) {
       return { status: "unavailable", error: "Daemon not running" };
     }
     return { status: "error", error: err.message || "Unknown error" };
   }
 }
-function trackHookActivitySync(hookName, projectDir, success = true, metrics = {}) {
+function trackHookActivitySync(
+  hookName,
+  projectDir,
+  success = true,
+  metrics = {},
+) {
   try {
     queryDaemonSync(
       { cmd: "track", hook: hookName, success, metrics },
-      projectDir
+      projectDir,
     );
-  } catch {
-  }
+  } catch {}
 }
 
 // src/smart-search-router.ts
@@ -267,10 +298,9 @@ function storeSearchContext(sessionId, context) {
     }
     writeFileSync2(
       `${CONTEXT_DIR}/${sessionId}.json`,
-      JSON.stringify(context, null, 2)
+      JSON.stringify(context, null, 2),
     );
-  } catch {
-  }
+  } catch {}
 }
 function tldrSearch(pattern, projectDir = ".") {
   try {
@@ -291,21 +321,36 @@ function ripgrepFallback(pattern, projectDir) {
     const escaped = pattern.replace(/"/g, '\\"').replace(/\$/g, "\\$");
     const result = execSync2(
       `rg "${escaped}" "${projectDir}" --type py --line-number --max-count 10 2>/dev/null`,
-      { encoding: "utf-8", timeout: 3e3 }
+      { encoding: "utf-8", timeout: 3e3 },
     );
-    return result.trim().split("\n").filter((l) => l).slice(0, 10).map((line) => {
-      const match = line.match(/^([^:]+):(\d+):(.*)$/);
-      if (match) {
-        return { file: match[1], line: parseInt(match[2], 10), content: match[3] };
-      }
-      return { file: line, line: 0, content: "" };
-    });
+    return result
+      .trim()
+      .split("\n")
+      .filter((l) => l)
+      .slice(0, 10)
+      .map((line) => {
+        const match = line.match(/^([^:]+):(\d+):(.*)$/);
+        if (match) {
+          return {
+            file: match[1],
+            line: parseInt(match[2], 10),
+            content: match[3],
+          };
+        }
+        return { file: line, line: 0, content: "" };
+      });
   } catch {
     return [];
   }
 }
 function checkSemanticIndexExists(projectDir) {
-  const indexPath = join2(projectDir, ".tldr", "cache", "semantic", "index.faiss");
+  const indexPath = join2(
+    projectDir,
+    ".tldr",
+    "cache",
+    "semantic",
+    "index.faiss",
+  );
   return existsSync2(indexPath);
 }
 function tldrSemantic(query, projectDir = ".") {
@@ -313,7 +358,10 @@ function tldrSemantic(query, projectDir = ".") {
     return { results: [], status: "no_index" };
   }
   try {
-    const response = queryDaemonSync({ cmd: "semantic", query, k: 5 }, projectDir);
+    const response = queryDaemonSync(
+      { cmd: "semantic", query, k: 5 },
+      projectDir,
+    );
     if (response.indexing) {
       return { results: [], status: "indexing" };
     }
@@ -330,7 +378,10 @@ function tldrSemantic(query, projectDir = ".") {
 }
 function tldrImpact(funcName, projectDir = ".") {
   try {
-    const response = queryDaemonSync({ cmd: "impact", func: funcName }, projectDir);
+    const response = queryDaemonSync(
+      { cmd: "impact", func: funcName },
+      projectDir,
+    );
     if (response.indexing || response.status === "unavailable") {
       return [];
     }
@@ -352,14 +403,14 @@ function lookupSymbol(pattern) {
   if (funcResults.length > 0) {
     return {
       type: "function",
-      location: `${funcResults[0].file}:${funcResults[0].line}`
+      location: `${funcResults[0].file}:${funcResults[0].line}`,
     };
   }
   const classResults = tldrSearch(`class ${pattern}`, projectDir);
   if (classResults.length > 0) {
     return {
       type: "class",
-      location: `${classResults[0].file}:${classResults[0].line}`
+      location: `${classResults[0].file}:${classResults[0].line}`,
     };
   }
   if (/^[A-Z][A-Z0-9_]+$/.test(pattern)) {
@@ -367,13 +418,14 @@ function lookupSymbol(pattern) {
     if (varResults.length > 0) {
       return {
         type: "variable",
-        location: `${varResults[0].file}:${varResults[0].line}`
+        location: `${varResults[0].file}:${varResults[0].line}`,
       };
     }
   }
   return null;
 }
-var FUNCTION_VERB_PREFIXES = /^(get|set|is|has|do|can|create|update|delete|fetch|load|save|read|write|parse|build|make|init|setup|run|start|stop|handle|process|validate|check|find|search|filter|sort|map|reduce|transform|convert|format|render|display|show|hide|enable|disable|add|remove|insert|append|push|pop|clear|reset|close|open|connect|disconnect|send|receive|emit|on_|async_|_get|_set|_is|_has|_do|_create|_update|_delete|_fetch|_load|_save|_read|_write|_parse|_build|_make|_init|_setup|_run|_handle|_process|_validate|_check|_find|poll|call|exec|execute|invoke|apply|bind|dispatch|trigger|fire|notify|broadcast|publish|subscribe|unsubscribe|listen|watch|observe|register|unregister|mount|unmount|attach|detach|flush|dump|log|warn|error|debug|trace|print|throw|raise|assert|test|mock|stub|spy|wait|sleep|delay|retry|abort|cancel|pause|resume|refresh|reload|rerun|revert|rollback|commit|merge|split|join|clone|copy|move|swap|toggle|flip|increment|decrement|next|prev|first|last|peek|drain|consume|produce|yield|spawn|fork|join|kill|terminate|shutdown|cleanup|destroy|dispose|release|acquire|lock|unlock|enter|exit|begin|end|finalize)(_|$)/;
+var FUNCTION_VERB_PREFIXES =
+  /^(get|set|is|has|do|can|create|update|delete|fetch|load|save|read|write|parse|build|make|init|setup|run|start|stop|handle|process|validate|check|find|search|filter|sort|map|reduce|transform|convert|format|render|display|show|hide|enable|disable|add|remove|insert|append|push|pop|clear|reset|close|open|connect|disconnect|send|receive|emit|on_|async_|_get|_set|_is|_has|_do|_create|_update|_delete|_fetch|_load|_save|_read|_write|_parse|_build|_make|_init|_setup|_run|_handle|_process|_validate|_check|_find|poll|call|exec|execute|invoke|apply|bind|dispatch|trigger|fire|notify|broadcast|publish|subscribe|unsubscribe|listen|watch|observe|register|unregister|mount|unmount|attach|detach|flush|dump|log|warn|error|debug|trace|print|throw|raise|assert|test|mock|stub|spy|wait|sleep|delay|retry|abort|cancel|pause|resume|refresh|reload|rerun|revert|rollback|commit|merge|split|join|clone|copy|move|swap|toggle|flip|increment|decrement|next|prev|first|last|peek|drain|consume|produce|yield|spawn|fork|join|kill|terminate|shutdown|cleanup|destroy|dispose|release|acquire|lock|unlock|enter|exit|begin|end|finalize)(_|$)/;
 function extractTarget(pattern) {
   const indexed = lookupSymbol(pattern);
   if (indexed) {
@@ -384,9 +436,11 @@ function extractTarget(pattern) {
   const defMatch = pattern.match(/^(?:async\s+)?def\s+(\w+)/);
   if (defMatch) return { target: defMatch[1], targetType: "function" };
   const functionMatch = pattern.match(/^(?:async\s+)?function\s+(\w+)/);
-  if (functionMatch) return { target: functionMatch[1], targetType: "function" };
+  if (functionMatch)
+    return { target: functionMatch[1], targetType: "function" };
   const decoratorMatch = pattern.match(/^@(\w+)/);
-  if (decoratorMatch) return { target: decoratorMatch[1], targetType: "decorator" };
+  if (decoratorMatch)
+    return { target: decoratorMatch[1], targetType: "decorator" };
   const importMatch = pattern.match(/^(?:import|from)\s+(\w+)/);
   if (importMatch) return { target: importMatch[1], targetType: "import" };
   const attrMatch = pattern.match(/(?:self|this)(?:\.|\\\.|\\\.\s*)(\w+)/);
@@ -398,21 +452,44 @@ function extractTarget(pattern) {
     return { target: attr, targetType: "variable" };
   }
   if (/^__[a-z][a-z0-9_]*__$/.test(pattern)) {
-    const moduleVars = ["__all__", "__version__", "__author__", "__doc__", "__file__", "__name__", "__package__", "__path__", "__cached__", "__loader__", "__spec__", "__builtins__", "__dict__", "__module__", "__slots__", "__annotations__"];
+    const moduleVars = [
+      "__all__",
+      "__version__",
+      "__author__",
+      "__doc__",
+      "__file__",
+      "__name__",
+      "__package__",
+      "__path__",
+      "__cached__",
+      "__loader__",
+      "__spec__",
+      "__builtins__",
+      "__dict__",
+      "__module__",
+      "__slots__",
+      "__annotations__",
+    ];
     if (moduleVars.includes(pattern)) {
       return { target: pattern, targetType: "variable" };
     }
     return { target: pattern, targetType: "function" };
   }
-  if (/^[A-Z][A-Z0-9_]+$/.test(pattern)) return { target: pattern, targetType: "variable" };
-  if (/^[A-Z][a-zA-Z0-9]+$/.test(pattern)) return { target: pattern, targetType: "class" };
-  if (/^_?[a-z][a-z0-9_]*$/.test(pattern) && FUNCTION_VERB_PREFIXES.test(pattern)) {
+  if (/^[A-Z][A-Z0-9_]+$/.test(pattern))
+    return { target: pattern, targetType: "variable" };
+  if (/^[A-Z][a-zA-Z0-9]+$/.test(pattern))
+    return { target: pattern, targetType: "class" };
+  if (
+    /^_?[a-z][a-z0-9_]*$/.test(pattern) &&
+    FUNCTION_VERB_PREFIXES.test(pattern)
+  ) {
     return { target: pattern, targetType: "function" };
   }
   if (/^_?[a-z][a-z0-9_]*$/.test(pattern)) {
     return { target: pattern, targetType: "variable" };
   }
-  const camelCaseVerbPattern = /^(get|set|is|has|do|can|use|create|update|delete|fetch|load|save|read|write|parse|build|make|init|setup|run|start|stop|handle|process|validate|check|find|search|filter|sort|map|reduce|transform|convert|format|render|display|show|hide|enable|disable|add|remove|insert|append|push|pop|clear|reset|close|open|connect|disconnect|send|receive|emit|on|async|poll|call|exec|execute|invoke|apply|bind|dispatch|trigger|fire|notify|broadcast|publish|subscribe|watch|observe|register|mount|attach|flush|dump|log|warn|error|debug|print|throw|assert|test|mock|wait|sleep|retry|abort|cancel|pause|resume|refresh|reload|revert|commit|merge|clone|copy|move|toggle|spawn|fork|kill|terminate|shutdown|cleanup|destroy|dispose|release|acquire|lock|unlock|enter|exit|begin|end)[A-Z]/;
+  const camelCaseVerbPattern =
+    /^(get|set|is|has|do|can|use|create|update|delete|fetch|load|save|read|write|parse|build|make|init|setup|run|start|stop|handle|process|validate|check|find|search|filter|sort|map|reduce|transform|convert|format|render|display|show|hide|enable|disable|add|remove|insert|append|push|pop|clear|reset|close|open|connect|disconnect|send|receive|emit|on|async|poll|call|exec|execute|invoke|apply|bind|dispatch|trigger|fire|notify|broadcast|publish|subscribe|watch|observe|register|mount|attach|flush|dump|log|warn|error|debug|print|throw|assert|test|mock|wait|sleep|retry|abort|cancel|pause|resume|refresh|reload|revert|commit|merge|clone|copy|move|toggle|spawn|fork|kill|terminate|shutdown|cleanup|destroy|dispose|release|acquire|lock|unlock|enter|exit|begin|end)[A-Z]/;
   if (camelCaseVerbPattern.test(pattern)) {
     return { target: pattern, targetType: "function" };
   }
@@ -436,7 +513,9 @@ function suggestLayers(targetType, queryType) {
     case "decorator":
       return ["ast", "call_graph"];
     default:
-      return queryType === "semantic" ? ["ast", "call_graph", "cfg"] : ["ast", "call_graph"];
+      return queryType === "semantic"
+        ? ["ast", "call_graph", "cfg"]
+        : ["ast", "call_graph"];
   }
 }
 function readStdin() {
@@ -458,23 +537,34 @@ function classifyQuery(pattern) {
     /^async\s+(function|def)/,
     /\$\w+/,
     // AST-grep metavariables
-    /^@\w+/
+    /^@\w+/,
     // decorators
   ];
   if (structuralPatterns.some((p) => p.test(pattern))) {
     return "structural";
   }
-  if (pattern.includes("\\") || pattern.includes("[") || /\([^)]*\|/.test(pattern)) {
+  if (
+    pattern.includes("\\") ||
+    pattern.includes("[") ||
+    /\([^)]*\|/.test(pattern)
+  ) {
     return "literal";
   }
-  if (/^[A-Z][a-zA-Z0-9]*$/.test(pattern) || /^[a-z_][a-z0-9_]*$/.test(pattern) || /^[A-Z_][A-Z0-9_]*$/.test(pattern)) {
+  if (
+    /^[A-Z][a-zA-Z0-9]*$/.test(pattern) ||
+    /^[a-z_][a-z0-9_]*$/.test(pattern) ||
+    /^[A-Z_][A-Z0-9_]*$/.test(pattern)
+  ) {
     return "literal";
   }
   if (pattern.includes("/") || /\.(ts|py|js|go|rs|md)/.test(pattern)) {
     return "literal";
   }
   const words = pattern.split(/\s+/).filter((w) => w.length > 0);
-  if (words.length <= 2 && !/^(how|what|where|why|when|find|show|list)/i.test(pattern)) {
+  if (
+    words.length <= 2 &&
+    !/^(how|what|where|why|when|find|show|list)/i.test(pattern)
+  ) {
     return "literal";
   }
   const semanticPatterns = [
@@ -482,7 +572,7 @@ function classifyQuery(pattern) {
     /\?$/,
     /^(find|show|list|get|explain)\s+(all|the|every|any)/i,
     /works?$/i,
-    /^.*\s+(implementation|architecture|flow|pattern|logic|system)$/i
+    /^.*\s+(implementation|architecture|flow|pattern|logic|system)$/i,
   ];
   if (semanticPatterns.some((p) => p.test(pattern))) {
     return "semantic";
@@ -494,11 +584,11 @@ function classifyQuery(pattern) {
 }
 function getAstGrepSuggestion(pattern, lang = "python") {
   const suggestions = {
-    "function": `def $FUNC($$$):`,
-    "async": `async def $FUNC($$$):`,
-    "class": `class $NAME:`,
-    "import": `import $MODULE`,
-    "decorator": `@$DECORATOR`
+    function: `def $FUNC($$$):`,
+    async: `async def $FUNC($$$):`,
+    class: `class $NAME:`,
+    import: `import $MODULE`,
+    decorator: `@$DECORATOR`,
   };
   for (const [keyword, astPattern] of Object.entries(suggestions)) {
     if (pattern.toLowerCase().includes(keyword)) {
@@ -538,14 +628,14 @@ async function main() {
     targetType,
     suggestedLayers: layers,
     definitionLocation: symbolInfo?.location,
-    callers: callers.slice(0, 20)
+    callers: callers.slice(0, 20),
     // Limit to 20 callers for token efficiency
   });
   const projectDir = process.env.CLAUDE_PROJECT_DIR || ".";
   if (queryType === "literal") {
     trackHookActivitySync("smart-search-router", projectDir, true, {
       queries_routed: 1,
-      literal_queries: 1
+      literal_queries: 1,
     });
     const reason2 = `\u{1F50D} Use TLDR search for code exploration (95% token savings):
 
@@ -565,8 +655,8 @@ TLDR finds location + provides call graph + docstrings in one call.`;
       hookSpecificOutput: {
         hookEventName: "PreToolUse",
         permissionDecision: "deny",
-        permissionDecisionReason: reason2
-      }
+        permissionDecisionReason: reason2,
+      },
     };
     console.log(JSON.stringify(output2));
     return;
@@ -574,7 +664,7 @@ TLDR finds location + provides call graph + docstrings in one call.`;
   if (queryType === "structural") {
     trackHookActivitySync("smart-search-router", projectDir, true, {
       queries_routed: 1,
-      structural_queries: 1
+      structural_queries: 1,
     });
     const astPattern = getAstGrepSuggestion(pattern);
     const reason2 = `\u{1F3AF} Structural query - Use AST-grep OR TLDR:
@@ -591,24 +681,26 @@ TLDR: finds + call graph + docstrings + complexity`;
       hookSpecificOutput: {
         hookEventName: "PreToolUse",
         permissionDecision: "deny",
-        permissionDecisionReason: reason2
-      }
+        permissionDecisionReason: reason2,
+      },
     };
     console.log(JSON.stringify(output2));
     return;
   }
   trackHookActivitySync("smart-search-router", projectDir, true, {
     queries_routed: 1,
-    semantic_queries: 1
+    semantic_queries: 1,
   });
   const semanticSearch = tldrSemantic(pattern, projectDir);
   let reason;
   if (semanticSearch.status === "ok" && semanticSearch.results.length > 0) {
-    const resultsStr = semanticSearch.results.map((r) => {
-      const loc = `${r.file}:${r.function || "module"}`;
-      const score = r.score ? ` (${(r.score * 100).toFixed(0)}%)` : "";
-      return `  - ${loc}${score}`;
-    }).join("\n");
+    const resultsStr = semanticSearch.results
+      .map((r) => {
+        const loc = `${r.file}:${r.function || "module"}`;
+        const score = r.score ? ` (${(r.score * 100).toFixed(0)}%)` : "";
+        return `  - ${loc}${score}`;
+      })
+      .join("\n");
     reason = `\u{1F9E0} **Semantic Search Results** (via TLDR daemon):
 
 ${resultsStr}
@@ -666,8 +758,8 @@ No code semantically similar to "${pattern}" found in the index.
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
       permissionDecision: "deny",
-      permissionDecisionReason: reason
-    }
+      permissionDecisionReason: reason,
+    },
   };
   console.log(JSON.stringify(output));
 }

@@ -8,6 +8,7 @@ description: Full 5-layer analysis of a specific function. Use when debugging or
 Full 5-layer analysis of a specific function. Use when debugging or deeply understanding code.
 
 ## Trigger
+
 - `/tldr-deep <function_name>`
 - "analyze function X in detail"
 - "I need to deeply understand how Y works"
@@ -15,13 +16,13 @@ Full 5-layer analysis of a specific function. Use when debugging or deeply under
 
 ## Layers
 
-| Layer | Purpose | Command |
-|-------|---------|---------|
-| L1: AST | Structure | `tldr extract <file>` |
-| L2: Call Graph | Navigation | `tldr context <func> --depth 2` |
-| L3: CFG | Complexity | `tldr cfg <file> <func>` |
-| L4: DFG | Data flow | `tldr dfg <file> <func>` |
-| L5: Slice | Dependencies | `tldr slice <file> <func> <line>` |
+| Layer          | Purpose      | Command                           |
+| -------------- | ------------ | --------------------------------- |
+| L1: AST        | Structure    | `tldr extract <file>`             |
+| L2: Call Graph | Navigation   | `tldr context <func> --depth 2`   |
+| L3: CFG        | Complexity   | `tldr cfg <file> <func>`          |
+| L4: DFG        | Data flow    | `tldr dfg <file> <func>`          |
+| L5: Slice      | Dependencies | `tldr slice <file> <func> <line>` |
 
 ## Execution
 

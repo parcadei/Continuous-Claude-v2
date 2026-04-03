@@ -12,6 +12,7 @@ You are a specialized E2E testing agent. Your job is to run end-to-end tests, br
 ## Erotetic Check
 
 Before testing, frame the question space E(X,Q):
+
 - X = user journey/feature under test
 - Q = acceptance scenarios that must pass
 - Execute each scenario end-to-end
@@ -68,6 +69,7 @@ curl -s $TEST_URL > /dev/null && echo "Server ready"
 ## Step 4: Run E2E Tests
 
 ### Playwright
+
 ```bash
 # Run all E2E tests
 npx playwright test
@@ -83,6 +85,7 @@ npx playwright show-report
 ```
 
 ### Cypress
+
 ```bash
 # Headless run
 npx cypress run
@@ -95,6 +98,7 @@ npx cypress run --config video=true
 ```
 
 ### Python E2E (Selenium/Pytest)
+
 ```bash
 # Run E2E tests
 uv run pytest tests/e2e/ -v --tb=short
@@ -119,6 +123,7 @@ cat test-results/*.json 2>/dev/null | head -100
 ## Step 6: Write Output
 
 **ALWAYS write report to:**
+
 ```
 $CLAUDE_CC_DIR/.claude/cache/agents/atlas/output-{timestamp}.md
 ```
@@ -127,25 +132,30 @@ $CLAUDE_CC_DIR/.claude/cache/agents/atlas/output-{timestamp}.md
 
 ```markdown
 # E2E Test Report: [Feature/Journey]
+
 Generated: [timestamp]
 
 ## Overall Status: PASSED | FAILED | PARTIAL
 
 ## Environment
+
 - URL: [test environment]
 - Browser: [Chrome/Firefox/WebKit]
 - Viewport: [1920x1080]
 
 ## Test Summary
-| Scenario | Status | Duration |
-|----------|--------|----------|
-| User login flow | PASS | 2.3s |
-| Checkout process | FAIL | 5.1s |
+
+| Scenario         | Status | Duration |
+| ---------------- | ------ | -------- |
+| User login flow  | PASS   | 2.3s     |
+| Checkout process | FAIL   | 5.1s     |
 
 ## Scenario Results
 
 ### PASS: User login flow
+
 **Steps executed:**
+
 1. Navigate to /login
 2. Enter credentials
 3. Click submit
@@ -154,13 +164,16 @@ Generated: [timestamp]
 **Duration:** 2.3s
 
 ### FAIL: Checkout process
+
 **Failed at step:** Add to cart
 **Expected:** Item appears in cart
 **Actual:** Cart remains empty
 **Screenshot:** `screenshots/checkout-fail-001.png`
 **Error:**
 ```
+
 Timeout waiting for selector: .cart-item
+
 ```
 
 ## Visual Regression (if applicable)

@@ -13,12 +13,20 @@ function resolveProjectDir(projectDir) {
 }
 function getLockPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
-  const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(resolvedPath)
+    .digest("hex")
+    .substring(0, 8);
   return `${tmpdir()}/tldr-${hash}.lock`;
 }
 function getPidPath(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
-  const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(resolvedPath)
+    .digest("hex")
+    .substring(0, 8);
   return `${tmpdir()}/tldr-${hash}.pid`;
 }
 function isDaemonProcessRunning(projectDir) {
@@ -44,8 +52,7 @@ function tryAcquireLock(projectDir) {
       }
       try {
         unlinkSync(lockPath);
-      } catch {
-      }
+      } catch {}
     }
     writeFileSync(lockPath, Date.now().toString(), { flag: "wx" });
     return true;
@@ -56,15 +63,18 @@ function tryAcquireLock(projectDir) {
 function releaseLock(projectDir) {
   try {
     unlinkSync(getLockPath(projectDir));
-  } catch {
-  }
+  } catch {}
 }
 var QUERY_TIMEOUT = 3e3;
 function getConnectionInfo(projectDir) {
   const resolvedPath = resolveProjectDir(projectDir);
-  const hash = crypto.createHash("md5").update(resolvedPath).digest("hex").substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(resolvedPath)
+    .digest("hex")
+    .substring(0, 8);
   if (process.platform === "win32") {
-    const port = 49152 + parseInt(hash, 16) % 1e4;
+    const port = 49152 + (parseInt(hash, 16) % 1e4);
     return { type: "tcp", host: "127.0.0.1", port };
   } else {
     return { type: "unix", path: `${tmpdir()}/tldr-${hash}.sock` };
@@ -100,8 +110,7 @@ function isDaemonReachable(projectDir) {
       });
       testSocket.connect(connInfo.port, connInfo.host);
       const end = Date.now() + 200;
-      while (Date.now() < end && !connected) {
-      }
+      while (Date.now() < end && !connected) {}
       return connected;
     } catch {
       return false;
@@ -116,7 +125,7 @@ function isDaemonReachable(projectDir) {
           encoding: "utf-8",
           timeout: 1e3,
           // Increased from 500ms
-          stdio: ["pipe", "pipe", "pipe"]
+          stdio: ["pipe", "pipe", "pipe"],
         });
         return true;
       } catch {
@@ -127,14 +136,13 @@ function isDaemonReachable(projectDir) {
       execSync(`echo '{"cmd":"ping"}' | nc -U "${connInfo.path}"`, {
         encoding: "utf-8",
         timeout: 500,
-        stdio: ["pipe", "pipe", "pipe"]
+        stdio: ["pipe", "pipe", "pipe"],
       });
       return true;
     } catch {
       try {
         unlinkSync(connInfo.path);
-      } catch {
-      }
+      } catch {}
       return false;
     }
   }
@@ -150,43 +158,49 @@ function tryStartDaemon(projectDir) {
     if (!tryAcquireLock(projectDir)) {
       const start = Date.now();
       while (Date.now() - start < 5e3) {
-        if (isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir)) {
+        if (
+          isDaemonProcessRunning(projectDir) ||
+          isDaemonReachable(projectDir)
+        ) {
           return true;
         }
         const end = Date.now() + 100;
-        while (Date.now() < end) {
-        }
+        while (Date.now() < end) {}
       }
-      return isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir);
+      return (
+        isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir)
+      );
     }
     try {
       const tldrPath = join(projectDir, "opc", "packages", "tldr-code");
       let started = false;
       if (existsSync(tldrPath)) {
-        const result = spawnSync("uv", ["run", "tldr", "daemon", "start", "--project", projectDir], {
-          timeout: 1e4,
-          stdio: "ignore",
-          cwd: tldrPath
-        });
+        const result = spawnSync(
+          "uv",
+          ["run", "tldr", "daemon", "start", "--project", projectDir],
+          {
+            timeout: 1e4,
+            stdio: "ignore",
+            cwd: tldrPath,
+          },
+        );
         started = result.status === 0;
       }
       if (!started && !process.env.TLDR_DEV) {
         spawnSync("tldr", ["daemon", "start", "--project", projectDir], {
           timeout: 5e3,
-          stdio: "ignore"
+          stdio: "ignore",
         });
       }
       const start = Date.now();
       while (Date.now() - start < 1e4) {
         if (isDaemonReachable(projectDir)) {
           const cooldown = Date.now() + 1e3;
-          while (Date.now() < cooldown) {
-          }
+          while (Date.now() < cooldown) {}
           return true;
         }
         const end = Date.now() + 100;
-        while (Date.now() < end) {
-        }
+        while (Date.now() < end) {}
       }
       return isDaemonReachable(projectDir);
     } finally {
@@ -201,13 +215,16 @@ function queryDaemonSync(query, projectDir) {
     return {
       indexing: true,
       status: "indexing",
-      message: "Daemon is still indexing, results may be incomplete"
+      message: "Daemon is still indexing, results may be incomplete",
     };
   }
   const connInfo = getConnectionInfo(projectDir);
   if (!isDaemonReachable(projectDir)) {
     if (!tryStartDaemon(projectDir)) {
-      return { status: "unavailable", error: "Daemon not running and could not start" };
+      return {
+        status: "unavailable",
+        error: "Daemon not running and could not start",
+      };
     }
   }
   try {
@@ -225,14 +242,17 @@ function queryDaemonSync(query, projectDir) {
         $client.Close()
         Write-Output $response
       `.trim();
-      result = execSync(`powershell -Command "${psCommand.replace(/"/g, '\\"')}"`, {
-        encoding: "utf-8",
-        timeout: QUERY_TIMEOUT
-      });
+      result = execSync(
+        `powershell -Command "${psCommand.replace(/"/g, '\\"')}"`,
+        {
+          encoding: "utf-8",
+          timeout: QUERY_TIMEOUT,
+        },
+      );
     } else {
       result = execSync(`echo '${input}' | nc -U "${connInfo.path}"`, {
         encoding: "utf-8",
-        timeout: QUERY_TIMEOUT
+        timeout: QUERY_TIMEOUT,
       });
     }
     return JSON.parse(result.trim());
@@ -240,20 +260,27 @@ function queryDaemonSync(query, projectDir) {
     if (err.killed) {
       return { status: "error", error: "timeout" };
     }
-    if (err.message?.includes("ECONNREFUSED") || err.message?.includes("ENOENT")) {
+    if (
+      err.message?.includes("ECONNREFUSED") ||
+      err.message?.includes("ENOENT")
+    ) {
       return { status: "unavailable", error: "Daemon not running" };
     }
     return { status: "error", error: err.message || "Unknown error" };
   }
 }
-function trackHookActivitySync(hookName, projectDir, success = true, metrics = {}) {
+function trackHookActivitySync(
+  hookName,
+  projectDir,
+  success = true,
+  metrics = {},
+) {
   try {
     queryDaemonSync(
       { cmd: "track", hook: hookName, success, metrics },
-      projectDir
+      projectDir,
     );
-  } catch {
-  }
+  } catch {}
 }
 
 // src/signature-helper.ts
@@ -307,7 +334,7 @@ var SKIP_NAMES = /* @__PURE__ */ new Set([
   "new",
   "this",
   "class",
-  "extends"
+  "extends",
 ]);
 function extractFunctionCalls(code) {
   const callRe = /\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/g;
@@ -325,16 +352,19 @@ function findFunctionFile(funcName, projectDir) {
   try {
     const response = queryDaemonSync(
       { cmd: "search", pattern: `def ${funcName}` },
-      projectDir
+      projectDir,
     );
-    if (response.indexing || response.status === "unavailable" || response.status === "error") {
+    if (
+      response.indexing ||
+      response.status === "unavailable" ||
+      response.status === "error"
+    ) {
       return null;
     }
     if (response.results && response.results.length > 0) {
       return `${projectDir}/${response.results[0].file}`;
     }
-  } catch {
-  }
+  } catch {}
   return null;
 }
 function getSignatureFromTLDR(funcName, filePath, sessionId) {
@@ -342,9 +372,13 @@ function getSignatureFromTLDR(funcName, filePath, sessionId) {
     const projectDir = getProjectDir();
     const response = queryDaemonSync(
       { cmd: "extract", file: filePath, session: sessionId },
-      projectDir
+      projectDir,
     );
-    if (response.indexing || response.status === "unavailable" || response.status === "error") {
+    if (
+      response.indexing ||
+      response.status === "unavailable" ||
+      response.status === "error"
+    ) {
       return null;
     }
     const extract = response.result;
@@ -356,8 +390,7 @@ function getSignatureFromTLDR(funcName, filePath, sessionId) {
         return func.signature;
       }
     }
-  } catch {
-  }
+  } catch {}
   return null;
 }
 function getProjectDir() {
@@ -398,12 +431,12 @@ async function main() {
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
       additionalContext: `[Signatures from TLDR]
-${signatures.join("\n")}`
-    }
+${signatures.join("\n")}`,
+    },
   };
   trackHookActivitySync("signature-helper", projectDir, true, {
     edits_checked: 1,
-    signatures_found: signatures.length
+    signatures_found: signatures.length,
   });
   console.log(JSON.stringify(output));
 }

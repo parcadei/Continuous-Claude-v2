@@ -72,16 +72,16 @@ If using detached spawn with `stdio: 'ignore'`:
 
 ```typescript
 // This pattern hides errors!
-spawn(cmd, args, { detached: true, stdio: 'ignore' })
+spawn(cmd, args, { detached: true, stdio: "ignore" });
 ```
 
 **Fix:** Add temporary logging:
 
 ```typescript
-const logFile = fs.openSync('.claude/cache/debug.log', 'a');
+const logFile = fs.openSync(".claude/cache/debug.log", "a");
 spawn(cmd, args, {
   detached: true,
-  stdio: ['ignore', logFile, logFile]  // capture stdout/stderr
+  stdio: ["ignore", logFile, logFile], // capture stdout/stderr
 });
 ```
 
@@ -100,13 +100,13 @@ Source edits alone don't take effect - the shell wrapper runs the bundled `.mjs`
 
 ## Common Issues
 
-| Symptom | Likely Cause | Fix |
-|---------|--------------|-----|
-| Hook never runs | Not registered in settings.json | Add to correct event in settings |
-| Hook runs but no output | Detached spawn hiding errors | Add logging, check manually |
-| Wrong session ID | Using "most recent" query | Pass ID explicitly |
-| Works locally, not in CI | Missing dependencies | Check npx/node availability |
-| Runs twice | Registered in both global + project | Remove duplicate |
+| Symptom                  | Likely Cause                        | Fix                              |
+| ------------------------ | ----------------------------------- | -------------------------------- |
+| Hook never runs          | Not registered in settings.json     | Add to correct event in settings |
+| Hook runs but no output  | Detached spawn hiding errors        | Add logging, check manually      |
+| Wrong session ID         | Using "most recent" query           | Pass ID explicitly               |
+| Works locally, not in CI | Missing dependencies                | Check npx/node availability      |
+| Runs twice               | Registered in both global + project | Remove duplicate                 |
 
 ## Debug Checklist
 
@@ -120,4 +120,5 @@ Source edits alone don't take effect - the shell wrapper runs the bundled `.mjs`
 ## Source Sessions
 
 Derived from 10 sessions (83% of all learnings):
+
 - a541f08a, 1c21e6c8, 6a9f2d7a, a8bd5cea, 2ca1a178, 657ce0b2, 3998f3a2, 2a829f12, 0b46cfd7, 862f6e2c

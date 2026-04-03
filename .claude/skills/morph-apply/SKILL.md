@@ -33,6 +33,7 @@ The API intelligently places your edit in the right location.
 ## Usage
 
 ### Add error handling
+
 ```bash
 uv run python -m runtime.harness scripts/mcp/morph_apply.py \
     --file "src/auth.py" \
@@ -47,6 +48,7 @@ except AuthError as e:
 ```
 
 ### Add logging
+
 ```bash
 uv run python -m runtime.harness scripts/mcp/morph_apply.py \
     --file "src/api.py" \
@@ -57,6 +59,7 @@ logger.debug(f'Processing request: {request.id}')
 ```
 
 ### TypeScript example
+
 ```bash
 uv run python -m runtime.harness scripts/mcp/morph_apply.py \
     --file "src/types.ts" \
@@ -69,26 +72,28 @@ if (!user.isActive) throw new Error('User inactive');
 
 ## Parameters
 
-| Parameter | Description |
-|-----------|-------------|
-| `--file` | File path to edit (required) |
-| `--instruction` | Human description of the change (required) |
-| `--code_edit` | Code snippet with markers showing where to place edit (required) |
+| Parameter       | Description                                                      |
+| --------------- | ---------------------------------------------------------------- |
+| `--file`        | File path to edit (required)                                     |
+| `--instruction` | Human description of the change (required)                       |
+| `--code_edit`   | Code snippet with markers showing where to place edit (required) |
 
 ## vs Claude's Edit Tool
 
-| Tool | Best For |
-|------|----------|
+| Tool            | Best For                                                            |
+| --------------- | ------------------------------------------------------------------- |
 | **morph-apply** | Fast edits, don't need to read file first, large files, batch edits |
-| **Claude Edit** | Small precise edits when file is already in context |
+| **Claude Edit** | Small precise edits when file is already in context                 |
 
 **Use morph-apply when:**
+
 - File is not in context and reading it would be expensive
 - File is very large (>500 lines)
 - Making multiple related edits at once
 - You know the context of the change (function name, class, etc.)
 
 **Use Claude Edit when:**
+
 - File is already in context from prior Read
 - Very precise edits requiring exact old/new string matching
 - Small files (<200 lines)

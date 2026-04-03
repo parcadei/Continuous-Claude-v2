@@ -17,19 +17,19 @@ Complete reference for developing Claude Code hooks. Use this to write hooks wit
 
 ## Quick Reference
 
-| Hook | Fires When | Can Block? | Primary Use |
-|------|-----------|------------|-------------|
-| **PreToolUse** | Before tool executes | YES | Block/modify tool calls |
-| **PostToolUse** | After tool completes | Partial | React to tool results |
-| **UserPromptSubmit** | User sends prompt | YES | Validate/inject context |
-| **PermissionRequest** | Permission dialog shows | YES | Auto-approve/deny |
-| **SessionStart** | Session begins | NO | Load context, set env vars |
-| **SessionEnd** | Session ends | NO | Cleanup/save state |
-| **Stop** | Agent finishes | YES | Force continuation |
-| **SubagentStart** | Subagent spawns | NO | Pattern coordination |
-| **SubagentStop** | Subagent finishes | YES | Force continuation |
-| **PreCompact** | Before compaction | NO | Save state |
-| **Notification** | Notification sent | NO | Custom alerts |
+| Hook                  | Fires When              | Can Block? | Primary Use                |
+| --------------------- | ----------------------- | ---------- | -------------------------- |
+| **PreToolUse**        | Before tool executes    | YES        | Block/modify tool calls    |
+| **PostToolUse**       | After tool completes    | Partial    | React to tool results      |
+| **UserPromptSubmit**  | User sends prompt       | YES        | Validate/inject context    |
+| **PermissionRequest** | Permission dialog shows | YES        | Auto-approve/deny          |
+| **SessionStart**      | Session begins          | NO         | Load context, set env vars |
+| **SessionEnd**        | Session ends            | NO         | Cleanup/save state         |
+| **Stop**              | Agent finishes          | YES        | Force continuation         |
+| **SubagentStart**     | Subagent spawns         | NO         | Pattern coordination       |
+| **SubagentStop**      | Subagent finishes       | YES        | Force continuation         |
+| **PreCompact**        | Before compaction       | NO         | Save state                 |
+| **Notification**      | Notification sent       | NO         | Custom alerts              |
 
 **Hook type options:** `type: "command"` (bash) or `type: "prompt"` (LLM evaluation)
 
@@ -42,6 +42,7 @@ Complete reference for developing Claude Code hooks. Use this to write hooks wit
 **Purpose:** Block or modify tool execution before it happens.
 
 **Input:**
+
 ```json
 {
   "session_id": "string",
@@ -59,6 +60,7 @@ Complete reference for developing Claude Code hooks. Use this to write hooks wit
 ```
 
 **Output (JSON):**
+
 ```json
 {
   "hookSpecificOutput": {
@@ -85,6 +87,7 @@ Complete reference for developing Claude Code hooks. Use this to write hooks wit
 **Purpose:** React to tool execution results, provide feedback to Claude.
 
 **Input:**
+
 ```json
 {
   "session_id": "string",
@@ -107,6 +110,7 @@ Complete reference for developing Claude Code hooks. Use this to write hooks wit
 **CRITICAL:** The response field is `tool_response`, NOT `tool_result`.
 
 **Output (JSON):**
+
 ```json
 {
   "decision": "block",
@@ -132,6 +136,7 @@ Complete reference for developing Claude Code hooks. Use this to write hooks wit
 **Purpose:** Validate user prompts, inject context before Claude processes.
 
 **Input:**
+
 ```json
 {
   "session_id": "string",
@@ -144,11 +149,13 @@ Complete reference for developing Claude Code hooks. Use this to write hooks wit
 ```
 
 **Output (Plain text):**
+
 ```
 Any stdout text is added to context for Claude.
 ```
 
 **Output (JSON):**
+
 ```json
 {
   "decision": "block",
@@ -171,6 +178,7 @@ Any stdout text is added to context for Claude.
 **Purpose:** Automate permission dialog decisions.
 
 **Input:**
+
 ```json
 {
   "session_id": "string",
@@ -184,6 +192,7 @@ Any stdout text is added to context for Claude.
 ```
 
 **Output:**
+
 ```json
 {
   "hookSpecificOutput": {
@@ -205,6 +214,7 @@ Any stdout text is added to context for Claude.
 **Purpose:** Initialize session, load context, set environment variables.
 
 **Input:**
+
 ```json
 {
   "session_id": "string",
@@ -219,6 +229,7 @@ Any stdout text is added to context for Claude.
 **Environment variable:** `CLAUDE_ENV_FILE` - write `export VAR=value` to persist env vars.
 
 **Output (Plain text or JSON):**
+
 ```json
 {
   "hookSpecificOutput": {
@@ -238,6 +249,7 @@ Plain text stdout is added as context.
 **Purpose:** Cleanup, save state, log session.
 
 **Input:**
+
 ```json
 {
   "session_id": "string",
@@ -258,6 +270,7 @@ Plain text stdout is added as context.
 **Purpose:** Control when Claude stops, force continuation.
 
 **Input:**
+
 ```json
 {
   "session_id": "string",
@@ -272,6 +285,7 @@ Plain text stdout is added as context.
 **CRITICAL:** Check `stop_hook_active: true` to prevent infinite loops!
 
 **Output:**
+
 ```json
 {
   "decision": "block",
@@ -288,6 +302,7 @@ Plain text stdout is added as context.
 **Purpose:** Run when a subagent (Task tool) is spawned.
 
 **Input:**
+
 ```json
 {
   "session_id": "string",
@@ -308,6 +323,7 @@ Plain text stdout is added as context.
 **Purpose:** Control when subagents (Task tool) stop.
 
 **Input:**
+
 ```json
 {
   "session_id": "string",
@@ -328,6 +344,7 @@ Plain text stdout is added as context.
 **Purpose:** Save state before context compaction.
 
 **Input:**
+
 ```json
 {
   "session_id": "string",
@@ -343,6 +360,7 @@ Plain text stdout is added as context.
 **Matchers:** `manual`, `auto`
 
 **Output:**
+
 ```json
 {
   "continue": true,
@@ -357,6 +375,7 @@ Plain text stdout is added as context.
 **Purpose:** Custom notification handling.
 
 **Input:**
+
 ```json
 {
   "session_id": "string",
@@ -372,6 +391,7 @@ Plain text stdout is added as context.
 **Matchers:** `permission_prompt`, `idle_prompt`, `auth_success`, `elicitation_dialog`, `*`
 
 **Output:**
+
 ```json
 {
   "continue": true,
@@ -407,13 +427,13 @@ Plain text stdout is added as context.
 
 ### Matcher Patterns
 
-| Pattern | Matches |
-|---------|---------|
-| `Bash` | Exactly Bash tool |
-| `Edit\|Write` | Edit OR Write |
-| `Read.*` | Regex: Read* |
-| `mcp__.*__write.*` | MCP write tools |
-| `*` | All tools |
+| Pattern            | Matches           |
+| ------------------ | ----------------- |
+| `Bash`             | Exactly Bash tool |
+| `Edit\|Write`      | Edit OR Write     |
+| `Read.*`           | Regex: Read\*     |
+| `mcp__.*__write.*` | MCP write tools   |
+| `*`                | All tools         |
 
 **Case-sensitive:** `Bash` ≠ `bash`
 
@@ -469,6 +489,7 @@ Uses LLM (Haiku) for context-aware decisions. Best for Stop/SubagentStop.
 ```
 
 **Response schema:**
+
 ```json
 {
   "decision": "approve" | "block",
@@ -483,11 +504,11 @@ Uses LLM (Haiku) for context-aware decisions. Best for Stop/SubagentStop.
 
 MCP tools use pattern `mcp__<server>__<tool>`:
 
-| Pattern | Matches |
-|---------|---------|
-| `mcp__memory__.*` | All memory server tools |
-| `mcp__.*__write.*` | All MCP write tools |
-| `mcp__github__.*` | All GitHub tools |
+| Pattern            | Matches                 |
+| ------------------ | ----------------------- |
+| `mcp__memory__.*`  | All memory server tools |
+| `mcp__.*__write.*` | All MCP write tools     |
+| `mcp__github__.*`  | All GitHub tools        |
 
 ---
 
@@ -495,41 +516,41 @@ MCP tools use pattern `mcp__<server>__<tool>`:
 
 ### Available to All Hooks
 
-| Variable | Description |
-|----------|-------------|
-| `CLAUDE_PROJECT_DIR` | Absolute path to project root |
+| Variable             | Description                              |
+| -------------------- | ---------------------------------------- |
+| `CLAUDE_PROJECT_DIR` | Absolute path to project root            |
 | `CLAUDE_CODE_REMOTE` | "true" if remote/web, empty if local CLI |
 
 ### SessionStart Only
 
-| Variable | Description |
-|----------|-------------|
+| Variable          | Description                            |
+| ----------------- | -------------------------------------- |
 | `CLAUDE_ENV_FILE` | Path to write `export VAR=value` lines |
 
 ### Plugin Hooks Only
 
-| Variable | Description |
-|----------|-------------|
+| Variable             | Description                       |
+| -------------------- | --------------------------------- |
 | `CLAUDE_PLUGIN_ROOT` | Absolute path to plugin directory |
 
 ---
 
 ## Exit Codes
 
-| Exit Code | Behavior | stdout | stderr |
-|-----------|----------|--------|--------|
-| **0** | Success | JSON processed | Ignored |
-| **2** | Blocking error | IGNORED | Error message |
-| **Other** | Non-blocking error | Ignored | Verbose mode |
+| Exit Code | Behavior           | stdout         | stderr        |
+| --------- | ------------------ | -------------- | ------------- |
+| **0**     | Success            | JSON processed | Ignored       |
+| **2**     | Blocking error     | IGNORED        | Error message |
+| **Other** | Non-blocking error | Ignored        | Verbose mode  |
 
 ### Exit Code 2 by Hook
 
-| Hook | Effect |
-|------|--------|
-| PreToolUse | Blocks tool, stderr to Claude |
-| PostToolUse | stderr to Claude (tool already ran) |
-| UserPromptSubmit | Blocks prompt, stderr to user only |
-| Stop | Blocks stop, stderr to Claude |
+| Hook             | Effect                              |
+| ---------------- | ----------------------------------- |
+| PreToolUse       | Blocks tool, stderr to Claude       |
+| PostToolUse      | stderr to Claude (tool already ran) |
+| UserPromptSubmit | Blocks prompt, stderr to user only  |
+| Stop             | Blocks stop, stderr to Claude       |
 
 ---
 
@@ -556,7 +577,7 @@ cat | node dist/my-hook.mjs
 ## TypeScript Handler Pattern
 
 ```typescript
-import { readFileSync } from 'fs';
+import { readFileSync } from "fs";
 
 interface HookInput {
   session_id: string;
@@ -568,7 +589,7 @@ interface HookInput {
 }
 
 function readStdin(): string {
-  return readFileSync(0, 'utf-8');
+  return readFileSync(0, "utf-8");
 }
 
 async function main() {
@@ -577,8 +598,8 @@ async function main() {
   // Process input
 
   const output = {
-    decision: 'block',  // or undefined to allow
-    reason: 'Why blocking'
+    decision: "block", // or undefined to allow
+    reason: "Why blocking",
   };
 
   console.log(JSON.stringify(output));

@@ -12,7 +12,6 @@ Use this skill when working on vector-spaces problems in linear algebra.
 
 ## Decision Tree
 
-
 1. **Check Subspace**
    - Contains zero vector?
    - Closed under addition?
@@ -31,23 +30,25 @@ Use this skill when working on vector-spaces problems in linear algebra.
 
 4. **Change of Basis**
    - Find transition matrix P
-   - New coords = P^(-1) * old coords
+   - New coords = P^(-1) \* old coords
    - `sympy_compute.py inverse "P"`
-
 
 ## Tool Commands
 
 ### Sympy_Nullspace
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py nullspace "[[1,2,3],[4,5,6]]"
 ```
 
 ### Sympy_Rref
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py rref "[[1,2,3],[4,5,6]]"
 ```
 
 ### Z3_Prove
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "subspace_closed"
 ```

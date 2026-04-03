@@ -15,6 +15,7 @@ This skill is invoked when running QLTY checks during development. Not user-invo
 ## When to Run
 
 Run QLTY after significant code changes:
+
 - After completing a new file
 - After substantial edits to existing files
 - Before committing changes
@@ -38,6 +39,7 @@ qlty check --fix
 ## Integration Pattern
 
 After writing code:
+
 1. Run `qlty check` on changed files
 2. If errors, fix them before proceeding
 3. Run `qlty fmt` to ensure formatting

@@ -12,6 +12,7 @@ Find unused functions and dead code using TLDR static analysis.
 ## When to Use
 
 Activate when:
+
 - User says "/dead-code" or "/find-dead-code"
 - User asks to "find unused code" or "cleanup dead code"
 - User asks to "find unreachable code"
@@ -62,6 +63,7 @@ tldr dead .
 ## Entry Points
 
 Functions matching entry patterns are excluded from dead code analysis:
+
 - `main`, `cli` - Application entry points
 - `test_*`, `*_test` - Test functions
 - `setup`, `teardown` - Fixtures
@@ -76,10 +78,10 @@ tldr dead src/ --entry main api_handler background_job
 
 This skill replaces the session-start-dead-code hook with on-demand analysis.
 
-| Approach | Pros | Cons |
-|----------|------|------|
-| Hook (removed) | Automatic | Slowed startup by 3s |
-| Skill (this) | On-demand, fast | Manual invocation |
+| Approach       | Pros            | Cons                 |
+| -------------- | --------------- | -------------------- |
+| Hook (removed) | Automatic       | Slowed startup by 3s |
+| Skill (this)   | On-demand, fast | Manual invocation    |
 
 ## Related Commands
 

@@ -3,23 +3,59 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 var PATH_RULES = [
   // Hook development
-  { pattern: /\.claude\/hooks\//, skillName: "hooks", description: "Hook development" },
+  {
+    pattern: /\.claude\/hooks\//,
+    skillName: "hooks",
+    description: "Hook development",
+  },
   // Skill development
-  { pattern: /\.claude\/skills\//, skillName: "skill-development", description: "Skill development" },
+  {
+    pattern: /\.claude\/skills\//,
+    skillName: "skill-development",
+    description: "Skill development",
+  },
   // Agent cache
-  { pattern: /\.claude\/cache\/agents\//, skillName: "agent-context-isolation", description: "Agent context isolation" },
+  {
+    pattern: /\.claude\/cache\/agents\//,
+    skillName: "agent-context-isolation",
+    description: "Agent context isolation",
+  },
   // Continuity ledgers
-  { pattern: /thoughts\/ledgers\/CONTINUITY_CLAUDE-/, skillName: "continuity", description: "Continuity ledger" },
+  {
+    pattern: /thoughts\/ledgers\/CONTINUITY_CLAUDE-/,
+    skillName: "continuity",
+    description: "Continuity ledger",
+  },
   // Agentica
-  { pattern: /opc\/scripts\/agentica/, skillName: "async-repl-protocol", description: "Agentica REPL protocol" },
+  {
+    pattern: /opc\/scripts\/agentica/,
+    skillName: "async-repl-protocol",
+    description: "Agentica REPL protocol",
+  },
   // MCP scripts
-  { pattern: /scripts\/.*\.py$/, skillName: "mcp-scripts", description: "MCP scripts" },
+  {
+    pattern: /scripts\/.*\.py$/,
+    skillName: "mcp-scripts",
+    description: "MCP scripts",
+  },
   // Lean files
-  { pattern: /\.lean$/, skillName: "llm-tuning-patterns", description: "LLM tuning for proofs" },
+  {
+    pattern: /\.lean$/,
+    skillName: "llm-tuning-patterns",
+    description: "LLM tuning for proofs",
+  },
   // Skill rules config
-  { pattern: /skill-rules\.json$/, skillName: "router-first-architecture", description: "Router-first architecture" },
+  {
+    pattern: /skill-rules\.json$/,
+    skillName: "router-first-architecture",
+    description: "Router-first architecture",
+  },
   // Wiring/hooks infrastructure
-  { pattern: /\.claude\/settings\.json$/, skillName: "wiring", description: "Wiring verification" }
+  {
+    pattern: /\.claude\/settings\.json$/,
+    skillName: "wiring",
+    description: "Wiring verification",
+  },
 ];
 function readStdin() {
   return readFileSync(0, "utf-8");
@@ -29,7 +65,13 @@ function getProjectDir() {
 }
 function loadSkillContent(skillName) {
   const projectDir = getProjectDir();
-  const skillPath = join(projectDir, ".claude", "skills", skillName, "SKILL.md");
+  const skillPath = join(
+    projectDir,
+    ".claude",
+    "skills",
+    skillName,
+    "SKILL.md",
+  );
   if (!existsSync(skillPath)) return null;
   try {
     let content = readFileSync(skillPath, "utf-8");
@@ -72,9 +114,11 @@ async function main() {
     console.log("{}");
     return;
   }
-  console.log(JSON.stringify({
-    continue: true,
-    systemMessage: contents.join("\n\n---\n\n")
-  }));
+  console.log(
+    JSON.stringify({
+      continue: true,
+      systemMessage: contents.join("\n\n---\n\n"),
+    }),
+  );
 }
 main().catch(() => process.exit(1));

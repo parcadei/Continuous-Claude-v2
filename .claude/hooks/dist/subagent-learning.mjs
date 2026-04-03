@@ -11,7 +11,7 @@ async function storeLearning(learning, sessionId, projectDir) {
     "python",
     "scripts/store_learning.py",
     "--session-id",
-    sessionId
+    sessionId,
   ];
   if (learning.outcome === "success") {
     args.push("--worked", `${learning.what}. ${learning.how}`);
@@ -28,9 +28,9 @@ async function storeLearning(learning, sessionId, projectDir) {
     cwd: opcDir,
     env: {
       ...process.env,
-      PYTHONPATH: opcDir
+      PYTHONPATH: opcDir,
     },
-    timeout: 1e4
+    timeout: 1e4,
   });
   return result.status === 0;
 }
@@ -39,9 +39,11 @@ function extractAgentLearning(agentType, agentPrompt, agentResult) {
     what: `Agent ${agentType} completed task`,
     why: agentPrompt.slice(0, 200),
     how: `Result: ${agentResult.slice(0, 300)}`,
-    outcome: agentResult.toLowerCase().includes("error") ? "failure" : "success",
+    outcome: agentResult.toLowerCase().includes("error")
+      ? "failure"
+      : "success",
     tags: ["agent", agentType, "auto_extracted"],
-    context: agentPrompt
+    context: agentPrompt,
   };
 }
 
@@ -60,9 +62,12 @@ function isMeaningfulResult(result) {
     /^failed:/i,
     /^exception:/i,
     /^traceback/i,
-    /^fatal:/i
+    /^fatal:/i,
   ];
-  if (result.length < 200 && errorOnlyPatterns.some((p) => p.test(result.trim()))) {
+  if (
+    result.length < 200 &&
+    errorOnlyPatterns.some((p) => p.test(result.trim()))
+  ) {
     return false;
   }
   if (result.trim().length < MIN_RESULT_LENGTH) {
@@ -77,10 +82,10 @@ function normalizeAgentType(agentType) {
   if (!agentType) return "unknown";
   const type = agentType.toLowerCase().trim();
   const aliases = {
-    "code": "kraken",
-    "research": "scout",
-    "search": "scout",
-    "explore": "scout"
+    code: "kraken",
+    research: "scout",
+    search: "scout",
+    explore: "scout",
   };
   return aliases[type] || type;
 }
@@ -101,18 +106,20 @@ async function main() {
     const learning = extractAgentLearning(
       agentType,
       agentPrompt,
-      input.agent_result
+      input.agent_result,
     );
     const stored = await storeLearning(learning, input.session_id, projectDir);
     if (stored) {
       const promptSummary = agentPrompt.slice(0, 50).replace(/\n/g, " ");
       const resultSummary = input.agent_result.slice(0, 80).replace(/\n/g, " ");
-      console.log(JSON.stringify({
-        hookSpecificOutput: {
-          hookEventName: "SubagentStop",
-          additionalContext: `AUTO-LEARNING: Agent ${agentType} completed. Task: "${promptSummary}..." Result: "${resultSummary}..."`
-        }
-      }));
+      console.log(
+        JSON.stringify({
+          hookSpecificOutput: {
+            hookEventName: "SubagentStop",
+            additionalContext: `AUTO-LEARNING: Agent ${agentType} completed. Task: "${promptSummary}..." Result: "${resultSummary}..."`,
+          },
+        }),
+      );
       return;
     }
   } catch (err) {

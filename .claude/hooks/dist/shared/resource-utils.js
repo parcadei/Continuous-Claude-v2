@@ -7,7 +7,7 @@
  * Part of Phase 1: RAM Query Utility
  * See: docs/handoffs/resource-limits-plan.md
  */
-import * as os from 'os';
+import * as os from "os";
 /**
  * Get current system resource information.
  *
@@ -29,10 +29,10 @@ import * as os from 'os';
  * ```
  */
 export function getSystemResources() {
-    return {
-        freeRAM: os.freemem(),
-        totalRAM: os.totalmem(),
-        cpuCores: os.cpus().length,
-        loadAvg: os.loadavg(),
-    };
+  return {
+    freeRAM: os.freemem(),
+    totalRAM: os.totalmem(),
+    cpuCores: os.cpus().length,
+    loadAvg: os.loadavg(),
+  };
 }

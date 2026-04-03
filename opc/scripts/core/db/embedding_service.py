@@ -450,6 +450,7 @@ class OllamaEmbeddingProvider(EmbeddingProvider):
             host: Ollama server URL (default from OLLAMA_HOST env or localhost:11434)
         """
         import os
+
         import httpx
 
         self.model = model or os.getenv("OLLAMA_EMBED_MODEL", self.DEFAULT_MODEL)

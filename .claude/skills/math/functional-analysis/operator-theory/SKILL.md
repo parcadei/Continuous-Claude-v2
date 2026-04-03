@@ -12,7 +12,6 @@ Use this skill when working on operator-theory problems in functional analysis.
 
 ## Decision Tree
 
-
 1. **Bounded operator verification**
    - ||Tx|| <= M||x|| for some M
    - Operator norm: ||T|| = sup{||Tx|| : ||x|| = 1}
@@ -20,11 +19,11 @@ Use this skill when working on operator-theory problems in functional analysis.
 
 2. **Adjoint operator**
    - <Tx, y> = <x, T*y> defines T*
-   - For matrices: T* = conjugate transpose
+   - For matrices: T\* = conjugate transpose
    - `sympy_compute.py simplify "<Tx, y> - <x, T*y>"`
 
 3. **Spectral Theory**
-   - Spectrum: sigma(T) = {lambda : T - lambda*I not invertible}
+   - Spectrum: sigma(T) = {lambda : T - lambda\*I not invertible}
    - Self-adjoint: spectrum is real
    - `z3_solve.py prove "self_adjoint_real_spectrum"`
 
@@ -34,35 +33,38 @@ Use this skill when working on operator-theory problems in functional analysis.
    - `sympy_compute.py limit "||T - T_n||" --var n`
 
 5. **Spectral Theorem**
-   - Self-adjoint compact: T = sum(lambda_n * P_n)
+   - Self-adjoint compact: T = sum(lambda_n \* P_n)
    - eigenvalues -> 0, eigenvectors form orthonormal basis
-
 
 ## Tool Commands
 
 ### Z3_Bounded_Operator
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "norm(Tx) <= M*norm(x)"
 ```
 
 ### Sympy_Adjoint
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py simplify "<Tx, y> - <x, T_star_y>"
 ```
 
 ### Z3_Spectral
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "self_adjoint implies real_spectrum"
 ```
 
 ### Sympy_Compact
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py limit "norm(T - T_n)" --var n --at oo
 ```
 
 ## Key Techniques
 
-*From indexed textbooks:*
+_From indexed textbooks:_
 
 - [Introductory Functional Analysis with Applications] Spectral theory is one of the main branches of modern functional analysis and its applications. Roughly speaking, it is concerned with certain inverse operators, their general properties and their relations to the original operators. Such inverse operators arise quite naturally in connection with the problem of solving equations (systems of linear algebraic equations, differential equations, integral equations).
 - [Introductory Functional Analysis with Applications] Unbounded linear operators in Hilb,ert spaces will be considered in Chap. Brief orientation about main content of Chap. We begin with finite dimensional vector spaces.

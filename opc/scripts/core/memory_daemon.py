@@ -457,7 +457,7 @@ def status_daemon():
     running, pid = is_running()
     db_type = "PostgreSQL" if use_postgres() else "SQLite"
 
-    print(f"Memory Daemon Status")
+    print("Memory Daemon Status")
     print(f"  Running: {'Yes' if running else 'No'}")
     if running:
         print(f"  PID: {pid}")
@@ -467,7 +467,7 @@ def status_daemon():
 
     # Show recent log
     if LOG_FILE.exists():
-        print(f"\nRecent log:")
+        print("\nRecent log:")
         lines = LOG_FILE.read_text().strip().split("\n")[-5:]
         for line in lines:
             print(f"  {line}")

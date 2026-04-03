@@ -14,16 +14,17 @@ This skill is invoked when organizing or refactoring Python code. Not user-invoc
 
 ## File Size Guidelines
 
-| Lines | Status | Action |
-|-------|--------|--------|
-| 150-500 | Optimal | Sweet spot for AI code editors and human comprehension |
-| 500-1000 | Large | Look for natural split points |
-| 1000-2000 | Too large | Refactor into focused modules |
-| 2000+ | Critical | Must split - causes tooling issues and cognitive overload |
+| Lines     | Status    | Action                                                    |
+| --------- | --------- | --------------------------------------------------------- |
+| 150-500   | Optimal   | Sweet spot for AI code editors and human comprehension    |
+| 500-1000  | Large     | Look for natural split points                             |
+| 1000-2000 | Too large | Refactor into focused modules                             |
+| 2000+     | Critical  | Must split - causes tooling issues and cognitive overload |
 
 ## When to Split
 
 Split when ANY of these apply:
+
 - File exceeds 500 lines
 - Multiple unrelated concerns in same file
 - Scroll fatigue finding functions
@@ -79,6 +80,7 @@ When splitting an existing large file:
 ## Current Codebase Candidates
 
 Files over 2000 lines that need attention:
+
 - Math compute modules (scipy, mpmath, numpy) - domain-specific, may be acceptable
 - patterns.py - consider splitting by pattern type
 - memory_backfill.py - consider splitting by operation type

@@ -15,6 +15,7 @@ You are a specialized review agent. Your job is to verify that an implementation
 ## When to Use
 
 This agent is the 4th step in the agent flow:
+
 ```
 plan-agent → validate-agent → kraken → review-agent
 ```
@@ -97,23 +98,23 @@ Parse the plan and list every requirement:
 ```markdown
 ## Requirements Extracted
 
-| ID | Requirement | Priority |
-|----|-------------|----------|
-| R1 | Add `--auto-insights` CLI flag | P0 |
-| R2 | Write insights to `.claude/cache/insights/` | P0 |
-| R3 | Integrate with Stop hook | P1 |
+| ID  | Requirement                                 | Priority |
+| --- | ------------------------------------------- | -------- |
+| R1  | Add `--auto-insights` CLI flag              | P0       |
+| R2  | Write insights to `.claude/cache/insights/` | P0       |
+| R3  | Integrate with Stop hook                    | P1       |
 ```
 
 ## Step 3: Compare Intent vs Reality
 
 For each requirement, evaluate:
 
-| Status | Meaning |
-|--------|---------|
-| DONE | Fully implemented, evidence in diff |
-| PARTIAL | Partially implemented, gaps exist |
-| MISSING | Not found in code diff |
-| DIVERGED | Implemented differently than planned |
+| Status   | Meaning                                            |
+| -------- | -------------------------------------------------- |
+| DONE     | Fully implemented, evidence in diff                |
+| PARTIAL  | Partially implemented, gaps exist                  |
+| MISSING  | Not found in code diff                             |
+| DIVERGED | Implemented differently than planned               |
 | DEFERRED | Explicitly skipped (check session data for reason) |
 
 ### Evaluation Prompt (Use Internally)
@@ -148,6 +149,7 @@ Return: Test status and any missing coverage
 ### 3.2 Edge Case Thinking
 
 For each requirement, ask:
+
 - Were error conditions handled?
 - Are there missing validations?
 - Could this break existing functionality?
@@ -159,6 +161,7 @@ Note any concerns in the Gaps section.
 ## Step 4: Generate Review Report
 
 **ALWAYS write output to:**
+
 ```
 $CLAUDE_CC_DIR/.claude/cache/agents/review-agent/output-{timestamp}.md
 ```
@@ -167,6 +170,7 @@ $CLAUDE_CC_DIR/.claude/cache/agents/review-agent/output-{timestamp}.md
 
 ```markdown
 # Implementation Review
+
 Generated: [timestamp]
 Plan: [path to plan file]
 Session: [session ID]
@@ -174,31 +178,35 @@ Session: [session ID]
 ## Verdict: PASS | FAIL | NEEDS_REVIEW
 
 ## Automated Verification Results
+
 ✓ Build passes: `make build`
 ✓ Tests pass: `uv run pytest`
 ✗ Type check: `uv run mypy` (3 errors)
 
 ## Code Quality (qlty)
+
 ✓ Linting: 0 issues
 ⚠️ Complexity: 2 functions exceed threshold
 ✓ Code smells: None detected
 
 ## Requirements Status
 
-| ID | Requirement | Status | Evidence |
-|----|-------------|--------|----------|
-| R1 | Description | DONE | `file.py:42` |
-| R2 | Description | MISSING | Not found |
+| ID  | Requirement | Status  | Evidence     |
+| --- | ----------- | ------- | ------------ |
+| R1  | Description | DONE    | `file.py:42` |
+| R2  | Description | MISSING | Not found    |
 
 ## Gaps Found (Action Required)
 
 ### GAP-001: [Title]
+
 - **Severity:** P0 | P1 | P2
 - **Requirement:** What was expected
 - **Actual:** What was found (or MISSING)
 - **Fix Action:** Specific steps to resolve
 
 ### GAP-002: [Title]
+
 ...
 
 ## Session Observations
@@ -252,11 +260,11 @@ After writing the full report, return a brief summary:
 
 ## Severity Levels
 
-| Level | Meaning | Action |
-|-------|---------|--------|
-| P0 | Blocks release | Must fix before handoff |
-| P1 | Important | Should fix, can defer with justification |
-| P2 | Nice to have | Track as tech debt |
+| Level | Meaning        | Action                                   |
+| ----- | -------------- | ---------------------------------------- |
+| P0    | Blocks release | Must fix before handoff                  |
+| P1    | Important      | Should fix, can defer with justification |
+| P2    | Nice to have   | Track as tech debt                       |
 
 ## Integration with Agent Flow
 

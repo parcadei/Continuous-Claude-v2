@@ -140,22 +140,27 @@ pytest tests/integration/  # Verify full call path
 // .claude/settings.json - hook definition exists but not in hooks section
 {
   "hooks": {
-    "PreToolUse": []  // Empty! Your hook never fires
+    "PreToolUse": [] // Empty! Your hook never fires
   }
 }
 ```
 
 **Fix**: Add hook registration:
+
 ```json
 {
   "hooks": {
-    "PreToolUse": [{
-      "matcher": ["Task"],
-      "hooks": [{
-        "type": "command",
-        "command": "$CLAUDE_CC_DIR/.claude/hooks/orchestration.sh"
-      }]
-    }]
+    "PreToolUse": [
+      {
+        "matcher": ["Task"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_CC_DIR/.claude/hooks/orchestration.sh"
+          }
+        ]
+      }
+    ]
   }
 }
 ```
@@ -218,18 +223,21 @@ Before marking infrastructure "complete":
 ### Example 1: DAG Orchestration (This Session)
 
 **What was built:**
+
 - `opc/orchestration/orchestration_layer.py` (500+ lines)
 - `opc/orchestration/dag/` (DAG builder, validator, executor)
 - 18 agent type definitions
 - Sophisticated routing logic
 
 **Wiring gap:**
+
 - No hook calls orchestration_layer.py
 - No script imports the DAG modules
 - Agent routing returns hardcoded "general-purpose"
 - Result: 100% dead code
 
 **Fix:**
+
 1. Create PreToolUse hook for Task tool
 2. Hook calls `scripts/orchestrate.py`
 3. Script imports and calls `orchestration_layer.dispatch()`
@@ -239,15 +247,18 @@ Before marking infrastructure "complete":
 ### Example 2: Artifact Index (Previous Session)
 
 **What was built:**
+
 - SQLite database schema
 - Indexing logic
 - Query functions
 
 **Wiring gap:**
+
 - No hook triggered indexing
 - Files created but never indexed
 
 **Fix:**
+
 1. PostToolUse hook on Write tool
 2. Hook calls indexing script immediately
 3. Integration test: Write file → verify indexed

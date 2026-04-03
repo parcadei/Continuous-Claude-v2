@@ -21,6 +21,7 @@ Skill("commit")
 ```
 
 The `/commit` skill:
+
 1. Removes Claude attribution from commits
 2. Generates reasoning.md capturing what was tried
 3. Clears build attempts for next feature
@@ -34,6 +35,7 @@ The `/commit` skill:
 ## Trigger Words
 
 When you see these in user prompts, use the commit skill:
+
 - "commit", "push", "save changes"
 - "push to github", "push changes"
 - "commit and push"
@@ -41,11 +43,13 @@ When you see these in user prompts, use the commit skill:
 ## After Commit
 
 The skill will prompt you to run:
+
 ```bash
 bash "$CLAUDE_CC_DIR/.claude/scripts/generate-reasoning.sh" <hash> "<message>"
 ```
 
 Then push if requested:
+
 ```bash
 git push origin <branch>
 ```

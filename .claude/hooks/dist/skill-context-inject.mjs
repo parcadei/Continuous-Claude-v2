@@ -2,7 +2,14 @@
 import { readFileSync as readFileSync2 } from "fs";
 
 // src/shared/project-state.ts
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from "fs";
+import {
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  statSync,
+} from "fs";
 import { join, dirname } from "path";
 var PROJECT_STATE_VERSION = "1.0";
 function getProjectStatePath(projectDir) {
@@ -13,26 +20,30 @@ function loadProjectState(projectDir) {
   if (existsSync(path)) {
     try {
       return JSON.parse(readFileSync(path, "utf-8"));
-    } catch {
-    }
+    } catch {}
   }
   return {
     version: PROJECT_STATE_VERSION,
     activePlan: null,
     activeSpec: null,
-    updatedAt: (/* @__PURE__ */ new Date()).toISOString()
+    updatedAt: /* @__PURE__ */ new Date().toISOString(),
   };
 }
 function findLatestFile(dir, pattern = /\.md$/) {
   if (!existsSync(dir)) return null;
   try {
-    const files = readdirSync(dir).filter((f) => pattern.test(f)).map((f) => {
-      const fullPath = join(dir, f);
-      const stat = statSync(fullPath);
-      const dateMatch = f.match(/^(\d{4}-\d{2}-\d{2})/);
-      const fileDate = dateMatch ? new Date(dateMatch[1]).getTime() : stat.mtimeMs;
-      return { path: fullPath, date: fileDate };
-    }).sort((a, b) => b.date - a.date);
+    const files = readdirSync(dir)
+      .filter((f) => pattern.test(f))
+      .map((f) => {
+        const fullPath = join(dir, f);
+        const stat = statSync(fullPath);
+        const dateMatch = f.match(/^(\d{4}-\d{2}-\d{2})/);
+        const fileDate = dateMatch
+          ? new Date(dateMatch[1]).getTime()
+          : stat.mtimeMs;
+        return { path: fullPath, date: fileDate };
+      })
+      .sort((a, b) => b.date - a.date);
     return files.length > 0 ? files[0].path : null;
   } catch {
     return null;
@@ -46,7 +57,7 @@ function getActivePlanOrLatest(projectDir) {
   const planDirs = [
     join(projectDir, "thoughts", "shared", "plans"),
     join(projectDir, "plans"),
-    join(projectDir, "specs")
+    join(projectDir, "specs"),
   ];
   for (const dir of planDirs) {
     const latest = findLatestFile(dir);
@@ -61,7 +72,7 @@ function getActiveSpecOrLatest(projectDir) {
   }
   const specDirs = [
     join(projectDir, "thoughts", "shared", "specs"),
-    join(projectDir, "specs")
+    join(projectDir, "specs"),
   ];
   for (const dir of specDirs) {
     const latest = findLatestFile(dir);
@@ -75,14 +86,10 @@ var PLAN_CONTEXT_SKILLS = /* @__PURE__ */ new Set([
   "implement_task",
   "implement_plan",
   "implement_plan_micro",
-  "validate-agent"
+  "validate-agent",
 ]);
-var SPEC_CONTEXT_SKILLS = /* @__PURE__ */ new Set([
-  "test-driven-development"
-]);
-var PLAN_OR_SPEC_SKILLS = /* @__PURE__ */ new Set([
-  "debug"
-]);
+var SPEC_CONTEXT_SKILLS = /* @__PURE__ */ new Set(["test-driven-development"]);
+var PLAN_OR_SPEC_SKILLS = /* @__PURE__ */ new Set(["debug"]);
 function readStdin() {
   try {
     return readFileSync2(0, "utf-8");
@@ -115,14 +122,15 @@ function main() {
   } else if (SPEC_CONTEXT_SKILLS.has(skillName)) {
     contextPath = getActiveSpecOrLatest(projectDir);
   } else if (PLAN_OR_SPEC_SKILLS.has(skillName)) {
-    contextPath = getActivePlanOrLatest(projectDir) || getActiveSpecOrLatest(projectDir);
+    contextPath =
+      getActivePlanOrLatest(projectDir) || getActiveSpecOrLatest(projectDir);
   }
   if (contextPath) {
     const output = {
       updatedInput: {
         skill: skillName,
-        args: contextPath
-      }
+        args: contextPath,
+      },
     };
     console.log(JSON.stringify(output));
   } else {
@@ -130,6 +138,4 @@ function main() {
   }
 }
 main();
-export {
-  main
-};
+export { main };

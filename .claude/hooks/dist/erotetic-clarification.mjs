@@ -5,15 +5,20 @@ import { readFileSync } from "fs";
 import { execSync } from "child_process";
 
 // src/shared/workflow-erotetic.ts
-var IMPL_PATTERNS = /\b(build|implement|create|add|develop|design|set up|write)\b/i;
-var NON_IMPL_PATTERNS = /\b(fix|run|show|explain|list|search|rename|delete|update)\b/i;
+var IMPL_PATTERNS =
+  /\b(build|implement|create|add|develop|design|set up|write)\b/i;
+var NON_IMPL_PATTERNS =
+  /\b(fix|run|show|explain|list|search|rename|delete|update)\b/i;
 var PROPOSITION_PATTERNS = {
-  framework: /\b(fastapi|express|hono|gin|django|flask|rails|spring|nest\.?js)\b/i,
-  auth_method: /\b(jwt|oauth\d?|session|api[- ]?key|basic auth|bearer|saml|oidc)\b/i,
-  database: /\b(postgres|postgresql|mysql|sqlite|mongodb|redis|dynamodb|firestore)\b/i,
+  framework:
+    /\b(fastapi|express|hono|gin|django|flask|rails|spring|nest\.?js)\b/i,
+  auth_method:
+    /\b(jwt|oauth\d?|session|api[- ]?key|basic auth|bearer|saml|oidc)\b/i,
+  database:
+    /\b(postgres|postgresql|mysql|sqlite|mongodb|redis|dynamodb|firestore)\b/i,
   hosting: /\b(vercel|aws|gcp|azure|heroku|railway|fly\.io|cloudflare)\b/i,
   language: /\b(python|typescript|javascript|go|rust|java|ruby|php)\b/i,
-  testing: /\b(pytest|jest|vitest|mocha|junit|rspec)\b/i
+  testing: /\b(pytest|jest|vitest|mocha|junit|rspec)\b/i,
 };
 function findFirstMatch(prompt, pattern) {
   const match = prompt.match(pattern);
@@ -50,8 +55,8 @@ function computeEvocation(propositions, cwd) {
         cwd,
         encoding: "utf-8",
         timeout: 5e3,
-        stdio: ["pipe", "pipe", "pipe"]
-      }
+        stdio: ["pipe", "pipe", "pipe"],
+      },
     );
     return JSON.parse(result.trim());
   } catch (err) {
@@ -77,7 +82,10 @@ Only proceed when all key decisions are resolved.
 EROTETIC CHECK PASSED - E(X,Q) = {} (empty)
 
 All propositions resolved from context:
-${Object.entries(propositions).filter(([_, v]) => v !== "UNKNOWN").map(([k, v]) => `  - ${k}: ${v}`).join("\n")}
+${Object.entries(propositions)
+  .filter(([_, v]) => v !== "UNKNOWN")
+  .map(([k, v]) => `  - ${k}: ${v}`)
+  .join("\n")}
 
 Proceed with implementation.
 `.trim();
@@ -91,7 +99,12 @@ UNKNOWNS (must clarify):
 ${evocation.unknowns.map((u) => `  \u2753 ${u}`).join("\n")}
 
 KNOWN (from context):
-${Object.entries(propositions).filter(([_, v]) => v !== "UNKNOWN").map(([k, v]) => `  \u2713 ${k}: ${v}`).join("\n") || "  (none extracted)"}
+${
+  Object.entries(propositions)
+    .filter(([_, v]) => v !== "UNKNOWN")
+    .map(([k, v]) => `  \u2713 ${k}: ${v}`)
+    .join("\n") || "  (none extracted)"
+}
 
 ACTION: Use AskUserQuestion to resolve the ${evocation.count} unknown(s) above.
 Loop until E(X,Q) = {} (empty), then proceed with implementation.
@@ -118,7 +131,7 @@ async function main() {
     const message = getEroteticMessage(propositions, evocation);
     const output = {
       result: "continue",
-      message
+      message,
     };
     console.log(JSON.stringify(output));
     process.exit(0);

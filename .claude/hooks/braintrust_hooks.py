@@ -259,7 +259,7 @@ def session_end(input_data: dict) -> dict:
     if not session_id:
         return {"result": "continue"}
 
-    root_span_id = get_session_value(session_id, "root_span_id")
+    get_session_value(session_id, "root_span_id")
     turn_count = get_session_value(session_id, "turn_count") or 0
 
     log("INFO", f"Session ended: {session_id} (turns={turn_count})")

@@ -10,12 +10,12 @@
  * - Graceful degradation when indexing
  */
 
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
-import { execSync, spawnSync } from 'child_process';
-import { join, resolve } from 'path';
-import { tmpdir } from 'os';
-import * as net from 'net';
-import * as crypto from 'crypto';
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from "fs";
+import { execSync, spawnSync } from "child_process";
+import { join, resolve } from "path";
+import { tmpdir } from "os";
+import * as net from "net";
+import * as crypto from "crypto";
 
 /**
  * Resolve project directory to absolute path.
@@ -31,7 +31,11 @@ function resolveProjectDir(projectDir: string): string {
  */
 function getLockPath(projectDir: string): string {
   const resolvedPath = resolveProjectDir(projectDir);
-  const hash = crypto.createHash('md5').update(resolvedPath).digest('hex').substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(resolvedPath)
+    .digest("hex")
+    .substring(0, 8);
   return `${tmpdir()}/tldr-${hash}.lock`;
 }
 
@@ -40,7 +44,11 @@ function getLockPath(projectDir: string): string {
  */
 function getPidPath(projectDir: string): string {
   const resolvedPath = resolveProjectDir(projectDir);
-  const hash = crypto.createHash('md5').update(resolvedPath).digest('hex').substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(resolvedPath)
+    .digest("hex")
+    .substring(0, 8);
   return `${tmpdir()}/tldr-${hash}.pid`;
 }
 
@@ -53,14 +61,14 @@ function isDaemonProcessRunning(projectDir: string): boolean {
   if (!existsSync(pidPath)) return false;
 
   try {
-    const pid = parseInt(readFileSync(pidPath, 'utf-8').trim(), 10);
+    const pid = parseInt(readFileSync(pidPath, "utf-8").trim(), 10);
     if (isNaN(pid) || pid <= 0) return false;
 
     // kill(pid, 0) checks if process exists without sending signal
     process.kill(pid, 0);
-    return true;  // Process exists
+    return true; // Process exists
   } catch {
-    return false;  // Process doesn't exist or permission denied
+    return false; // Process doesn't exist or permission denied
   }
 }
 
@@ -73,16 +81,20 @@ function tryAcquireLock(projectDir: string): boolean {
   try {
     // Check if lock exists and is recent (within 30s)
     if (existsSync(lockPath)) {
-      const lockContent = readFileSync(lockPath, 'utf-8');
+      const lockContent = readFileSync(lockPath, "utf-8");
       const lockTime = parseInt(lockContent, 10);
       if (!isNaN(lockTime) && Date.now() - lockTime < 30000) {
-        return false;  // Lock is held by another process
+        return false; // Lock is held by another process
       }
       // Stale lock - remove it
-      try { unlinkSync(lockPath); } catch { /* ignore */ }
+      try {
+        unlinkSync(lockPath);
+      } catch {
+        /* ignore */
+      }
     }
     // Create lock atomically with O_EXCL - fails if file exists (race-safe)
-    writeFileSync(lockPath, Date.now().toString(), { flag: 'wx' });
+    writeFileSync(lockPath, Date.now().toString(), { flag: "wx" });
     return true;
   } catch {
     // Either lock exists (race lost) or write failed - either way, don't acquire
@@ -96,7 +108,9 @@ function tryAcquireLock(projectDir: string): boolean {
 function releaseLock(projectDir: string): void {
   try {
     unlinkSync(getLockPath(projectDir));
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 /** Query timeout in milliseconds (3 seconds) */
@@ -106,7 +120,28 @@ const QUERY_TIMEOUT = 3000;
  * Query structure for daemon commands.
  */
 export interface DaemonQuery {
-  cmd: 'ping' | 'search' | 'impact' | 'extract' | 'status' | 'dead' | 'arch' | 'cfg' | 'dfg' | 'slice' | 'calls' | 'warm' | 'semantic' | 'tree' | 'structure' | 'context' | 'imports' | 'importers' | 'notify' | 'diagnostics' | 'track';
+  cmd:
+    | "ping"
+    | "search"
+    | "impact"
+    | "extract"
+    | "status"
+    | "dead"
+    | "arch"
+    | "cfg"
+    | "dfg"
+    | "slice"
+    | "calls"
+    | "warm"
+    | "semantic"
+    | "tree"
+    | "structure"
+    | "context"
+    | "imports"
+    | "importers"
+    | "notify"
+    | "diagnostics"
+    | "track";
   pattern?: string;
   func?: string;
   file?: string;
@@ -116,9 +151,9 @@ export interface DaemonQuery {
   language?: string;
   entry_points?: string[];
   line?: number;
-  direction?: 'backward' | 'forward';
+  direction?: "backward" | "forward";
   variable?: string;
-  action?: 'index' | 'search';
+  action?: "index" | "search";
   query?: string;
   k?: number;
   // New fields for tree, structure, context, imports, importers
@@ -160,8 +195,8 @@ export interface DaemonResponse {
     line: number;
     column?: number;
     message: string;
-    severity: 'error' | 'warning';
-    source: 'pyright' | 'ruff' | 'tsc' | 'eslint';
+    severity: "error" | "warning";
+    source: "pyright" | "ruff" | "tsc" | "eslint";
   }>;
   // Session stats (P7)
   session_stats?: {
@@ -178,14 +213,17 @@ export interface DaemonResponse {
     total_requests: number;
   };
   // Hook activity stats (P8)
-  hook_stats?: Record<string, {
-    hook_name: string;
-    invocations: number;
-    successes: number;
-    failures: number;
-    success_rate: number;
-    metrics: Record<string, number>;
-  }>;
+  hook_stats?: Record<
+    string,
+    {
+      hook_name: string;
+      invocations: number;
+      successes: number;
+      failures: number;
+      success_rate: number;
+      metrics: Record<string, number>;
+    }
+  >;
   // Track response fields
   hook?: string;
   total_invocations?: number;
@@ -195,7 +233,7 @@ export interface DaemonResponse {
  * Connection info for daemon communication.
  */
 export interface ConnectionInfo {
-  type: 'unix' | 'tcp';
+  type: "unix" | "tcp";
   path?: string;
   host?: string;
   port?: number;
@@ -210,15 +248,19 @@ export interface ConnectionInfo {
  */
 export function getConnectionInfo(projectDir: string): ConnectionInfo {
   const resolvedPath = resolveProjectDir(projectDir);
-  const hash = crypto.createHash('md5').update(resolvedPath).digest('hex').substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(resolvedPath)
+    .digest("hex")
+    .substring(0, 8);
 
-  if (process.platform === 'win32') {
+  if (process.platform === "win32") {
     // TCP on localhost with deterministic port
     const port = 49152 + (parseInt(hash, 16) % 10000);
-    return { type: 'tcp', host: '127.0.0.1', port };
+    return { type: "tcp", host: "127.0.0.1", port };
   } else {
     // Unix socket
-    return { type: 'unix', path: `${tmpdir()}/tldr-${hash}.sock` };
+    return { type: "unix", path: `${tmpdir()}/tldr-${hash}.sock` };
   }
 }
 
@@ -231,7 +273,11 @@ export function getConnectionInfo(projectDir: string): ConnectionInfo {
  */
 export function getSocketPath(projectDir: string): string {
   const resolvedPath = resolveProjectDir(projectDir);
-  const hash = crypto.createHash('md5').update(resolvedPath).digest('hex').substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(resolvedPath)
+    .digest("hex")
+    .substring(0, 8);
   return `${tmpdir()}/tldr-${hash}.sock`;
 }
 
@@ -242,10 +288,10 @@ export function getSocketPath(projectDir: string): string {
  * @returns Status string ('ready', 'indexing', 'stopped') or null if no status file
  */
 export function getStatusFile(projectDir: string): string | null {
-  const statusPath = join(projectDir, '.tldr', 'status');
+  const statusPath = join(projectDir, ".tldr", "status");
   if (existsSync(statusPath)) {
     try {
-      return readFileSync(statusPath, 'utf-8').trim();
+      return readFileSync(statusPath, "utf-8").trim();
     } catch {
       return null;
     }
@@ -260,7 +306,7 @@ export function getStatusFile(projectDir: string): string | null {
  * @returns true if daemon is indexing
  */
 export function isIndexing(projectDir: string): boolean {
-  return getStatusFile(projectDir) === 'indexing';
+  return getStatusFile(projectDir) === "indexing";
 }
 
 /**
@@ -272,19 +318,19 @@ export function isIndexing(projectDir: string): boolean {
 function isDaemonReachable(projectDir: string): boolean {
   const connInfo = getConnectionInfo(projectDir);
 
-  if (connInfo.type === 'tcp') {
+  if (connInfo.type === "tcp") {
     // On Windows, try to connect to TCP port
     try {
       const testSocket = new net.Socket();
       testSocket.setTimeout(100);
       let connected = false;
 
-      testSocket.on('connect', () => {
+      testSocket.on("connect", () => {
         connected = true;
         testSocket.destroy();
       });
 
-      testSocket.on('error', () => {
+      testSocket.on("error", () => {
         testSocket.destroy();
       });
 
@@ -311,9 +357,9 @@ function isDaemonReachable(projectDir: string): boolean {
       // Try a quick ping but don't delete socket on failure
       try {
         execSync(`echo '{"cmd":"ping"}' | nc -U "${connInfo.path}"`, {
-          encoding: 'utf-8',
-          timeout: 1000,  // Increased from 500ms
-          stdio: ['pipe', 'pipe', 'pipe'],
+          encoding: "utf-8",
+          timeout: 1000, // Increased from 500ms
+          stdio: ["pipe", "pipe", "pipe"],
         });
         return true;
       } catch {
@@ -326,9 +372,9 @@ function isDaemonReachable(projectDir: string): boolean {
     // No daemon process running - try ping to verify socket isn't stale
     try {
       execSync(`echo '{"cmd":"ping"}' | nc -U "${connInfo.path}"`, {
-        encoding: 'utf-8',
+        encoding: "utf-8",
         timeout: 500,
-        stdio: ['pipe', 'pipe', 'pipe'],
+        stdio: ["pipe", "pipe", "pipe"],
       });
       return true;
     } catch {
@@ -355,13 +401,13 @@ export function tryStartDaemon(projectDir: string): boolean {
     // FAST CHECK: Is daemon process running? (checks PID file + kill -0)
     // This is faster and more reliable than socket ping
     if (isDaemonProcessRunning(projectDir)) {
-      return true;  // Process exists, even if socket not ready yet
+      return true; // Process exists, even if socket not ready yet
     }
 
     // SLOW CHECK: Is daemon reachable via socket?
     // Only needed if PID file doesn't exist (first start or cleaned up)
     if (isDaemonReachable(projectDir)) {
-      return true;  // Already running, no need to spawn
+      return true; // Already running, no need to spawn
     }
 
     // Try to acquire lock - if another process is starting daemon, wait for it
@@ -370,37 +416,48 @@ export function tryStartDaemon(projectDir: string): boolean {
       const start = Date.now();
       while (Date.now() - start < 5000) {
         // Check process first (faster), then socket
-        if (isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir)) {
+        if (
+          isDaemonProcessRunning(projectDir) ||
+          isDaemonReachable(projectDir)
+        ) {
           return true;
         }
         // Brief wait
         const end = Date.now() + 100;
-        while (Date.now() < end) { /* spin */ }
+        while (Date.now() < end) {
+          /* spin */
+        }
       }
-      return isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir);
+      return (
+        isDaemonProcessRunning(projectDir) || isDaemonReachable(projectDir)
+      );
     }
 
     try {
       // We hold the lock - start the daemon
-      const tldrPath = join(projectDir, 'opc', 'packages', 'tldr-code');
+      const tldrPath = join(projectDir, "opc", "packages", "tldr-code");
       let started = false;
 
       // Try local dev installation first (only if it exists)
       if (existsSync(tldrPath)) {
-        const result = spawnSync('uv', ['run', 'tldr', 'daemon', 'start', '--project', projectDir], {
-          timeout: 10000,
-          stdio: 'ignore',
-          cwd: tldrPath,
-        });
+        const result = spawnSync(
+          "uv",
+          ["run", "tldr", "daemon", "start", "--project", projectDir],
+          {
+            timeout: 10000,
+            stdio: "ignore",
+            cwd: tldrPath,
+          },
+        );
         started = result.status === 0;
       }
 
       // Fallback to global tldr if local didn't work
       // Skip fallback in dev mode (TLDR_DEV=1) to prevent duplicate daemons
       if (!started && !process.env.TLDR_DEV) {
-        spawnSync('tldr', ['daemon', 'start', '--project', projectDir], {
+        spawnSync("tldr", ["daemon", "start", "--project", projectDir], {
           timeout: 5000,
-          stdio: 'ignore',
+          stdio: "ignore",
         });
       }
 
@@ -410,12 +467,16 @@ export function tryStartDaemon(projectDir: string): boolean {
         if (isDaemonReachable(projectDir)) {
           // Daemon is ready - keep lock for a bit longer to prevent races
           const cooldown = Date.now() + 1000;
-          while (Date.now() < cooldown) { /* spin */ }
+          while (Date.now() < cooldown) {
+            /* spin */
+          }
           return true;
         }
         // Brief wait
         const end = Date.now() + 100;
-        while (Date.now() < end) { /* spin */ }
+        while (Date.now() < end) {
+          /* spin */
+        }
       }
 
       return isDaemonReachable(projectDir);
@@ -435,14 +496,17 @@ export function tryStartDaemon(projectDir: string): boolean {
  * @param projectDir - Project directory path
  * @returns Promise resolving to daemon response
  */
-export function queryDaemon(query: DaemonQuery, projectDir: string): Promise<DaemonResponse> {
+export function queryDaemon(
+  query: DaemonQuery,
+  projectDir: string,
+): Promise<DaemonResponse> {
   return new Promise((resolve, reject) => {
     // Check if indexing - return early with indexing flag
     if (isIndexing(projectDir)) {
       resolve({
         indexing: true,
-        status: 'indexing',
-        message: 'Daemon is still indexing, results may be incomplete',
+        status: "indexing",
+        message: "Daemon is still indexing, results may be incomplete",
       });
       return;
     }
@@ -453,13 +517,16 @@ export function queryDaemon(query: DaemonQuery, projectDir: string): Promise<Dae
     if (!isDaemonReachable(projectDir)) {
       // Try to start daemon
       if (!tryStartDaemon(projectDir)) {
-        resolve({ status: 'unavailable', error: 'Daemon not running and could not start' });
+        resolve({
+          status: "unavailable",
+          error: "Daemon not running and could not start",
+        });
         return;
       }
     }
 
     const client = new net.Socket();
-    let data = '';
+    let data = "";
     let resolved = false;
 
     // Timeout handling
@@ -467,24 +534,24 @@ export function queryDaemon(query: DaemonQuery, projectDir: string): Promise<Dae
       if (!resolved) {
         resolved = true;
         client.destroy();
-        resolve({ status: 'error', error: 'timeout' });
+        resolve({ status: "error", error: "timeout" });
       }
     }, QUERY_TIMEOUT);
 
     // Connect based on platform
-    if (connInfo.type === 'tcp') {
+    if (connInfo.type === "tcp") {
       client.connect(connInfo.port!, connInfo.host!, () => {
-        client.write(JSON.stringify(query) + '\n');
+        client.write(JSON.stringify(query) + "\n");
       });
     } else {
       client.connect(connInfo.path!, () => {
-        client.write(JSON.stringify(query) + '\n');
+        client.write(JSON.stringify(query) + "\n");
       });
     }
 
-    client.on('data', (chunk) => {
+    client.on("data", (chunk) => {
       data += chunk.toString();
-      if (data.includes('\n')) {
+      if (data.includes("\n")) {
         if (!resolved) {
           resolved = true;
           clearTimeout(timer);
@@ -492,25 +559,31 @@ export function queryDaemon(query: DaemonQuery, projectDir: string): Promise<Dae
           try {
             resolve(JSON.parse(data.trim()));
           } catch {
-            resolve({ status: 'error', error: 'Invalid JSON response from daemon' });
+            resolve({
+              status: "error",
+              error: "Invalid JSON response from daemon",
+            });
           }
         }
       }
     });
 
-    client.on('error', (err) => {
+    client.on("error", (err) => {
       if (!resolved) {
         resolved = true;
         clearTimeout(timer);
-        if (err.message.includes('ECONNREFUSED') || err.message.includes('ENOENT')) {
-          resolve({ status: 'unavailable', error: 'Daemon not running' });
+        if (
+          err.message.includes("ECONNREFUSED") ||
+          err.message.includes("ENOENT")
+        ) {
+          resolve({ status: "unavailable", error: "Daemon not running" });
         } else {
-          resolve({ status: 'error', error: err.message });
+          resolve({ status: "error", error: err.message });
         }
       }
     });
 
-    client.on('close', () => {
+    client.on("close", () => {
       if (!resolved) {
         resolved = true;
         clearTimeout(timer);
@@ -518,10 +591,13 @@ export function queryDaemon(query: DaemonQuery, projectDir: string): Promise<Dae
           try {
             resolve(JSON.parse(data.trim()));
           } catch {
-            resolve({ status: 'error', error: 'Incomplete response' });
+            resolve({ status: "error", error: "Incomplete response" });
           }
         } else {
-          resolve({ status: 'error', error: 'Connection closed without response' });
+          resolve({
+            status: "error",
+            error: "Connection closed without response",
+          });
         }
       }
     });
@@ -536,13 +612,16 @@ export function queryDaemon(query: DaemonQuery, projectDir: string): Promise<Dae
  * @param projectDir - Project directory path
  * @returns Daemon response
  */
-export function queryDaemonSync(query: DaemonQuery, projectDir: string): DaemonResponse {
+export function queryDaemonSync(
+  query: DaemonQuery,
+  projectDir: string,
+): DaemonResponse {
   // Check if indexing - return early with indexing flag
   if (isIndexing(projectDir)) {
     return {
       indexing: true,
-      status: 'indexing',
-      message: 'Daemon is still indexing, results may be incomplete',
+      status: "indexing",
+      message: "Daemon is still indexing, results may be incomplete",
     };
   }
 
@@ -552,7 +631,10 @@ export function queryDaemonSync(query: DaemonQuery, projectDir: string): DaemonR
   if (!isDaemonReachable(projectDir)) {
     // Try to start daemon
     if (!tryStartDaemon(projectDir)) {
-      return { status: 'unavailable', error: 'Daemon not running and could not start' };
+      return {
+        status: "unavailable",
+        error: "Daemon not running and could not start",
+      };
     }
   }
 
@@ -560,7 +642,7 @@ export function queryDaemonSync(query: DaemonQuery, projectDir: string): DaemonR
     const input = JSON.stringify(query);
     let result: string;
 
-    if (connInfo.type === 'tcp') {
+    if (connInfo.type === "tcp") {
       // Windows: Use PowerShell to communicate with TCP socket
       const psCommand = `
         $client = New-Object System.Net.Sockets.TcpClient('${connInfo.host}', ${connInfo.port})
@@ -574,15 +656,18 @@ export function queryDaemonSync(query: DaemonQuery, projectDir: string): DaemonR
         Write-Output $response
       `.trim();
 
-      result = execSync(`powershell -Command "${psCommand.replace(/"/g, '\\"')}"`, {
-        encoding: 'utf-8',
-        timeout: QUERY_TIMEOUT,
-      });
+      result = execSync(
+        `powershell -Command "${psCommand.replace(/"/g, '\\"')}"`,
+        {
+          encoding: "utf-8",
+          timeout: QUERY_TIMEOUT,
+        },
+      );
     } else {
       // Unix: Use nc (netcat) to communicate with Unix socket
       // echo '{"cmd":"ping"}' | nc -U /tmp/tldr-xxx.sock
       result = execSync(`echo '${input}' | nc -U "${connInfo.path}"`, {
-        encoding: 'utf-8',
+        encoding: "utf-8",
         timeout: QUERY_TIMEOUT,
       });
     }
@@ -590,12 +675,15 @@ export function queryDaemonSync(query: DaemonQuery, projectDir: string): DaemonR
     return JSON.parse(result.trim());
   } catch (err: any) {
     if (err.killed) {
-      return { status: 'error', error: 'timeout' };
+      return { status: "error", error: "timeout" };
     }
-    if (err.message?.includes('ECONNREFUSED') || err.message?.includes('ENOENT')) {
-      return { status: 'unavailable', error: 'Daemon not running' };
+    if (
+      err.message?.includes("ECONNREFUSED") ||
+      err.message?.includes("ENOENT")
+    ) {
+      return { status: "unavailable", error: "Daemon not running" };
     }
-    return { status: 'error', error: err.message || 'Unknown error' };
+    return { status: "error", error: err.message || "Unknown error" };
   }
 }
 
@@ -606,8 +694,8 @@ export function queryDaemonSync(query: DaemonQuery, projectDir: string): DaemonR
  * @returns true if daemon responds to ping
  */
 export async function pingDaemon(projectDir: string): Promise<boolean> {
-  const response = await queryDaemon({ cmd: 'ping' }, projectDir);
-  return response.status === 'ok';
+  const response = await queryDaemon({ cmd: "ping" }, projectDir);
+  return response.status === "ok";
 }
 
 /**
@@ -621,11 +709,11 @@ export async function pingDaemon(projectDir: string): Promise<boolean> {
 export async function searchDaemon(
   pattern: string,
   projectDir: string,
-  maxResults: number = 100
+  maxResults: number = 100,
 ): Promise<any[]> {
   const response = await queryDaemon(
-    { cmd: 'search', pattern, max_results: maxResults },
-    projectDir
+    { cmd: "search", pattern, max_results: maxResults },
+    projectDir,
   );
   return response.results || [];
 }
@@ -637,8 +725,14 @@ export async function searchDaemon(
  * @param projectDir - Project directory path
  * @returns Array of callers or empty array
  */
-export async function impactDaemon(funcName: string, projectDir: string): Promise<any[]> {
-  const response = await queryDaemon({ cmd: 'impact', func: funcName }, projectDir);
+export async function impactDaemon(
+  funcName: string,
+  projectDir: string,
+): Promise<any[]> {
+  const response = await queryDaemon(
+    { cmd: "impact", func: funcName },
+    projectDir,
+  );
   return response.callers || [];
 }
 
@@ -650,8 +744,15 @@ export async function impactDaemon(funcName: string, projectDir: string): Promis
  * @param sessionId - Optional session ID for token tracking
  * @returns Extraction result or null
  */
-export async function extractDaemon(filePath: string, projectDir: string, sessionId?: string): Promise<any | null> {
-  const response = await queryDaemon({ cmd: 'extract', file: filePath, session: sessionId }, projectDir);
+export async function extractDaemon(
+  filePath: string,
+  projectDir: string,
+  sessionId?: string,
+): Promise<any | null> {
+  const response = await queryDaemon(
+    { cmd: "extract", file: filePath, session: sessionId },
+    projectDir,
+  );
   return response.result || null;
 }
 
@@ -661,8 +762,10 @@ export async function extractDaemon(filePath: string, projectDir: string, sessio
  * @param projectDir - Project directory path
  * @returns Status response
  */
-export async function statusDaemon(projectDir: string): Promise<DaemonResponse> {
-  return queryDaemon({ cmd: 'status' }, projectDir);
+export async function statusDaemon(
+  projectDir: string,
+): Promise<DaemonResponse> {
+  return queryDaemon({ cmd: "status" }, projectDir);
 }
 
 /**
@@ -676,11 +779,11 @@ export async function statusDaemon(projectDir: string): Promise<DaemonResponse> 
 export async function deadCodeDaemon(
   projectDir: string,
   entryPoints?: string[],
-  language: string = 'python'
+  language: string = "python",
 ): Promise<any> {
   const response = await queryDaemon(
-    { cmd: 'dead', entry_points: entryPoints, language },
-    projectDir
+    { cmd: "dead", entry_points: entryPoints, language },
+    projectDir,
   );
   return response.result || response;
 }
@@ -692,8 +795,11 @@ export async function deadCodeDaemon(
  * @param language - Language to analyze (default: python)
  * @returns Architecture analysis result
  */
-export async function archDaemon(projectDir: string, language: string = 'python'): Promise<any> {
-  const response = await queryDaemon({ cmd: 'arch', language }, projectDir);
+export async function archDaemon(
+  projectDir: string,
+  language: string = "python",
+): Promise<any> {
+  const response = await queryDaemon({ cmd: "arch", language }, projectDir);
   return response.result || response;
 }
 
@@ -710,11 +816,11 @@ export async function cfgDaemon(
   filePath: string,
   funcName: string,
   projectDir: string,
-  language: string = 'python'
+  language: string = "python",
 ): Promise<any> {
   const response = await queryDaemon(
-    { cmd: 'cfg', file: filePath, function: funcName, language },
-    projectDir
+    { cmd: "cfg", file: filePath, function: funcName, language },
+    projectDir,
   );
   return response.result || response;
 }
@@ -732,11 +838,11 @@ export async function dfgDaemon(
   filePath: string,
   funcName: string,
   projectDir: string,
-  language: string = 'python'
+  language: string = "python",
 ): Promise<any> {
   const response = await queryDaemon(
-    { cmd: 'dfg', file: filePath, function: funcName, language },
-    projectDir
+    { cmd: "dfg", file: filePath, function: funcName, language },
+    projectDir,
   );
   return response.result || response;
 }
@@ -757,12 +863,19 @@ export async function sliceDaemon(
   funcName: string,
   line: number,
   projectDir: string,
-  direction: 'backward' | 'forward' = 'backward',
-  variable?: string
+  direction: "backward" | "forward" = "backward",
+  variable?: string,
 ): Promise<any> {
   const response = await queryDaemon(
-    { cmd: 'slice', file: filePath, function: funcName, line, direction, variable },
-    projectDir
+    {
+      cmd: "slice",
+      file: filePath,
+      function: funcName,
+      line,
+      direction,
+      variable,
+    },
+    projectDir,
   );
   return response;
 }
@@ -774,8 +887,11 @@ export async function sliceDaemon(
  * @param language - Language (default: python)
  * @returns Call graph result
  */
-export async function callsDaemon(projectDir: string, language: string = 'python'): Promise<any> {
-  const response = await queryDaemon({ cmd: 'calls', language }, projectDir);
+export async function callsDaemon(
+  projectDir: string,
+  language: string = "python",
+): Promise<any> {
+  const response = await queryDaemon({ cmd: "calls", language }, projectDir);
   return response.result || response;
 }
 
@@ -786,8 +902,11 @@ export async function callsDaemon(projectDir: string, language: string = 'python
  * @param language - Language (default: python)
  * @returns Warm result with file/edge counts
  */
-export async function warmDaemon(projectDir: string, language: string = 'python'): Promise<any> {
-  return queryDaemon({ cmd: 'warm', language }, projectDir);
+export async function warmDaemon(
+  projectDir: string,
+  language: string = "python",
+): Promise<any> {
+  return queryDaemon({ cmd: "warm", language }, projectDir);
 }
 
 /**
@@ -801,11 +920,11 @@ export async function warmDaemon(projectDir: string, language: string = 'python'
 export async function semanticSearchDaemon(
   projectDir: string,
   query: string,
-  k: number = 10
+  k: number = 10,
 ): Promise<any[]> {
   const response = await queryDaemon(
-    { cmd: 'semantic', action: 'search', query, k },
-    projectDir
+    { cmd: "semantic", action: "search", query, k },
+    projectDir,
   );
   return response.results || [];
 }
@@ -819,9 +938,12 @@ export async function semanticSearchDaemon(
  */
 export async function semanticIndexDaemon(
   projectDir: string,
-  language: string = 'python'
+  language: string = "python",
 ): Promise<any> {
-  return queryDaemon({ cmd: 'semantic', action: 'index', language }, projectDir);
+  return queryDaemon(
+    { cmd: "semantic", action: "index", language },
+    projectDir,
+  );
 }
 
 /**
@@ -835,11 +957,11 @@ export async function semanticIndexDaemon(
 export async function treeDaemon(
   projectDir: string,
   extensions?: string[],
-  excludeHidden: boolean = true
+  excludeHidden: boolean = true,
 ): Promise<any> {
   const response = await queryDaemon(
-    { cmd: 'tree', extensions, exclude_hidden: excludeHidden },
-    projectDir
+    { cmd: "tree", extensions, exclude_hidden: excludeHidden },
+    projectDir,
   );
   return response.result || response;
 }
@@ -854,12 +976,12 @@ export async function treeDaemon(
  */
 export async function structureDaemon(
   projectDir: string,
-  language: string = 'python',
-  maxResults: number = 100
+  language: string = "python",
+  maxResults: number = 100,
 ): Promise<any> {
   const response = await queryDaemon(
-    { cmd: 'structure', language, max_results: maxResults },
-    projectDir
+    { cmd: "structure", language, max_results: maxResults },
+    projectDir,
   );
   return response.result || response;
 }
@@ -876,12 +998,12 @@ export async function structureDaemon(
 export async function contextDaemon(
   projectDir: string,
   entry: string,
-  language: string = 'python',
-  depth: number = 2
+  language: string = "python",
+  depth: number = 2,
 ): Promise<any> {
   const response = await queryDaemon(
-    { cmd: 'context', entry, language, depth },
-    projectDir
+    { cmd: "context", entry, language, depth },
+    projectDir,
   );
   return response.result || response;
 }
@@ -897,11 +1019,11 @@ export async function contextDaemon(
 export async function importsDaemon(
   projectDir: string,
   filePath: string,
-  language: string = 'python'
+  language: string = "python",
 ): Promise<any[]> {
   const response = await queryDaemon(
-    { cmd: 'imports', file: filePath, language },
-    projectDir
+    { cmd: "imports", file: filePath, language },
+    projectDir,
   );
   return response.imports || [];
 }
@@ -917,9 +1039,9 @@ export async function importsDaemon(
 export async function importersDaemon(
   projectDir: string,
   module: string,
-  language: string = 'python'
+  language: string = "python",
 ): Promise<any> {
-  return queryDaemon({ cmd: 'importers', module, language }, projectDir);
+  return queryDaemon({ cmd: "importers", module, language }, projectDir);
 }
 
 /**
@@ -937,12 +1059,12 @@ export function trackHookActivity(
   hookName: string,
   projectDir: string,
   success: boolean = true,
-  metrics: Record<string, number> = {}
+  metrics: Record<string, number> = {},
 ): void {
   // Fire-and-forget - don't await, don't block
   queryDaemon(
-    { cmd: 'track', hook: hookName, success, metrics },
-    projectDir
+    { cmd: "track", hook: hookName, success, metrics },
+    projectDir,
   ).catch(() => {
     // Silently ignore errors - stats tracking is best-effort
   });
@@ -963,12 +1085,12 @@ export function trackHookActivitySync(
   hookName: string,
   projectDir: string,
   success: boolean = true,
-  metrics: Record<string, number> = {}
+  metrics: Record<string, number> = {},
 ): void {
   try {
     queryDaemonSync(
-      { cmd: 'track', hook: hookName, success, metrics },
-      projectDir
+      { cmd: "track", hook: hookName, success, metrics },
+      projectDir,
     );
   } catch {
     // Silently ignore errors - stats tracking is best-effort

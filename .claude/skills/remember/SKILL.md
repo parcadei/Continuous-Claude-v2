@@ -11,6 +11,7 @@ Store a learning, pattern, or decision in the memory system for future recall.
 ## When to Use
 
 Activate when:
+
 - User says "/remember" or "/remember-this"
 - User says "remember this pattern" or "save this learning"
 - User says "I learned that X" or "note that Y"
@@ -45,13 +46,13 @@ Or with explicit type:
 
 ## Learning Types
 
-| Type | Use For |
-|------|---------|
-| `WORKING_SOLUTION` | Fixes, solutions that worked (default) |
-| `ARCHITECTURAL_DECISION` | Design choices, system structure |
-| `CODEBASE_PATTERN` | Patterns discovered in code |
-| `FAILED_APPROACH` | What didn't work |
-| `ERROR_FIX` | Specific error resolutions |
+| Type                     | Use For                                |
+| ------------------------ | -------------------------------------- |
+| `WORKING_SOLUTION`       | Fixes, solutions that worked (default) |
+| `ARCHITECTURAL_DECISION` | Design choices, system structure       |
+| `CODEBASE_PATTERN`       | Patterns discovered in code            |
+| `FAILED_APPROACH`        | What didn't work                       |
+| `ERROR_FIX`              | Specific error resolutions             |
 
 ## Execution
 
@@ -69,6 +70,7 @@ cd $CLAUDE_OPC_DIR && PYTHONPATH=. uv run python scripts/core/store_learning.py 
 ## Auto-Type Detection
 
 If no `--type` specified, infer from content:
+
 - Contains "error", "fix", "bug" → ERROR_FIX
 - Contains "decided", "chose", "architecture" → ARCHITECTURAL_DECISION
 - Contains "pattern", "always", "convention" → CODEBASE_PATTERN

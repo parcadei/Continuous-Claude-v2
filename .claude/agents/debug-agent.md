@@ -39,6 +39,7 @@ $CLAUDE_CC_DIR = /path/to/project
 ## Step 3: Investigate with MCP Tools
 
 ### Codebase Exploration
+
 ```bash
 # Codebase exploration (RepoPrompt) - trace code flow
 rp-cli -e 'workspace list'  # Check workspace
@@ -60,6 +61,7 @@ uv run python -m runtime.harness scripts/ast_grep_find.py --pattern "console.err
 ```
 
 ### External Resources
+
 ```bash
 # GitHub issues (check for known issues)
 uv run python -m runtime.harness scripts/github_search.py --query "similar error" --type issues
@@ -69,6 +71,7 @@ uv run python -m runtime.harness scripts/nia_docs.py --query "library expected b
 ```
 
 ### Git History
+
 ```bash
 # Check recent changes
 git log --oneline -20
@@ -81,6 +84,7 @@ git log -p --all -S 'search_term' -- '*.ts'
 ## Step 4: Write Output
 
 **ALWAYS write your findings to:**
+
 ```
 $CLAUDE_CC_DIR/.claude/cache/agents/debug-agent/output-{timestamp}.md
 ```
@@ -89,27 +93,33 @@ $CLAUDE_CC_DIR/.claude/cache/agents/debug-agent/output-{timestamp}.md
 
 ```markdown
 # Debug Report: [Issue Summary]
+
 Generated: [timestamp]
 
 ## Symptom
+
 [What's happening - from context]
 
 ## Investigation Steps
+
 1. [What I checked and what I found]
 2. [What I checked and what I found]
-...
+   ...
 
 ## Evidence
 
 ### Finding 1
+
 - **Location:** `path/to/file.ts:123`
 - **Observation:** [What the code does]
 - **Relevance:** [Why this matters]
 
 ### Finding 2
+
 ...
 
 ## Root Cause Analysis
+
 [Most likely cause based on evidence]
 
 **Confidence:** [High/Medium/Low]
@@ -118,13 +128,16 @@ Generated: [timestamp]
 ## Recommended Fix
 
 **Files to modify:**
+
 - `path/to/file.ts` (line 123) - [what to change]
 
 **Steps:**
+
 1. [Specific fix step]
 2. [Specific fix step]
 
 ## Prevention
+
 [How to prevent similar issues in the future]
 ```
 

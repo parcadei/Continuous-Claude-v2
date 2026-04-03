@@ -11,12 +11,14 @@ When the user asks to implement something, use implementation agents to preserve
 ## The Pattern
 
 **Wrong - burns context:**
+
 ```
 Main: Read files → Understand → Make edits → Report
       (2000+ tokens consumed in main context)
 ```
 
 **Right - preserves context:**
+
 ```
 Main: Spawn agent("implement X per plan")
       ↓
@@ -27,13 +29,13 @@ Main: Gets summary (~200 tokens)
 
 ## When to Use Agents
 
-| Task Type | Use Agent? | Reason |
-|-----------|------------|--------|
-| Multi-file implementation | Yes | Agent handles complexity internally |
-| Following a plan phase | Yes | Agent reads plan, implements |
-| New feature with tests | Yes | Agent can run tests |
-| Single-line fix | No | Faster to do directly |
-| Quick config change | No | Overhead not worth it |
+| Task Type                 | Use Agent? | Reason                              |
+| ------------------------- | ---------- | ----------------------------------- |
+| Multi-file implementation | Yes        | Agent handles complexity internally |
+| Following a plan phase    | Yes        | Agent reads plan, implements        |
+| New feature with tests    | Yes        | Agent can run tests                 |
+| Single-line fix           | No         | Faster to do directly               |
+| Quick config change       | No         | Overhead not worth it               |
 
 ## Key Insight
 
@@ -58,6 +60,7 @@ When done, provide a summary of files created and any issues.
 ## Trigger Words
 
 When user says these, consider using an agent:
+
 - "implement", "build", "create feature"
 - "follow the plan", "do phase X"
 - "use implementation agents"

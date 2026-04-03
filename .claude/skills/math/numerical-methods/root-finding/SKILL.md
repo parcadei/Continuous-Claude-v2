@@ -12,7 +12,6 @@ Use this skill when working on root-finding problems in numerical methods.
 
 ## Decision Tree
 
-
 1. **Characterize the Problem**
    - Single root or multiple roots?
    - Bracketed (know interval containing root)?
@@ -41,27 +40,29 @@ Use this skill when working on root-finding problems in numerical methods.
    - Verify root is in expected domain
    - `z3_solve.py prove "f(root) == 0"`
 
-
 ## Tool Commands
 
 ### Scipy_Brentq
+
 ```bash
 uv run python -c "from scipy.optimize import brentq; root = brentq(lambda x: x**2 - 2, 0, 2); print('Root:', root)"
 ```
 
 ### Scipy_Newton
+
 ```bash
 uv run python -c "from scipy.optimize import newton; root = newton(lambda x: x**2 - 2, 1.0, fprime=lambda x: 2*x); print('Root:', root)"
 ```
 
 ### Sympy_Solve
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py solve "x**3 - x - 1" --var x
 ```
 
 ## Key Techniques
 
-*From indexed textbooks:*
+_From indexed textbooks:_
 
 - [Numerical analysis (Burden R.L., Fair... (Z-Library)] How accurate was his approximation? C H A P T E R 2 Solutions of Equations in One Variable 2. Survey of Methods and Software In this chapter we have considered the problem of solving the equation f (x) = 0, where f is a given continuous function.
 - [An Introduction to Numerical Analysis... (Z-Library)] Computational Solution of Nonlinear Operator Equations. Methods for Solving Systems of Nonlinear Equations. Society for Industrial and Applied Mathematics, Philadelphia.

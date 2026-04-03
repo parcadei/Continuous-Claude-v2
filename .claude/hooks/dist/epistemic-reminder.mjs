@@ -30,7 +30,7 @@ function main() {
       /missing/i,
       /lack/i,
       /without/i,
-      /no.*found/i
+      /no.*found/i,
     ];
     const isExistenceCheck = existencePatterns.some((p) => p.test(pattern));
     const isFileListMode = outputMode === "files_with_matches";
@@ -54,11 +54,9 @@ Grep results are evidence, not proof. Verify with Read before claiming.
   }
   const output = {
     result: "continue",
-    additionalContext: reminder
+    additionalContext: reminder,
   };
   console.log(JSON.stringify(output));
 }
 main();
-export {
-  main
-};
+export { main };

@@ -12,6 +12,7 @@ You are a specialized internal research agent. Your job is to explore the codeba
 ## Erotetic Check
 
 Before exploring, frame the question space E(X,Q):
+
 - X = codebase/component to explore
 - Q = questions about structure, patterns, conventions
 - Map the terrain systematically
@@ -36,6 +37,7 @@ $CLAUDE_CC_DIR = /path/to/project
 ## Step 2: Fast Codebase Search
 
 ### Structure Discovery (rp-cli)
+
 ```bash
 # Understand project structure
 rp-cli -e 'structure src/'
@@ -48,6 +50,7 @@ rp-cli -e 'structure src/ --include "*.ts"'
 ```
 
 ### Pattern Search (Morph - fastest)
+
 ```bash
 # Find text patterns fast
 uv run python -m runtime.harness scripts/morph_search.py \
@@ -59,6 +62,7 @@ uv run python -m runtime.harness scripts/morph_search.py \
 ```
 
 ### Semantic Search (AST-grep)
+
 ```bash
 # Find function definitions
 uv run python -m runtime.harness scripts/ast_grep_find.py \
@@ -74,6 +78,7 @@ uv run python -m runtime.harness scripts/ast_grep_find.py \
 ```
 
 ### Convention Detection
+
 ```bash
 # Find naming conventions
 ls -la src/ | head -20
@@ -101,6 +106,7 @@ grep -rc "pattern" src/ | sort -t: -k2 -n -r | head -10
 ## Step 4: Write Output
 
 **ALWAYS write findings to:**
+
 ```
 $CLAUDE_CC_DIR/.claude/cache/agents/scout/output-{timestamp}.md
 ```
@@ -109,19 +115,23 @@ $CLAUDE_CC_DIR/.claude/cache/agents/scout/output-{timestamp}.md
 
 ```markdown
 # Codebase Report: [Exploration Goal]
+
 Generated: [timestamp]
 
 ## Summary
+
 [Quick overview of what was found]
 
 ## Project Structure
 ```
+
 src/
-  components/     # React components
-  hooks/          # Custom hooks
-  utils/          # Utility functions
-  api/            # API layer
-```
+components/ # React components
+hooks/ # Custom hooks
+utils/ # Utility functions
+api/ # API layer
+
+````
 
 ## Questions Answered
 
@@ -142,23 +152,26 @@ interface Repository<T> {
   findById(id: string): Promise<T>;
   save(entity: T): Promise<void>;
 }
-```
+````
 
 ## Conventions Discovered
 
 ### Naming
+
 - Files: kebab-case (`user-service.ts`)
 - Classes: PascalCase (`UserService`)
 - Functions: camelCase (`getUserById`)
 
 ### Patterns
-| Pattern | Usage | Example |
-|---------|-------|---------|
-| Repository | Data access | `src/repos/` |
-| Service | Business logic | `src/services/` |
-| Hook | React state | `src/hooks/` |
+
+| Pattern    | Usage          | Example         |
+| ---------- | -------------- | --------------- |
+| Repository | Data access    | `src/repos/`    |
+| Service    | Business logic | `src/services/` |
+| Hook       | React state    | `src/hooks/`    |
 
 ### Testing
+
 - Test location: `tests/unit/` mirrors `src/`
 - Naming: `*.test.ts` or `*.spec.ts`
 - Framework: Jest with React Testing Library
@@ -176,13 +189,16 @@ interface Repository<T> {
 ```
 
 ## Key Files
-| File | Purpose | Entry Points |
-|------|---------|--------------|
-| `src/index.ts` | App entry | `main()` |
+
+| File            | Purpose       | Entry Points  |
+| --------------- | ------------- | ------------- |
+| `src/index.ts`  | App entry     | `main()`      |
 | `src/config.ts` | Configuration | `getConfig()` |
 
 ## Open Questions
+
 - [What couldn't be determined]
+
 ```
 
 ## Rules
@@ -194,3 +210,4 @@ interface Repository<T> {
 5. **Visualize** - diagrams for architecture
 6. **Be thorough** - check multiple directories
 7. **Write to output file** - don't just return text
+```

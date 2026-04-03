@@ -17,18 +17,21 @@ Fast, AI-powered codebase search using WarpGrep. 20x faster than traditional gre
 ## Usage
 
 ### Search for code patterns
+
 ```bash
 uv run python -m runtime.harness scripts/mcp/morph_search.py \
     --search "authentication" --path "."
 ```
 
 ### Search with regex
+
 ```bash
 uv run python -m runtime.harness scripts/mcp/morph_search.py \
     --search "def.*login" --path "./src"
 ```
 
 ### Edit a file
+
 ```bash
 uv run python -m runtime.harness scripts/mcp/morph_search.py \
     --edit "/path/to/file.py" --content "new content"
@@ -36,11 +39,11 @@ uv run python -m runtime.harness scripts/mcp/morph_search.py \
 
 ## Parameters
 
-| Parameter | Description |
-|-----------|-------------|
-| `--search` | Search query/pattern |
-| `--path` | Directory to search (default: `.`) |
-| `--edit` | File path to edit |
+| Parameter   | Description                              |
+| ----------- | ---------------------------------------- |
+| `--search`  | Search query/pattern                     |
+| `--path`    | Directory to search (default: `.`)       |
+| `--edit`    | File path to edit                        |
 | `--content` | New content for file (use with `--edit`) |
 
 ## Examples
@@ -57,10 +60,10 @@ uv run python -m runtime.harness scripts/mcp/morph_search.py \
 
 ## vs ast-grep
 
-| Tool | Best For |
-|------|----------|
-| **morph/warpgrep** | Fast text/regex search (20x faster) |
-| **ast-grep** | Structural code search (understands syntax) |
+| Tool               | Best For                                    |
+| ------------------ | ------------------------------------------- |
+| **morph/warpgrep** | Fast text/regex search (20x faster)         |
+| **ast-grep**       | Structural code search (understands syntax) |
 
 ## MCP Server Required
 

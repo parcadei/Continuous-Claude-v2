@@ -21,6 +21,7 @@ Use this skill after user selects an Agentica pattern.
 ## Pattern Selection to Spawn Method
 
 ### Swarm (Research/Explore)
+
 ```python
 swarm = Swarm(
     perspectives=[
@@ -34,6 +35,7 @@ result = await swarm.execute(task_description)
 ```
 
 ### Hierarchical (Build/Implement)
+
 ```python
 hierarchical = Hierarchical(
     coordinator_premise="You break tasks into subtasks",
@@ -47,6 +49,7 @@ result = await hierarchical.execute(task_description)
 ```
 
 ### Generator/Critic (Iterate/Refine)
+
 ```python
 gc = GeneratorCritic(
     generator_premise="You generate solutions",
@@ -57,6 +60,7 @@ result = await gc.run(task_description)
 ```
 
 ### Jury (Validate/Verify)
+
 ```python
 jury = Jury(
     num_jurors=5,
@@ -69,6 +73,7 @@ verdict = await jury.decide(bool, question)
 ## Environment Variables
 
 All spawned agents receive:
+
 - `SWARM_ID`: Unique identifier for this swarm run
 - `AGENT_ROLE`: Role within the pattern (coordinator, specialist, etc.)
 - `PATTERN_TYPE`: Which pattern is running

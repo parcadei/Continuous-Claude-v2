@@ -5,12 +5,12 @@
  * The client communicates with the Python TLDR daemon via Unix socket.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { existsSync, mkdirSync, writeFileSync, rmSync, unlinkSync } from 'fs';
-import { join } from 'path';
-import { execSync, spawnSync } from 'child_process';
-import * as net from 'net';
-import * as crypto from 'crypto';
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { existsSync, mkdirSync, writeFileSync, rmSync, unlinkSync } from "fs";
+import { join } from "path";
+import { execSync, spawnSync } from "child_process";
+import * as net from "net";
+import * as crypto from "crypto";
 
 // Import the actual implementation
 import {
@@ -21,11 +21,11 @@ import {
   queryDaemonSync,
   DaemonQuery,
   DaemonResponse,
-} from '../daemon-client.js';
+} from "../daemon-client.js";
 
 // Test fixtures
-const TEST_PROJECT_DIR = '/tmp/daemon-client-test';
-const TLDR_DIR = join(TEST_PROJECT_DIR, '.tldr');
+const TEST_PROJECT_DIR = "/tmp/daemon-client-test";
+const TLDR_DIR = join(TEST_PROJECT_DIR, ".tldr");
 
 function setupTestEnv(): void {
   if (!existsSync(TLDR_DIR)) {
@@ -41,7 +41,11 @@ function cleanupTestEnv(): void {
 
 // Helper to compute socket path (mirrors the daemon logic)
 function computeSocketPath(projectDir: string): string {
-  const hash = crypto.createHash('md5').update(projectDir).digest('hex').substring(0, 8);
+  const hash = crypto
+    .createHash("md5")
+    .update(projectDir)
+    .digest("hex")
+    .substring(0, 8);
   return `/tmp/tldr-${hash}.sock`;
 }
 
@@ -49,29 +53,30 @@ function computeSocketPath(projectDir: string): string {
 // Test 1: getSocketPath() - compute deterministic socket path
 // =============================================================================
 
-describe('getSocketPath', () => {
-  it('should compute socket path using md5 hash', () => {
+describe("getSocketPath", () => {
+  it("should compute socket path using md5 hash", () => {
     // The daemon uses: /tmp/tldr-{md5(project_path)[:8]}.sock
-    const projectPath = '/Users/test/myproject';
-    const expectedHash = crypto.createHash('md5')
+    const projectPath = "/Users/test/myproject";
+    const expectedHash = crypto
+      .createHash("md5")
       .update(projectPath)
-      .digest('hex')
+      .digest("hex")
       .substring(0, 8);
     const expectedPath = `/tmp/tldr-${expectedHash}.sock`;
 
     expect(getSocketPath(projectPath)).toBe(expectedPath);
   });
 
-  it('should produce different paths for different projects', () => {
-    const path1 = getSocketPath('/project/a');
-    const path2 = getSocketPath('/project/b');
+  it("should produce different paths for different projects", () => {
+    const path1 = getSocketPath("/project/a");
+    const path2 = getSocketPath("/project/b");
 
     expect(path1).not.toBe(path2);
   });
 
-  it('should be deterministic for same project', () => {
-    const path1 = getSocketPath('/project/same');
-    const path2 = getSocketPath('/project/same');
+  it("should be deterministic for same project", () => {
+    const path1 = getSocketPath("/project/same");
+    const path2 = getSocketPath("/project/same");
 
     expect(path1).toBe(path2);
   });
@@ -81,7 +86,7 @@ describe('getSocketPath', () => {
 // Test 2: getStatusFile() - read .tldr/status if exists
 // =============================================================================
 
-describe('getStatusFile', () => {
+describe("getStatusFile", () => {
   beforeEach(() => {
     setupTestEnv();
   });
@@ -90,14 +95,14 @@ describe('getStatusFile', () => {
     cleanupTestEnv();
   });
 
-  it('should return status content when file exists', () => {
-    writeFileSync(join(TLDR_DIR, 'status'), 'ready');
-    expect(getStatusFile(TEST_PROJECT_DIR)).toBe('ready');
+  it("should return status content when file exists", () => {
+    writeFileSync(join(TLDR_DIR, "status"), "ready");
+    expect(getStatusFile(TEST_PROJECT_DIR)).toBe("ready");
   });
 
-  it('should return null when status file does not exist', () => {
+  it("should return null when status file does not exist", () => {
     // Remove status file if it exists
-    const statusPath = join(TLDR_DIR, 'status');
+    const statusPath = join(TLDR_DIR, "status");
     if (existsSync(statusPath)) {
       unlinkSync(statusPath);
     }
@@ -105,16 +110,16 @@ describe('getStatusFile', () => {
     expect(getStatusFile(TEST_PROJECT_DIR)).toBeNull();
   });
 
-  it('should detect indexing status', () => {
-    writeFileSync(join(TLDR_DIR, 'status'), 'indexing');
-    expect(getStatusFile(TEST_PROJECT_DIR)).toBe('indexing');
+  it("should detect indexing status", () => {
+    writeFileSync(join(TLDR_DIR, "status"), "indexing");
+    expect(getStatusFile(TEST_PROJECT_DIR)).toBe("indexing");
   });
 
-  it('should work with isIndexing helper', () => {
-    writeFileSync(join(TLDR_DIR, 'status'), 'indexing');
+  it("should work with isIndexing helper", () => {
+    writeFileSync(join(TLDR_DIR, "status"), "indexing");
     expect(isIndexing(TEST_PROJECT_DIR)).toBe(true);
 
-    writeFileSync(join(TLDR_DIR, 'status'), 'ready');
+    writeFileSync(join(TLDR_DIR, "status"), "ready");
     expect(isIndexing(TEST_PROJECT_DIR)).toBe(false);
   });
 });
@@ -123,29 +128,29 @@ describe('getStatusFile', () => {
 // Test 3: DaemonQuery and DaemonResponse interfaces
 // =============================================================================
 
-describe('DaemonQuery and DaemonResponse types', () => {
-  it('should define valid query structure for ping', () => {
+describe("DaemonQuery and DaemonResponse types", () => {
+  it("should define valid query structure for ping", () => {
     // Using imported types
-    const query: DaemonQuery = { cmd: 'ping' };
-    expect(query.cmd).toBe('ping');
+    const query: DaemonQuery = { cmd: "ping" };
+    expect(query.cmd).toBe("ping");
   });
 
-  it('should define valid query structure for search', () => {
-    const query: DaemonQuery = { cmd: 'search', pattern: 'handleClick' };
-    expect(query.cmd).toBe('search');
-    expect(query.pattern).toBe('handleClick');
+  it("should define valid query structure for search", () => {
+    const query: DaemonQuery = { cmd: "search", pattern: "handleClick" };
+    expect(query.cmd).toBe("search");
+    expect(query.pattern).toBe("handleClick");
   });
 
-  it('should define valid response structure', () => {
+  it("should define valid response structure", () => {
     const response: DaemonResponse = {
-      status: 'ok',
-      results: [{ file: 'test.ts', line: 42 }],
+      status: "ok",
+      results: [{ file: "test.ts", line: 42 }],
     };
-    expect(response.status).toBe('ok');
+    expect(response.status).toBe("ok");
     expect(response.results).toHaveLength(1);
   });
 
-  it('should support indexing flag in response', () => {
+  it("should support indexing flag in response", () => {
     const response: DaemonResponse = { indexing: true };
     expect(response.indexing).toBe(true);
   });
@@ -155,7 +160,7 @@ describe('DaemonQuery and DaemonResponse types', () => {
 // Test 4: queryDaemonSync() - sync version using nc or direct socket
 // =============================================================================
 
-describe('queryDaemonSync', () => {
+describe("queryDaemonSync", () => {
   let mockSocketPath: string;
 
   beforeEach(() => {
@@ -176,26 +181,32 @@ describe('queryDaemonSync', () => {
     cleanupTestEnv();
   });
 
-  it('should return unavailable when socket does not exist', () => {
+  it("should return unavailable when socket does not exist", () => {
     // Using the real implementation - it should return unavailable when no socket
-    const result = queryDaemonSync({ cmd: 'ping' }, TEST_PROJECT_DIR);
-    expect(result.status).toBe('unavailable');
+    const result = queryDaemonSync({ cmd: "ping" }, TEST_PROJECT_DIR);
+    expect(result.status).toBe("unavailable");
   });
 
-  it('should return indexing:true when status file says indexing', () => {
-    writeFileSync(join(TLDR_DIR, 'status'), 'indexing');
+  it("should return indexing:true when status file says indexing", () => {
+    writeFileSync(join(TLDR_DIR, "status"), "indexing");
 
     // The real implementation checks status file first
-    const result = queryDaemonSync({ cmd: 'search', pattern: 'test' }, TEST_PROJECT_DIR);
+    const result = queryDaemonSync(
+      { cmd: "search", pattern: "test" },
+      TEST_PROJECT_DIR,
+    );
     expect(result.indexing).toBe(true);
   });
 
-  it('should handle timeout gracefully', () => {
+  it("should handle timeout gracefully", () => {
     // This test validates the expected behavior of timeout handling
     // The real implementation returns { status: 'error', error: 'timeout' }
     // We test the shape of such a response
-    const timeoutResponse: DaemonResponse = { status: 'error', error: 'timeout' };
-    expect(timeoutResponse.error).toBe('timeout');
+    const timeoutResponse: DaemonResponse = {
+      status: "error",
+      error: "timeout",
+    };
+    expect(timeoutResponse.error).toBe("timeout");
   });
 });
 
@@ -203,7 +214,7 @@ describe('queryDaemonSync', () => {
 // Test 5: queryDaemon() - async version using net.Socket
 // =============================================================================
 
-describe('queryDaemon async', () => {
+describe("queryDaemon async", () => {
   let mockServer: net.Server | null = null;
   let mockSocketPath: string;
 
@@ -233,13 +244,13 @@ describe('queryDaemon async', () => {
     cleanupTestEnv();
   });
 
-  it('should connect to daemon and receive response', async () => {
+  it("should connect to daemon and receive response", async () => {
     // Create a mock server to simulate the daemon
     mockServer = net.createServer((conn) => {
-      conn.on('data', (data) => {
+      conn.on("data", (data) => {
         const request = JSON.parse(data.toString().trim());
-        if (request.cmd === 'ping') {
-          conn.write(JSON.stringify({ status: 'ok' }) + '\n');
+        if (request.cmd === "ping") {
+          conn.write(JSON.stringify({ status: "ok" }) + "\n");
         }
         conn.end();
       });
@@ -250,21 +261,23 @@ describe('queryDaemon async', () => {
     });
 
     // Test the real implementation
-    const result = await queryDaemon({ cmd: 'ping' }, TEST_PROJECT_DIR);
-    expect(result.status).toBe('ok');
+    const result = await queryDaemon({ cmd: "ping" }, TEST_PROJECT_DIR);
+    expect(result.status).toBe("ok");
   });
 
-  it('should handle search command', async () => {
+  it("should handle search command", async () => {
     mockServer = net.createServer((conn) => {
-      conn.on('data', (data) => {
+      conn.on("data", (data) => {
         const request = JSON.parse(data.toString().trim());
-        if (request.cmd === 'search') {
-          conn.write(JSON.stringify({
-            status: 'ok',
-            results: [
-              { file: 'test.ts', line: 10, content: 'function test()' },
-            ],
-          }) + '\n');
+        if (request.cmd === "search") {
+          conn.write(
+            JSON.stringify({
+              status: "ok",
+              results: [
+                { file: "test.ts", line: 10, content: "function test()" },
+              ],
+            }) + "\n",
+          );
         }
         conn.end();
       });
@@ -275,19 +288,22 @@ describe('queryDaemon async', () => {
     });
 
     // Test the real implementation
-    const result = await queryDaemon({ cmd: 'search', pattern: 'test' }, TEST_PROJECT_DIR);
-    expect(result.status).toBe('ok');
+    const result = await queryDaemon(
+      { cmd: "search", pattern: "test" },
+      TEST_PROJECT_DIR,
+    );
+    expect(result.status).toBe("ok");
     expect(result.results).toHaveLength(1);
-    expect(result.results![0].file).toBe('test.ts');
+    expect(result.results![0].file).toBe("test.ts");
   });
 
-  it('should return unavailable on connection error', async () => {
+  it("should return unavailable on connection error", async () => {
     // No server running - the real implementation returns unavailable (not throws)
-    const result = await queryDaemon({ cmd: 'ping' }, TEST_PROJECT_DIR);
-    expect(result.status).toBe('unavailable');
+    const result = await queryDaemon({ cmd: "ping" }, TEST_PROJECT_DIR);
+    expect(result.status).toBe("unavailable");
   });
 
-  it('should timeout after QUERY_TIMEOUT ms', async () => {
+  it("should timeout after QUERY_TIMEOUT ms", async () => {
     // The real implementation has a 3 second timeout.
     // We test with a mock server that never responds.
     let clientConn: net.Socket | null = null;
@@ -306,7 +322,7 @@ describe('queryDaemon async', () => {
     const queryDaemonWithShortTimeout = (
       query: { cmd: string },
       projectDir: string,
-      timeout: number
+      timeout: number,
     ): Promise<any> => {
       return new Promise((resolve) => {
         const socketPath = computeSocketPath(projectDir);
@@ -314,28 +330,32 @@ describe('queryDaemon async', () => {
 
         const timer = setTimeout(() => {
           client.destroy();
-          resolve({ status: 'error', error: 'timeout' });
+          resolve({ status: "error", error: "timeout" });
         }, timeout);
 
         client.connect(socketPath, () => {
-          client.write(JSON.stringify(query) + '\n');
+          client.write(JSON.stringify(query) + "\n");
         });
 
-        client.on('data', (chunk) => {
+        client.on("data", (chunk) => {
           clearTimeout(timer);
           client.end();
           resolve(JSON.parse(chunk.toString().trim()));
         });
 
-        client.on('error', () => {
+        client.on("error", () => {
           clearTimeout(timer);
-          resolve({ status: 'error', error: 'connection failed' });
+          resolve({ status: "error", error: "connection failed" });
         });
       });
     };
 
-    const result = await queryDaemonWithShortTimeout({ cmd: 'ping' }, TEST_PROJECT_DIR, 100);
-    expect(result.error).toBe('timeout');
+    const result = await queryDaemonWithShortTimeout(
+      { cmd: "ping" },
+      TEST_PROJECT_DIR,
+      100,
+    );
+    expect(result.error).toBe("timeout");
 
     // Clean up the server-side connection
     if (clientConn) {
@@ -348,7 +368,7 @@ describe('queryDaemon async', () => {
 // Test 6: Auto-start daemon if not running
 // =============================================================================
 
-describe('auto-start daemon', () => {
+describe("auto-start daemon", () => {
   beforeEach(() => {
     setupTestEnv();
   });
@@ -364,17 +384,17 @@ describe('auto-start daemon', () => {
     }
   });
 
-  it('should detect when socket is missing', () => {
+  it("should detect when socket is missing", () => {
     const socketPath = getSocketPath(TEST_PROJECT_DIR);
     // Socket should not exist for fresh test project
     expect(existsSync(socketPath)).toBe(false);
   });
 
-  it('should detect when socket file exists', () => {
+  it("should detect when socket file exists", () => {
     const socketPath = getSocketPath(TEST_PROJECT_DIR);
 
     // Create a dummy socket file
-    writeFileSync(socketPath, '');
+    writeFileSync(socketPath, "");
 
     expect(existsSync(socketPath)).toBe(true);
 
@@ -382,11 +402,11 @@ describe('auto-start daemon', () => {
     unlinkSync(socketPath);
   });
 
-  it('should return unavailable when daemon cannot start', async () => {
+  it("should return unavailable when daemon cannot start", async () => {
     // The real implementation tries to start daemon when socket missing
     // When tldr CLI is not available, it returns unavailable
-    const result = await queryDaemon({ cmd: 'ping' }, TEST_PROJECT_DIR);
-    expect(result.status).toBe('unavailable');
+    const result = await queryDaemon({ cmd: "ping" }, TEST_PROJECT_DIR);
+    expect(result.status).toBe("unavailable");
   });
 });
 
@@ -394,7 +414,7 @@ describe('auto-start daemon', () => {
 // Test 7: Graceful degradation when indexing
 // =============================================================================
 
-describe('graceful degradation', () => {
+describe("graceful degradation", () => {
   beforeEach(() => {
     setupTestEnv();
   });
@@ -403,31 +423,37 @@ describe('graceful degradation', () => {
     cleanupTestEnv();
   });
 
-  it('should return indexing response when daemon is indexing', async () => {
-    writeFileSync(join(TLDR_DIR, 'status'), 'indexing');
+  it("should return indexing response when daemon is indexing", async () => {
+    writeFileSync(join(TLDR_DIR, "status"), "indexing");
 
     // The real implementation checks status and returns indexing flag
-    const result = await queryDaemon({ cmd: 'search', pattern: 'test' }, TEST_PROJECT_DIR);
+    const result = await queryDaemon(
+      { cmd: "search", pattern: "test" },
+      TEST_PROJECT_DIR,
+    );
     expect(result.indexing).toBe(true);
-    expect(result.message).toContain('indexing');
+    expect(result.message).toContain("indexing");
   });
 
-  it('should not block on indexing - return immediately', async () => {
-    writeFileSync(join(TLDR_DIR, 'status'), 'indexing');
+  it("should not block on indexing - return immediately", async () => {
+    writeFileSync(join(TLDR_DIR, "status"), "indexing");
 
     const start = Date.now();
-    const result = await queryDaemon({ cmd: 'search', pattern: 'test' }, TEST_PROJECT_DIR);
+    const result = await queryDaemon(
+      { cmd: "search", pattern: "test" },
+      TEST_PROJECT_DIR,
+    );
     const elapsed = Date.now() - start;
 
     expect(result.indexing).toBe(true);
     expect(elapsed).toBeLessThan(100); // Should be instant
   });
 
-  it('should use isIndexing helper correctly', () => {
-    writeFileSync(join(TLDR_DIR, 'status'), 'indexing');
+  it("should use isIndexing helper correctly", () => {
+    writeFileSync(join(TLDR_DIR, "status"), "indexing");
     expect(isIndexing(TEST_PROJECT_DIR)).toBe(true);
 
-    writeFileSync(join(TLDR_DIR, 'status'), 'ready');
+    writeFileSync(join(TLDR_DIR, "status"), "ready");
     expect(isIndexing(TEST_PROJECT_DIR)).toBe(false);
   });
 });
@@ -436,7 +462,7 @@ describe('graceful degradation', () => {
 // Test 8: Error handling
 // =============================================================================
 
-describe('error handling', () => {
+describe("error handling", () => {
   beforeEach(() => {
     setupTestEnv();
   });
@@ -445,40 +471,40 @@ describe('error handling', () => {
     cleanupTestEnv();
   });
 
-  it('should handle malformed JSON response gracefully', () => {
+  it("should handle malformed JSON response gracefully", () => {
     // Test that the response parsing in the client handles bad JSON
     const parseResponse = (data: string): DaemonResponse => {
       try {
         return JSON.parse(data);
       } catch {
-        return { status: 'error', error: 'Invalid JSON response from daemon' };
+        return { status: "error", error: "Invalid JSON response from daemon" };
       }
     };
 
-    const result = parseResponse('not json{');
-    expect(result.status).toBe('error');
-    expect(result.error).toContain('Invalid JSON');
+    const result = parseResponse("not json{");
+    expect(result.status).toBe("error");
+    expect(result.error).toContain("Invalid JSON");
   });
 
-  it('should return unavailable when socket does not exist', async () => {
+  it("should return unavailable when socket does not exist", async () => {
     // Socket doesn't exist and tldr CLI is not available
-    const result = await queryDaemon({ cmd: 'ping' }, TEST_PROJECT_DIR);
-    expect(result.status).toBe('unavailable');
+    const result = await queryDaemon({ cmd: "ping" }, TEST_PROJECT_DIR);
+    expect(result.status).toBe("unavailable");
   });
 
-  it('should handle sync query to missing socket', () => {
+  it("should handle sync query to missing socket", () => {
     // queryDaemonSync also returns unavailable when socket missing
-    const result = queryDaemonSync({ cmd: 'ping' }, TEST_PROJECT_DIR);
-    expect(result.status).toBe('unavailable');
+    const result = queryDaemonSync({ cmd: "ping" }, TEST_PROJECT_DIR);
+    expect(result.status).toBe("unavailable");
   });
 
-  it('should return error structure with proper fields', () => {
+  it("should return error structure with proper fields", () => {
     // Verify the error response structure
     const errorResponse: DaemonResponse = {
-      status: 'error',
-      error: 'Some error message',
+      status: "error",
+      error: "Some error message",
     };
-    expect(errorResponse.status).toBe('error');
+    expect(errorResponse.status).toBe("error");
     expect(errorResponse.error).toBeDefined();
   });
 });

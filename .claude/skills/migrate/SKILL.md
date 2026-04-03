@@ -31,17 +31,18 @@ Safe migrations for frameworks, languages, and infrastructure.
 
 ## Agent Sequence
 
-| # | Agent | Role | Output |
-|---|-------|------|--------|
-| 1 | **oracle** | Research target framework/version | Research report |
-| 2 | **phoenix** | Analyze current codebase for migration impact | Impact analysis |
-| 3 | **plan-agent** | Create phased migration plan | Migration plan |
-| 4 | **kraken** | Implement migration changes | Code changes |
-| 5 | **surveyor** | Review migration for completeness | Migration review |
+| #   | Agent          | Role                                          | Output           |
+| --- | -------------- | --------------------------------------------- | ---------------- |
+| 1   | **oracle**     | Research target framework/version             | Research report  |
+| 2   | **phoenix**    | Analyze current codebase for migration impact | Impact analysis  |
+| 3   | **plan-agent** | Create phased migration plan                  | Migration plan   |
+| 4   | **kraken**     | Implement migration changes                   | Code changes     |
+| 5   | **surveyor**   | Review migration for completeness             | Migration review |
 
 ## Why Extra Gates?
 
 Migrations are high-risk:
+
 - Breaking changes between versions
 - Dependency conflicts
 - Data format changes
@@ -157,24 +158,28 @@ Task(
 ## Migration Types
 
 ### Framework Upgrade
+
 ```
 User: /migrate React 17 → 18
 → Full workflow with hooks/concurrent mode changes
 ```
 
 ### Language Version
+
 ```
 User: /migrate Python 3.9 → 3.12
 → Focus on new syntax, removed features
 ```
 
 ### Database Migration
+
 ```
 User: /migrate MongoDB → PostgreSQL
 → Schema design, data transformation, query rewrite
 ```
 
 ### Infrastructure
+
 ```
 User: /migrate AWS → GCP
 → Service mapping, config translation

@@ -12,7 +12,7 @@ import json
 import logging
 import re
 import subprocess
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -26,7 +26,7 @@ except ImportError:
 logger = logging.getLogger("mcp_execution.generate_test_params")
 
 
-class ToolSafety(str, Enum):
+class ToolSafety(StrEnum):
     """Safety classification for tools."""
 
     SAFE = "safe"

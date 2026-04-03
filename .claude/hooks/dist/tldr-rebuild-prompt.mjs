@@ -15,7 +15,7 @@ function loadEditCount(countPath, sessionId) {
       session_id: sessionId,
       count: 0,
       last_prompt_at: 0,
-      files_changed: []
+      files_changed: [],
     };
   }
   try {
@@ -25,7 +25,7 @@ function loadEditCount(countPath, sessionId) {
         session_id: sessionId,
         count: 0,
         last_prompt_at: 0,
-        files_changed: []
+        files_changed: [],
       };
     }
     return data;
@@ -34,7 +34,7 @@ function loadEditCount(countPath, sessionId) {
       session_id: sessionId,
       count: 0,
       last_prompt_at: 0,
-      files_changed: []
+      files_changed: [],
     };
   }
 }
@@ -59,7 +59,8 @@ async function main() {
     console.log("{}");
     return;
   }
-  const filePath = input.tool_input?.file_path || input.tool_response?.filePath || "";
+  const filePath =
+    input.tool_input?.file_path || input.tool_response?.filePath || "";
   if (!filePath || !isCodeFile(filePath)) {
     console.log("{}");
     return;
@@ -72,7 +73,9 @@ async function main() {
     editCount.files_changed.push(filePath);
   }
   const now = Date.now();
-  const shouldPrompt = editCount.count >= REBUILD_THRESHOLD && now - editCount.last_prompt_at > PROMPT_COOLDOWN_MS;
+  const shouldPrompt =
+    editCount.count >= REBUILD_THRESHOLD &&
+    now - editCount.last_prompt_at > PROMPT_COOLDOWN_MS;
   if (shouldPrompt) {
     editCount.last_prompt_at = now;
     saveEditCount(countPath, editCount);
@@ -93,8 +96,8 @@ tldr calls src/ > .claude/cache/tldr/calls.json
 tldr dead src/ > .claude/cache/tldr/dead.json
 \`\`\`
 
-Or say "rebuild TLDR index" and I'll run these commands.`
-      }
+Or say "rebuild TLDR index" and I'll run these commands.`,
+      },
     };
     console.log(JSON.stringify(output));
     return;

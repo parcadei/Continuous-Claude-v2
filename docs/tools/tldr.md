@@ -5,6 +5,7 @@ TLDR-Code is a 5-layer code analysis system that provides 95% token savings when
 ## Why TLDR-Code Exists
 
 Large Language Models have token limits. A medium-sized codebase can easily exceed context windows, forcing you to choose between:
+
 - Reading only part of the code (incomplete context)
 - Reading everything (hitting token limits)
 - Manual summarization (time-consuming, error-prone)
@@ -13,10 +14,10 @@ TLDR-Code solves this by providing structured summaries that preserve the essent
 
 ### Token Savings Comparison
 
-| Approach | Tokens | Savings |
-|----------|--------|---------|
-| Read raw files | 23,314 | 0% |
-| TLDR all layers | 1,189 | **95%** |
+| Approach        | Tokens | Savings |
+| --------------- | ------ | ------- |
+| Read raw files  | 23,314 | 0%      |
+| TLDR all layers | 1,189  | **95%** |
 
 The key insight: Call graphs navigate to relevant code, then layers provide structured summaries. You don't need to read irrelevant code.
 
@@ -37,6 +38,7 @@ Total: ~1,200 tokens vs 23,000 raw
 ### Layer 1: AST (Abstract Syntax Tree)
 
 Extracts code structure without implementation details:
+
 - Function and method signatures
 - Class definitions
 - Import statements
@@ -48,6 +50,7 @@ Extracts code structure without implementation details:
 ### Layer 2: Call Graph
 
 Maps function call relationships across files:
+
 - What functions call what
 - Cross-file dependencies
 - Module boundaries
@@ -58,6 +61,7 @@ Maps function call relationships across files:
 ### Layer 3: CFG (Control Flow Graph)
 
 Analyzes control flow within functions:
+
 - Basic blocks (sequential code)
 - Control flow edges (branches, loops)
 - Cyclomatic complexity
@@ -68,6 +72,7 @@ Analyzes control flow within functions:
 ### Layer 4: DFG (Data Flow Graph)
 
 Tracks variable lifecycle:
+
 - Variable definitions
 - Variable uses (reads)
 - Variable modifications (writes)
@@ -78,6 +83,7 @@ Tracks variable lifecycle:
 ### Layer 5: PDG (Program Dependence Graph)
 
 Combines control and data dependencies:
+
 - Control dependencies (what affects execution)
 - Data dependencies (what variables affect)
 - Program slicing (what affects a specific line)
@@ -167,6 +173,7 @@ tldr extract src/main.py
 ```
 
 **Output:** JSON with complete module structure:
+
 - Functions with signatures and docstrings
 - Classes with methods
 - Imports (stdlib, third-party, local)
@@ -188,6 +195,7 @@ tldr context handleRequest --project src/ --lang typescript
 ```
 
 **Output:** Human-readable text with:
+
 - Entry point signature and docstring
 - Called functions with their signatures
 - Transitive dependencies up to depth limit
@@ -203,6 +211,7 @@ tldr cfg src/processor.py process_data
 ```
 
 **Output:** JSON with:
+
 - Basic blocks with line ranges
 - Control flow edges (branch targets)
 - Cyclomatic complexity
@@ -217,6 +226,7 @@ tldr dfg src/processor.py process_data
 ```
 
 **Output:** JSON with:
+
 - Variable definitions (where assigned)
 - Variable uses (where read)
 - Variable modifications (where updated)
@@ -296,6 +306,7 @@ tldr arch src/
 ```
 
 **Output:** JSON with:
+
 - **Entry layer:** Controllers/handlers (many callers, few calls)
 - **Middle layer:** Services (moderate calls in/out)
 - **Leaf layer:** Utilities (few callers, many calls)
@@ -532,13 +543,13 @@ cfg = get_cfg_context(source, "process")
 
 TLDR-Code supports multiple languages with varying feature levels:
 
-| Language | AST | Call Graph | CFG | DFG | PDG |
-|----------|-----|------------|-----|-----|-----|
-| Python | Full | Full | Full | Full | Full |
-| TypeScript | Full | Full | Full | Basic | Basic |
-| JavaScript | Full | Full | Full | Basic | Basic |
-| Go | Full | Full | Basic | Basic | - |
-| Rust | Full | Full | Basic | Basic | - |
+| Language   | AST  | Call Graph | CFG   | DFG   | PDG   |
+| ---------- | ---- | ---------- | ----- | ----- | ----- |
+| Python     | Full | Full       | Full  | Full  | Full  |
+| TypeScript | Full | Full       | Full  | Basic | Basic |
+| JavaScript | Full | Full       | Full  | Basic | Basic |
+| Go         | Full | Full       | Basic | Basic | -     |
+| Rust       | Full | Full       | Basic | Basic | -     |
 
 **Full:** Complete support with all features
 **Basic:** Core features implemented, edge cases may be incomplete
@@ -547,21 +558,25 @@ TLDR-Code supports multiple languages with varying feature levels:
 ### Language-Specific Notes
 
 **Python:**
+
 - Handles async/await
 - Supports decorators
 - Tracks imports (stdlib, third-party, local)
 
 **TypeScript/JavaScript:**
+
 - Distinguishes TypeScript from JavaScript
 - Handles ES6+ features (arrow functions, classes)
 - Tracks imports/exports
 
 **Go:**
+
 - Handles package imports
 - Supports interfaces and structs
 - Tracks goroutines
 
 **Rust:**
+
 - Handles traits and implementations
 - Supports macros (basic)
 - Tracks crate dependencies
@@ -583,6 +598,7 @@ Read src/services/payment.py
 ```
 
 To bypass and read the full file:
+
 ```bash
 Read src/services/payment.py with offset/limit
 ```
@@ -687,11 +703,13 @@ tldr arch src/
 ### Caching
 
 TLDR-Code caches analysis results. The cache is stored in:
+
 ```
 .tldr/cache/   # In your project directory
 ```
 
 To warm the cache:
+
 ```bash
 tldr warm src/
 ```
@@ -699,6 +717,7 @@ tldr warm src/
 ### Incremental Updates
 
 TLDR-Code supports incremental updates (P4 implementation). When files change:
+
 1. Dirty flags track changed files
 2. Only affected call graphs are rebuilt
 3. Patches are applied to existing graphs
@@ -706,6 +725,7 @@ TLDR-Code supports incremental updates (P4 implementation). When files change:
 ### Large Codebases
 
 For projects with 1000+ files:
+
 1. Use `--max` to limit initial analysis
 2. Pre-warm the cache with `tldr warm`
 3. Use file filters (`--file`, `--ext`) to narrow scope
@@ -766,13 +786,13 @@ Calls:
 
 ## Comparison with Other Tools
 
-| Tool | Purpose | Token Savings | Call Graphs | Flow Analysis |
-|------|---------|---------------|-------------|---------------|
-| **TLDR-Code** | LLM context | 95% | Yes | CFG/DFG/PDG |
-| AST Parser | Structure only | 60% | No | No |
-| ctags/etags | Navigation | 50% | No | No |
-| LSP | Editor support | N/A | Limited | No |
-| Static analyzers | Bug finding | N/A | No | Yes |
+| Tool             | Purpose        | Token Savings | Call Graphs | Flow Analysis |
+| ---------------- | -------------- | ------------- | ----------- | ------------- |
+| **TLDR-Code**    | LLM context    | 95%           | Yes         | CFG/DFG/PDG   |
+| AST Parser       | Structure only | 60%           | No          | No            |
+| ctags/etags      | Navigation     | 50%           | No          | No            |
+| LSP              | Editor support | N/A           | Limited     | No            |
+| Static analyzers | Bug finding    | N/A           | No          | Yes           |
 
 TLDR-Code is specifically designed for LLM context preparation, not general static analysis.
 
@@ -798,6 +818,7 @@ TLDR-Code is specifically designed for LLM context preparation, not general stat
 ### "No tree-sitter parser found"
 
 Install language-specific parsers:
+
 ```bash
 uv pip install tree-sitter-typescript tree-sitter-go tree-sitter-rust
 ```
@@ -805,6 +826,7 @@ uv pip install tree-sitter-typescript tree-sitter-go tree-sitter-rust
 ### "Function not found"
 
 Check the function name exactly matches (case-sensitive):
+
 ```bash
 # List all functions first
 tldr extract src/module.py | jq '.functions[].name'
@@ -813,6 +835,7 @@ tldr extract src/module.py | jq '.functions[].name'
 ### "Cache out of sync"
 
 Clear the cache:
+
 ```bash
 rm -rf .tldr/cache/
 tldr warm src/
@@ -821,6 +844,7 @@ tldr warm src/
 ### High memory usage
 
 Limit the scope:
+
 ```bash
 tldr structure src/ --max 50  # Limit files analyzed
 ```
@@ -839,6 +863,7 @@ TLDR-Code is a separate package. To contribute:
 ### Meta-Patterns
 
 CFG, DFG, and PDG use meta-patterns that work across languages:
+
 - **CFG:** Basic blocks + edges (same structure for all languages)
 - **DFG:** VarRef + DataflowEdge (language-agnostic)
 - **PDG:** Combines CFG and DFG dependencies

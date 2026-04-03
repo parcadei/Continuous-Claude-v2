@@ -10,6 +10,7 @@ You are tasked with writing a handoff document to hand off your work to another 
 ## When to Use
 
 Activate when:
+
 - User says "/handoff" or "/create-handoff"
 - User says "create a handoff" or "hand off this work"
 - Before ending a session with incomplete work
@@ -17,10 +18,13 @@ Activate when:
 - Before a long break during complex work
 
 ## Process
+
 ### 1. Filepath & Metadata
+
 Use the following information to understand how to create your document:
 
 **First, determine the session name from existing handoffs:**
+
 ```bash
 ls -td thoughts/shared/handoffs/*/ 2>/dev/null | head -1 | xargs basename
 ```
@@ -30,12 +34,14 @@ This returns the most recently modified handoff folder name (e.g., `open-source-
 If no handoffs exist, use `general` as the folder name.
 
 **Create your file under:** `thoughts/shared/handoffs/{session-name}/YYYY-MM-DD_HH-MM_description.yaml`, where:
+
 - `{session-name}` is from existing handoffs (e.g., `open-source-release`) or `general` if none exist
 - `YYYY-MM-DD` is today's date
 - `HH-MM` is the current time in 24-hour format (no seconds needed)
 - `description` is a brief kebab-case description
 
 **Examples:**
+
 - `thoughts/shared/handoffs/open-source-release/2026-01-08_16-30_memory-system-fix.yaml`
 - `thoughts/shared/handoffs/general/2026-01-08_16-30_bug-investigation.yaml`
 
@@ -47,45 +53,45 @@ The `goal:` and `now:` fields are shown in the statusline - they MUST be named e
 
 ```yaml
 ---
-session: {session-name from ledger}
+session: { session-name from ledger }
 date: YYYY-MM-DD
 status: complete|partial|blocked
 outcome: SUCCEEDED|PARTIAL_PLUS|PARTIAL_MINUS|FAILED
 ---
-
-goal: {What this session accomplished - shown in statusline}
-now: {What next session should do first - shown in statusline}
-test: {Command to verify this work, e.g., pytest tests/test_foo.py}
+goal: { What this session accomplished - shown in statusline }
+now: { What next session should do first - shown in statusline }
+test: { Command to verify this work, e.g., pytest tests/test_foo.py }
 
 done_this_session:
-  - task: {First completed task}
-    files: [{file1.py}, {file2.py}]
-  - task: {Second completed task}
-    files: [{file3.py}]
+  - task: { First completed task }
+    files: [{ file1.py }, { file2.py }]
+  - task: { Second completed task }
+    files: [{ file3.py }]
 
-blockers: [{any blocking issues}]
+blockers: [{ any blocking issues }]
 
-questions: [{unresolved questions for next session}]
+questions: [{ unresolved questions for next session }]
 
 decisions:
-  - {decision_name}: {rationale}
+  - { decision_name }: { rationale }
 
 findings:
-  - {key_finding}: {details}
+  - { key_finding }: { details }
 
-worked: [{approaches that worked}]
-failed: [{approaches that failed and why}]
+worked: [{ approaches that worked }]
+failed: [{ approaches that failed and why }]
 
 next:
-  - {First next step}
-  - {Second next step}
+  - { First next step }
+  - { Second next step }
 
 files:
-  created: [{new files}]
-  modified: [{changed files}]
+  created: [{ new files }]
+  modified: [{ changed files }]
 ```
 
 **Field guide:**
+
 - `goal:` + `now:` - REQUIRED, shown in statusline
 - `done_this_session:` - What was accomplished with file references
 - `decisions:` - Important choices and rationale
@@ -95,6 +101,7 @@ files:
 
 **DO NOT use alternative field names like `session_goal`, `objective`, `focus`, `current`, etc.**
 **The statusline parser looks for EXACTLY `goal:` and `now:` - nothing else works.**
+
 ---
 
 ### 3. Mark Session Outcome (REQUIRED)
@@ -113,6 +120,7 @@ Options:
 ```
 
 After the user responds, index and mark the outcome:
+
 ```bash
 # Mark the most recent handoff (works with PostgreSQL or SQLite)
 # Use git root to find project, then opc/scripts/core/
@@ -143,7 +151,9 @@ Resume in a new session with:
 ```
 
 ---
-##.  Additional Notes & Instructions
+
+##. Additional Notes & Instructions
+
 - **more information, not less**. This is a guideline that defines the minimum of what a handoff should be. Always feel free to include more information if necessary.
 - **be thorough and precise**. include both top-level objectives, and lower-level details as necessary.
 - **avoid excessive code snippets**. While a brief snippet to describe some key change is important, avoid large code blocks or diffs; do not include one unless it's necessary (e.g. pertains to an error you're debugging). Prefer using `/path/to/file.ext:line` references that an agent can follow later when it's ready, e.g. `packages/dashboard/src/app/dashboard/page.tsx:12-24`

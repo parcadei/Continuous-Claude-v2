@@ -8,6 +8,7 @@ description: Show full session token usage, costs, TLDR savings, and hook activi
 Show a beautiful dashboard with token usage, actual API costs, TLDR savings, and hook activity.
 
 ## When to Use
+
 - See how much TLDR is saving you in real $ terms
 - Check total session token usage and costs
 - Before/after comparisons of TLDR effectiveness
@@ -19,6 +20,7 @@ Show a beautiful dashboard with token usage, actual API costs, TLDR savings, and
 **IMPORTANT:** Run the script AND display the output to the user.
 
 1. Run the stats script:
+
 ```bash
 python3 $CLAUDE_CC_DIR/.claude/scripts/tldr_stats.py
 ```
@@ -61,14 +63,14 @@ python3 $CLAUDE_CC_DIR/.claude/scripts/tldr_stats.py
 
 ## Understanding the Numbers
 
-| Metric | What it means |
-|--------|---------------|
-| **You've spent** | Actual $ spent on Claude API this session |
-| **You sent / Without TLDR** | Actual tokens vs what it would have been |
-| **TLDR saved you** | Money saved by compressing file reads |
-| **File reads X → Y** | Raw file tokens compressed to TLDR summary |
-| **Cache hits** | How often TLDR reuses parsed file results |
-| **History sparkline** | Compression % over recent sessions (█ = high) |
+| Metric                      | What it means                                 |
+| --------------------------- | --------------------------------------------- |
+| **You've spent**            | Actual $ spent on Claude API this session     |
+| **You sent / Without TLDR** | Actual tokens vs what it would have been      |
+| **TLDR saved you**          | Money saved by compressing file reads         |
+| **File reads X → Y**        | Raw file tokens compressed to TLDR summary    |
+| **Cache hits**              | How often TLDR reuses parsed file results     |
+| **History sparkline**       | Compression % over recent sessions (█ = high) |
 
 ## Visual Elements
 

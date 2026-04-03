@@ -20,12 +20,15 @@ Create specialized AI agents with isolated contexts for specific tasks.
 ## Quick Start
 
 ### Interactive (Recommended)
+
 ```bash
 /agents
 ```
+
 Opens menu to create, edit, and manage agents.
 
 ### Manual Creation
+
 ```bash
 mkdir -p .claude/agents
 cat > .claude/agents/reviewer.md << 'EOF'
@@ -47,6 +50,7 @@ EOF
 ```
 
 ### CLI-Based
+
 ```bash
 claude --agents '{
   "reviewer": {
@@ -64,37 +68,36 @@ claude --agents '{
 ---
 name: agent-name
 description: When/why to use this agent
-tools: Read, Edit, Bash      # Optional, inherits all if omitted
-model: sonnet                 # sonnet, haiku, claude-opus-4-5-20251101, inherit
+tools: Read, Edit, Bash # Optional, inherits all if omitted
+model: sonnet # sonnet, haiku, claude-opus-4-5-20251101, inherit
 ---
-
 System prompt content here...
 ```
 
 ## Configuration Fields
 
-| Field | Required | Options |
-|-------|----------|---------|
-| `name` | Yes | lowercase, hyphens |
-| `description` | Yes | When to use |
-| `tools` | No | Tool list (inherits all if omitted) |
-| `model` | No | `sonnet`, `haiku`, `claude-opus-4-5-20251101`, `inherit` |
+| Field         | Required | Options                                                  |
+| ------------- | -------- | -------------------------------------------------------- |
+| `name`        | Yes      | lowercase, hyphens                                       |
+| `description` | Yes      | When to use                                              |
+| `tools`       | No       | Tool list (inherits all if omitted)                      |
+| `model`       | No       | `sonnet`, `haiku`, `claude-opus-4-5-20251101`, `inherit` |
 
 ## Built-In Agents
 
-| Agent | Model | Tools | Purpose |
-|-------|-------|-------|---------|
-| General-purpose | Sonnet | All | Complex multi-step tasks |
-| Plan | Sonnet | Read-only | Plan mode research |
-| Explore | Haiku | Read-only | Fast codebase search |
+| Agent           | Model  | Tools     | Purpose                  |
+| --------------- | ------ | --------- | ------------------------ |
+| General-purpose | Sonnet | All       | Complex multi-step tasks |
+| Plan            | Sonnet | Read-only | Plan mode research       |
+| Explore         | Haiku  | Read-only | Fast codebase search     |
 
 ## Model Selection
 
-| Model | Speed | Best For |
-|-------|-------|----------|
-| Haiku | Fastest | Search, quick lookups |
-| Sonnet | Fast | Most tasks (default) |
-| Opus | Slower | Complex reasoning |
+| Model  | Speed   | Best For              |
+| ------ | ------- | --------------------- |
+| Haiku  | Fastest | Search, quick lookups |
+| Sonnet | Fast    | Most tasks (default)  |
+| Opus   | Slower  | Complex reasoning     |
 
 ## Tool Combinations
 
@@ -112,6 +115,7 @@ tools: Read, Write, Edit, Bash, Glob
 ## Example Agents
 
 ### Code Reviewer
+
 ```yaml
 ---
 name: code-reviewer
@@ -119,17 +123,17 @@ description: Reviews code for quality and security. Use after code changes.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
-
 Review code for:
-- Security vulnerabilities
-- Code quality issues
-- Missing error handling
-- Test coverage gaps
+  - Security vulnerabilities
+  - Code quality issues
+  - Missing error handling
+  - Test coverage gaps
 
 Output findings by priority: Critical > Warning > Suggestion
 ```
 
 ### Debugger
+
 ```yaml
 ---
 name: debugger
@@ -148,14 +152,15 @@ Debugging process:
 
 ## File Locations
 
-| Type | Location | Priority |
-|------|----------|----------|
-| Project | `.claude/agents/` | Highest |
-| User | `~/.claude/agents/` | Lower |
+| Type    | Location            | Priority |
+| ------- | ------------------- | -------- |
+| Project | `.claude/agents/`   | Highest  |
+| User    | `~/.claude/agents/` | Lower    |
 
 ## Advanced Patterns
 
 ### Resumable Agents
+
 ```
 [Agent returns agentId: "abc123"]
 
@@ -164,6 +169,7 @@ claude -r "abc123" "Continue analysis"
 ```
 
 ### Agent Chaining
+
 ```
 Use code-analyzer to find issues,
 then use optimizer to fix them

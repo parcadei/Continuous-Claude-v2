@@ -5,15 +5,20 @@
  * Provides type-safe interface between TypeScript hooks and Python logic.
  */
 
-import { execSync } from 'child_process';
-import { dirname, resolve } from 'path';
-import { fileURLToPath } from 'url';
-import type { ValidationResult, PatternInferenceResult, PatternType } from './pattern-selector.js';
+import { execSync } from "child_process";
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
+import type {
+  ValidationResult,
+  PatternInferenceResult,
+  PatternType,
+} from "./pattern-selector.js";
 
 // Get project root - from .claude/hooks/src/shared/ go up 4 levels
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const PROJECT_DIR = process.env.CLAUDE_PROJECT_DIR || resolve(__dirname, '..', '..', '..', '..');
+const PROJECT_DIR =
+  process.env.CLAUDE_PROJECT_DIR || resolve(__dirname, "..", "..", "..", "..");
 
 /**
  * Call Python validate_composition.py with JSON output.
@@ -28,7 +33,7 @@ export function callValidateComposition(
   patternA: string,
   patternB: string,
   scope: string,
-  operator: string = ';'
+  operator: string = ";",
 ): ValidationResult {
   const expr = `${patternA} ${operator}[${scope}] ${patternB}`;
   const cmd = `uv run python scripts/validate_composition.py --json "${expr}"`;
@@ -36,9 +41,9 @@ export function callValidateComposition(
   try {
     const stdout = execSync(cmd, {
       cwd: PROJECT_DIR,
-      encoding: 'utf-8',
+      encoding: "utf-8",
       timeout: 10000,
-      stdio: ['pipe', 'pipe', 'pipe'],
+      stdio: ["pipe", "pipe", "pipe"],
     });
 
     const result = JSON.parse(stdout);
@@ -71,15 +76,15 @@ export function callValidateComposition(
  */
 export function callPatternInference(prompt: string): PatternInferenceResult {
   // Escape double quotes and backslashes for shell safety
-  const escaped = prompt.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  const escaped = prompt.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
   const cmd = `uv run python scripts/agentica_patterns/pattern_inference.py "${escaped}"`;
 
   try {
     const stdout = execSync(cmd, {
       cwd: PROJECT_DIR,
-      encoding: 'utf-8',
+      encoding: "utf-8",
       timeout: 10000,
-      stdio: ['pipe', 'pipe', 'pipe'],
+      stdio: ["pipe", "pipe", "pipe"],
     });
 
     const result = JSON.parse(stdout);
@@ -92,19 +97,19 @@ export function callPatternInference(prompt: string): PatternInferenceResult {
       clarificationProbe: result.clarification_probe ?? null,
       ambiguityType: result.ambiguity_type ?? null,
       alternatives: (result.alternatives ?? []) as PatternType[],
-      workBreakdown: result.work_breakdown ?? 'Task decomposition',
+      workBreakdown: result.work_breakdown ?? "Task decomposition",
     };
   } catch (err) {
     // Fallback to hierarchical on error
     return {
-      pattern: 'hierarchical',
+      pattern: "hierarchical",
       confidence: 0.3,
-      signals: ['bridge error fallback'],
+      signals: ["bridge error fallback"],
       needsClarification: true,
-      clarificationProbe: 'Could not infer pattern - what would help?',
-      ambiguityType: 'scope',
+      clarificationProbe: "Could not infer pattern - what would help?",
+      ambiguityType: "scope",
       alternatives: [],
-      workBreakdown: 'Coordinated task decomposition with specialists',
+      workBreakdown: "Coordinated task decomposition with specialists",
     };
   }
 }

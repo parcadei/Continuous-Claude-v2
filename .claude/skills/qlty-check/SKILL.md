@@ -36,29 +36,31 @@ uv run python -m runtime.harness scripts/qlty_check.py --smells
 
 ## Parameters
 
-| Parameter | Description |
-|-----------|-------------|
-| `--check` | Run linters (default) |
-| `--fix` | Auto-fix issues |
-| `--all` | Process all files, not just changed |
-| `--fmt` | Format files instead |
-| `--metrics` | Calculate code metrics |
-| `--smells` | Find code smells |
-| `--paths` | Specific files/directories |
-| `--level` | Min issue level: note/low/medium/high |
-| `--cwd` | Working directory |
-| `--init` | Initialize qlty in a repo |
-| `--plugins` | List available plugins |
+| Parameter   | Description                           |
+| ----------- | ------------------------------------- |
+| `--check`   | Run linters (default)                 |
+| `--fix`     | Auto-fix issues                       |
+| `--all`     | Process all files, not just changed   |
+| `--fmt`     | Format files instead                  |
+| `--metrics` | Calculate code metrics                |
+| `--smells`  | Find code smells                      |
+| `--paths`   | Specific files/directories            |
+| `--level`   | Min issue level: note/low/medium/high |
+| `--cwd`     | Working directory                     |
+| `--init`    | Initialize qlty in a repo             |
+| `--plugins` | List available plugins                |
 
 ## Common Workflows
 
 ### After Implementation
+
 ```bash
 # Auto-fix what's possible, see what remains
 uv run python -m runtime.harness scripts/qlty_check.py --fix
 ```
 
 ### Quality Report
+
 ```bash
 # Get metrics for changed code
 uv run python -m runtime.harness scripts/qlty_check.py --metrics
@@ -68,6 +70,7 @@ uv run python -m runtime.harness scripts/qlty_check.py --smells
 ```
 
 ### Initialize in New Repo
+
 ```bash
 uv run python -m runtime.harness scripts/qlty_check.py --init --cwd /path/to/repo
 ```
@@ -96,8 +99,8 @@ qlty fmt
 
 ## vs Other Tools
 
-| Tool | Use Case |
-|------|----------|
-| **qlty** | Unified linting, formatting, metrics for any language |
-| **ast-grep** | Structural code patterns and refactoring |
-| **morph** | Fast text search |
+| Tool         | Use Case                                              |
+| ------------ | ----------------------------------------------------- |
+| **qlty**     | Unified linting, formatting, metrics for any language |
+| **ast-grep** | Structural code patterns and refactoring              |
+| **morph**    | Fast text search                                      |

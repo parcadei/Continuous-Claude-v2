@@ -40,13 +40,13 @@ Claude Code has a **compaction problem**: when context fills up, the system comp
 
 **Continuous Claude solves this with:**
 
-| Problem | Solution |
-|---------|----------|
-| Context loss on compaction | YAML handoffs - more token-efficient transfer |
-| Starting fresh each session | Memory system recalls + daemon auto-extracts learnings |
-| Reading entire files burns tokens | 5-layer code analysis + semantic index |
-| Complex tasks need coordination | Meta-skills orchestrate agent workflows |
-| Repeating workflows manually | 109 skills with natural language triggers |
+| Problem                           | Solution                                               |
+| --------------------------------- | ------------------------------------------------------ |
+| Context loss on compaction        | YAML handoffs - more token-efficient transfer          |
+| Starting fresh each session       | Memory system recalls + daemon auto-extracts learnings |
+| Reading entire files burns tokens | 5-layer code analysis + semantic index                 |
+| Complex tasks need coordination   | Meta-skills orchestrate agent workflows                |
+| Repeating workflows manually      | 109 skills with natural language triggers              |
 
 **The mantra: Compound, don't compact.** Extract learnings automatically, then start fresh with full context.
 
@@ -60,19 +60,20 @@ The name is a pun. **Continuous** because Claude maintains state across sessions
 
 An agent is five things: **Prompt + Tools + Context + Memory + Model**.
 
-| Component | What We Optimize |
-|-----------|------------------|
-| **Prompt** | Skills inject relevant context; hooks add system reminders |
-| **Tools** | TLDR reduces tokens; agents parallelize work |
-| **Context** | Not just *what* Claude knows, but *how* it's provided |
-| **Memory** | Daemon extracts learnings; recall surfaces them |
-| **Model** | Becomes swappable when the other four are solid |
+| Component   | What We Optimize                                           |
+| ----------- | ---------------------------------------------------------- |
+| **Prompt**  | Skills inject relevant context; hooks add system reminders |
+| **Tools**   | TLDR reduces tokens; agents parallelize work               |
+| **Context** | Not just _what_ Claude knows, but _how_ it's provided      |
+| **Memory**  | Daemon extracts learnings; recall surfaces them            |
+| **Model**   | Becomes swappable when the other four are solid            |
 
 ### Anti-Complexity
 
 We resist plugin sprawl. Every MCP, subscription, and tool you add promises improvement but risks breaking context, tools, or prompts through clashes.
 
 **Our approach:**
+
 - **Time, not money** — No required paid services. Perplexity and NIA are optional, high-value-per-token.
 - **Learn, don't accumulate** — A system that learns handles edge cases better than one that collects plugins.
 - **Shift-left validation** — Hooks run pyright/ruff after edits, catching errors before tests.
@@ -112,43 +113,43 @@ ACTION: Use Skill tool BEFORE responding
 
 ### Priority Levels
 
-| Level | Meaning |
-|-------|---------|
-| ⚠️ **CRITICAL** | Must use (e.g., handoffs before ending session) |
-| 📚 **RECOMMENDED** | Should use (e.g., workflow skills) |
-| 💡 **SUGGESTED** | Consider using (e.g., optimization tools) |
-| 📌 **OPTIONAL** | Nice to have (e.g., documentation helpers) |
+| Level              | Meaning                                         |
+| ------------------ | ----------------------------------------------- |
+| ⚠️ **CRITICAL**    | Must use (e.g., handoffs before ending session) |
+| 📚 **RECOMMENDED** | Should use (e.g., workflow skills)              |
+| 💡 **SUGGESTED**   | Consider using (e.g., optimization tools)       |
+| 📌 **OPTIONAL**    | Nice to have (e.g., documentation helpers)      |
 
 ### Natural Language Examples
 
-| What You Say | What Activates |
-|--------------|----------------|
-| "Fix the broken login" | `/fix` workflow → debug-agent, scout |
-| "Build a user dashboard" | `/build` workflow → plan-agent, kraken |
-| "I want to understand this codebase" | `/explore` + scout agent |
-| "What could go wrong with this plan?" | `/premortem` |
-| "Help me figure out what I need" | `/discovery-interview` |
-| "Done for today" | `create_handoff` (critical) |
-| "Resume where we left off" | `resume_handoff` |
-| "Research auth patterns" | oracle agent + perplexity |
-| "Find all usages of this API" | scout agent + ast-grep |
+| What You Say                          | What Activates                         |
+| ------------------------------------- | -------------------------------------- |
+| "Fix the broken login"                | `/fix` workflow → debug-agent, scout   |
+| "Build a user dashboard"              | `/build` workflow → plan-agent, kraken |
+| "I want to understand this codebase"  | `/explore` + scout agent               |
+| "What could go wrong with this plan?" | `/premortem`                           |
+| "Help me figure out what I need"      | `/discovery-interview`                 |
+| "Done for today"                      | `create_handoff` (critical)            |
+| "Resume where we left off"            | `resume_handoff`                       |
+| "Research auth patterns"              | oracle agent + perplexity              |
+| "Find all usages of this API"         | scout agent + ast-grep                 |
 
 ### Why This Approach?
 
-| Benefit | How |
-|---------|-----|
-| **More Discoverable** | Don't need to know commands exist |
-| **Context-Aware** | System knows when you're 90% through context |
+| Benefit                    | How                                                |
+| -------------------------- | -------------------------------------------------- |
+| **More Discoverable**      | Don't need to know commands exist                  |
+| **Context-Aware**          | System knows when you're 90% through context       |
 | **Reduces Cognitive Load** | Describe intent naturally, get curated suggestions |
-| **Power User Friendly** | Still supports /fix, /build, etc. directly |
+| **Power User Friendly**    | Still supports /fix, /build, etc. directly         |
 
 ### Skill vs Workflow vs Agent
 
-| Type | Purpose | Example |
-|------|---------|---------|
-| **Skill** | Single-purpose tool | `commit`, `tldr-code`, `qlty-check` |
-| **Workflow** | Multi-step process | `/fix` (sleuth → premortem → kraken → commit) |
-| **Agent** | Specialized sub-session | scout (exploration), oracle (research) |
+| Type         | Purpose                 | Example                                       |
+| ------------ | ----------------------- | --------------------------------------------- |
+| **Skill**    | Single-purpose tool     | `commit`, `tldr-code`, `qlty-check`           |
+| **Workflow** | Multi-step process      | `/fix` (sleuth → premortem → kraken → commit) |
+| **Agent**    | Specialized sub-session | scout (exploration), oracle (research)        |
 
 [See detailed skill activation docs →](docs/skill-activation.md)
 
@@ -178,17 +179,16 @@ uv run python -m scripts.setup.wizard
 
 ### What the Wizard Does
 
-| Step | What It Does |
-|------|--------------|
-| 1 | Backup existing .claude/ config (if present) |
-| 2 | Check prerequisites (Docker, Python, uv) |
-| 3-5 | Database + API key configuration |
-| 6-7 | Start Docker stack, run migrations |
-| 8 | Install Claude Code integration (32 agents, 109 skills, 30 hooks) |
-| 9 | Math features (SymPy, Z3, Pint - optional) |
-| 10 | TLDR code analysis tool |
-| 11-12 | Diagnostics tools + Loogle (optional) |
-
+| Step  | What It Does                                                      |
+| ----- | ----------------------------------------------------------------- |
+| 1     | Backup existing .claude/ config (if present)                      |
+| 2     | Check prerequisites (Docker, Python, uv)                          |
+| 3-5   | Database + API key configuration                                  |
+| 6-7   | Start Docker stack, run migrations                                |
+| 8     | Install Claude Code integration (32 agents, 109 skills, 30 hooks) |
+| 9     | Math features (SymPy, Z3, Pint - optional)                        |
+| 10    | TLDR code analysis tool                                           |
+| 11-12 | Diagnostics tools + Loogle (optional)                             |
 
 #### To Uninstall:
 
@@ -200,17 +200,17 @@ cd Continuous-Claude-v3/opc
 **What it does**
 
 1. Archives your current setup → Moves ~/.claude to ~/.claude-v3.archived.<timestamp>
-2. Restores your backup → Finds the most recent ~/.claude.backup.* (created during install) and restores it
+2. Restores your backup → Finds the most recent ~/.claude.backup.\* (created during install) and restores it
 3. Preserves user data → Copies these back from the archive:
 
-  - history.jsonl (your command history)
-  - mcp_config.json (MCP servers)
-  - .env (API keys)
-  - projects.json (project configs)
-  - file-history/ directory
-  - projects/ directory
-4. Removes CC-v3 additions → Everything else (hooks, skills, agents, rules)
+- history.jsonl (your command history)
+- mcp_config.json (MCP servers)
+- .env (API keys)
+- projects.json (project configs)
+- file-history/ directory
+- projects/ directory
 
+4. Removes CC-v3 additions → Everything else (hooks, skills, agents, rules)
 
 **Safety Features**
 
@@ -218,7 +218,6 @@ cd Continuous-Claude-v3/opc
 - The wizard asks for confirmation before proceeding
 - It restores from the backup that was made during installation
 - All your Claude Code settings stay intact
-
 
 ### Remote Database Setup
 
@@ -238,6 +237,7 @@ psql -h hostname -U user -d continuous_claude -f docker/init-schema.sql
 ```
 
 > **Managed PostgreSQL tips:**
+>
 > - **AWS RDS**: Add `vector` to `shared_preload_libraries` in DB Parameter Group
 > - **Supabase**: Enable via Database Extensions page
 > - **Azure Database**: Use Extensions pane to enable pgvector
@@ -275,13 +275,13 @@ claude
 
 ### First Session Commands
 
-| Command | What it does |
-|---------|--------------|
-| `/workflow` | Goal-based routing (Research/Plan/Build/Fix) |
-| `/fix bug <description>` | Investigate and fix a bug |
-| `/build greenfield <feature>` | Build a new feature from scratch |
-| `/explore` | Understand the codebase |
-| `/premortem` | Risk analysis before implementation |
+| Command                       | What it does                                 |
+| ----------------------------- | -------------------------------------------- |
+| `/workflow`                   | Goal-based routing (Research/Plan/Build/Fix) |
+| `/fix bug <description>`      | Investigate and fix a bug                    |
+| `/build greenfield <feature>` | Build a new feature from scratch             |
+| `/explore`                    | Understand the codebase                      |
+| `/premortem`                  | Risk analysis before implementation          |
 
 ---
 
@@ -484,17 +484,17 @@ Skills are modular capabilities triggered by natural language. Located in `.clau
 
 #### Meta-Skills (Workflow Orchestrators)
 
-| Meta-Skill | Chain | Use When |
-|------------|-------|----------|
-| `/workflow` | Router → appropriate workflow | Don't know where to start |
-| `/build` | discovery → plan → validate → implement → commit | Building features |
-| `/fix` | sleuth → premortem → kraken → test → commit | Fixing bugs |
-| `/tdd` | plan → arbiter (tests) → kraken (implement) → arbiter | Test-first development |
-| `/refactor` | phoenix → plan → kraken → reviewer → arbiter | Safe code transformation |
-| `/review` | parallel specialized reviews → synthesis | Code review |
-| `/explore` | scout (quick/deep/architecture) | Understand codebase |
-| `/security` | vulnerability scan → verification | Security audits |
-| `/release` | audit → E2E → review → changelog | Ship releases |
+| Meta-Skill  | Chain                                                 | Use When                  |
+| ----------- | ----------------------------------------------------- | ------------------------- |
+| `/workflow` | Router → appropriate workflow                         | Don't know where to start |
+| `/build`    | discovery → plan → validate → implement → commit      | Building features         |
+| `/fix`      | sleuth → premortem → kraken → test → commit           | Fixing bugs               |
+| `/tdd`      | plan → arbiter (tests) → kraken (implement) → arbiter | Test-first development    |
+| `/refactor` | phoenix → plan → kraken → reviewer → arbiter          | Safe code transformation  |
+| `/review`   | parallel specialized reviews → synthesis              | Code review               |
+| `/explore`  | scout (quick/deep/architecture)                       | Understand codebase       |
+| `/security` | vulnerability scan → verification                     | Security audits           |
+| `/release`  | audit → E2E → review → changelog                      | Ship releases             |
 
 #### Meta-Skill Reference
 
@@ -502,54 +502,55 @@ Each meta-skill supports modes, scopes, and flags. Type the skill alone (e.g., `
 
 **`/build <mode> [options] [description]`**
 
-| Mode | Chain | Use For |
-|------|-------|---------|
-| `greenfield` | discovery → plan → validate → implement → commit → PR | New feature from scratch |
-| `brownfield` | onboard → research → plan → validate → implement | Feature in existing codebase |
-| `tdd` | plan → test-first → implement | Test-driven development |
-| `refactor` | impact analysis → plan → TDD → implement | Safe refactoring |
+| Mode         | Chain                                                 | Use For                      |
+| ------------ | ----------------------------------------------------- | ---------------------------- |
+| `greenfield` | discovery → plan → validate → implement → commit → PR | New feature from scratch     |
+| `brownfield` | onboard → research → plan → validate → implement      | Feature in existing codebase |
+| `tdd`        | plan → test-first → implement                         | Test-driven development      |
+| `refactor`   | impact analysis → plan → TDD → implement              | Safe refactoring             |
 
-| Option | Effect |
-|--------|--------|
+| Option             | Effect                                 |
+| ------------------ | -------------------------------------- |
 | `--skip-discovery` | Skip interview phase (have clear spec) |
-| `--skip-validate` | Skip plan validation |
-| `--skip-commit` | Don't auto-commit |
-| `--skip-pr` | Don't create PR description |
-| `--parallel` | Run research agents in parallel |
+| `--skip-validate`  | Skip plan validation                   |
+| `--skip-commit`    | Don't auto-commit                      |
+| `--skip-pr`        | Don't create PR description            |
+| `--parallel`       | Run research agents in parallel        |
 
 **`/fix <scope> [options] [description]`**
 
-| Scope | Chain | Use For |
-|-------|-------|---------|
-| `bug` | debug → implement → test → commit | General bug fix |
-| `hook` | debug-hooks → hook-developer → implement → test | Hook issues |
-| `deps` | preflight → oracle → plan → implement → qlty | Dependency errors |
-| `pr-comments` | github-search → research → plan → implement → commit | PR feedback |
+| Scope         | Chain                                                | Use For           |
+| ------------- | ---------------------------------------------------- | ----------------- |
+| `bug`         | debug → implement → test → commit                    | General bug fix   |
+| `hook`        | debug-hooks → hook-developer → implement → test      | Hook issues       |
+| `deps`        | preflight → oracle → plan → implement → qlty         | Dependency errors |
+| `pr-comments` | github-search → research → plan → implement → commit | PR feedback       |
 
-| Option | Effect |
-|--------|--------|
-| `--no-test` | Skip regression test |
-| `--dry-run` | Diagnose only, don't fix |
-| `--no-commit` | Don't auto-commit |
+| Option        | Effect                   |
+| ------------- | ------------------------ |
+| `--no-test`   | Skip regression test     |
+| `--dry-run`   | Diagnose only, don't fix |
+| `--no-commit` | Don't auto-commit        |
 
 **`/explore <depth> [options]`**
 
-| Depth | Time | What It Does |
-|-------|------|--------------|
-| `quick` | ~1 min | tldr tree + structure overview |
-| `deep` | ~5 min | onboard + tldr + research + documentation |
-| `architecture` | ~3 min | tldr arch + call graph + layers |
+| Depth          | Time   | What It Does                              |
+| -------------- | ------ | ----------------------------------------- |
+| `quick`        | ~1 min | tldr tree + structure overview            |
+| `deep`         | ~5 min | onboard + tldr + research + documentation |
+| `architecture` | ~3 min | tldr arch + call graph + layers           |
 
-| Option | Effect |
-|--------|--------|
-| `--focus "area"` | Focus on specific area (e.g., `--focus "auth"`) |
-| `--output handoff` | Create handoff for implementation |
-| `--output doc` | Create documentation file |
-| `--entry "func"` | Start from specific entry point |
+| Option             | Effect                                          |
+| ------------------ | ----------------------------------------------- |
+| `--focus "area"`   | Focus on specific area (e.g., `--focus "auth"`) |
+| `--output handoff` | Create handoff for implementation               |
+| `--output doc`     | Create documentation file                       |
+| `--entry "func"`   | Start from specific entry point                 |
 
 **`/tdd`, `/refactor`, `/review`, `/security`, `/release`**
 
 These follow their defined chains without mode flags. Just run:
+
 ```
 /tdd "implement retry logic"
 /refactor "extract auth module"
@@ -561,29 +562,35 @@ These follow their defined chains without mode flags. Just run:
 #### Key Skills (High-Value Tools)
 
 **Planning & Risk**
+
 - **premortem**: TIGERS & ELEPHANTS risk analysis - use before any significant implementation
 - **discovery-interview**: Transform vague ideas into detailed specs
 
 **Context Management**
+
 - **create_handoff**: Capture session state for transfer
 - **resume_handoff**: Resume from handoff with context
 - **continuity_ledger**: Track state within session
 
 **Code Analysis (95% Token Savings)**
+
 - **tldr-code**: Call graph, CFG, DFG, slicing
 - **ast-grep-find**: Structural code search
 - **morph-search**: Fast text search (20x faster than grep)
 
 **Research**
+
 - **perplexity-search**: AI-powered web search
 - **nia-docs**: Library documentation search
 - **github-search**: Search GitHub code/issues/PRs
 
 **Quality**
+
 - **qlty-check**: 70+ linters, auto-fix
 - **braintrust-analyze**: Session analysis, replay, and debugging failed sessions
 
 **Math & Formal Proofs**
+
 - **math**: Unified computation (SymPy, Z3, Pint) — one entry point for all math
 - **prove**: Lean4 theorem proving with 5-phase workflow (Research → Design → Test → Implement → Verify)
 - **pint-compute**: Unit-aware arithmetic and conversions
@@ -620,27 +627,32 @@ Agents are specialized AI workers spawned via the Task tool. Located in `.claude
 > **Note:** There are likely too many agents—consolidation is a v4 goal. Use what fits your workflow.
 
 **Orchestrators (2)**
+
 - **maestro**: Multi-agent coordination with patterns (Pipeline, Swarm, Jury)
 - **kraken**: TDD implementation agent with checkpoint/resume support
 
 **Planners (4)**
+
 - **architect**: Feature planning + API integration
 - **phoenix**: Refactoring + framework migration planning
 - **plan-agent**: Lightweight planning with research/MCP tools
 - **validate-agent**: Validate plans against best practices
 
 **Explorers (4)**
+
 - **scout**: Codebase exploration (use instead of Explore)
 - **oracle**: External research (web, docs, APIs)
 - **pathfinder**: External repository analysis
 - **research-codebase**: Document codebase as-is
 
 **Implementers (3)**
+
 - **kraken**: TDD implementation with strict test-first workflow
 - **spark**: Lightweight fixes and quick tweaks
 - **agentica-agent**: Build Python agents using Agentica SDK
 
 **Debuggers (3)**
+
 - **sleuth**: General bug investigation and root cause
 - **debug-agent**: Issue investigation via logs/code search
 - **profiler**: Performance profiling and race conditions
@@ -653,11 +665,11 @@ Agents are specialized AI workers spawned via the Task tool. Located in `.claude
 
 #### Common Workflows
 
-| Workflow | Agent Chain |
-|----------|-------------|
-| Feature | architect → plan-reviewer → kraken → review-agent → arbiter |
-| Refactoring | phoenix → plan-reviewer → kraken → judge → arbiter |
-| Bug Fix | sleuth → spark/kraken → arbiter → scribe |
+| Workflow    | Agent Chain                                                 |
+| ----------- | ----------------------------------------------------------- |
+| Feature     | architect → plan-reviewer → kraken → review-agent → arbiter |
+| Refactoring | phoenix → plan-reviewer → kraken → judge → arbiter          |
+| Bug Fix     | sleuth → spark/kraken → arbiter → scribe                    |
 
 [See detailed agent guide →](docs/agents/)
 
@@ -669,24 +681,24 @@ Hooks intercept Claude Code at lifecycle points. Located in `.claude/hooks/`.
 
 #### Hook Events (30 hooks total)
 
-| Event | Key Hooks | Purpose |
-|-------|-----------|---------|
-| **SessionStart** | session-start-continuity, session-register, braintrust-tracing | Load context, register session |
-| **PreToolUse** | tldr-read-enforcer, smart-search-router, tldr-context-inject, file-claims | Token savings, search routing |
-| **PostToolUse** | post-edit-diagnostics, handoff-index, post-edit-notify | Validation, indexing |
-| **PreCompact** | pre-compact-continuity | Auto-save before compaction |
-| **UserPromptSubmit** | skill-activation-prompt, memory-awareness | Skill hints, memory recall |
-| **SubagentStop** | subagent-stop-continuity | Save agent state |
-| **SessionEnd** | session-end-cleanup, session-outcome | Cleanup, extract learnings |
+| Event                | Key Hooks                                                                 | Purpose                        |
+| -------------------- | ------------------------------------------------------------------------- | ------------------------------ |
+| **SessionStart**     | session-start-continuity, session-register, braintrust-tracing            | Load context, register session |
+| **PreToolUse**       | tldr-read-enforcer, smart-search-router, tldr-context-inject, file-claims | Token savings, search routing  |
+| **PostToolUse**      | post-edit-diagnostics, handoff-index, post-edit-notify                    | Validation, indexing           |
+| **PreCompact**       | pre-compact-continuity                                                    | Auto-save before compaction    |
+| **UserPromptSubmit** | skill-activation-prompt, memory-awareness                                 | Skill hints, memory recall     |
+| **SubagentStop**     | subagent-stop-continuity                                                  | Save agent state               |
+| **SessionEnd**       | session-end-cleanup, session-outcome                                      | Cleanup, extract learnings     |
 
 #### Key Hooks
 
-| Hook | Purpose |
-|------|---------|
-| **tldr-context-inject** | Adds code analysis to agent prompts |
-| **smart-search-router** | Routes grep to AST-grep when appropriate |
-| **post-edit-diagnostics** | Runs pyright/ruff after edits |
-| **memory-awareness** | Surfaces relevant learnings |
+| Hook                      | Purpose                                  |
+| ------------------------- | ---------------------------------------- |
+| **tldr-context-inject**   | Adds code analysis to agent prompts      |
+| **smart-search-router**   | Routes grep to AST-grep when appropriate |
+| **post-edit-diagnostics** | Runs pyright/ruff after edits            |
+| **memory-awareness**      | Surfaces relevant learnings              |
 
 [See all 30 hooks →](docs/hooks/)
 
@@ -698,13 +710,13 @@ TLDR provides token-efficient code summaries through 5 analysis layers.
 
 #### The 5-Layer Stack
 
-| Layer | Name | What it provides | Tokens |
-|-------|------|------------------|--------|
-| **L1** | AST | Functions, classes, signatures | ~500 tokens |
-| **L2** | Call Graph | Who calls what (cross-file) | +440 tokens |
-| **L3** | CFG | Control flow, complexity | +110 tokens |
-| **L4** | DFG | Data flow, variable tracking | +130 tokens |
-| **L5** | PDG | Program slicing, impact analysis | +150 tokens |
+| Layer  | Name       | What it provides                 | Tokens      |
+| ------ | ---------- | -------------------------------- | ----------- |
+| **L1** | AST        | Functions, classes, signatures   | ~500 tokens |
+| **L2** | Call Graph | Who calls what (cross-file)      | +440 tokens |
+| **L3** | CFG        | Control flow, complexity         | +110 tokens |
+| **L4** | DFG        | Data flow, variable tracking     | +130 tokens |
+| **L5** | PDG        | Program slicing, impact analysis | +150 tokens |
 
 **Total: ~1,200 tokens vs 23,000 raw = 95% savings**
 
@@ -781,20 +793,20 @@ The key insight: **thinking blocks contain the real reasoning**—not just what 
 
 #### Conversational Interface
 
-| What You Say | What Happens |
-|--------------|--------------|
-| "Remember that auth uses JWT" | Stores learning with context |
-| "Recall authentication patterns" | Searches memory, surfaces matches |
-| "What did we decide about X?" | Implicit recall via memory-awareness hook |
+| What You Say                     | What Happens                              |
+| -------------------------------- | ----------------------------------------- |
+| "Remember that auth uses JWT"    | Stores learning with context              |
+| "Recall authentication patterns" | Searches memory, surfaces matches         |
+| "What did we decide about X?"    | Implicit recall via memory-awareness hook |
 
 #### Database Schema (4 tables)
 
-| Table | Purpose |
-|-------|---------|
-| **sessions** | Cross-terminal awareness |
-| **file_claims** | Cross-terminal file locking |
+| Table               | Purpose                                 |
+| ------------------- | --------------------------------------- |
+| **sessions**        | Cross-terminal awareness                |
+| **file_claims**     | Cross-terminal file locking             |
 | **archival_memory** | Long-term learnings with BGE embeddings |
-| **handoffs** | Session handoffs with embeddings |
+| **handoffs**        | Session handoffs with embeddings        |
 
 #### Recall Commands
 
@@ -827,19 +839,24 @@ Within-session state tracking. Location: `thoughts/ledgers/CONTINUITY_<topic>.md
 
 ```markdown
 # Session: feature-x
+
 Updated: 2026-01-08
 
 ## Goal
+
 Implement feature X with proper error handling
 
 ## Completed
+
 - [x] Designed API schema
 - [x] Implemented core logic
 
 ## In Progress
+
 - [ ] Add error handling
 
 ## Blockers
+
 - Need clarification on retry policy
 ```
 
@@ -870,11 +887,11 @@ status: complete
 
 #### Commands
 
-| Command | Effect |
-|---------|--------|
-| "save state" | Updates continuity ledger |
-| "done for today" / `/handoff` | Creates handoff document |
-| "resume work" | Loads latest handoff |
+| Command                       | Effect                    |
+| ----------------------------- | ------------------------- |
+| "save state"                  | Updates continuity ledger |
+| "done for today" / `/handoff` | Creates handoff document  |
+| "resume work"                 | Loads latest handoff      |
 
 ---
 
@@ -884,20 +901,20 @@ Two capabilities: **computation** (SymPy, Z3, Pint) and **formal verification** 
 
 #### The Stack
 
-| Tool | Purpose | Example |
-|------|---------|---------|
-| **SymPy** | Symbolic math | Solve equations, integrals, matrix operations |
-| **Z3** | Constraint solving | Prove inequalities, SAT problems |
-| **Pint** | Unit conversion | Convert miles to km, dimensional analysis |
-| **Lean4** | Formal proofs | Machine-verified theorems |
-| **Mathlib** | 100K+ theorems | Pre-formalized lemmas to build on |
-| **Loogle** | Type-aware search | Find Mathlib lemmas by signature |
+| Tool        | Purpose            | Example                                       |
+| ----------- | ------------------ | --------------------------------------------- |
+| **SymPy**   | Symbolic math      | Solve equations, integrals, matrix operations |
+| **Z3**      | Constraint solving | Prove inequalities, SAT problems              |
+| **Pint**    | Unit conversion    | Convert miles to km, dimensional analysis     |
+| **Lean4**   | Formal proofs      | Machine-verified theorems                     |
+| **Mathlib** | 100K+ theorems     | Pre-formalized lemmas to build on             |
+| **Loogle**  | Type-aware search  | Find Mathlib lemmas by signature              |
 
 #### Two Entry Points
 
-| Skill | Use When |
-|-------|----------|
-| `/math` | Computing, solving, calculating |
+| Skill    | Use When                                    |
+| -------- | ------------------------------------------- |
+| `/math`  | Computing, solving, calculating             |
 | `/prove` | Formal verification, machine-checked proofs |
 
 #### /math Examples
@@ -973,12 +990,12 @@ curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf 
 
 **Chain:** sleuth → [checkpoint] → [premortem] → kraken → test → commit
 
-| Scope | What it does |
-|-------|--------------|
-| `bug` | General bug investigation |
-| `hook` | Hook-specific debugging |
-| `deps` | Dependency issues |
-| `pr-comments` | Address PR feedback |
+| Scope         | What it does              |
+| ------------- | ------------------------- |
+| `bug`         | General bug investigation |
+| `hook`        | Hook-specific debugging   |
+| `deps`        | Dependency issues         |
+| `pr-comments` | Address PR feedback       |
 
 ### /build - Feature Development
 
@@ -988,12 +1005,12 @@ curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf 
 
 **Chain:** discovery → plan → validate → implement → commit → PR
 
-| Mode | What it does |
-|------|--------------|
+| Mode         | What it does             |
+| ------------ | ------------------------ |
 | `greenfield` | New feature from scratch |
 | `brownfield` | Modify existing codebase |
-| `tdd` | Test-first development |
-| `refactor` | Safe code transformation |
+| `tdd`        | Test-first development   |
+| `refactor`   | Safe code transformation |
 
 ### /premortem - Risk Analysis
 
@@ -1002,6 +1019,7 @@ curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf 
 ```
 
 **Output:**
+
 - **TIGERS**: Clear threats (HIGH/MEDIUM/LOW severity)
 - **ELEPHANTS**: Unspoken concerns
 
@@ -1034,6 +1052,7 @@ uv run python -m scripts.setup.update
 ```
 
 This will:
+
 - Pull latest from GitHub
 - Update hooks, skills, rules, agents
 - Upgrade TLDR if installed
@@ -1041,23 +1060,23 @@ This will:
 
 ### What Gets Installed
 
-| Component | Location |
-|-----------|----------|
-| Agents (32) | ~/.claude/agents/ |
-| Skills (109) | ~/.claude/skills/ |
-| Hooks (30) | ~/.claude/hooks/ |
-| Rules | ~/.claude/rules/ |
-| Scripts | ~/.claude/scripts/ |
-| PostgreSQL | Docker container |
+| Component    | Location           |
+| ------------ | ------------------ |
+| Agents (32)  | ~/.claude/agents/  |
+| Skills (109) | ~/.claude/skills/  |
+| Hooks (30)   | ~/.claude/hooks/   |
+| Rules        | ~/.claude/rules/   |
+| Scripts      | ~/.claude/scripts/ |
+| PostgreSQL   | Docker container   |
 
 ### Installation Mode: Copy vs Symlink
 
 The wizard offers two installation modes:
 
-| Mode | How It Works | Best For |
-|------|--------------|----------|
-| **Copy** (default) | Copies files from repo to `~/.claude/` | End users, stable setup |
-| **Symlink** | Creates symlinks to repo files | Contributors, development |
+| Mode               | How It Works                           | Best For                  |
+| ------------------ | -------------------------------------- | ------------------------- |
+| **Copy** (default) | Copies files from repo to `~/.claude/` | End users, stable setup   |
+| **Symlink**        | Creates symlinks to repo files         | Contributors, development |
 
 #### Copy Mode (Default)
 
@@ -1083,11 +1102,13 @@ Creates symlinks so `~/.claude/` points directly to repo files. Changes in eithe
 ```
 
 **Pros:**
+
 - Changes auto-sync to repo (can `git commit` improvements)
 - No re-installation needed after `git pull`
 - Contribute back easily
 
 **Cons:**
+
 - Breaking changes in repo affect your setup immediately
 - Need to manage git workflow
 
@@ -1148,6 +1169,7 @@ Get-ChildItem "$HOME\.claude" | Where-Object { $_.LinkType -eq "SymbolicLink" }
 ### For Brownfield Projects
 
 After installation, start Claude and run:
+
 ```
 > /onboard
 ```
@@ -1191,16 +1213,17 @@ Skill activation triggers.
 
 ### Environment Variables
 
-| Variable | Purpose | Required |
-|----------|---------|----------|
-| `DATABASE_URL` | PostgreSQL connection string | Yes |
-| `BRAINTRUST_API_KEY` | Session tracing | No |
-| `PERPLEXITY_API_KEY` | Web search | No |
-| `NIA_API_KEY` | Documentation search | No |
-| `CLAUDE_OPC_DIR` | Path to CC's opc/ directory (set by wizard) | Auto |
-| `CLAUDE_PROJECT_DIR` | Current project directory (set by SessionStart hook) | Auto |
+| Variable             | Purpose                                              | Required |
+| -------------------- | ---------------------------------------------------- | -------- |
+| `DATABASE_URL`       | PostgreSQL connection string                         | Yes      |
+| `BRAINTRUST_API_KEY` | Session tracing                                      | No       |
+| `PERPLEXITY_API_KEY` | Web search                                           | No       |
+| `NIA_API_KEY`        | Documentation search                                 | No       |
+| `CLAUDE_OPC_DIR`     | Path to CC's opc/ directory (set by wizard)          | Auto     |
+| `CLAUDE_PROJECT_DIR` | Current project directory (set by SessionStart hook) | Auto     |
 
 Services without API keys still work:
+
 - Continuity system (ledgers, handoffs)
 - TLDR code analysis
 - Local git operations
@@ -1253,6 +1276,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
 ## Acknowledgments
 
 ### Patterns & Architecture
+
 - **[@numman-ali](https://github.com/numman-ali)** - Continuity ledger pattern
 - **[Anthropic](https://anthropic.com)** - Claude Code and "Code Execution with MCP"
 - **[obra/superpowers](https://github.com/obra/superpowers)** - Agent orchestration patterns
@@ -1261,6 +1285,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
 - **[HumanLayer](https://github.com/humanlayer/humanlayer)** - Agent patterns
 
 ### Tools & Services
+
 - **[uv](https://github.com/astral-sh/uv)** - Python packaging
 - **[tree-sitter](https://tree-sitter.github.io/)** - Code parsing
 - **[Braintrust](https://braintrust.dev)** - LLM evaluation, logging, and session tracing

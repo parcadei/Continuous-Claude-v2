@@ -14,6 +14,7 @@ Create a YAML handoff document for state preservation across `/clear`. This is t
 ### 1. Filepath & Metadata
 
 **First, determine the session name from existing handoffs:**
+
 ```bash
 ls -td thoughts/shared/handoffs/*/ 2>/dev/null | head -1 | xargs basename
 ```
@@ -23,12 +24,14 @@ This returns the most recently modified handoff folder name (e.g., `open-source-
 If no handoffs exist, use `general` as the folder name.
 
 **Create your file under:** `thoughts/shared/handoffs/{session-name}/YYYY-MM-DD_HH-MM_description.yaml`, where:
+
 - `{session-name}` is from existing handoffs (e.g., `open-source-release`) or `general` if none exist
 - `YYYY-MM-DD` is today's date
 - `HH-MM` is the current time in 24-hour format (no seconds needed)
 - `description` is a brief kebab-case description
 
 **Examples:**
+
 - `thoughts/shared/handoffs/open-source-release/2026-01-08_16-30_memory-system-fix.yaml`
 - `thoughts/shared/handoffs/general/2026-01-08_16-30_bug-investigation.yaml`
 
@@ -40,45 +43,45 @@ The `goal:` and `now:` fields are shown in the statusline - they MUST be named e
 
 ```yaml
 ---
-session: {session-name from ledger}
+session: { session-name from ledger }
 date: YYYY-MM-DD
 status: complete|partial|blocked
 outcome: SUCCEEDED|PARTIAL_PLUS|PARTIAL_MINUS|FAILED
 ---
-
-goal: {What this session accomplished - shown in statusline}
-now: {What next session should do first - shown in statusline}
-test: {Command to verify this work, e.g., pytest tests/test_foo.py}
+goal: { What this session accomplished - shown in statusline }
+now: { What next session should do first - shown in statusline }
+test: { Command to verify this work, e.g., pytest tests/test_foo.py }
 
 done_this_session:
-  - task: {First completed task}
-    files: [{file1.py}, {file2.py}]
-  - task: {Second completed task}
-    files: [{file3.py}]
+  - task: { First completed task }
+    files: [{ file1.py }, { file2.py }]
+  - task: { Second completed task }
+    files: [{ file3.py }]
 
-blockers: [{any blocking issues}]
+blockers: [{ any blocking issues }]
 
-questions: [{unresolved questions for next session}]
+questions: [{ unresolved questions for next session }]
 
 decisions:
-  - {decision_name}: {rationale}
+  - { decision_name }: { rationale }
 
 findings:
-  - {key_finding}: {details}
+  - { key_finding }: { details }
 
-worked: [{approaches that worked}]
-failed: [{approaches that failed and why}]
+worked: [{ approaches that worked }]
+failed: [{ approaches that failed and why }]
 
 next:
-  - {First next step}
-  - {Second next step}
+  - { First next step }
+  - { Second next step }
 
 files:
-  created: [{new files}]
-  modified: [{changed files}]
+  created: [{ new files }]
+  modified: [{ changed files }]
 ```
 
 **Field guide:**
+
 - `goal:` + `now:` - REQUIRED, shown in statusline
 - `done_this_session:` - What was accomplished with file references
 - `decisions:` - Important choices and rationale
@@ -105,6 +108,7 @@ Options:
 ```
 
 After the user responds, mark the outcome:
+
 ```bash
 # Mark the most recent handoff (works with PostgreSQL or SQLite)
 PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "${CLAUDE_PROJECT_DIR:-.}")

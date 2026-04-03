@@ -18,6 +18,7 @@ Meta-skill that upgrades any SKILL.md to Decision Theory v5 Hybrid format using 
 ## Prerequisites
 
 Ragie RAG with indexed books:
+
 - **decision-theory partition**: LaValle Planning Algorithms, Sutton & Barto RL
 - **modal-logic partition**: Blackburn Modal Logic, Huth & Ryan Logic in CS
 
@@ -36,15 +37,19 @@ Create `thoughts/skill-builds/{session}/00-blackboard.md`:
 
 ```markdown
 # Skill Upgrade: {skill_name}
+
 Started: {timestamp}
 
 ## Input Skill
+
 {path_to_skill}
 
 ## Target Format
+
 Decision Theory v5 Hybrid
 
 ## Agent Findings
+
 (Agents append below)
 
 ---
@@ -53,6 +58,7 @@ Decision Theory v5 Hybrid
 ### Step 3: Launch 4 Agents in Parallel
 
 Use Task tool to spawn all 4 agents simultaneously. Each agent:
+
 1. Reads the input skill
 2. Queries Ragie for their specific book
 3. Appends findings to the blackboard
@@ -64,7 +70,7 @@ Use Task tool to spawn all 4 agents simultaneously. Each agent:
 **Book:** LaValle's "Planning Algorithms" (decision-theory partition)
 **Focus:** States, Actions, Transitions
 
-```
+````
 Task(
   subagent_type="general-purpose",
   prompt="""
@@ -80,9 +86,10 @@ Query Ragie:
 uv run python scripts/ragie_query.py -q "MDP state space definition" -p decision-theory
 uv run python scripts/ragie_query.py -q "action space sequential decisions" -p decision-theory
 uv run python scripts/ragie_query.py -q "POMDP partial observability" -p decision-theory
-```
+````
 
 Read the input skill and answer:
+
 1. What are the STATES? (phases, modes, tracked info)
 2. What are the ACTIONS? (what can agent do in each state)
 3. How do TRANSITIONS work? (deterministic or stochastic)
@@ -93,6 +100,7 @@ WRITE to blackboard section: ## Agent 1: States, Actions & Transitions
 Format as plain English with LaValle chapter citations.
 """
 )
+
 ```
 
 ---
@@ -104,9 +112,10 @@ Format as plain English with LaValle chapter citations.
 **Depends on:** Agent 1
 
 ```
+
 Task(
-  subagent_type="general-purpose",
-  prompt="""
+subagent_type="general-purpose",
+prompt="""
 INPUT SKILL: {path}
 BLACKBOARD: thoughts/skill-builds/{session}/00-blackboard.md
 
@@ -117,6 +126,7 @@ WAIT: Read Agent 1's findings from blackboard first.
 TASK: Design policy and termination conditions.
 
 Query Ragie:
+
 ```bash
 uv run python scripts/ragie_query.py -q "policy deterministic stochastic" -p decision-theory
 uv run python scripts/ragie_query.py -q "episodic termination conditions" -p decision-theory
@@ -124,6 +134,7 @@ uv run python scripts/ragie_query.py -q "reward function design" -p decision-the
 ```
 
 Using Agent 1's states and actions, answer:
+
 1. What's the POLICY? (state → action rules)
 2. When does it END? (terminal states, success/failure)
 3. What are REWARDS? (goals +, costs -)
@@ -134,6 +145,7 @@ WRITE to blackboard section: ## Agent 2: Policy & Values
 Format as plain English with Sutton & Barto section citations.
 """
 )
+
 ```
 
 ---
@@ -144,9 +156,10 @@ Format as plain English with Sutton & Barto section citations.
 **Focus:** Constraints (temporal, epistemic, deontic)
 
 ```
+
 Task(
-  subagent_type="general-purpose",
-  prompt="""
+subagent_type="general-purpose",
+prompt="""
 INPUT SKILL: {path}
 BLACKBOARD: thoughts/skill-builds/{session}/00-blackboard.md
 
@@ -155,6 +168,7 @@ YOUR BOOK: Blackburn's "Modal Logic" in Ragie partition 'modal-logic'
 TASK: Extract constraints from the skill.
 
 Query Ragie:
+
 ```bash
 uv run python scripts/ragie_query.py -q "temporal logic LTL operators" -p modal-logic
 uv run python scripts/ragie_query.py -q "epistemic logic knowledge" -p modal-logic
@@ -162,6 +176,7 @@ uv run python scripts/ragie_query.py -q "deontic logic obligations" -p modal-log
 ```
 
 Read the input skill and identify:
+
 1. TEMPORAL: "must do X before Y" → □, ◇, U
 2. EPISTEMIC: "must know X" → K operator
 3. DEONTIC: "must/forbidden/may" → O, F, P
@@ -170,12 +185,14 @@ Read the input skill and identify:
 WRITE to blackboard section: ## Agent 3: Constraints
 
 For each constraint:
+
 - Plain English description
 - Modal logic notation
 - Why it matters
 - Blackburn chapter citation
-"""
-)
+  """
+  )
+
 ```
 
 ---
@@ -187,9 +204,10 @@ For each constraint:
 **Depends on:** Agents 1-3
 
 ```
+
 Task(
-  subagent_type="general-purpose",
-  prompt="""
+subagent_type="general-purpose",
+prompt="""
 INPUT SKILL: {path}
 BLACKBOARD: thoughts/skill-builds/{session}/00-blackboard.md
 
@@ -200,6 +218,7 @@ WAIT: Read Agents 1-3 findings from blackboard first.
 TASK: Verify consistency and completeness.
 
 Query Ragie:
+
 ```bash
 uv run python scripts/ragie_query.py -q "safety properties verification" -p modal-logic
 uv run python scripts/ragie_query.py -q "liveness properties eventually" -p modal-logic
@@ -207,6 +226,7 @@ uv run python scripts/ragie_query.py -q "model checking CTL" -p modal-logic
 ```
 
 Check:
+
 1. SAFETY: What bad things never happen? □¬(bad)
 2. LIVENESS: What good things eventually happen? ◇(good)
 3. CONSISTENCY: Any contradictions between agents?
@@ -219,7 +239,8 @@ Overall verdict: PASS or NEEDS_WORK
 Huth & Ryan section citations.
 """
 )
-```
+
+````
 
 ---
 
@@ -263,7 +284,7 @@ version: 5.1-hybrid
 
 ## Verification
 [From Agent 4 safety/liveness]
-```
+````
 
 ---
 
@@ -298,6 +319,7 @@ uv run python scripts/ragie_query.py -q "your question" -p decision-theory --rer
 ## Files Created
 
 After upgrade:
+
 ```
 thoughts/skill-builds/{session}/
 ├── 00-blackboard.md      # Agent collaboration

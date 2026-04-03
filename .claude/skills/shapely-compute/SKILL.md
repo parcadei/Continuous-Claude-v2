@@ -1,12 +1,25 @@
 ---
 name: shapely-compute
 description: Computational geometry with Shapely - create geometries, boolean operations, measurements, predicates
-triggers: ["geometry", "polygon", "intersection", "area", "contains", "distance between points", "buffer", "convex hull", "centroid", "WKT"]
+triggers:
+  [
+    "geometry",
+    "polygon",
+    "intersection",
+    "area",
+    "contains",
+    "distance between points",
+    "buffer",
+    "convex hull",
+    "centroid",
+    "WKT",
+  ]
 ---
 
 # Computational Geometry with Shapely
 
 ## When to Use
+
 - Creating geometric shapes (points, lines, polygons)
 - Boolean operations (intersection, union, difference)
 - Spatial predicates (contains, intersects, within)
@@ -16,20 +29,22 @@ triggers: ["geometry", "polygon", "intersection", "area", "contains", "distance 
 
 ## Quick Reference
 
-| I want to... | Command | Example |
-|--------------|---------|---------|
-| Create geometry | `create` | `create polygon --coords "0,0 1,0 1,1 0,1"` |
-| Intersection | `op intersection` | `op intersection --g1 "POLYGON(...)" --g2 "POLYGON(...)"` |
-| Check contains | `pred contains` | `pred contains --g1 "POLYGON(...)" --g2 "POINT(0.5 0.5)"` |
-| Calculate area | `measure area` | `measure area --geom "POLYGON(...)"` |
-| Distance | `distance` | `distance --g1 "POINT(0 0)" --g2 "POINT(3 4)"` |
-| Transform | `transform translate` | `transform translate --geom "..." --params "1,2"` |
-| Validate | `validate` | `validate --geom "POLYGON(...)"` |
+| I want to...    | Command               | Example                                                   |
+| --------------- | --------------------- | --------------------------------------------------------- |
+| Create geometry | `create`              | `create polygon --coords "0,0 1,0 1,1 0,1"`               |
+| Intersection    | `op intersection`     | `op intersection --g1 "POLYGON(...)" --g2 "POLYGON(...)"` |
+| Check contains  | `pred contains`       | `pred contains --g1 "POLYGON(...)" --g2 "POINT(0.5 0.5)"` |
+| Calculate area  | `measure area`        | `measure area --geom "POLYGON(...)"`                      |
+| Distance        | `distance`            | `distance --g1 "POINT(0 0)" --g2 "POINT(3 4)"`            |
+| Transform       | `transform translate` | `transform translate --geom "..." --params "1,2"`         |
+| Validate        | `validate`            | `validate --geom "POLYGON(...)"`                          |
 
 ## Commands
 
 ### create
+
 Create geometric objects from coordinates.
+
 ```bash
 # Point
 uv run python scripts/shapely_compute.py create point --coords "1,2"
@@ -54,7 +69,9 @@ uv run python scripts/shapely_compute.py create multipolygon --coords "0,0 1,0 1
 ```
 
 ### op (operations)
+
 Boolean geometry operations.
+
 ```bash
 # Intersection of two polygons
 uv run python scripts/shapely_compute.py op intersection \
@@ -84,7 +101,9 @@ uv run python scripts/shapely_compute.py op simplify --g1 "LINESTRING(...)" --g2
 ```
 
 ### pred (predicates)
+
 Spatial relationship tests (returns boolean).
+
 ```bash
 # Does polygon contain point?
 uv run python scripts/shapely_compute.py pred contains \
@@ -120,7 +139,9 @@ uv run python scripts/shapely_compute.py pred covered_by --g1 "..." --g2 "..."
 ```
 
 ### measure
+
 Geometric measurements.
+
 ```bash
 # Area (polygons)
 uv run python scripts/shapely_compute.py measure area --geom "POLYGON((0 0,1 0,1 1,0 1,0 0))"
@@ -142,14 +163,18 @@ uv run python scripts/shapely_compute.py measure all --geom "POLYGON((0 0,2 0,2 
 ```
 
 ### distance
+
 Distance between geometries.
+
 ```bash
 uv run python scripts/shapely_compute.py distance --g1 "POINT(0 0)" --g2 "POINT(3 4)"
 # Returns: {"distance": 5.0, "g1_type": "Point", "g2_type": "Point"}
 ```
 
 ### transform
+
 Affine transformations.
+
 ```bash
 # Translate (move)
 uv run python scripts/shapely_compute.py transform translate \
@@ -173,7 +198,9 @@ uv run python scripts/shapely_compute.py transform skew \
 ```
 
 ### validate / makevalid
+
 Check and fix geometry validity.
+
 ```bash
 # Check if valid
 uv run python scripts/shapely_compute.py validate --geom "POLYGON((0 0,1 0,1 1,0 1,0 0))"
@@ -184,31 +211,39 @@ uv run python scripts/shapely_compute.py makevalid --geom "POLYGON((0 0,2 2,2 0,
 ```
 
 ### coords
+
 Extract coordinates from geometry.
+
 ```bash
 uv run python scripts/shapely_compute.py coords --geom "POLYGON((0 0,1 0,1 1,0 1,0 0))"
 # Returns: {"coords": [[0,0],[1,0],[1,1],[0,1],[0,0]], "type": "Polygon"}
 ```
 
 ### fromwkt
+
 Parse WKT and get geometry information.
+
 ```bash
 uv run python scripts/shapely_compute.py fromwkt "POLYGON((0 0,1 0,1 1,0 1,0 0))"
 # Returns: {"type": "Polygon", "bounds": [...], "area": 1.0, ...}
 ```
 
 ## Geometry Types
+
 - `point` - Single coordinate (x, y) or (x, y, z)
 - `line`/`linestring` - Sequence of connected points
 - `polygon` - Closed shape with optional holes
 - `multipoint`, `multilinestring`, `multipolygon` - Collections
 
 ## Input Formats
+
 - **Coordinates string**: `"0,0 1,0 1,1 0,1"` (space-separated x,y pairs)
 - **WKT**: `"POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))"`
 
 ## Output Format
+
 All commands return JSON with:
+
 - `wkt`: WKT representation of result geometry
 - `type`: Geometry type (Point, LineString, Polygon, etc.)
 - `bounds`: (minx, miny, maxx, maxy)
@@ -217,17 +252,18 @@ All commands return JSON with:
 
 ## Common Use Cases
 
-| Use Case | Command |
-|----------|---------|
-| Collision detection | `pred intersects` |
-| Point-in-polygon | `pred contains` |
-| Area calculation | `measure area` |
-| Buffer zones | `op buffer` |
-| Shape combination | `op union` |
-| Shape subtraction | `op difference` |
-| Bounding box | `op envelope` or `measure bounds` |
-| Simplify path | `op simplify` |
+| Use Case            | Command                           |
+| ------------------- | --------------------------------- |
+| Collision detection | `pred intersects`                 |
+| Point-in-polygon    | `pred contains`                   |
+| Area calculation    | `measure area`                    |
+| Buffer zones        | `op buffer`                       |
+| Shape combination   | `op union`                        |
+| Shape subtraction   | `op difference`                   |
+| Bounding box        | `op envelope` or `measure bounds` |
+| Simplify path       | `op simplify`                     |
 
 ## Related Skills
+
 - `/math-mode` - Full math orchestration (SymPy, Z3)
 - `/math-plot` - Visualization with matplotlib

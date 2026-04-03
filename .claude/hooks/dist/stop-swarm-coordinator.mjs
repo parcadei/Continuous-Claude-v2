@@ -30,7 +30,7 @@ async function main() {
     ".claude",
     "cache",
     "agentica-coordination",
-    "coordination.db"
+    "coordination.db",
   );
   if (!existsSync(dbPath)) {
     console.log(JSON.stringify({ result: "continue" }));
@@ -71,7 +71,7 @@ print(json.dumps({'done': done_count, 'total': total_count}))
 `;
     const result = spawnSync("python3", ["-c", query, dbPath, swarmId], {
       encoding: "utf-8",
-      maxBuffer: 1024 * 1024
+      maxBuffer: 1024 * 1024,
     });
     if (result.status !== 0) {
       console.log(JSON.stringify({ result: "continue" }));
@@ -86,10 +86,12 @@ print(json.dumps({'done': done_count, 'total': total_count}))
     }
     if (counts.done < counts.total) {
       const waiting = counts.total - counts.done;
-      console.log(JSON.stringify({
-        result: "block",
-        message: `Waiting for ${waiting} agent(s) to complete. Synthesize results when all agents broadcast 'done'.`
-      }));
+      console.log(
+        JSON.stringify({
+          result: "block",
+          message: `Waiting for ${waiting} agent(s) to complete. Synthesize results when all agents broadcast 'done'.`,
+        }),
+      );
     } else {
       console.log(JSON.stringify({ result: "continue" }));
     }

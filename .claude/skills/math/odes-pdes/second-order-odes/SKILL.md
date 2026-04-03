@@ -12,7 +12,6 @@ Use this skill when working on second-order-odes problems in odes pdes.
 
 ## Decision Tree
 
-
 1. **Classify the ODE**
    - Constant coefficients: ay'' + by' + cy = f(x)?
    - Variable coefficients: y'' + P(x)y' + Q(x)y = R(x)?
@@ -38,27 +37,29 @@ Use this skill when working on second-order-odes problems in odes pdes.
    - Shooting method: guess initial slope, iterate
    - `scipy.integrate.solve_bvp(ode, bc, x, y_init)`
 
-
 ## Tool Commands
 
 ### Scipy_Solve_Ivp_System
+
 ```bash
 uv run python -c "from scipy.integrate import solve_ivp; sol = solve_ivp(lambda t, Y: [Y[1], -Y[0]], [0, 10], [1, 0]); print('y(10) =', sol.y[0][-1])"
 ```
 
 ### Sympy_Charpoly
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py solve "r**2 + r + 1" --var r
 ```
 
 ### Sympy_Dsolve_2Nd
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py dsolve "Derivative(y,x,2) + y"
 ```
 
 ## Key Techniques
 
-*From indexed textbooks:*
+_From indexed textbooks:_
 
 - [An Introduction to Numerical Analysis... (Z-Library)] Modern Numerical Methods for Ordinary Wiley, New York. User's guide for DVERK: A subroutine for solving non-stiff ODEs. Keller (1966), Analysis of Numerical Methods.
 - [Elementary Differential Equations and... (Z-Library)] Riccati equation and that y1(t) = 1 is one solution. Use the transformation suggested in Problem 33, and nd the linear equation satised by v(t). Find v(t) in the case that x(t) = at, where a is a constant.

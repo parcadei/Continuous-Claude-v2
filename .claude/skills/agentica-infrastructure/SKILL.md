@@ -21,40 +21,40 @@ Complete API specification for Agentica multi-agent coordination infrastructure.
 
 ### 11 Pattern Classes
 
-| Pattern | Purpose | Key Method |
-|---------|---------|------------|
-| `Swarm` | Parallel perspectives | `.execute(query)` |
-| `Pipeline` | Sequential stages | `.run(initial_state)` |
-| `Hierarchical` | Coordinator + specialists | `.execute(task)` |
-| `Jury` | Voting consensus | `.decide(return_type, question)` |
-| `GeneratorCritic` | Iterative refinement | `.run(task)` |
-| `CircuitBreaker` | Failure fallback | `.execute(query)` |
-| `Adversarial` | Debate + judge | `.resolve(question)` |
-| `ChainOfResponsibility` | Route to handler | `.process(query)` |
-| `MapReduce` | Fan out + reduce | `.execute(query, chunks)` |
-| `Blackboard` | Shared state | `.solve(query)` |
-| `EventDriven` | Event bus | `.publish(event)` |
+| Pattern                 | Purpose                   | Key Method                       |
+| ----------------------- | ------------------------- | -------------------------------- |
+| `Swarm`                 | Parallel perspectives     | `.execute(query)`                |
+| `Pipeline`              | Sequential stages         | `.run(initial_state)`            |
+| `Hierarchical`          | Coordinator + specialists | `.execute(task)`                 |
+| `Jury`                  | Voting consensus          | `.decide(return_type, question)` |
+| `GeneratorCritic`       | Iterative refinement      | `.run(task)`                     |
+| `CircuitBreaker`        | Failure fallback          | `.execute(query)`                |
+| `Adversarial`           | Debate + judge            | `.resolve(question)`             |
+| `ChainOfResponsibility` | Route to handler          | `.process(query)`                |
+| `MapReduce`             | Fan out + reduce          | `.execute(query, chunks)`        |
+| `Blackboard`            | Shared state              | `.solve(query)`                  |
+| `EventDriven`           | Event bus                 | `.publish(event)`                |
 
 ### Core Infrastructure
 
-| Component | File | Purpose |
-|-----------|------|---------|
-| `CoordinationDB` | `coordination.py` | SQLite tracking |
-| `tracked_spawn` | `tracked_agent.py` | Agent with tracking |
-| `HandoffAtom` | `handoff_atom.py` | Universal handoff format |
-| `BlackboardCache` | `blackboard.py` | Hot tier communication |
-| `MemoryService` | `memory_service.py` | Core + Archival memory |
-| `create_claude_scope` | `claude_scope.py` | Scope with file ops |
+| Component             | File                | Purpose                  |
+| --------------------- | ------------------- | ------------------------ |
+| `CoordinationDB`      | `coordination.py`   | SQLite tracking          |
+| `tracked_spawn`       | `tracked_agent.py`  | Agent with tracking      |
+| `HandoffAtom`         | `handoff_atom.py`   | Universal handoff format |
+| `BlackboardCache`     | `blackboard.py`     | Hot tier communication   |
+| `MemoryService`       | `memory_service.py` | Core + Archival memory   |
+| `create_claude_scope` | `claude_scope.py`   | Scope with file ops      |
 
 ### Primitives
 
-| Primitive | Purpose |
-|-----------|---------|
-| `Consensus` | Voting (MAJORITY, UNANIMOUS, THRESHOLD) |
-| `Aggregator` | Combine results (MERGE, CONCAT, BEST) |
-| `HandoffState` | Structured agent handoff |
-| `build_premise` | Structured premise builder |
-| `gather_fail_fast` | TaskGroup-based parallel execution |
+| Primitive          | Purpose                                 |
+| ------------------ | --------------------------------------- |
+| `Consensus`        | Voting (MAJORITY, UNANIMOUS, THRESHOLD) |
+| `Aggregator`       | Combine results (MERGE, CONCAT, BEST)   |
+| `HandoffState`     | Structured agent handoff                |
+| `build_premise`    | Structured premise builder              |
+| `gather_fail_fast` | TaskGroup-based parallel execution      |
 
 ## Full API Spec
 

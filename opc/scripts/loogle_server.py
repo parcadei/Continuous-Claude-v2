@@ -21,7 +21,7 @@ import os
 import signal
 import subprocess
 import sys
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from threading import Lock
 

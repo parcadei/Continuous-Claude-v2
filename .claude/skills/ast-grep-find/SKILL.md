@@ -18,18 +18,21 @@ Structural code search that understands syntax. Find patterns like function call
 ## Usage
 
 ### Search for a pattern
+
 ```bash
 uv run python -m runtime.harness scripts/ast_grep_find.py \
     --pattern "import asyncio" --language python
 ```
 
 ### Search in specific directory
+
 ```bash
 uv run python -m runtime.harness scripts/ast_grep_find.py \
     --pattern "async def \$FUNC(\$\$\$)" --language python --path "./src"
 ```
 
 ### Refactor/replace pattern
+
 ```bash
 uv run python -m runtime.harness scripts/ast_grep_find.py \
     --pattern "console.log(\$MSG)" --replace "logger.info(\$MSG)" \
@@ -37,6 +40,7 @@ uv run python -m runtime.harness scripts/ast_grep_find.py \
 ```
 
 ### Dry run (preview changes)
+
 ```bash
 uv run python -m runtime.harness scripts/ast_grep_find.py \
     --pattern "print(\$X)" --replace "logger.info(\$X)" \
@@ -45,23 +49,23 @@ uv run python -m runtime.harness scripts/ast_grep_find.py \
 
 ## Parameters
 
-| Parameter | Description |
-|-----------|-------------|
-| `--pattern` | AST pattern to search (required) |
+| Parameter    | Description                                                |
+| ------------ | ---------------------------------------------------------- |
+| `--pattern`  | AST pattern to search (required)                           |
 | `--language` | Language: `python`, `javascript`, `typescript`, `go`, etc. |
-| `--path` | Directory to search (default: `.`) |
-| `--glob` | File glob pattern (e.g., `**/*.py`) |
-| `--replace` | Replacement pattern for refactoring |
-| `--dry-run` | Preview changes without applying |
-| `--context` | Lines of context (default: 2) |
+| `--path`     | Directory to search (default: `.`)                         |
+| `--glob`     | File glob pattern (e.g., `**/*.py`)                        |
+| `--replace`  | Replacement pattern for refactoring                        |
+| `--dry-run`  | Preview changes without applying                           |
+| `--context`  | Lines of context (default: 2)                              |
 
 ## Pattern Syntax
 
-| Syntax | Meaning |
-|--------|---------|
-| `$NAME` | Match single node (variable, expression) |
-| `$$$` | Match multiple nodes (arguments, statements) |
-| `$_` | Match any single node (wildcard) |
+| Syntax  | Meaning                                      |
+| ------- | -------------------------------------------- |
+| `$NAME` | Match single node (variable, expression)     |
+| `$$$`   | Match multiple nodes (arguments, statements) |
+| `$_`    | Match any single node (wildcard)             |
 
 ## Examples
 
@@ -82,10 +86,10 @@ uv run python -m runtime.harness scripts/ast_grep_find.py \
 
 ## vs morph/warpgrep
 
-| Tool | Best For |
-|------|----------|
+| Tool         | Best For                                      |
+| ------------ | --------------------------------------------- |
 | **ast-grep** | Structural patterns (understands code syntax) |
-| **warpgrep** | Fast text/regex search (20x faster grep) |
+| **warpgrep** | Fast text/regex search (20x faster grep)      |
 
 Use ast-grep when you need syntax-aware matching. Use warpgrep for raw speed.
 

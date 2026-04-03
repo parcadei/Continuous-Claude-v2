@@ -38,6 +38,7 @@ If given a path instead of content, read the plan file first.
 ## Step 3: Extract Tech Choices
 
 Identify all technical decisions from the plan:
+
 - Libraries/frameworks chosen
 - Patterns/architectures proposed
 - APIs or external services used
@@ -64,6 +65,7 @@ WebSearch(query="[pattern] deprecated OR recommended 2025")
 ```
 
 Check for:
+
 - Is this still the recommended approach?
 - Are there better alternatives now?
 - Any known deprecations or issues?
@@ -72,11 +74,13 @@ Check for:
 ## Step 6: Write Output
 
 **ALWAYS write your validation to:**
+
 ```
 $CLAUDE_CC_DIR/.claude/cache/agents/validate-agent/output-{timestamp}.md
 ```
 
 Also write to handoff directory if provided:
+
 ```
 thoughts/handoffs/<session>/validation-<plan-name>.md
 ```
@@ -85,37 +89,45 @@ thoughts/handoffs/<session>/validation-<plan-name>.md
 
 ```markdown
 # Plan Validation: [Plan Name]
+
 Generated: [timestamp]
 
 ## Overall Status: [VALIDATED | NEEDS REVIEW]
 
 ## Precedent Check
+
 **Verdict:** [PASS | FAIL | SKIPPED]
 [Findings from RAG-Judge or note if skipped]
 
 ## Tech Choices Validated
 
 ### 1. [Tech Choice]
+
 **Purpose:** [What it's used for]
 **Status:** [VALID | OUTDATED | DEPRECATED | RISKY | UNKNOWN]
 **Findings:** [Research results]
 **Recommendation:** [Keep as-is | Consider alternative | Must change]
 
 ### 2. [Tech Choice]
+
 ...
 
 ## Summary
 
 ### Validated (Safe to Proceed):
+
 - [Choice 1] ✓
 
 ### Needs Review:
+
 - [Choice 2] - [reason]
 
 ### Must Change:
+
 - [Choice 3] - [reason and alternative]
 
 ## Recommendations
+
 [Specific recommendations if issues found]
 ```
 

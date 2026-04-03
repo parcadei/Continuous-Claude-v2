@@ -12,7 +12,6 @@ Use this skill when working on boundary-value-problems problems in odes pdes.
 
 ## Decision Tree
 
-
 1. **Problem Classification**
    - Two-point BVP: conditions at x=a and x=b?
    - Sturm-Liouville: eigenvalue problem?
@@ -25,8 +24,8 @@ Use this skill when working on boundary-value-problems problems in odes pdes.
    - `scipy.integrate.solve_ivp` + root finding
 
 3. **Finite Difference Method**
-   - Discretize domain: x_i = a + i*h
-   - Replace derivatives with differences: y'' ~ (y_{i+1} - 2y_i + y_{i-1})/h^2
+   - Discretize domain: x_i = a + i\*h
+   - Replace derivatives with differences: y'' ~ (y*{i+1} - 2y_i + y*{i-1})/h^2
    - Solve resulting linear system
    - `sympy_compute.py linsolve "tridiagonal_matrix" "boundary_vector"`
 
@@ -41,27 +40,29 @@ Use this skill when working on boundary-value-problems problems in odes pdes.
    - Eigenfunctions orthogonal with weight w
    - `sympy_compute.py eigenvalues "sturm_liouville_matrix"`
 
-
 ## Tool Commands
 
 ### Scipy_Solve_Bvp
+
 ```bash
 uv run python -c "from scipy.integrate import solve_bvp; import numpy as np; ode = lambda x, y: [y[1], -y[0]]; bc = lambda ya, yb: [ya[0], yb[0]-1]; x = np.linspace(0, np.pi, 10); y = np.zeros((2, 10)); sol = solve_bvp(ode, bc, x, y); print('Solution at pi/2:', sol.sol(np.pi/2)[0])"
 ```
 
 ### Sympy_Linsolve
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py linsolve "tridiagonal_matrix" "boundary_vector"
 ```
 
 ### Z3_Sturm_Liouville
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "eigenvalue_real"
 ```
 
 ## Key Techniques
 
-*From indexed textbooks:*
+_From indexed textbooks:_
 
 - [Elementary Differential Equations and... (Z-Library)] Boundary Value Problems and Partial Differential Equations (6th ed. Boston: Academic August 7, 2012 21:05 c10 Sheet number 88 Page number 676 cyan black August 7, 2012 21:05 c11 Sheet number 1 Page number 677 cyan black C H A P T E R Boundary Value Problems and Sturm–Liouville Theory As a result of separating variables in a partial differential equation in Chapter 10, we repeatedly encountered the differential equation X + λX = 0, 0 < x < L with the boundary conditions X (0) = 0, X (L) = 0. This boundary value problem is the prototype of a large class of problems that are important in applied mathematics.
 - [Elementary Differential Equations and... (Z-Library)] Nonhomogeneous Boundary Value Problems In this section we discuss how to solve nonhomogeneous boundary value problems for both ordinary and partial differential equations. Most of our attention is directed toward problems in which the differential equation alone is nonhomogeneous, while the boundary conditions are homogeneous. We assume that the solution can be expanded in a series of eigenfunctions of a related homogeneous problem, and then we determine the coefcients in this series so that the nonhomogeneous problem is satised.

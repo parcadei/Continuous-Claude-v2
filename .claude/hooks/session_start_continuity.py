@@ -731,7 +731,7 @@ def main() -> None:
                 session_name = most_recent["session_name"]
                 current_focus = most_recent["now"]
                 handoff_filename = most_recent["handoff_path"].name
-                is_yaml = most_recent["is_yaml"]
+                most_recent["is_yaml"]
 
                 if session_type == "startup":
                     # Fresh startup: brief notification

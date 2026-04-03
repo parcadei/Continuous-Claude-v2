@@ -15,18 +15,18 @@
  * - CLAUDE_PROJECT_DIR: Project directory for DB path
  */
 
-import { existsSync } from 'fs';
+import { existsSync } from "fs";
 
 // Import shared utilities
-import { getDbPath, runPythonQuery, isValidId } from '../shared/db-utils.js';
+import { getDbPath, runPythonQuery, isValidId } from "../shared/db-utils.js";
 import type {
   SubagentStartInput,
   SubagentStopInput,
   PreToolUseInput,
   PostToolUseInput,
   StopInput,
-  HookOutput
-} from '../shared/types.js';
+  HookOutput,
+} from "../shared/types.js";
 
 // Re-export types for convenience
 export type {
@@ -35,7 +35,7 @@ export type {
   PreToolUseInput,
   PostToolUseInput,
   StopInput,
-  HookOutput
+  HookOutput,
 };
 
 // =============================================================================
@@ -47,54 +47,66 @@ export type {
  * Injects specialist role and readable/writable keys context.
  * Always returns 'continue' - never blocks agent start.
  */
-export async function onSubagentStart(input: SubagentStartInput): Promise<HookOutput> {
+export async function onSubagentStart(
+  input: SubagentStartInput,
+): Promise<HookOutput> {
   const blackboardId = process.env.BLACKBOARD_ID;
 
   // If no BLACKBOARD_ID, continue silently (not in a blackboard)
   if (!blackboardId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate BLACKBOARD_ID format
   if (!isValidId(blackboardId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const role = process.env.AGENT_ROLE || 'specialist';
-  const writesTo = process.env.BLACKBOARD_WRITES_TO || '';
-  const readsFrom = process.env.BLACKBOARD_READS_FROM || '';
+  const role = process.env.AGENT_ROLE || "specialist";
+  const writesTo = process.env.BLACKBOARD_WRITES_TO || "";
+  const readsFrom = process.env.BLACKBOARD_READS_FROM || "";
 
   // Log for debugging - this goes to stderr, not stdout
   console.error(`[blackboard] ${role} starting for blackboard ${blackboardId}`);
 
   // Build context message based on role
-  let message = '';
+  let message = "";
 
-  if (role === 'controller') {
-    message = 'You are the controller for this blackboard pattern.';
-    message += ' Review the final blackboard state and determine if the solution is complete and coherent.';
-    message += ' Approve only when all required information is present and consistent.';
+  if (role === "controller") {
+    message = "You are the controller for this blackboard pattern.";
+    message +=
+      " Review the final blackboard state and determine if the solution is complete and coherent.";
+    message +=
+      " Approve only when all required information is present and consistent.";
   } else {
     // Specialist role
     message = `You are a specialist in the blackboard pattern.`;
 
     if (writesTo) {
-      const keys = writesTo.split(',').map(k => k.trim()).filter(k => k);
-      message += `\n\nYou are responsible for writing to these blackboard keys: ${keys.join(', ')}`;
+      const keys = writesTo
+        .split(",")
+        .map((k) => k.trim())
+        .filter((k) => k);
+      message += `\n\nYou are responsible for writing to these blackboard keys: ${keys.join(", ")}`;
     }
 
     if (readsFrom) {
-      const keys = readsFrom.split(',').map(k => k.trim()).filter(k => k);
-      message += `\n\nYou may read from these blackboard keys: ${keys.join(', ')}`;
+      const keys = readsFrom
+        .split(",")
+        .map((k) => k.trim())
+        .filter((k) => k);
+      message += `\n\nYou may read from these blackboard keys: ${keys.join(", ")}`;
     }
 
-    message += '\n\nProvide your contribution based on the current blackboard state.';
-    message += ' Focus on your assigned keys and build upon work from other specialists.';
+    message +=
+      "\n\nProvide your contribution based on the current blackboard state.";
+    message +=
+      " Focus on your assigned keys and build upon work from other specialists.";
   }
 
   return {
-    result: 'continue',
-    message
+    result: "continue",
+    message,
   };
 }
 
@@ -106,31 +118,33 @@ export async function onSubagentStart(input: SubagentStartInput): Promise<HookOu
  * Handles SubagentStop hook for blackboard pattern.
  * Records specialist contribution to database.
  */
-export async function onSubagentStop(input: SubagentStopInput): Promise<HookOutput> {
+export async function onSubagentStop(
+  input: SubagentStopInput,
+): Promise<HookOutput> {
   const blackboardId = process.env.BLACKBOARD_ID;
 
   // If no BLACKBOARD_ID, continue silently
   if (!blackboardId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate BLACKBOARD_ID format
   if (!isValidId(blackboardId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const agentId = input.agent_id ?? 'unknown';
+  const agentId = input.agent_id ?? "unknown";
 
   // Validate agent_id format
   if (!isValidId(agentId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const role = process.env.AGENT_ROLE || 'specialist';
+  const role = process.env.AGENT_ROLE || "specialist";
   const dbPath = getDbPath();
 
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
@@ -177,17 +191,17 @@ conn.close()
     const result = runPythonQuery(query, [dbPath, blackboardId, agentId, role]);
 
     if (!result.success) {
-      console.error('SubagentStop Python error:', result.stderr);
-      return { result: 'continue' };
+      console.error("SubagentStop Python error:", result.stderr);
+      return { result: "continue" };
     }
 
     // Log for debugging
     console.error(`[blackboard] ${role} ${agentId} completed contribution`);
 
-    return { result: 'continue' };
+    return { result: "continue" };
   } catch (err) {
-    console.error('SubagentStop hook error:', err);
-    return { result: 'continue' };
+    console.error("SubagentStop hook error:", err);
+    return { result: "continue" };
   }
 }
 
@@ -200,42 +214,47 @@ conn.close()
  * Injects current blackboard state for specialists to read.
  * Controller does not receive state injection.
  */
-export async function onPreToolUse(input: PreToolUseInput): Promise<HookOutput> {
+export async function onPreToolUse(
+  input: PreToolUseInput,
+): Promise<HookOutput> {
   const blackboardId = process.env.BLACKBOARD_ID;
 
   // If no BLACKBOARD_ID, continue silently
   if (!blackboardId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate BLACKBOARD_ID format
   if (!isValidId(blackboardId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const role = process.env.AGENT_ROLE || 'specialist';
+  const role = process.env.AGENT_ROLE || "specialist";
 
   // Only inject state for specialists
-  if (role !== 'specialist') {
-    return { result: 'continue' };
+  if (role !== "specialist") {
+    return { result: "continue" };
   }
 
-  const readsFrom = process.env.BLACKBOARD_READS_FROM || '';
+  const readsFrom = process.env.BLACKBOARD_READS_FROM || "";
 
   // If specialist doesn't read from any keys, no injection needed
   if (!readsFrom) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   const dbPath = getDbPath();
 
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
     // Fetch current blackboard state for keys this specialist reads from
-    const keys = readsFrom.split(',').map(k => k.trim()).filter(k => k);
+    const keys = readsFrom
+      .split(",")
+      .map((k) => k.trim())
+      .filter((k) => k);
 
     const query = `
 import sqlite3
@@ -269,11 +288,15 @@ conn.close()
 print(json.dumps(state))
 `;
 
-    const result = runPythonQuery(query, [dbPath, blackboardId, JSON.stringify(keys)]);
+    const result = runPythonQuery(query, [
+      dbPath,
+      blackboardId,
+      JSON.stringify(keys),
+    ]);
 
     if (!result.success) {
-      console.error('PreToolUse Python error:', result.stderr);
-      return { result: 'continue' };
+      console.error("PreToolUse Python error:", result.stderr);
+      return { result: "continue" };
     }
 
     // Parse Python output
@@ -281,28 +304,28 @@ print(json.dumps(state))
     try {
       state = JSON.parse(result.stdout);
     } catch (parseErr) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // If no state found, continue without injection
     if (Object.keys(state).length === 0) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // Build state injection message
-    let message = 'CURRENT BLACKBOARD STATE:\n\n';
+    let message = "CURRENT BLACKBOARD STATE:\n\n";
     for (const [key, data] of Object.entries(state)) {
       message += `${key}: ${data.value}\n`;
       message += `  (contributed by: ${data.updated_by})\n\n`;
     }
 
     return {
-      result: 'continue',
-      message
+      result: "continue",
+      message,
     };
   } catch (err) {
-    console.error('PreToolUse hook error:', err);
-    return { result: 'continue' };
+    console.error("PreToolUse hook error:", err);
+    return { result: "continue" };
   }
 }
 
@@ -324,12 +347,14 @@ const VALID_KEY_PATTERN = /^[a-zA-Z0-9_-]+$/;
  * @returns Key name if valid blackboard path, null otherwise
  */
 function extractBlackboardKey(filePath: string): string | null {
-  if (!filePath || typeof filePath !== 'string') {
+  if (!filePath || typeof filePath !== "string") {
     return null;
   }
 
   // Check if path contains /blackboard/
-  const blackboardMatch = filePath.match(/\/blackboard\/([^\/]+?)(?:\.[^\/]*)?$/);
+  const blackboardMatch = filePath.match(
+    /\/blackboard\/([^\/]+?)(?:\.[^\/]*)?$/,
+  );
   if (!blackboardMatch) {
     return null;
   }
@@ -355,65 +380,74 @@ function extractBlackboardKey(filePath: string): string | null {
  * - Validates input format for security (no injection attacks)
  * - Records changes to blackboard_state table
  */
-export async function onPostToolUse(input: PostToolUseInput): Promise<HookOutput> {
+export async function onPostToolUse(
+  input: PostToolUseInput,
+): Promise<HookOutput> {
   const blackboardId = process.env.BLACKBOARD_ID;
 
   // If no BLACKBOARD_ID, continue silently (not in a blackboard)
   if (!blackboardId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate BLACKBOARD_ID format
   if (!isValidId(blackboardId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Only process Write tool calls
-  if (input.tool_name !== 'Write') {
-    return { result: 'continue' };
+  if (input.tool_name !== "Write") {
+    return { result: "continue" };
   }
 
   // Controller role bypasses write tracking
-  const role = process.env.AGENT_ROLE || 'specialist';
-  if (role === 'controller') {
-    return { result: 'continue' };
+  const role = process.env.AGENT_ROLE || "specialist";
+  if (role === "controller") {
+    return { result: "continue" };
   }
 
   // Extract file path from tool input
-  const toolInput = input.tool_input as { file_path?: string; content?: string } | undefined;
-  if (!toolInput || typeof toolInput.file_path !== 'string') {
-    return { result: 'continue' };
+  const toolInput = input.tool_input as
+    | { file_path?: string; content?: string }
+    | undefined;
+  if (!toolInput || typeof toolInput.file_path !== "string") {
+    return { result: "continue" };
   }
 
   // Extract and validate blackboard key from file path
   const key = extractBlackboardKey(toolInput.file_path);
   if (!key) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate write permissions
-  const writesTo = process.env.BLACKBOARD_WRITES_TO || '';
-  const allowedKeys = writesTo.split(',').map(k => k.trim()).filter(k => k);
+  const writesTo = process.env.BLACKBOARD_WRITES_TO || "";
+  const allowedKeys = writesTo
+    .split(",")
+    .map((k) => k.trim())
+    .filter((k) => k);
 
   if (allowedKeys.length > 0 && !allowedKeys.includes(key)) {
     // Key not in allowed list - don't record
-    console.error(`[blackboard] Write to key '${key}' not allowed. Allowed: ${allowedKeys.join(', ')}`);
-    return { result: 'continue' };
+    console.error(
+      `[blackboard] Write to key '${key}' not allowed. Allowed: ${allowedKeys.join(", ")}`,
+    );
+    return { result: "continue" };
   }
 
   // Get agent ID
-  const agentId = process.env.AGENT_ID || 'unknown';
+  const agentId = process.env.AGENT_ID || "unknown";
   if (!isValidId(agentId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Get content value
-  const value = typeof toolInput.content === 'string' ? toolInput.content : '';
+  const value = typeof toolInput.content === "string" ? toolInput.content : "";
 
   // Check if DB exists
   const dbPath = getDbPath();
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
@@ -457,20 +491,26 @@ conn.commit()
 conn.close()
 `;
 
-    const result = runPythonQuery(query, [dbPath, blackboardId, key, value, agentId]);
+    const result = runPythonQuery(query, [
+      dbPath,
+      blackboardId,
+      key,
+      value,
+      agentId,
+    ]);
 
     if (!result.success) {
-      console.error('[blackboard] PostToolUse Python error:', result.stderr);
-      return { result: 'continue' };
+      console.error("[blackboard] PostToolUse Python error:", result.stderr);
+      return { result: "continue" };
     }
 
     // Log for debugging
     console.error(`[blackboard] Recorded write to key '${key}' by ${agentId}`);
 
-    return { result: 'continue' };
+    return { result: "continue" };
   } catch (err) {
-    console.error('[blackboard] PostToolUse hook error:', err);
-    return { result: 'continue' };
+    console.error("[blackboard] PostToolUse hook error:", err);
+    return { result: "continue" };
   }
 }
 
@@ -485,31 +525,31 @@ conn.close()
 export async function onStop(input: StopInput): Promise<HookOutput> {
   // Prevent infinite loops - if we're already in a stop hook, continue
   if (input.stop_hook_active) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   const blackboardId = process.env.BLACKBOARD_ID;
 
   if (!blackboardId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate BLACKBOARD_ID format
   if (!isValidId(blackboardId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const role = process.env.AGENT_ROLE || 'specialist';
+  const role = process.env.AGENT_ROLE || "specialist";
 
   // Only controller gets approval notification
-  if (role !== 'controller') {
-    return { result: 'continue' };
+  if (role !== "controller") {
+    return { result: "continue" };
   }
 
   const dbPath = getDbPath();
 
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
@@ -550,7 +590,7 @@ print(json.dumps(state))
     const result = runPythonQuery(query, [dbPath, blackboardId]);
 
     if (!result.success) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // Parse Python output
@@ -558,18 +598,19 @@ print(json.dumps(state))
     try {
       state = JSON.parse(result.stdout);
     } catch (parseErr) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // Build approval notification
-    let message = 'BLACKBOARD PATTERN COMPLETION:\n\n';
-    message += 'All specialists have completed their contributions.\n';
-    message += 'Review the final blackboard state below and determine if the solution is complete and coherent.\n\n';
+    let message = "BLACKBOARD PATTERN COMPLETION:\n\n";
+    message += "All specialists have completed their contributions.\n";
+    message +=
+      "Review the final blackboard state below and determine if the solution is complete and coherent.\n\n";
 
     if (state.length === 0) {
-      message += '(No state contributed yet)\n';
+      message += "(No state contributed yet)\n";
     } else {
-      message += 'FINAL STATE:\n';
+      message += "FINAL STATE:\n";
       for (const item of state) {
         message += `\n${item.key}: ${item.value}`;
         message += `\n  (contributed by: ${item.updated_by})\n`;
@@ -577,11 +618,11 @@ print(json.dumps(state))
     }
 
     return {
-      result: 'continue',
-      message
+      result: "continue",
+      message,
     };
   } catch (err) {
-    console.error('Stop hook error:', err);
-    return { result: 'continue' };
+    console.error("Stop hook error:", err);
+    return { result: "continue" };
   }
 }

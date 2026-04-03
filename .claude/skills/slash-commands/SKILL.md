@@ -19,23 +19,24 @@ Create and use user-triggered prompts with `/command-name` syntax.
 
 ## Built-in Commands
 
-| Command | Purpose |
-|---------|---------|
-| `/clear` | Clear conversation history |
+| Command    | Purpose                         |
+| ---------- | ------------------------------- |
+| `/clear`   | Clear conversation history      |
 | `/compact` | Compact conversation with focus |
-| `/config` | Open settings interface |
-| `/cost` | Show token usage |
-| `/agents` | Manage sub-agents |
-| `/mcp` | Manage MCP servers |
-| `/memory` | Edit CLAUDE.md files |
-| `/model` | Select AI model |
-| `/review` | Request code review |
-| `/resume` | Resume session |
-| `/help` | Get usage help |
+| `/config`  | Open settings interface         |
+| `/cost`    | Show token usage                |
+| `/agents`  | Manage sub-agents               |
+| `/mcp`     | Manage MCP servers              |
+| `/memory`  | Edit CLAUDE.md files            |
+| `/model`   | Select AI model                 |
+| `/review`  | Request code review             |
+| `/resume`  | Resume session                  |
+| `/help`    | Get usage help                  |
 
 ## Creating Commands
 
 ### Project Commands
+
 ```bash
 mkdir -p .claude/commands
 cat > .claude/commands/optimize.md << 'EOF'
@@ -51,6 +52,7 @@ EOF
 ```
 
 ### Personal Commands
+
 ```bash
 mkdir -p ~/.claude/commands
 cat > ~/.claude/commands/review.md << 'EOF'
@@ -70,10 +72,9 @@ EOF
 ```yaml
 ---
 description: Brief description for /help
-allowed-tools: [Bash, Read, Write]  # Optional
-argument-hint: "[file] [type]"       # Optional
+allowed-tools: [Bash, Read, Write] # Optional
+argument-hint: "[file] [type]" # Optional
 ---
-
 Your markdown instructions here.
 Use $1, $2 for arguments or $ARGUMENTS for all.
 ```
@@ -96,6 +97,7 @@ Based on these changes, suggest a commit message.
 ```
 
 **Rules:**
+
 - Must declare `allowed-tools: Bash(...)` in frontmatter
 - Use backticks: `` !`command` ``
 - Output is included in Claude's context
@@ -108,10 +110,11 @@ Include files with `@` prefix:
 Review against @.claude/STYLE_GUIDE.md
 
 Compare:
+
 - @src/old.js
 - @src/new.js
 
-Refactor files matching @src/**/*.util.ts
+Refactor files matching @src/\*_/_.util.ts
 ```
 
 ## Arguments
@@ -128,6 +131,7 @@ Fix issue #$ARGUMENTS
 ```
 
 **Usage:**
+
 ```bash
 /review-pr 456 high
 # $1 = "456", $2 = "high"
@@ -157,11 +161,11 @@ MCP servers expose prompts as commands:
 
 ## Slash Commands vs Skills
 
-| Aspect | Slash Commands | Skills |
-|--------|----------------|--------|
-| Invocation | Explicit: `/command` | Auto-discovered |
-| Files | Single .md file | Directory with SKILL.md |
-| Use Case | Quick prompts | Complex workflows |
+| Aspect     | Slash Commands       | Skills                  |
+| ---------- | -------------------- | ----------------------- |
+| Invocation | Explicit: `/command` | Auto-discovered         |
+| Files      | Single .md file      | Directory with SKILL.md |
+| Use Case   | Quick prompts        | Complex workflows       |
 
 **Use slash commands for:** Frequently typed prompts, simple templates
 **Use skills for:** Complex workflows, multiple files, auto-discovery

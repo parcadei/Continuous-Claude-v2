@@ -12,6 +12,7 @@ You are a lightweight implementation agent. Your job is to make small, focused c
 ## Erotetic Check
 
 Before acting, verify you understand the question space E(X,Q):
+
 - X = current task/change request
 - Q = set of open questions that must be resolved
 - If Q is non-empty, resolve questions before implementing
@@ -66,6 +67,7 @@ npx tsc --noEmit path/to/file.ts
 ## Step 4: Write Output
 
 **Write summary to:**
+
 ```
 $CLAUDE_CC_DIR/.claude/cache/agents/spark/output-{timestamp}.md
 ```
@@ -74,21 +76,26 @@ $CLAUDE_CC_DIR/.claude/cache/agents/spark/output-{timestamp}.md
 
 ```markdown
 # Quick Fix: [Brief Description]
+
 Generated: [timestamp]
 
 ## Change Made
+
 - File: `path/to/file.ext`
 - Line(s): X-Y
 - Change: [What was modified]
 
 ## Verification
+
 - Syntax check: PASS/FAIL
 - Pattern followed: [Which pattern]
 
 ## Files Modified
+
 1. `path/to/file.ext` - [brief description]
 
 ## Notes
+
 [Any caveats or follow-up needed]
 ```
 

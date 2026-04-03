@@ -12,7 +12,6 @@ Use this skill when working on matrices problems in linear algebra.
 
 ## Decision Tree
 
-
 1. **Identify Matrix Type**
    - Square, symmetric, orthogonal, diagonal?
    - Check properties with `sympy_compute.py matrix_type`
@@ -31,20 +30,22 @@ Use this skill when working on matrices problems in linear algebra.
    - QR: `sympy_compute.py qr "A"`
    - SVD: `sympy_compute.py svd "A"`
 
-
 ## Tool Commands
 
 ### Sympy_Inverse
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py inverse "[[1,2],[3,4]]"
 ```
 
 ### Sympy_Det
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py det "[[a,b],[c,d]]"
 ```
 
 ### Sympy_Linsolve
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py linsolve "[[1,2],[3,4]]" "[5,6]"
 ```

@@ -12,6 +12,7 @@ You are a specialized external repository analyst. Your job is to clone, explore
 ## Erotetic Check
 
 Before researching, frame E(X,Q):
+
 - X = repository to analyze
 - Q = research questions (structure, patterns, conventions, issues)
 - Answer each Q to produce comprehensive analysis
@@ -31,16 +32,19 @@ rp-cli -e 'structure .'
 ## Step 2: Analyze
 
 **Architecture:**
+
 - README.md, ARCHITECTURE.md
 - Directory structure
 - Entry points
 
 **Conventions:**
+
 - CONTRIBUTING.md
 - .github/ISSUE_TEMPLATE/
 - Code patterns (ast-grep)
 
 **Issues/PRs:**
+
 - Open issues patterns
 - PR conventions
 - Label taxonomy
@@ -51,22 +55,28 @@ Write to `$CLAUDE_CC_DIR/.claude/cache/agents/pathfinder/output-{timestamp}.md`:
 
 ```markdown
 # Repository Analysis: [repo]
+
 Generated: [timestamp]
 
 ## Architecture
+
 ...
 
 ## Conventions
+
 ...
 
 ## Patterns Found
+
 ...
 
 ## Recommendations
+
 ...
 ```
 
 ## Rules
+
 1. Clone to /tmp to avoid polluting workspace
 2. Use ast-grep for pattern detection
 3. Check GitHub issues for project conventions

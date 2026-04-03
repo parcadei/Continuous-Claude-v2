@@ -14,7 +14,7 @@
  *   const results = client.searchSimilar('find TypeScript hooks');
  *   client.store('User prefers async/await', { type: 'preference' });
  */
-import { spawnSync } from 'child_process';
+import { spawnSync } from "child_process";
 /**
  * Memory client that calls Python memory service via subprocess.
  *
@@ -26,98 +26,91 @@ import { spawnSync } from 'child_process';
  * Falls back gracefully when database is unavailable.
  */
 export class MemoryClient {
-    sessionId;
-    agentId;
-    timeoutMs;
-    projectDir;
-    constructor(options = {}) {
-        this.sessionId = options.sessionId || 'default';
-        this.agentId = options.agentId || null;
-        this.timeoutMs = options.timeoutMs || 5000;
-        this.projectDir = options.projectDir ||
-            process.env.CLAUDE_PROJECT_DIR ||
-            process.cwd();
+  sessionId;
+  agentId;
+  timeoutMs;
+  projectDir;
+  constructor(options = {}) {
+    this.sessionId = options.sessionId || "default";
+    this.agentId = options.agentId || null;
+    this.timeoutMs = options.timeoutMs || 5000;
+    this.projectDir =
+      options.projectDir || process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  }
+  /**
+   * Search for similar content in memory.
+   *
+   * Uses the Python memory service's search functionality.
+   * Returns empty array on any error (graceful fallback).
+   *
+   * @param query - Natural language search query
+   * @param limit - Maximum number of results (default: 5)
+   * @returns Array of matching results sorted by relevance
+   */
+  searchSimilar(query, limit = 5) {
+    if (!query || !query.trim()) {
+      return [];
     }
-    /**
-     * Search for similar content in memory.
-     *
-     * Uses the Python memory service's search functionality.
-     * Returns empty array on any error (graceful fallback).
-     *
-     * @param query - Natural language search query
-     * @param limit - Maximum number of results (default: 5)
-     * @returns Array of matching results sorted by relevance
-     */
-    searchSimilar(query, limit = 5) {
-        if (!query || !query.trim()) {
-            return [];
-        }
-        const pythonScript = this.buildSearchScript();
-        const args = [query, String(limit), this.sessionId];
-        if (this.agentId) {
-            args.push(this.agentId);
-        }
-        const result = this.runPython(pythonScript, args);
-        if (!result.success) {
-            // Log error for debugging but don't crash
-            if (process.env.DEBUG) {
-                console.error('Memory search failed:', result.stderr);
-            }
-            return [];
-        }
-        try {
-            const parsed = JSON.parse(result.stdout);
-            if (!Array.isArray(parsed)) {
-                return [];
-            }
-            return parsed.map(this.normalizeResult);
-        }
-        catch {
-            return [];
-        }
+    const pythonScript = this.buildSearchScript();
+    const args = [query, String(limit), this.sessionId];
+    if (this.agentId) {
+      args.push(this.agentId);
     }
-    /**
-     * Store content in memory.
-     *
-     * @param content - The content to store
-     * @param metadata - Optional metadata to attach
-     * @returns Memory ID if successful, null on failure
-     */
-    store(content, metadata = {}) {
-        if (!content || !content.trim()) {
-            return null;
-        }
-        const pythonScript = this.buildStoreScript();
-        const args = [
-            content,
-            JSON.stringify(metadata),
-            this.sessionId,
-        ];
-        if (this.agentId) {
-            args.push(this.agentId);
-        }
-        const result = this.runPython(pythonScript, args);
-        if (!result.success) {
-            if (process.env.DEBUG) {
-                console.error('Memory store failed:', result.stderr);
-            }
-            return null;
-        }
-        try {
-            const parsed = JSON.parse(result.stdout);
-            return parsed.id || null;
-        }
-        catch {
-            return null;
-        }
+    const result = this.runPython(pythonScript, args);
+    if (!result.success) {
+      // Log error for debugging but don't crash
+      if (process.env.DEBUG) {
+        console.error("Memory search failed:", result.stderr);
+      }
+      return [];
     }
-    /**
-     * Check if memory service is available.
-     *
-     * @returns true if memory service is reachable
-     */
-    isAvailable() {
-        const pythonScript = `
+    try {
+      const parsed = JSON.parse(result.stdout);
+      if (!Array.isArray(parsed)) {
+        return [];
+      }
+      return parsed.map(this.normalizeResult);
+    } catch {
+      return [];
+    }
+  }
+  /**
+   * Store content in memory.
+   *
+   * @param content - The content to store
+   * @param metadata - Optional metadata to attach
+   * @returns Memory ID if successful, null on failure
+   */
+  store(content, metadata = {}) {
+    if (!content || !content.trim()) {
+      return null;
+    }
+    const pythonScript = this.buildStoreScript();
+    const args = [content, JSON.stringify(metadata), this.sessionId];
+    if (this.agentId) {
+      args.push(this.agentId);
+    }
+    const result = this.runPython(pythonScript, args);
+    if (!result.success) {
+      if (process.env.DEBUG) {
+        console.error("Memory store failed:", result.stderr);
+      }
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(result.stdout);
+      return parsed.id || null;
+    } catch {
+      return null;
+    }
+  }
+  /**
+   * Check if memory service is available.
+   *
+   * @returns true if memory service is reachable
+   */
+  isAvailable() {
+    const pythonScript = `
 import json
 import sys
 try:
@@ -127,23 +120,22 @@ try:
 except Exception as e:
     print(json.dumps({"available": False, "error": str(e)}))
 `;
-        const result = this.runPython(pythonScript, []);
-        if (!result.success) {
-            return false;
-        }
-        try {
-            const parsed = JSON.parse(result.stdout);
-            return parsed.available === true;
-        }
-        catch {
-            return false;
-        }
+    const result = this.runPython(pythonScript, []);
+    if (!result.success) {
+      return false;
     }
-    /**
-     * Build Python script for memory search.
-     */
-    buildSearchScript() {
-        return `
+    try {
+      const parsed = JSON.parse(result.stdout);
+      return parsed.available === true;
+    } catch {
+      return false;
+    }
+  }
+  /**
+   * Build Python script for memory search.
+   */
+  buildSearchScript() {
+    return `
 import json
 import sys
 import asyncio
@@ -188,12 +180,12 @@ async def search():
 
 asyncio.run(search())
 `;
-    }
-    /**
-     * Build Python script for memory store.
-     */
-    buildStoreScript() {
-        return `
+  }
+  /**
+   * Build Python script for memory store.
+   */
+  buildStoreScript() {
+    return `
 import json
 import sys
 import asyncio
@@ -226,46 +218,45 @@ async def store():
 
 asyncio.run(store())
 `;
+  }
+  /**
+   * Execute Python script via subprocess.
+   */
+  runPython(script, args) {
+    try {
+      const result = spawnSync("python3", ["-c", script, ...args], {
+        encoding: "utf-8",
+        maxBuffer: 1024 * 1024,
+        timeout: this.timeoutMs,
+        cwd: this.projectDir,
+        env: {
+          ...process.env,
+          CLAUDE_PROJECT_DIR: this.projectDir,
+        },
+      });
+      return {
+        success: result.status === 0,
+        stdout: result.stdout?.trim() || "",
+        stderr: result.stderr || "",
+      };
+    } catch (err) {
+      return {
+        success: false,
+        stdout: "",
+        stderr: String(err),
+      };
     }
-    /**
-     * Execute Python script via subprocess.
-     */
-    runPython(script, args) {
-        try {
-            const result = spawnSync('python3', ['-c', script, ...args], {
-                encoding: 'utf-8',
-                maxBuffer: 1024 * 1024,
-                timeout: this.timeoutMs,
-                cwd: this.projectDir,
-                env: {
-                    ...process.env,
-                    CLAUDE_PROJECT_DIR: this.projectDir,
-                },
-            });
-            return {
-                success: result.status === 0,
-                stdout: result.stdout?.trim() || '',
-                stderr: result.stderr || '',
-            };
-        }
-        catch (err) {
-            return {
-                success: false,
-                stdout: '',
-                stderr: String(err),
-            };
-        }
-    }
-    /**
-     * Normalize a search result to the standard interface.
-     */
-    normalizeResult(raw) {
-        return {
-            content: String(raw.content || ''),
-            similarity: typeof raw.similarity === 'number' ? raw.similarity : 0,
-            metadata: raw.metadata || {},
-        };
-    }
+  }
+  /**
+   * Normalize a search result to the standard interface.
+   */
+  normalizeResult(raw) {
+    return {
+      content: String(raw.content || ""),
+      similarity: typeof raw.similarity === "number" ? raw.similarity : 0,
+      metadata: raw.metadata || {},
+    };
+  }
 }
 /**
  * Convenience function to search memory.
@@ -278,8 +269,8 @@ asyncio.run(store())
  * @returns Array of matching results
  */
 export function searchMemory(query, limit = 5, options = {}) {
-    const client = new MemoryClient(options);
-    return client.searchSimilar(query, limit);
+  const client = new MemoryClient(options);
+  return client.searchSimilar(query, limit);
 }
 /**
  * Convenience function to store in memory.
@@ -292,8 +283,8 @@ export function searchMemory(query, limit = 5, options = {}) {
  * @returns Memory ID or null on failure
  */
 export function storeMemory(content, metadata = {}, options = {}) {
-    const client = new MemoryClient(options);
-    return client.store(content, metadata);
+  const client = new MemoryClient(options);
+  return client.store(content, metadata);
 }
 /**
  * Check if memory service is available.
@@ -302,8 +293,8 @@ export function storeMemory(content, metadata = {}, options = {}) {
  * @returns true if available
  */
 export function isMemoryAvailable(options = {}) {
-    const client = new MemoryClient(options);
-    return client.isAvailable();
+  const client = new MemoryClient(options);
+  return client.isAvailable();
 }
 /**
  * Track usage of a skill or memory match.
@@ -320,17 +311,17 @@ export function isMemoryAvailable(options = {}) {
  * @returns Memory ID if successful, null on failure
  */
 export function trackUsage(record, options = {}) {
-    const content = `Skill usage: ${record.skillName || 'unknown'} via ${record.source} (confidence: ${record.confidence.toFixed(2)})`;
-    const metadata = {
-        type: 'skill_usage',
-        usageType: record.type,
-        skillName: record.skillName,
-        source: record.source,
-        confidence: record.confidence,
-        timestamp: record.timestamp,
-        sessionId: record.sessionId,
-    };
-    return storeMemory(content, metadata, options);
+  const content = `Skill usage: ${record.skillName || "unknown"} via ${record.source} (confidence: ${record.confidence.toFixed(2)})`;
+  const metadata = {
+    type: "skill_usage",
+    usageType: record.type,
+    skillName: record.skillName,
+    source: record.source,
+    confidence: record.confidence,
+    timestamp: record.timestamp,
+    sessionId: record.sessionId,
+  };
+  return storeMemory(content, metadata, options);
 }
 /**
  * Record that a skill match was used successfully.
@@ -345,14 +336,20 @@ export function trackUsage(record, options = {}) {
  * @param options - Client options
  * @returns Memory ID if successful, null on failure
  */
-export function recordSkillUsage(skillName, source, confidence, sessionId, options = {}) {
-    const record = {
-        type: 'skill_match',
-        skillName,
-        source,
-        confidence,
-        timestamp: new Date().toISOString(),
-        sessionId,
-    };
-    return trackUsage(record, options);
+export function recordSkillUsage(
+  skillName,
+  source,
+  confidence,
+  sessionId,
+  options = {},
+) {
+  const record = {
+    type: "skill_match",
+    skillName,
+    source,
+    confidence,
+    timestamp: new Date().toISOString(),
+    sessionId,
+  };
+  return trackUsage(record, options);
 }

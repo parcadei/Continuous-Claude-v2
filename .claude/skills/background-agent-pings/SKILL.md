@@ -15,6 +15,7 @@ This skill is invoked when managing background agents. Not user-invocable direct
 ## Pattern
 
 When you launch a background agent, **continue working on other tasks**. The system will notify you via reminders when:
+
 - Agent makes progress: `Agent <id> progress: X new tools used, Y new tokens`
 - Agent writes output file (check the path you specified)
 

@@ -26,9 +26,9 @@ import argparse
 import json
 import re
 import sys
-from dataclasses import dataclass
-from typing import Any, Optional
 from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Any
 
 # =============================================================================
 # Route Configuration
@@ -1690,19 +1690,19 @@ def _extract_arg_names_from_args_kwarg(args_value) -> list[str]:
     arg_names: list[str] = []
     if not isinstance(args_value, ast.List):
         return arg_names
-    
+
     for elt in args_value.elts:
         if not isinstance(elt, ast.Dict):
             continue
         for key, val in zip(elt.keys, elt.values):
-            if (key is not None 
-                and isinstance(key, ast.Constant) 
+            if (key is not None
+                and isinstance(key, ast.Constant)
                 and key.value == "name"
                 and isinstance(val, ast.Constant)):
                 arg_name = val.value.lstrip("-")
                 arg_names.append(arg_name)
                 break
-    
+
     return arg_names
 
 
@@ -1711,13 +1711,13 @@ def _extract_schema_from_decorator(decorator) -> tuple[str | None, list[str]]:
     import ast
     cmd_name = None
     arg_names: list[str] = []
-    
+
     for kw in decorator.keywords:
         if kw.arg == "name" and isinstance(kw.value, ast.Constant):
             cmd_name = kw.value.value
         elif kw.arg == "args":
             arg_names = _extract_arg_names_from_args_kwarg(kw.value)
-    
+
     return cmd_name, arg_names
 
 
@@ -1752,7 +1752,7 @@ def _extract_command_schemas_from_file(filepath: str) -> dict[str, list[str]]:
         for decorator in node.decorator_list:
             if not _is_math_command_decorator(decorator):
                 continue
-            
+
             cmd_name, arg_names = _extract_schema_from_decorator(decorator)
             if cmd_name:
                 schemas[cmd_name] = arg_names
@@ -2525,15 +2525,15 @@ def _extract_explicit_assignments(
     for arg in expected_args:
         if arg in result:
             continue
-        
+
         if arg in _ARRAY_ARGS:
             if _extract_explicit_array_assignment(intent, arg, result, used_values):
                 continue
-        
+
         if arg == "z":
             if _extract_explicit_complex_assignment(intent, arg, result, used_values):
                 continue
-        
+
         _extract_explicit_value_assignment(intent, arg, result, used_values)
 
 
@@ -2610,7 +2610,7 @@ def _extract_typed_args(
 ) -> None:
     """PASS 2: Extract by argument type patterns."""
     expected_set = set(expected_args)
-    
+
     # Extract each type category
     _extract_special_typed_args(intent, intent_lower, expected_set, result)
     _extract_array_typed_args(intent, expected_set, result, used_values)
@@ -2722,7 +2722,7 @@ def _try_explicit_array_extract(intent: str, arg_name: str) -> str | None:
         value = _extract_brackets_from_position(intent, bracket_start)
         if value:
             return value
-    
+
     # Fallback: single brackets
     explicit_single_pattern = rf"\b{re.escape(arg_name)}\s*=\s*(\[[^\]]+\])"
     match = re.search(explicit_single_pattern, intent, re.IGNORECASE)
@@ -2833,11 +2833,11 @@ def _extract_bracket_bounds(intent: str, expected_args: list[str], result: dict)
     """Extract bounds from bracket notation [X, Y]."""
     if "bounds" not in expected_args or "bounds" in result:
         return
-    
+
     match = re.search(r"\[([^\]]+)\]", intent)
     if match and "," in match.group(1):
         result["bounds"] = match.group(0)
-    
+
     if "bounds" not in result:
         match = re.search(r"over\s+(\[[^\]]+\])", intent)
         if match:
@@ -2999,15 +2999,15 @@ def _extract_integer_arg(intent: str, arg_name: str) -> str | None:
     # Dispatch by arg name
     if arg_name == "n":
         return _try_match_patterns(_INTEGER_N_PATTERNS, intent_lower)
-    
+
     if arg_name == "axis":
         match = re.search(r"axis\s*(-?\d+)", intent_lower)
         return match.group(1) if match else None
-    
+
     if arg_name == "m":
         match = re.search(r"(?:mod|modulus)\s+(\d+)", intent_lower)
         return match.group(1) if match else None
-    
+
     if arg_name == "order":
         match = re.search(r"order\s+(\d+)", intent_lower)
         return match.group(1) if match else None
@@ -3057,29 +3057,29 @@ def _extract_from_func_call(
     func_call_match = re.search(r"\b\w+\s*\(\s*([^)]+)\s*\)", intent)
     if not func_call_match:
         return result
-    
+
     args_str = func_call_match.group(1)
     parts = [p.strip() for p in args_str.split(",")]
     valid_parts = [p for p in parts if _is_valid_value(p) and p not in used_values]
     remaining_args = [a for a in value_args if a not in existing]
-    
+
     for i, val in enumerate(valid_parts):
         if i < len(remaining_args):
             result[remaining_args[i]] = val
             used_values.add(val)
-    
+
     return result
 
 
 def _extract_from_and_pattern(
-    intent_lower: str, value_args: list[str], existing: dict[str, str], 
+    intent_lower: str, value_args: list[str], existing: dict[str, str],
     result: dict[str, str], used_values: set[str]
 ) -> None:
     """Extract from 'X and Y' pattern (for gcd, lcm)."""
     and_match = re.search(r"of\s+(-?[\d\.]+)\s+and\s+(-?[\d\.]+)", intent_lower)
     if not and_match:
         return
-    
+
     vals = [and_match.group(1), and_match.group(2)]
     remaining_args = [a for a in value_args if a not in existing and a not in result]
     for i, val in enumerate(vals):
@@ -3098,7 +3098,7 @@ def _extract_from_of_pattern(
     )
     if not of_match:
         return
-    
+
     val = of_match.group(1)
     remaining_args = [a for a in value_args if a not in existing and a not in result]
     if remaining_args and val not in used_values:
@@ -3114,7 +3114,7 @@ def _extract_from_at_pattern(
     at_match = re.search(r"\bat\s+(-?[\d\.]+)", intent_lower)
     if not at_match:
         return
-    
+
     val = at_match.group(1)
     if "x" in value_args and "x" not in existing and "x" not in result and val not in used_values:
         result["x"] = val
@@ -3129,10 +3129,10 @@ def _extract_numeric_fallback(
     remaining_args = [a for a in value_args if a not in existing and a not in result]
     if not remaining_args:
         return
-    
+
     numbers = re.findall(r"(?<![a-z])(-?[\d\.]+(?:[eE][+-]?\d+)?(?:/\d+)?|pi|e)\b", intent)
     valid_numbers = [n for n in numbers if n not in used_values and _is_valid_value(n)]
-    
+
     for i, num in enumerate(valid_numbers):
         if i < len(remaining_args):
             result[remaining_args[i]] = num
@@ -3144,25 +3144,25 @@ def _extract_positional_values(
 ) -> dict[str, str]:
     """Extract positional value arguments (x, a, b, y, z, s, etc.)."""
     intent_lower = intent.lower()
-    
+
     # Try function call syntax first
     result = _extract_from_func_call(intent, value_args, existing, used_values)
-    
+
     # Try "X and Y" pattern
     _extract_from_and_pattern(intent_lower, value_args, existing, result, used_values)
-    
+
     # Try "of X" pattern if no results yet
     if not result:
         _extract_from_of_pattern(intent_lower, value_args, existing, result, used_values)
-    
+
     # Try "at X" pattern if no results yet
     if not result:
         _extract_from_at_pattern(intent_lower, value_args, existing, result, used_values)
-    
+
     # Fallback to finding numeric values
     if not result:
         _extract_numeric_fallback(intent, value_args, existing, result, used_values)
-    
+
     return result
 
 

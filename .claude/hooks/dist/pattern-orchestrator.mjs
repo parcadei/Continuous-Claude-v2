@@ -1,7 +1,15 @@
 // src/pattern-orchestrator.ts
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, unlinkSync } from "fs";
+import {
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  unlinkSync,
+} from "fs";
 import { join, dirname } from "path";
-var PATTERN_TAG_REGEX = /\[PATTERN:([a-z]+)-([a-zA-Z0-9_-]+):([a-zA-Z0-9_-]+)\]/;
+var PATTERN_TAG_REGEX =
+  /\[PATTERN:([a-z]+)-([a-zA-Z0-9_-]+):([a-zA-Z0-9_-]+)\]/;
 var SAFE_ID_PATTERN = /^[a-zA-Z0-9_-]{1,64}$/;
 function getPatternDir() {
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
@@ -57,10 +65,11 @@ function cleanupExpiredPatterns() {
         const state = JSON.parse(content);
         if (isExpired(state)) {
           unlinkSync(path);
-          console.error(`[pattern-orchestrator] Cleaned up expired pattern: ${file}`);
+          console.error(
+            `[pattern-orchestrator] Cleaned up expired pattern: ${file}`,
+          );
         }
-      } catch {
-      }
+      } catch {}
     }
   } catch (err) {
     console.error(`[pattern-orchestrator] Cleanup error: ${err}`);
@@ -72,7 +81,7 @@ function extractPatternTag(prompt) {
   return {
     type: match[1],
     id: match[2],
-    stage: match[3]
+    stage: match[3],
   };
 }
 function handlePipeline(state, agentId, stage, toolResponse) {
@@ -82,8 +91,11 @@ function handlePipeline(state, agentId, stage, toolResponse) {
   state.agents[agentId] = {
     stage,
     status: "complete",
-    result: typeof toolResponse === "string" ? toolResponse.slice(0, 2e3) : JSON.stringify(toolResponse).slice(0, 2e3),
-    completed_at: Date.now()
+    result:
+      typeof toolResponse === "string"
+        ? toolResponse.slice(0, 2e3)
+        : JSON.stringify(toolResponse).slice(0, 2e3),
+    completed_at: Date.now(),
   };
   const currentIndex = state.stages.indexOf(stage);
   if (currentIndex === -1) {
@@ -124,13 +136,24 @@ Now spawn a Task agent for stage "${nextStage}" with tag:
 The agent should process the above output and continue the pipeline.`;
 }
 function handleJury(state, agentId, stage, toolResponse) {
-  const responseStr = typeof toolResponse === "string" ? toolResponse : JSON.stringify(toolResponse);
+  const responseStr =
+    typeof toolResponse === "string"
+      ? toolResponse
+      : JSON.stringify(toolResponse);
   const lowerResponse = responseStr.toLowerCase();
   let vote;
   let reason;
-  if (lowerResponse.includes("approve") || lowerResponse.includes("yes") || lowerResponse.includes("accept")) {
+  if (
+    lowerResponse.includes("approve") ||
+    lowerResponse.includes("yes") ||
+    lowerResponse.includes("accept")
+  ) {
     vote = true;
-  } else if (lowerResponse.includes("reject") || lowerResponse.includes("no") || lowerResponse.includes("deny")) {
+  } else if (
+    lowerResponse.includes("reject") ||
+    lowerResponse.includes("no") ||
+    lowerResponse.includes("deny")
+  ) {
     vote = false;
   } else {
     vote = false;
@@ -148,7 +171,7 @@ function handleJury(state, agentId, stage, toolResponse) {
     stage,
     status: "complete",
     result: responseStr.slice(0, 500),
-    completed_at: Date.now()
+    completed_at: Date.now(),
   };
   const totalExpected = Object.keys(state.agents).length;
   const totalVoted = state.votes.length;
@@ -162,9 +185,12 @@ function handleJury(state, agentId, stage, toolResponse) {
   const verdict = approveRatio >= threshold ? "APPROVED" : "REJECTED";
   state.active = false;
   savePatternState(state);
-  const voteSummary = state.votes.map(
-    (v) => `- ${v.agent_id}: ${v.vote ? "APPROVE" : "REJECT"}${v.reason ? ` (${v.reason})` : ""}`
-  ).join("\n");
+  const voteSummary = state.votes
+    .map(
+      (v) =>
+        `- ${v.agent_id}: ${v.vote ? "APPROVE" : "REJECT"}${v.reason ? ` (${v.reason})` : ""}`,
+    )
+    .join("\n");
   return `[Jury Complete] Verdict: ${verdict}
 
 ## Vote Summary
@@ -178,20 +204,23 @@ ${voteSummary}
 Take appropriate action based on the jury's verdict.`;
 }
 function handleDebate(state, agentId, stage, toolResponse) {
-  const responseStr = typeof toolResponse === "string" ? toolResponse : JSON.stringify(toolResponse);
+  const responseStr =
+    typeof toolResponse === "string"
+      ? toolResponse
+      : JSON.stringify(toolResponse);
   if (!state.positions) {
     state.positions = [];
   }
   state.positions.push({
     side: stage,
     agent_id: agentId,
-    argument: responseStr.slice(0, 3e3)
+    argument: responseStr.slice(0, 3e3),
   });
   state.agents[agentId] = {
     stage,
     status: "complete",
     result: responseStr.slice(0, 1e3),
-    completed_at: Date.now()
+    completed_at: Date.now(),
   };
   const round = state.round ?? 1;
   const maxRounds = state.maxRounds ?? 3;
@@ -201,7 +230,8 @@ function handleDebate(state, agentId, stage, toolResponse) {
   });
   if (positionsThisRound.length < 2) {
     const nextSide = stage === "pro" ? "con" : "pro";
-    const lastArgument = state.positions[state.positions.length - 1]?.argument || "";
+    const lastArgument =
+      state.positions[state.positions.length - 1]?.argument || "";
     savePatternState(state);
     return `[Debate] Round ${round}/${maxRounds} - ${stage.toUpperCase()} has argued.
 
@@ -218,8 +248,10 @@ The ${nextSide.toUpperCase()} agent should counter the above argument.`;
   if (round < maxRounds) {
     state.round = round + 1;
     savePatternState(state);
-    const proArg = positionsThisRound.find((p) => p.side === "pro")?.argument || "";
-    const conArg = positionsThisRound.find((p) => p.side === "con")?.argument || "";
+    const proArg =
+      positionsThisRound.find((p) => p.side === "pro")?.argument || "";
+    const conArg =
+      positionsThisRound.find((p) => p.side === "con")?.argument || "";
     return `[Debate] Round ${round}/${maxRounds} complete. Starting round ${round + 1}.
 
 ## Round ${round} Summary
@@ -254,12 +286,15 @@ ${transcript.join("\n\n")}
 Evaluate the debate and declare a winner based on argument quality.`;
 }
 function handleGenCritic(state, agentId, stage, toolResponse) {
-  const responseStr = typeof toolResponse === "string" ? toolResponse : JSON.stringify(toolResponse);
+  const responseStr =
+    typeof toolResponse === "string"
+      ? toolResponse
+      : JSON.stringify(toolResponse);
   state.agents[agentId] = {
     stage,
     status: "complete",
     result: responseStr.slice(0, 2e3),
-    completed_at: Date.now()
+    completed_at: Date.now(),
   };
   const iteration = state.iteration ?? 1;
   const maxIterations = state.maxIterations ?? 5;
@@ -281,7 +316,10 @@ The critic should review the output and either:
   }
   if (stage === "critic") {
     const lowerResponse = responseStr.toLowerCase();
-    const isApproved = lowerResponse.includes("approved") || lowerResponse.includes("lgtm") || lowerResponse.includes("looks good");
+    const isApproved =
+      lowerResponse.includes("approved") ||
+      lowerResponse.includes("lgtm") ||
+      lowerResponse.includes("looks good");
     if (isApproved) {
       state.approved = true;
       state.active = false;
@@ -390,15 +428,17 @@ async function main() {
       context = handleGenCritic(state, agentId, stage, input.tool_response);
       break;
     default:
-      console.error(`[pattern-orchestrator] Unknown pattern type: ${state.type}`);
+      console.error(
+        `[pattern-orchestrator] Unknown pattern type: ${state.type}`,
+      );
   }
   if (context) {
     const output = {
       result: "continue",
       hookSpecificOutput: {
         hookEventName: "PostToolUse",
-        additionalContext: context
-      }
+        additionalContext: context,
+      },
     };
     console.log(JSON.stringify(output));
   } else {

@@ -52,7 +52,7 @@ Your output scope is **shared** - you write to directories that persist across s
 
 ```
 thoughts/shared/handoffs/    # Handoff documents
-thoughts/shared/plans/       # Implementation plans  
+thoughts/shared/plans/       # Implementation plans
 thoughts/ledgers/            # Continuity ledgers
 docs/                        # User-facing documentation
 ```
@@ -60,16 +60,19 @@ docs/                        # User-facing documentation
 ## Step 4: Write Output
 
 **Handoffs go to:**
+
 ```
 $CLAUDE_CC_DIR/thoughts/shared/handoffs/{session-name}/current.md
 ```
 
 **Ledger updates go to:**
+
 ```
 $CLAUDE_CC_DIR/thoughts/ledgers/CONTINUITY_CLAUDE-{session-name}.md
 ```
 
 **Session summaries can also go to:**
+
 ```
 $CLAUDE_CC_DIR/.claude/cache/scribe/latest-summary.md
 ```
@@ -82,29 +85,36 @@ $CLAUDE_CC_DIR/.claude/cache/scribe/latest-summary.md
 # Handoff: [Session/Feature Name]
 
 ## Ledger
+
 **Goal:** [Success criteria]
 **Updated:** [timestamp]
 
 ### State
+
 - Done:
   - [x] Phase 1: What was completed
 - Now: [->] Current phase description
 - Next: What comes after
 
 ### Key Decisions
+
 - Decision 1: [choice] - [rationale]
 
 ### Open Questions
+
 - UNCONFIRMED: [anything uncertain]
 
 ### Working Set
+
 - Branch: `feature/branch-name`
 - Key files: `path/to/file.ts`
 
 ## Context
+
 [Detailed narrative of what happened, why, blockers encountered]
 
 ## Recommendations
+
 [Suggested next steps for the resuming session]
 ```
 
@@ -114,15 +124,19 @@ $CLAUDE_CC_DIR/.claude/cache/scribe/latest-summary.md
 # Session Summary: [Date/Topic]
 
 ## Accomplishments
+
 - [What was built/fixed/improved]
 
 ## Key Files
+
 - `path/to/file.ts` - [what it does]
 
 ## Learnings
+
 - [Technical discoveries worth remembering]
 
 ## Handoff
+
 See: `thoughts/shared/handoffs/{name}/current.md`
 ```
 

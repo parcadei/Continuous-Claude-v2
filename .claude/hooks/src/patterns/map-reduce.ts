@@ -15,18 +15,18 @@
  * - CLAUDE_PROJECT_DIR: Project directory for DB path
  */
 
-import { existsSync } from 'fs';
+import { existsSync } from "fs";
 
 // Import shared utilities
-import { getDbPath, runPythonQuery, isValidId } from '../shared/db-utils.js';
+import { getDbPath, runPythonQuery, isValidId } from "../shared/db-utils.js";
 import type {
   SubagentStartInput,
   SubagentStopInput,
   PreToolUseInput,
   PostToolUseInput,
   StopInput,
-  HookOutput
-} from '../shared/types.js';
+  HookOutput,
+} from "../shared/types.js";
 
 // Re-export types for convenience
 export type {
@@ -35,7 +35,7 @@ export type {
   PreToolUseInput,
   PostToolUseInput,
   StopInput,
-  HookOutput
+  HookOutput,
 };
 
 // =============================================================================
@@ -47,40 +47,43 @@ export type {
  * Injects mapper index context or reducer context.
  * Always returns 'continue' - never blocks agent start.
  */
-export async function onSubagentStart(input: SubagentStartInput): Promise<HookOutput> {
+export async function onSubagentStart(
+  input: SubagentStartInput,
+): Promise<HookOutput> {
   const mrId = process.env.MR_ID;
 
   // If no MR_ID, continue silently (not in a map-reduce)
   if (!mrId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate MR_ID format
   if (!isValidId(mrId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const agentRole = process.env.AGENT_ROLE || 'mapper';
-  const mapperIndex = process.env.MAPPER_INDEX || '0';
-  const totalMappers = process.env.TOTAL_MAPPERS || '1';
+  const agentRole = process.env.AGENT_ROLE || "mapper";
+  const mapperIndex = process.env.MAPPER_INDEX || "0";
+  const totalMappers = process.env.TOTAL_MAPPERS || "1";
 
   // Log for debugging - this goes to stderr, not stdout
   console.error(`[map-reduce] ${agentRole} starting for MR ${mrId}`);
 
   // Inject context based on role
-  let message = '';
-  if (agentRole === 'mapper') {
+  let message = "";
+  if (agentRole === "mapper") {
     message = `You are Mapper ${mapperIndex} (position ${parseInt(mapperIndex) + 1} of ${totalMappers}) in a MapReduce execution.`;
-    message += ' Process your assigned chunk and return results.';
-    message += ' Your output will be combined with other mappers by the reducer.';
-  } else if (agentRole === 'reducer') {
+    message += " Process your assigned chunk and return results.";
+    message +=
+      " Your output will be combined with other mappers by the reducer.";
+  } else if (agentRole === "reducer") {
     message = `You are the Reducer in a MapReduce execution with ${totalMappers} mappers.`;
-    message += ' Synthesize the outputs from all mappers into a final result.';
+    message += " Synthesize the outputs from all mappers into a final result.";
   }
 
   return {
-    result: 'continue',
-    message: message || undefined
+    result: "continue",
+    message: message || undefined,
   };
 }
 
@@ -93,39 +96,41 @@ export async function onSubagentStart(input: SubagentStartInput): Promise<HookOu
  * Marks mapper as completed in database.
  * Triggers reducer when all mappers complete.
  */
-export async function onSubagentStop(input: SubagentStopInput): Promise<HookOutput> {
+export async function onSubagentStop(
+  input: SubagentStopInput,
+): Promise<HookOutput> {
   const mrId = process.env.MR_ID;
 
   // If no MR_ID, continue silently
   if (!mrId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate MR_ID format
   if (!isValidId(mrId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const agentRole = process.env.AGENT_ROLE || 'mapper';
+  const agentRole = process.env.AGENT_ROLE || "mapper";
 
   // Only track mapper completion (reducers don't need tracking)
-  if (agentRole !== 'mapper') {
-    return { result: 'continue' };
+  if (agentRole !== "mapper") {
+    return { result: "continue" };
   }
 
-  const mapperId = input.agent_id ?? 'unknown';
+  const mapperId = input.agent_id ?? "unknown";
 
   // Validate agent_id format
   if (!isValidId(mapperId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const mapperIndex = parseInt(process.env.MAPPER_INDEX || '0', 10);
-  const totalMappers = parseInt(process.env.TOTAL_MAPPERS || '1', 10);
+  const mapperIndex = parseInt(process.env.MAPPER_INDEX || "0", 10);
+  const totalMappers = parseInt(process.env.TOTAL_MAPPERS || "1", 10);
   const dbPath = getDbPath();
 
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
@@ -183,11 +188,16 @@ conn.close()
 print(json.dumps({'completed': completed_count}))
 `;
 
-    const result = runPythonQuery(query, [dbPath, mrId, mapperId, mapperIndex.toString()]);
+    const result = runPythonQuery(query, [
+      dbPath,
+      mrId,
+      mapperId,
+      mapperIndex.toString(),
+    ]);
 
     if (!result.success) {
-      console.error('SubagentStop Python error:', result.stderr);
-      return { result: 'continue' };
+      console.error("SubagentStop Python error:", result.stderr);
+      return { result: "continue" };
     }
 
     // Parse Python output
@@ -195,24 +205,26 @@ print(json.dumps({'completed': completed_count}))
     try {
       counts = JSON.parse(result.stdout);
     } catch (parseErr) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // Log for debugging
-    console.error(`[map-reduce] Mapper ${mapperId} done. Progress: ${counts.completed}/${totalMappers}`);
+    console.error(
+      `[map-reduce] Mapper ${mapperId} done. Progress: ${counts.completed}/${totalMappers}`,
+    );
 
     // Check if all mappers have completed
     if (counts.completed >= totalMappers && totalMappers > 0) {
       return {
-        result: 'continue',
-        message: 'All mappers have completed. Proceeding to reduce phase.'
+        result: "continue",
+        message: "All mappers have completed. Proceeding to reduce phase.",
       };
     }
 
-    return { result: 'continue' };
+    return { result: "continue" };
   } catch (err) {
-    console.error('SubagentStop hook error:', err);
-    return { result: 'continue' };
+    console.error("SubagentStop hook error:", err);
+    return { result: "continue" };
   }
 }
 
@@ -224,10 +236,12 @@ print(json.dumps({'completed': completed_count}))
  * Handles PreToolUse hook for map-reduce pattern.
  * Currently no special handling needed (chunk context injected at start).
  */
-export async function onPreToolUse(input: PreToolUseInput): Promise<HookOutput> {
+export async function onPreToolUse(
+  input: PreToolUseInput,
+): Promise<HookOutput> {
   // No special handling needed for map-reduce pattern
   // Chunk context is provided in the mapper's initial prompt
-  return { result: 'continue' };
+  return { result: "continue" };
 }
 
 // =============================================================================
@@ -239,51 +253,56 @@ export async function onPreToolUse(input: PreToolUseInput): Promise<HookOutput> 
  * Records mapper outputs when Write tool completes.
  * Signals reducer when all mappers have written their outputs.
  */
-export async function onPostToolUse(input: PostToolUseInput): Promise<HookOutput> {
+export async function onPostToolUse(
+  input: PostToolUseInput,
+): Promise<HookOutput> {
   const mrId = process.env.MR_ID;
 
   // If no MR_ID, continue silently (not in a map-reduce)
   if (!mrId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate MR_ID format
   if (!isValidId(mrId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const agentRole = process.env.AGENT_ROLE || 'mapper';
+  const agentRole = process.env.AGENT_ROLE || "mapper";
 
   // Only track mapper outputs (not reducer)
-  if (agentRole !== 'mapper') {
-    return { result: 'continue' };
+  if (agentRole !== "mapper") {
+    return { result: "continue" };
   }
 
   // Only process Write tool completions
-  if (input.tool_name !== 'Write') {
-    return { result: 'continue' };
+  if (input.tool_name !== "Write") {
+    return { result: "continue" };
   }
 
   // Validate tool_input is an object with content
-  if (!input.tool_input || typeof input.tool_input !== 'object') {
-    return { result: 'continue' };
+  if (!input.tool_input || typeof input.tool_input !== "object") {
+    return { result: "continue" };
   }
 
-  const toolInput = input.tool_input as { content?: string; file_path?: string };
+  const toolInput = input.tool_input as {
+    content?: string;
+    file_path?: string;
+  };
   const outputContent = toolInput.content;
 
   // No content to record
-  if (!outputContent || typeof outputContent !== 'string') {
-    return { result: 'continue' };
+  if (!outputContent || typeof outputContent !== "string") {
+    return { result: "continue" };
   }
 
-  const mapperIndex = parseInt(process.env.MAPPER_INDEX || '0', 10);
-  const totalMappers = parseInt(process.env.TOTAL_MAPPERS || '1', 10);
-  const agentId = process.env.AGENT_ID || 'unknown';
+  const mapperIndex = parseInt(process.env.MAPPER_INDEX || "0", 10);
+  const totalMappers = parseInt(process.env.TOTAL_MAPPERS || "1", 10);
+  const agentId = process.env.AGENT_ID || "unknown";
   const dbPath = getDbPath();
 
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
@@ -349,12 +368,12 @@ print(json.dumps({'completed': completed_count, 'total': total_mappers}))
       mapperIndex.toString(),
       agentId,
       outputContent,
-      totalMappers.toString()
+      totalMappers.toString(),
     ]);
 
     if (!result.success) {
-      console.error('PostToolUse Python error:', result.stderr);
-      return { result: 'continue' };
+      console.error("PostToolUse Python error:", result.stderr);
+      return { result: "continue" };
     }
 
     // Parse Python output
@@ -362,24 +381,27 @@ print(json.dumps({'completed': completed_count, 'total': total_mappers}))
     try {
       counts = JSON.parse(result.stdout);
     } catch (parseErr) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // Log for debugging
-    console.error(`[map-reduce] Mapper ${mapperIndex} output recorded. Progress: ${counts.completed}/${counts.total}`);
+    console.error(
+      `[map-reduce] Mapper ${mapperIndex} output recorded. Progress: ${counts.completed}/${counts.total}`,
+    );
 
     // Check if all mappers have completed with output
     if (counts.completed >= counts.total && counts.total > 0) {
       return {
-        result: 'continue',
-        message: 'All mappers have completed their outputs. Proceeding to reduce phase.'
+        result: "continue",
+        message:
+          "All mappers have completed their outputs. Proceeding to reduce phase.",
       };
     }
 
-    return { result: 'continue' };
+    return { result: "continue" };
   } catch (err) {
-    console.error('PostToolUse hook error:', err);
-    return { result: 'continue' };
+    console.error("PostToolUse hook error:", err);
+    return { result: "continue" };
   }
 }
 
@@ -395,32 +417,32 @@ print(json.dumps({'completed': completed_count, 'total': total_mappers}))
 export async function onStop(input: StopInput): Promise<HookOutput> {
   // Prevent infinite loops - if we're already in a stop hook, continue
   if (input.stop_hook_active) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   const mrId = process.env.MR_ID;
 
   if (!mrId) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   // Validate MR_ID format
   if (!isValidId(mrId)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
-  const agentRole = process.env.AGENT_ROLE || 'mapper';
+  const agentRole = process.env.AGENT_ROLE || "mapper";
 
   // Only apply to reducer (mappers can complete independently)
-  if (agentRole !== 'reducer') {
-    return { result: 'continue' };
+  if (agentRole !== "reducer") {
+    return { result: "continue" };
   }
 
-  const totalMappers = parseInt(process.env.TOTAL_MAPPERS || '0', 10);
+  const totalMappers = parseInt(process.env.TOTAL_MAPPERS || "0", 10);
   const dbPath = getDbPath();
 
   if (!existsSync(dbPath)) {
-    return { result: 'continue' };
+    return { result: "continue" };
   }
 
   try {
@@ -469,40 +491,47 @@ print(json.dumps({'completed': completed_count, 'results': results}))
     const result = runPythonQuery(query, [dbPath, mrId]);
 
     if (!result.success) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     // Parse Python output
-    let data: { completed: number; results: Array<{ index: number; agent_id: string; output: string | null }> };
+    let data: {
+      completed: number;
+      results: Array<{
+        index: number;
+        agent_id: string;
+        output: string | null;
+      }>;
+    };
     try {
       data = JSON.parse(result.stdout);
     } catch (parseErr) {
-      return { result: 'continue' };
+      return { result: "continue" };
     }
 
     if (data.completed < totalMappers) {
       const waiting = totalMappers - data.completed;
       return {
-        result: 'block',
-        message: `Waiting for ${waiting} mapper(s) to complete. All mappers must finish before the reduce phase can begin.`
+        result: "block",
+        message: `Waiting for ${waiting} mapper(s) to complete. All mappers must finish before the reduce phase can begin.`,
       };
     }
 
     // All mappers have completed - provide results summary
     let message = `All ${totalMappers} mappers have completed their work.\n\n`;
-    message += 'MAPPER RESULTS:\n';
+    message += "MAPPER RESULTS:\n";
     for (const r of data.results) {
-      const output = r.output ? r.output.substring(0, 100) : '(no output)';
-      message += `- Mapper ${r.index}: ${output}${r.output && r.output.length > 100 ? '...' : ''}\n`;
+      const output = r.output ? r.output.substring(0, 100) : "(no output)";
+      message += `- Mapper ${r.index}: ${output}${r.output && r.output.length > 100 ? "..." : ""}\n`;
     }
-    message += '\nProceed with the reduce phase to synthesize these results.';
+    message += "\nProceed with the reduce phase to synthesize these results.";
 
     return {
-      result: 'continue',
-      message
+      result: "continue",
+      message,
     };
   } catch (err) {
-    console.error('Stop hook error:', err);
-    return { result: 'continue' };
+    console.error("Stop hook error:", err);
+    return { result: "continue" };
   }
 }

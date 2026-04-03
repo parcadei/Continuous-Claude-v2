@@ -1,7 +1,7 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { spawn, execSync } from 'child_process';
-import Database from 'better-sqlite3';
+import * as fs from "fs";
+import * as path from "path";
+import { spawn, execSync } from "child_process";
+import Database from "better-sqlite3";
 
 interface PostToolUseInput {
   session_id: string;
@@ -32,14 +32,17 @@ interface BraintrustState {
  * Get parent PID using ps command (Unix only).
  */
 function getPpid(pid: number): number | null {
-  if (process.platform === 'win32') {
+  if (process.platform === "win32") {
     // Windows: use wmic
     try {
-      const result = execSync(`wmic process where ProcessId=${pid} get ParentProcessId`, {
-        encoding: 'utf-8',
-        timeout: 5000,
-      });
-      for (const line of result.split('\n')) {
+      const result = execSync(
+        `wmic process where ProcessId=${pid} get ParentProcessId`,
+        {
+          encoding: "utf-8",
+          timeout: 5000,
+        },
+      );
+      for (const line of result.split("\n")) {
         const trimmed = line.trim();
         if (/^\d+$/.test(trimmed)) {
           return parseInt(trimmed, 10);
@@ -54,7 +57,7 @@ function getPpid(pid: number): number | null {
   // Unix: use ps
   try {
     const result = execSync(`ps -o ppid= -p ${pid}`, {
-      encoding: 'utf-8',
+      encoding: "utf-8",
       timeout: 5000,
     });
     const ppid = parseInt(result.trim(), 10);
@@ -83,8 +86,18 @@ function getTerminalShellPid(): number | null {
 /**
  * Store terminal_pid -> session_name mapping for session affinity.
  */
-function storeSessionAffinity(projectDir: string, terminalPid: number, sessionName: string): void {
-  const dbPath = path.join(projectDir, '.claude', 'cache', 'artifact-index', 'context.db');
+function storeSessionAffinity(
+  projectDir: string,
+  terminalPid: number,
+  sessionName: string,
+): void {
+  const dbPath = path.join(
+    projectDir,
+    ".claude",
+    "cache",
+    "artifact-index",
+    "context.db",
+  );
   const dbDir = path.dirname(dbPath);
 
   try {
@@ -122,8 +135,8 @@ function storeSessionAffinity(projectDir: string, terminalPid: number, sessionNa
  * Path format: .../handoffs/<session-name>/handoff-XXX.md
  */
 function extractSessionName(filePath: string): string | null {
-  const parts = filePath.split('/');
-  const handoffsIdx = parts.findIndex(p => p === 'handoffs');
+  const parts = filePath.split("/");
+  const handoffsIdx = parts.findIndex((p) => p === "handoffs");
   if (handoffsIdx >= 0 && handoffsIdx < parts.length - 1) {
     return parts[handoffsIdx + 1];
   }
@@ -133,55 +146,66 @@ function extractSessionName(filePath: string): string | null {
 async function main() {
   const input: PostToolUseInput = JSON.parse(await readStdin());
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-  const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+  const homeDir = process.env.HOME || process.env.USERPROFILE || "";
 
   // Only process Write tool calls
-  if (input.tool_name !== 'Write') {
-    console.log(JSON.stringify({ result: 'continue' }));
+  if (input.tool_name !== "Write") {
+    console.log(JSON.stringify({ result: "continue" }));
     return;
   }
 
-  const filePath = input.tool_input?.file_path || '';
+  const filePath = input.tool_input?.file_path || "";
 
   // Only process handoff files (.md or .yaml/.yml)
-  const isHandoffFile = filePath.endsWith('.md') || filePath.endsWith('.yaml') || filePath.endsWith('.yml');
-  if (!filePath.includes('handoffs') || !isHandoffFile) {
-    console.log(JSON.stringify({ result: 'continue' }));
+  const isHandoffFile =
+    filePath.endsWith(".md") ||
+    filePath.endsWith(".yaml") ||
+    filePath.endsWith(".yml");
+  if (!filePath.includes("handoffs") || !isHandoffFile) {
+    console.log(JSON.stringify({ result: "continue" }));
     return;
   }
 
   try {
-    const fullPath = path.isAbsolute(filePath) ? filePath : path.join(projectDir, filePath);
+    const fullPath = path.isAbsolute(filePath)
+      ? filePath
+      : path.join(projectDir, filePath);
 
     if (!fs.existsSync(fullPath)) {
-      console.log(JSON.stringify({ result: 'continue' }));
+      console.log(JSON.stringify({ result: "continue" }));
       return;
     }
 
     // Read current file content
-    let content = fs.readFileSync(fullPath, 'utf-8');
+    let content = fs.readFileSync(fullPath, "utf-8");
     let modified = false;
 
     // Check if frontmatter already has root_span_id
-    const isYamlFile = fullPath.endsWith('.yaml') || fullPath.endsWith('.yml');
-    const hasFrontmatter = content.startsWith('---');
-    const hasRootSpanId = content.includes('root_span_id:');
+    const isYamlFile = fullPath.endsWith(".yaml") || fullPath.endsWith(".yml");
+    const hasFrontmatter = content.startsWith("---");
+    const hasRootSpanId = content.includes("root_span_id:");
 
     // If missing root_span_id, try to inject it
     if (!hasRootSpanId) {
       // Read Braintrust state file
-      const stateFile = path.join(homeDir, '.claude', 'state', 'braintrust_sessions', `${input.session_id}.json`);
+      const stateFile = path.join(
+        homeDir,
+        ".claude",
+        "state",
+        "braintrust_sessions",
+        `${input.session_id}.json`,
+      );
 
       if (fs.existsSync(stateFile)) {
         try {
-          const stateContent = fs.readFileSync(stateFile, 'utf-8');
+          const stateContent = fs.readFileSync(stateFile, "utf-8");
           const state: BraintrustState = JSON.parse(stateContent);
 
           const newFields = [
             `root_span_id: ${state.root_span_id}`,
-            `turn_span_id: ${state.current_turn_span_id || ''}`,
-            `session_id: ${input.session_id}`
-          ].join('\n');
+            `turn_span_id: ${state.current_turn_span_id || ""}`,
+            `session_id: ${input.session_id}`,
+          ].join("\n");
 
           if (isYamlFile) {
             // For YAML files, prepend fields at the top (no frontmatter delimiters needed)
@@ -195,7 +219,7 @@ async function main() {
           }
 
           // Write updated content atomically (temp file + rename)
-          const tempPath = fullPath + '.tmp';
+          const tempPath = fullPath + ".tmp";
           fs.writeFileSync(tempPath, content);
           fs.renameSync(tempPath, fullPath);
           modified = true;
@@ -213,29 +237,33 @@ async function main() {
     }
 
     // Always trigger indexing (idempotent, will upsert)
-    const indexScript = path.join(projectDir, 'scripts', 'artifact_index.py');
+    const indexScript = path.join(projectDir, "scripts", "artifact_index.py");
 
     if (fs.existsSync(indexScript)) {
-      const child = spawn('uv', ['run', 'python', indexScript, '--file', fullPath], {
-        cwd: projectDir,
-        detached: true,
-        stdio: 'ignore'
-      });
+      const child = spawn(
+        "uv",
+        ["run", "python", indexScript, "--file", fullPath],
+        {
+          cwd: projectDir,
+          detached: true,
+          stdio: "ignore",
+        },
+      );
       child.unref();
     }
 
-    console.log(JSON.stringify({ result: 'continue' }));
+    console.log(JSON.stringify({ result: "continue" }));
   } catch (err) {
     // Don't block on errors
-    console.log(JSON.stringify({ result: 'continue' }));
+    console.log(JSON.stringify({ result: "continue" }));
   }
 }
 
 async function readStdin(): Promise<string> {
   return new Promise((resolve) => {
-    let data = '';
-    process.stdin.on('data', chunk => data += chunk);
-    process.stdin.on('end', () => resolve(data));
+    let data = "";
+    process.stdin.on("data", (chunk) => (data += chunk));
+    process.stdin.on("end", () => resolve(data));
   });
 }
 

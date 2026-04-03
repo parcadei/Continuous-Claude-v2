@@ -5,9 +5,9 @@
  * Uses TLDR daemon for fast code extraction (replaces CLI spawning).
  */
 
-import { readFileSync } from 'fs';
-import { basename } from 'path';
-import { queryDaemonSync, trackHookActivitySync } from './daemon-client.js';
+import { readFileSync } from "fs";
+import { basename } from "path";
+import { queryDaemonSync, trackHookActivitySync } from "./daemon-client.js";
 
 interface HookInput {
   tool_name: string;
@@ -53,11 +53,15 @@ function getTLDRImports(filePath: string): TLDRImport[] {
   try {
     const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
     const response = queryDaemonSync(
-      { cmd: 'imports', file: filePath },
-      projectDir
+      { cmd: "imports", file: filePath },
+      projectDir,
     );
 
-    if (response.indexing || response.status === 'unavailable' || response.status === 'error') {
+    if (
+      response.indexing ||
+      response.status === "unavailable" ||
+      response.status === "error"
+    ) {
       return [];
     }
 
@@ -75,16 +79,23 @@ function getTLDRImports(filePath: string): TLDRImport[] {
  * Get file structure using TLDR daemon extract command.
  * @param sessionId - Optional session ID for token tracking
  */
-function getTLDRExtract(filePath: string, sessionId?: string): TLDRExtract | null {
+function getTLDRExtract(
+  filePath: string,
+  sessionId?: string,
+): TLDRExtract | null {
   try {
     const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
     const response = queryDaemonSync(
-      { cmd: 'extract', file: filePath, session: sessionId },
-      projectDir
+      { cmd: "extract", file: filePath, session: sessionId },
+      projectDir,
     );
 
     // Skip if daemon is indexing or unavailable
-    if (response.indexing || response.status === 'unavailable' || response.status === 'error') {
+    if (
+      response.indexing ||
+      response.status === "unavailable" ||
+      response.status === "error"
+    ) {
       return null;
     }
 
@@ -99,16 +110,16 @@ function getTLDRExtract(filePath: string, sessionId?: string): TLDRExtract | nul
 }
 
 async function main() {
-  const input: HookInput = JSON.parse(readFileSync(0, 'utf-8'));
+  const input: HookInput = JSON.parse(readFileSync(0, "utf-8"));
 
-  if (input.tool_name !== 'Edit') {
-    console.log('{}');
+  if (input.tool_name !== "Edit") {
+    console.log("{}");
     return;
   }
 
   const filePath = input.tool_input.file_path;
   if (!filePath) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
@@ -122,7 +133,7 @@ async function main() {
   const total = classCount + funcCount;
 
   if (total === 0 && importCount === 0) {
-    console.log('{}');
+    console.log("{}");
     return;
   }
 
@@ -131,38 +142,44 @@ async function main() {
 
   // Show imports first - important for understanding dependencies
   if (importCount > 0) {
-    const importModules = imports.slice(0, 8).map(i => i.module);
-    parts.push(`Dependencies: ${importModules.join(', ')}${importCount > 8 ? '...' : ''}`);
+    const importModules = imports.slice(0, 8).map((i) => i.module);
+    parts.push(
+      `Dependencies: ${importModules.join(", ")}${importCount > 8 ? "..." : ""}`,
+    );
   }
 
   if (classCount > 0 && extract) {
-    const classNames = extract.classes.map(c => c.name).slice(0, 10);
-    parts.push(`Classes: ${classNames.join(', ')}${classCount > 10 ? '...' : ''}`);
+    const classNames = extract.classes.map((c) => c.name).slice(0, 10);
+    parts.push(
+      `Classes: ${classNames.join(", ")}${classCount > 10 ? "..." : ""}`,
+    );
   }
 
   if (funcCount > 0 && extract) {
     // Show function names with param counts for quick reference
-    const funcSummaries = extract.functions.slice(0, 12).map(f => {
+    const funcSummaries = extract.functions.slice(0, 12).map((f) => {
       const paramCount = f.params?.length || 0;
       return paramCount > 0 ? `${f.name}(${paramCount})` : f.name;
     });
-    parts.push(`Functions: ${funcSummaries.join(', ')}${funcCount > 12 ? '...' : ''}`);
+    parts.push(
+      `Functions: ${funcSummaries.join(", ")}${funcCount > 12 ? "..." : ""}`,
+    );
   }
 
-  const symbolInfo = total > 0 ? `${total} symbols` : '';
-  const depInfo = importCount > 0 ? `${importCount} deps` : '';
-  const summary = [symbolInfo, depInfo].filter(Boolean).join(', ');
+  const symbolInfo = total > 0 ? `${total} symbols` : "";
+  const depInfo = importCount > 0 ? `${importCount} deps` : "";
+  const summary = [symbolInfo, depInfo].filter(Boolean).join(", ");
 
   const output: HookOutput = {
     hookSpecificOutput: {
-      hookEventName: 'PreToolUse',
-      additionalContext: `[Edit context: ${basename(filePath)} - ${summary}]\n${parts.join('\n')}`
-    }
+      hookEventName: "PreToolUse",
+      additionalContext: `[Edit context: ${basename(filePath)} - ${summary}]\n${parts.join("\n")}`,
+    },
   };
 
   // Track hook activity for flush threshold
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-  trackHookActivitySync('edit-context-inject', projectDir, true, {
+  trackHookActivitySync("edit-context-inject", projectDir, true, {
     edits_processed: 1,
     symbols_shown: total,
   });
@@ -170,4 +187,4 @@ async function main() {
   console.log(JSON.stringify(output));
 }
 
-main().catch(() => console.log('{}'));
+main().catch(() => console.log("{}"));

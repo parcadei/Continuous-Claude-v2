@@ -675,7 +675,7 @@ def install_opc_integration_symlink(
             try:
                 os.symlink(source_path, target_path)
                 result["symlinked_dirs"].append(dir_name)
-            except OSError as e:
+            except OSError:
                 if platform.system() == "Windows":
                     result["error"] = (
                         f"Symlink creation failed for '{dir_name}'. On Windows, enable Developer Mode "
@@ -980,7 +980,7 @@ def uninstall_opc_integration(
 
     for config_path in configs_to_clean:
         try:
-            with open(config_path, "r") as f:
+            with open(config_path) as f:
                 lines = f.readlines()
             new_lines = [l for l in lines if "CLAUDE_OPC_DIR" not in l]
             if len(new_lines) < len(lines):

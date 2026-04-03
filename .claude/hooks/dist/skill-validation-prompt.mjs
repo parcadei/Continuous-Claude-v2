@@ -20,7 +20,7 @@ var AMBIGUOUS_KEYWORDS = /* @__PURE__ */ new Set([
   "analyze",
   "document",
   "refactor",
-  "optimize"
+  "optimize",
 ]);
 var SPECIFIC_TECHNICAL_TERMS = /* @__PURE__ */ new Set([
   "sympy",
@@ -37,30 +37,98 @@ var SPECIFIC_TECHNICAL_TERMS = /* @__PURE__ */ new Set([
   "mathlib",
   "z3",
   "shapely",
-  "pint"
+  "pint",
 ]);
 var TECHNICAL_CONTEXT_INDICATORS = {
-  commit: ["git", "changes", "files", "message", "push", "repository", "branch", "staged"],
+  commit: [
+    "git",
+    "changes",
+    "files",
+    "message",
+    "push",
+    "repository",
+    "branch",
+    "staged",
+  ],
   push: ["git", "remote", "origin", "branch", "repository", "upstream"],
   pull: ["git", "remote", "origin", "branch", "merge", "rebase", "request"],
   merge: ["git", "branch", "conflict", "pull request", "pr"],
   branch: ["git", "checkout", "create", "switch", "feature"],
   checkout: ["git", "branch", "file", "commit", "HEAD"],
-  debug: ["error", "bug", "issue", "logs", "stack trace", "exception", "crash", "breakpoint"],
-  build: ["npm", "yarn", "cargo", "make", "compile", "webpack", "bundle", "project"],
-  implement: ["code", "feature", "function", "class", "method", "api", "interface", "module"],
-  plan: ["implementation", "phase", "architecture", "design", "roadmap", "milestone"],
-  research: ["api", "library", "documentation", "docs", "best practices", "pattern", "codebase"],
-  deploy: ["server", "production", "staging", "kubernetes", "docker", "cloud", "ci/cd"],
+  debug: [
+    "error",
+    "bug",
+    "issue",
+    "logs",
+    "stack trace",
+    "exception",
+    "crash",
+    "breakpoint",
+  ],
+  build: [
+    "npm",
+    "yarn",
+    "cargo",
+    "make",
+    "compile",
+    "webpack",
+    "bundle",
+    "project",
+  ],
+  implement: [
+    "code",
+    "feature",
+    "function",
+    "class",
+    "method",
+    "api",
+    "interface",
+    "module",
+  ],
+  plan: [
+    "implementation",
+    "phase",
+    "architecture",
+    "design",
+    "roadmap",
+    "milestone",
+  ],
+  research: [
+    "api",
+    "library",
+    "documentation",
+    "docs",
+    "best practices",
+    "pattern",
+    "codebase",
+  ],
+  deploy: [
+    "server",
+    "production",
+    "staging",
+    "kubernetes",
+    "docker",
+    "cloud",
+    "ci/cd",
+  ],
   release: ["version", "tag", "changelog", "npm", "package", "publish"],
   fix: ["bug", "error", "issue", "broken", "failing", "test", "regression"],
-  test: ["unit", "integration", "e2e", "coverage", "spec", "jest", "pytest", "vitest"],
+  test: [
+    "unit",
+    "integration",
+    "e2e",
+    "coverage",
+    "spec",
+    "jest",
+    "pytest",
+    "vitest",
+  ],
   validate: ["input", "schema", "data", "form", "field", "type"],
   review: ["code", "pr", "pull request", "changes", "diff"],
   analyze: ["code", "codebase", "performance", "metrics", "logs"],
   document: ["api", "readme", "docs", "jsdoc", "docstring", "comments"],
   refactor: ["code", "function", "class", "module", "clean up", "simplify"],
-  optimize: ["performance", "speed", "memory", "query", "algorithm"]
+  optimize: ["performance", "speed", "memory", "query", "algorithm"],
 };
 function shouldValidateWithLLM(match) {
   if (match.matchType === "explicit") {
@@ -118,7 +186,7 @@ function parseValidationResponse(response) {
     // Fail-open: activate on parse error
     confidence: 0.4,
     reason: "Failed to parse validation response",
-    parseError: true
+    parseError: true,
   };
   try {
     const jsonMatch = response.match(/\{[\s\S]*?\}/);
@@ -132,8 +200,12 @@ function parseValidationResponse(response) {
     }
     return {
       decision,
-      confidence: typeof parsed.confidence === "number" ? parsed.confidence : 0.5,
-      reason: typeof parsed.reason === "string" ? parsed.reason : "No reason provided"
+      confidence:
+        typeof parsed.confidence === "number" ? parsed.confidence : 0.5,
+      reason:
+        typeof parsed.reason === "string"
+          ? parsed.reason
+          : "No reason provided",
     };
   } catch (err) {
     return defaultResult;
@@ -149,11 +221,15 @@ async function validateSkillRelevance(match, llmCall) {
       decision: "activate",
       confidence: 0.3,
       reason: `Validation error: ${err instanceof Error ? err.message : "Unknown error"}`,
-      error: true
+      error: true,
     };
   }
 }
-function filterValidatedSkills(matches, validationResults, confidenceThreshold = 0.5) {
+function filterValidatedSkills(
+  matches,
+  validationResults,
+  confidenceThreshold = 0.5,
+) {
   return matches.filter((match) => {
     const result = validationResults.get(match.skillName);
     if (!result) {
@@ -173,5 +249,5 @@ export {
   filterValidatedSkills,
   parseValidationResponse,
   shouldValidateWithLLM,
-  validateSkillRelevance
+  validateSkillRelevance,
 };

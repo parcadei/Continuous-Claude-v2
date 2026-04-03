@@ -11,9 +11,9 @@
  * 4. Claude proactively discloses and acts on relevant memories
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { spawnSync } from 'child_process';
-import { getOpcDir } from './shared/opc-path.js';
+import { readFileSync, existsSync } from "fs";
+import { spawnSync } from "child_process";
+import { getOpcDir } from "./shared/opc-path.js";
 
 interface UserPromptSubmitInput {
   session_id: string;
@@ -35,7 +35,7 @@ interface MemoryMatch {
 }
 
 function readStdin(): string {
-  return readFileSync(0, 'utf-8');
+  return readFileSync(0, "utf-8");
 }
 
 /**
@@ -56,7 +56,7 @@ function extractIntent(prompt: string): string {
 
   // Strip meta-phrases iteratively
   for (const pattern of metaPhrases) {
-    intent = intent.replace(pattern, '');
+    intent = intent.replace(pattern, "");
   }
 
   intent = intent.trim();
@@ -74,30 +74,148 @@ function extractIntent(prompt: string): string {
  */
 function extractKeywords(prompt: string): string {
   const stopWords = new Set([
-    'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
-    'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
-    'should', 'may', 'might', 'must', 'can', 'to', 'of', 'in', 'for',
-    'on', 'with', 'at', 'by', 'from', 'as', 'into', 'through', 'during',
-    'before', 'after', 'above', 'below', 'between', 'under', 'again',
-    'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why',
-    'how', 'all', 'each', 'few', 'more', 'most', 'other', 'some', 'such',
-    'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very',
-    's', 't', 'just', 'don', 'now', 'i', 'me', 'my', 'you', 'your', 'we', 'help', 'with',
-    'our', 'they', 'them', 'their', 'it', 'its', 'this', 'that', 'these',
-    'what', 'which', 'who', 'whom', 'and', 'but', 'if', 'or', 'because',
-    'until', 'while', 'about', 'against', 'also', 'get', 'got', 'make',
-    'want', 'need', 'look', 'see', 'use', 'like', 'know', 'think', 'take',
-    'come', 'go', 'say', 'said', 'tell', 'please', 'help', 'let', 'sure',
-    'recall', 'remember', 'similar', 'problems', 'issues'
+    "a",
+    "an",
+    "the",
+    "is",
+    "are",
+    "was",
+    "were",
+    "be",
+    "been",
+    "being",
+    "have",
+    "has",
+    "had",
+    "do",
+    "does",
+    "did",
+    "will",
+    "would",
+    "could",
+    "should",
+    "may",
+    "might",
+    "must",
+    "can",
+    "to",
+    "of",
+    "in",
+    "for",
+    "on",
+    "with",
+    "at",
+    "by",
+    "from",
+    "as",
+    "into",
+    "through",
+    "during",
+    "before",
+    "after",
+    "above",
+    "below",
+    "between",
+    "under",
+    "again",
+    "further",
+    "then",
+    "once",
+    "here",
+    "there",
+    "when",
+    "where",
+    "why",
+    "how",
+    "all",
+    "each",
+    "few",
+    "more",
+    "most",
+    "other",
+    "some",
+    "such",
+    "no",
+    "nor",
+    "not",
+    "only",
+    "own",
+    "same",
+    "so",
+    "than",
+    "too",
+    "very",
+    "s",
+    "t",
+    "just",
+    "don",
+    "now",
+    "i",
+    "me",
+    "my",
+    "you",
+    "your",
+    "we",
+    "help",
+    "with",
+    "our",
+    "they",
+    "them",
+    "their",
+    "it",
+    "its",
+    "this",
+    "that",
+    "these",
+    "what",
+    "which",
+    "who",
+    "whom",
+    "and",
+    "but",
+    "if",
+    "or",
+    "because",
+    "until",
+    "while",
+    "about",
+    "against",
+    "also",
+    "get",
+    "got",
+    "make",
+    "want",
+    "need",
+    "look",
+    "see",
+    "use",
+    "like",
+    "know",
+    "think",
+    "take",
+    "come",
+    "go",
+    "say",
+    "said",
+    "tell",
+    "please",
+    "help",
+    "let",
+    "sure",
+    "recall",
+    "remember",
+    "similar",
+    "problems",
+    "issues",
   ]);
 
   const words = prompt
     .toLowerCase()
-    .replace(/[^\w\s-]/g, ' ')
+    .replace(/[^\w\s-]/g, " ")
     .split(/\s+/)
-    .filter(w => w.length > 2 && !stopWords.has(w));
+    .filter((w) => w.length > 2 && !stopWords.has(w));
 
-  return [...new Set(words)].slice(0, 5).join(' ');
+  return [...new Set(words)].slice(0, 5).join(" ");
 }
 
 /**
@@ -105,36 +223,47 @@ function extractKeywords(prompt: string): string {
  * For text-only mode, we search by the most significant keyword
  * (text ILIKE looks for substring match, not multi-word).
  */
-function checkMemoryRelevance(intent: string, projectDir: string): MemoryMatch | null {
+function checkMemoryRelevance(
+  intent: string,
+  projectDir: string,
+): MemoryMatch | null {
   if (!intent || intent.length < 3) return null;
 
   const opcDir = getOpcDir();
-  if (!opcDir) return null;  // Graceful degradation if OPC not available
+  if (!opcDir) return null; // Graceful degradation if OPC not available
 
   // PostgreSQL full-text search handles stopwords automatically via plainto_tsquery
   // Just clean up the intent: remove paths, underscores, short words
   const searchTerm = intent
-    .replace(/[_\/]/g, ' ')           // Convert underscores/slashes to spaces
-    .replace(/\b\w{1,2}\b/g, '')      // Remove 1-2 char words
-    .replace(/\s+/g, ' ')             // Collapse whitespace
+    .replace(/[_\/]/g, " ") // Convert underscores/slashes to spaces
+    .replace(/\b\w{1,2}\b/g, "") // Remove 1-2 char words
+    .replace(/\s+/g, " ") // Collapse whitespace
     .trim();
 
   // Use text-only for fast checking (< 1s), user can run /recall for semantic
-  const result = spawnSync('uv', [
-    'run', 'python', 'scripts/core/recall_learnings.py',
-    '--query', searchTerm,  // Single keyword for text match
-    '--k', '3',
-    '--json',
-    '--text-only'  // Fast text search for hints
-  ], {
-    encoding: 'utf-8',
-    cwd: opcDir,
-    env: {
-      ...process.env,
-      PYTHONPATH: opcDir
+  const result = spawnSync(
+    "uv",
+    [
+      "run",
+      "python",
+      "scripts/core/recall_learnings.py",
+      "--query",
+      searchTerm, // Single keyword for text match
+      "--k",
+      "3",
+      "--json",
+      "--text-only", // Fast text search for hints
+    ],
+    {
+      encoding: "utf-8",
+      cwd: opcDir,
+      env: {
+        ...process.env,
+        PYTHONPATH: opcDir,
+      },
+      timeout: 5000, // 5s timeout for fast check
     },
-    timeout: 5000  // 5s timeout for fast check
-  });
+  );
 
   if (result.status !== 0 || !result.stdout) {
     return null;
@@ -152,26 +281,26 @@ function checkMemoryRelevance(intent: string, projectDir: string): MemoryMatch |
 
     // Extract structured results with better previews
     const results: LearningResult[] = data.results.slice(0, 3).map((r: any) => {
-      const content = r.content || '';
+      const content = r.content || "";
       // Get first meaningful line up to 120 chars
       const preview = content
-        .split('\n')
+        .split("\n")
         .filter((l: string) => l.trim().length > 0)
         .map((l: string) => l.trim())
-        .join(' ')
+        .join(" ")
         .slice(0, 120);
 
       return {
-        id: (r.id || 'unknown').slice(0, 8),
-        type: r.learning_type || r.type || 'UNKNOWN',
-        content: preview + (content.length > 120 ? '...' : ''),
-        score: r.score || 0
+        id: (r.id || "unknown").slice(0, 8),
+        type: r.learning_type || r.type || "UNKNOWN",
+        content: preview + (content.length > 120 ? "..." : ""),
+        score: r.score || 0,
       };
     });
 
     return {
       count: data.results.length,
-      results
+      results,
     };
   } catch {
     return null;
@@ -193,7 +322,7 @@ async function main() {
   }
 
   // Skip if prompt is just a slash command
-  if (input.prompt.trim().startsWith('/')) {
+  if (input.prompt.trim().startsWith("/")) {
     return;
   }
 
@@ -210,18 +339,20 @@ async function main() {
 
   if (match) {
     // Build structured context for Claude
-    const resultLines = match.results.map((r, i) =>
-      `${i + 1}. [${r.type}] ${r.content} (id: ${r.id})`
-    ).join('\n');
+    const resultLines = match.results
+      .map((r, i) => `${i + 1}. [${r.type}] ${r.content} (id: ${r.id})`)
+      .join("\n");
 
     const claudeContext = `MEMORY MATCH (${match.count} results) for "${intent}":\n${resultLines}\nUse /recall "${intent}" for full content. Disclose if helpful.`;
 
-    console.log(JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: 'UserPromptSubmit',
-        additionalContext: claudeContext
-      }
-    }));
+    console.log(
+      JSON.stringify({
+        hookSpecificOutput: {
+          hookEventName: "UserPromptSubmit",
+          additionalContext: claudeContext,
+        },
+      }),
+    );
   }
 }
 

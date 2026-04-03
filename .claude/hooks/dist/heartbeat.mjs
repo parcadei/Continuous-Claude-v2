@@ -2,7 +2,10 @@
 import { spawnSync } from "child_process";
 import { join } from "path";
 function getPgConnectionString() {
-  return process.env.OPC_POSTGRES_URL || "postgresql://opc:opc_dev_password@localhost:5432/opc";
+  return (
+    process.env.OPC_POSTGRES_URL ||
+    "postgresql://opc:opc_dev_password@localhost:5432/opc"
+  );
 }
 function runPgQuery(pythonCode, args = []) {
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
@@ -20,32 +23,40 @@ os.chdir('${opcDir}')
 ${pythonCode}
 `;
   try {
-    const result = spawnSync("uv", ["run", "python", "-c", wrappedCode, ...args], {
-      encoding: "utf-8",
-      maxBuffer: 1024 * 1024,
-      cwd: opcDir,
-      env: {
-        ...process.env,
-        OPC_POSTGRES_URL: getPgConnectionString()
-      }
-    });
+    const result = spawnSync(
+      "uv",
+      ["run", "python", "-c", wrappedCode, ...args],
+      {
+        encoding: "utf-8",
+        maxBuffer: 1024 * 1024,
+        cwd: opcDir,
+        env: {
+          ...process.env,
+          OPC_POSTGRES_URL: getPgConnectionString(),
+        },
+      },
+    );
     return {
       success: result.status === 0,
       stdout: result.stdout?.trim() || "",
-      stderr: result.stderr || ""
+      stderr: result.stderr || "",
     };
   } catch (err) {
     return {
       success: false,
       stdout: "",
-      stderr: String(err)
+      stderr: String(err),
     };
   }
 }
 
 // src/heartbeat.ts
 function getSessionId() {
-  return process.env.COORDINATION_SESSION_ID || process.env.BRAINTRUST_SPAN_ID?.slice(0, 8) || "";
+  return (
+    process.env.COORDINATION_SESSION_ID ||
+    process.env.BRAINTRUST_SPAN_ID?.slice(0, 8) ||
+    ""
+  );
 }
 function getProject() {
   return process.env.CLAUDE_PROJECT_DIR || process.cwd();
@@ -86,6 +97,4 @@ asyncio.run(main())
   console.log(JSON.stringify({ result: "continue" }));
 }
 main();
-export {
-  main
-};
+export { main };

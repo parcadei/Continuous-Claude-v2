@@ -66,7 +66,6 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import List
 
 # API base URL
 NIA_API_URL = os.environ.get("NIA_API_URL", "https://apigcp.trynia.ai")
@@ -319,7 +318,7 @@ async def oracle_stream_job_events(job_id: str) -> None:
 async def search_query(
     messages: list[dict],
     repositories: list[str] = None,
-    data_sources: List[str] = None,
+    data_sources: list[str] = None,
     search_mode: str = "repositories",
     include_sources: bool = True,
 ) -> dict:

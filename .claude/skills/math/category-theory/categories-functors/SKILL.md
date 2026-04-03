@@ -12,7 +12,6 @@ Use this skill when working on categories-functors problems in category theory.
 
 ## Decision Tree
 
-
 1. **Verify Category Axioms**
    - Objects and morphisms (arrows) defined?
    - Identity morphism for each object: id_A: A -> A
@@ -21,7 +20,7 @@ Use this skill when working on categories-functors problems in category theory.
 
 2. **Check Functor Properties**
    - F: C -> D maps objects to objects, arrows to arrows
-   - Preserves identity: F(id_A) = id_{F(A)}
+   - Preserves identity: F(id*A) = id*{F(A)}
    - Preserves composition: F(g . f) = F(g) . F(f)
    - Write Lean 4: `theorem comp : F.map (g ≫ f) = F.map g ≫ F.map f := F.map_comp`
 
@@ -42,20 +41,22 @@ Use this skill when working on categories-functors problems in category theory.
    - Mathlib has full category theory library
    - See: `.claude/skills/lean4-functors/SKILL.md` for exact syntax
 
-
 ## Tool Commands
 
 ### Lean4_Category
+
 ```bash
 # Lean 4 with Mathlib: import CategoryTheory.Category.Basic
 ```
 
 ### Lean4_Functor
+
 ```bash
 # Lean 4: theorem map_comp (F : C ⥤ D) : F.map (g ≫ f) = F.map g ≫ F.map f := F.map_comp
 ```
 
 ### Lean4_Build
+
 ```bash
 lake build  # Compiler-in-the-loop verification
 ```

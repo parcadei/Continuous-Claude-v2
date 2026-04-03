@@ -12,7 +12,6 @@ Use this skill when working on graph-algorithms problems in graph number theory.
 
 ## Decision Tree
 
-
 1. **Traversal selection**
    - BFS: shortest paths (unweighted), level structure
    - DFS: cycle detection, topological sort, SCC
@@ -39,32 +38,35 @@ Use this skill when working on graph-algorithms problems in graph number theory.
    - Connectivity: via DFS/BFS
    - Coloring: greedy or SAT reduction
 
-
 ## Tool Commands
 
 ### Sympy_Adjacency
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py eigenvalues "adjacency_matrix"
 ```
 
 ### Z3_Dijkstra
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "d[v] >= d[u] + w(u,v) for all edges"
 ```
 
 ### Z3_Mst_Cut
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "min_edge_crossing_cut_in_mst"
 ```
 
 ### Sympy_Flow
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py linsolve "flow_conservation_equations"
 ```
 
 ## Key Techniques
 
-*From indexed textbooks:*
+_From indexed textbooks:_
 
 - [Graph Theory (Graduate Texts in Mathematics (173))] Given two numerical graph invariants i1 and i2, write i1 i2 if we can force i2 to be arbitrarily high on some subgraph of G by assuming that i1(G) is large enough. Formally: write i1 i2 if there exists a function f : N → N such that, given any k ∈ N, every graph G with i1(G) f (k) has a subgraph H with i2(H) k. If i1 i2 as well as i1 i2, write i1 ∼ i2.
 - [Graph Theory (Graduate Texts in Mathematics (173))] Find the smallest integer b = b(k) such that every graph of order n with more than kn + b edges has a (k + 1)-edge- connected subgraph, for every k ∈ N. Show that every tree T has at least Δ(T ) leaves. Show that a tree without a vertex of degree 2 has more leaves than other vertices.

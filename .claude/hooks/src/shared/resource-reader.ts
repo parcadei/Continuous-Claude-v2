@@ -12,9 +12,9 @@
  * See: docs/handoffs/resource-limits-plan.md
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { tmpdir } from 'os';
-import { join } from 'path';
+import { readFileSync, existsSync } from "fs";
+import { tmpdir } from "os";
+import { join } from "path";
 
 // =============================================================================
 // Types
@@ -113,15 +113,27 @@ export function readResourceState(): ResourceState | null {
   }
 
   try {
-    const content = readFileSync(resourceFile, 'utf-8');
+    const content = readFileSync(resourceFile, "utf-8");
     const data = JSON.parse(content);
 
     // Merge with defaults to handle missing fields
     return {
-      freeMemMB: typeof data.freeMemMB === 'number' ? data.freeMemMB : DEFAULT_RESOURCE_STATE.freeMemMB,
-      activeAgents: typeof data.activeAgents === 'number' ? data.activeAgents : DEFAULT_RESOURCE_STATE.activeAgents,
-      maxAgents: typeof data.maxAgents === 'number' ? data.maxAgents : DEFAULT_RESOURCE_STATE.maxAgents,
-      contextPct: typeof data.contextPct === 'number' ? data.contextPct : DEFAULT_RESOURCE_STATE.contextPct,
+      freeMemMB:
+        typeof data.freeMemMB === "number"
+          ? data.freeMemMB
+          : DEFAULT_RESOURCE_STATE.freeMemMB,
+      activeAgents:
+        typeof data.activeAgents === "number"
+          ? data.activeAgents
+          : DEFAULT_RESOURCE_STATE.activeAgents,
+      maxAgents:
+        typeof data.maxAgents === "number"
+          ? data.maxAgents
+          : DEFAULT_RESOURCE_STATE.maxAgents,
+      contextPct:
+        typeof data.contextPct === "number"
+          ? data.contextPct
+          : DEFAULT_RESOURCE_STATE.contextPct,
     };
   } catch {
     // Return null on JSON parse error or file read error

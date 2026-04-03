@@ -12,7 +12,6 @@ Use this skill when working on limits problems in real analysis.
 
 ## Decision Tree
 
-
 1. **Direct Substitution**
    - Try plugging in the value directly
    - If you get a determinate form, that's the answer
@@ -30,20 +29,22 @@ Use this skill when working on limits problems in real analysis.
    - Find delta in terms of epsilon
    - Verify with `math_scratchpad.py verify`
 
-
 ## Tool Commands
 
 ### Sympy_Limit
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py limit "sin(x)/x" --var x --at 0
 ```
 
 ### Sympy_Diff
+
 ```bash
 uv run python -m runtime.harness scripts/sympy_compute.py diff "x**2" --var x
 ```
 
 ### Z3_Prove
+
 ```bash
 uv run python -m runtime.harness scripts/z3_solve.py prove "limit_bound" --vars x
 ```

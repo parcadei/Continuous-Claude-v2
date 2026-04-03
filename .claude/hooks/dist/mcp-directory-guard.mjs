@@ -28,11 +28,10 @@ function getOpcDir() {
 // src/mcp-directory-guard.ts
 var SCRIPT_PATH_PATTERN = /\bscripts\/(mcp|core)\//;
 function buildCdPrefixPattern(opcDir) {
-  const escapedDir = opcDir ? opcDir.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") : "";
-  const variants = [
-    "\\$CLAUDE_OPC_DIR",
-    "\\$\\{CLAUDE_OPC_DIR\\}"
-  ];
+  const escapedDir = opcDir
+    ? opcDir.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    : "";
+  const variants = ["\\$CLAUDE_OPC_DIR", "\\$\\{CLAUDE_OPC_DIR\\}"];
   if (escapedDir) {
     variants.push(escapedDir);
   }
@@ -78,8 +77,8 @@ Blocked command:
   ${command.trim()}
 
 Corrected command:
-  ${corrected}`
-    }
+  ${corrected}`,
+    },
   };
   console.log(JSON.stringify(output));
 }

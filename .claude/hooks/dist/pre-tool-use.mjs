@@ -24,25 +24,25 @@ function getDbPath() {
     ".claude",
     "cache",
     "agentica-coordination",
-    "coordination.db"
+    "coordination.db",
   );
 }
 function runPythonQuery(script, args) {
   try {
     const result = spawnSync("python3", ["-c", script, ...args], {
       encoding: "utf-8",
-      maxBuffer: 1024 * 1024
+      maxBuffer: 1024 * 1024,
     });
     return {
       success: result.status === 0,
       stdout: result.stdout?.trim() || "",
-      stderr: result.stderr || ""
+      stderr: result.stderr || "",
     };
   } catch (err) {
     return {
       success: false,
       stdout: "",
-      stderr: String(err)
+      stderr: String(err),
     };
   }
 }
@@ -53,7 +53,7 @@ var DEFAULT_RESOURCE_STATE = {
   freeMemMB: 4096,
   activeAgents: 0,
   maxAgents: 10,
-  contextPct: 0
+  contextPct: 0,
 };
 function getSessionId() {
   return process.env.CLAUDE_SESSION_ID || String(process.ppid || process.pid);
@@ -71,10 +71,22 @@ function readResourceState() {
     const content = readFileSync(resourceFile, "utf-8");
     const data = JSON.parse(content);
     return {
-      freeMemMB: typeof data.freeMemMB === "number" ? data.freeMemMB : DEFAULT_RESOURCE_STATE.freeMemMB,
-      activeAgents: typeof data.activeAgents === "number" ? data.activeAgents : DEFAULT_RESOURCE_STATE.activeAgents,
-      maxAgents: typeof data.maxAgents === "number" ? data.maxAgents : DEFAULT_RESOURCE_STATE.maxAgents,
-      contextPct: typeof data.contextPct === "number" ? data.contextPct : DEFAULT_RESOURCE_STATE.contextPct
+      freeMemMB:
+        typeof data.freeMemMB === "number"
+          ? data.freeMemMB
+          : DEFAULT_RESOURCE_STATE.freeMemMB,
+      activeAgents:
+        typeof data.activeAgents === "number"
+          ? data.activeAgents
+          : DEFAULT_RESOURCE_STATE.activeAgents,
+      maxAgents:
+        typeof data.maxAgents === "number"
+          ? data.maxAgents
+          : DEFAULT_RESOURCE_STATE.maxAgents,
+      contextPct:
+        typeof data.contextPct === "number"
+          ? data.contextPct
+          : DEFAULT_RESOURCE_STATE.contextPct,
     };
   } catch {
     return null;
@@ -149,7 +161,7 @@ print(json.dumps(broadcasts))
       contextMessage += "------------------------\n";
       return {
         result: "continue",
-        message: contextMessage
+        message: contextMessage,
       };
     }
     return { result: "continue" };
@@ -176,7 +188,8 @@ async function onPreToolUse2(input) {
   if (toolName === "Read") {
     return {
       result: "block",
-      message: "JURY ISOLATION: Read tool is blocked in strict isolation mode to prevent cross-juror contamination. Vote based on your independent analysis."
+      message:
+        "JURY ISOLATION: Read tool is blocked in strict isolation mode to prevent cross-juror contamination. Vote based on your independent analysis.",
     };
   }
   return { result: "continue" };
@@ -242,7 +255,11 @@ conn.close()
 print(json.dumps({'feedback': feedback}))
 `;
     const prevIteration = iteration - 1;
-    const result = runPythonQuery(query, [dbPath, gcId, prevIteration.toString()]);
+    const result = runPythonQuery(query, [
+      dbPath,
+      gcId,
+      prevIteration.toString(),
+    ]);
     if (!result.success) {
       return { result: "continue" };
     }
@@ -255,7 +272,7 @@ print(json.dumps({'feedback': feedback}))
     if (data.feedback && data.feedback !== "(feedback recorded)") {
       return {
         result: "continue",
-        message: `CRITIC FEEDBACK from iteration ${prevIteration}: ${data.feedback}`
+        message: `CRITIC FEEDBACK from iteration ${prevIteration}: ${data.feedback}`,
       };
     }
     return { result: "continue" };
@@ -288,7 +305,10 @@ async function onPreToolUse5(input) {
     return { result: "continue" };
   }
   try {
-    const keys = readsFrom.split(",").map((k) => k.trim()).filter((k) => k);
+    const keys = readsFrom
+      .split(",")
+      .map((k) => k.trim())
+      .filter((k) => k);
     const query = `
 import sqlite3
 import json
@@ -320,7 +340,11 @@ for key in keys:
 conn.close()
 print(json.dumps(state))
 `;
-    const result = runPythonQuery(query, [dbPath, blackboardId, JSON.stringify(keys)]);
+    const result = runPythonQuery(query, [
+      dbPath,
+      blackboardId,
+      JSON.stringify(keys),
+    ]);
     if (!result.success) {
       console.error("PreToolUse Python error:", result.stderr);
       return { result: "continue" };
@@ -344,7 +368,7 @@ print(json.dumps(state))
     }
     return {
       result: "continue",
-      message
+      message,
     };
   } catch (err) {
     console.error("PreToolUse hook error:", err);
@@ -476,7 +500,7 @@ print(json.dumps({'events': events, 'count': len(events)}))
     message += "Process these events according to your subscription.";
     return {
       result: "continue",
-      message
+      message,
     };
   } catch (err) {
     console.error("PreToolUse hook error:", err);
@@ -533,7 +557,12 @@ opponent_arg = row[0] if row and row[0] else None
 conn.close()
 print(json.dumps({'opponent_argument': opponent_arg}))
 `;
-    const result = runPythonQuery(query, [dbPath, advId, (round - 1).toString(), opponentRole]);
+    const result = runPythonQuery(query, [
+      dbPath,
+      advId,
+      (round - 1).toString(),
+      opponentRole,
+    ]);
     if (!result.success) {
       return { result: "continue" };
     }
@@ -549,7 +578,7 @@ print(json.dumps({'opponent_argument': opponent_arg}))
         message: `OPPONENT'S LAST ARGUMENT:
 ${data.opponent_argument}
 
-Consider this when forming your response.`
+Consider this when forming your response.`,
       };
     }
     return { result: "continue" };
@@ -616,7 +645,11 @@ for row in cursor.fetchall():
 
 print(json.dumps(artifacts))
 `;
-    const result = runPythonQuery(query, [dbPath, pipelineId, String(currentStage)]);
+    const result = runPythonQuery(query, [
+      dbPath,
+      pipelineId,
+      String(currentStage),
+    ]);
     if (!result.success) {
       return { result: "continue" };
     }
@@ -644,7 +677,7 @@ print(json.dumps(artifacts))
       contextMessage += "-----------------------------------\n";
       return {
         result: "continue",
-        message: contextMessage
+        message: contextMessage,
       };
     }
     return { result: "continue" };
@@ -666,11 +699,16 @@ async function main() {
   }
   if (input.tool_name === "Task") {
     const resourceState = readResourceState();
-    if (resourceState && resourceState.activeAgents >= resourceState.maxAgents) {
-      console.log(JSON.stringify({
-        result: "block",
-        reason: `Agent limit reached: ${resourceState.activeAgents}/${resourceState.maxAgents} agents running. Wait for existing agents to complete or terminate idle ones.`
-      }));
+    if (
+      resourceState &&
+      resourceState.activeAgents >= resourceState.maxAgents
+    ) {
+      console.log(
+        JSON.stringify({
+          result: "block",
+          reason: `Agent limit reached: ${resourceState.activeAgents}/${resourceState.maxAgents} agents running. Wait for existing agents to complete or terminate idle ones.`,
+        }),
+      );
       return;
     }
   }

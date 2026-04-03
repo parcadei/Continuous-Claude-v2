@@ -36,10 +36,10 @@ Pass explicit identifiers through the entire pipeline. "Most recent" is a race c
 
 ```typescript
 // BAD: race condition at session boundaries
-spawn('analyzer', ['--learn'])  // defaults to "most recent"
+spawn("analyzer", ["--learn"]); // defaults to "most recent"
 
 // GOOD: explicit identity
-spawn('analyzer', ['--learn', '--session-id', input.session_id])
+spawn("analyzer", ["--learn", "--session-id", input.session_id]);
 ```
 
 ## Source Sessions

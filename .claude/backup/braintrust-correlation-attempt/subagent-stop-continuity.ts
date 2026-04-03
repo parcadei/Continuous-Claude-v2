@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 interface SubagentStopInput {
   session_id: string;
@@ -25,13 +25,13 @@ async function main() {
 
   // Prevent infinite loops
   if (input.stop_hook_active) {
-    console.log(JSON.stringify({ result: 'continue' }));
+    console.log(JSON.stringify({ result: "continue" }));
     return;
   }
 
   // Write session_id for PostToolUse to pick up (enables sub-agent trace correlation)
-  const stateDir = path.join(process.env.HOME || '', '.claude', 'state');
-  const pendingFile = path.join(stateDir, 'pending_subagent_session.json');
+  const stateDir = path.join(process.env.HOME || "", ".claude", "state");
+  const pendingFile = path.join(stateDir, "pending_subagent_session.json");
 
   try {
     // Ensure state directory exists
@@ -42,7 +42,7 @@ async function main() {
     // Append to array (handle parallel agents)
     let pending: string[] = [];
     try {
-      pending = JSON.parse(fs.readFileSync(pendingFile, 'utf-8'));
+      pending = JSON.parse(fs.readFileSync(pendingFile, "utf-8"));
       if (!Array.isArray(pending)) pending = [];
     } catch {
       // File doesn't exist or is invalid, start fresh
@@ -59,29 +59,32 @@ async function main() {
 
     if (!agentInfo.agentName) {
       // Not a recognized agent, skip
-      console.log(JSON.stringify({ result: 'continue' }));
+      console.log(JSON.stringify({ result: "continue" }));
       return;
     }
 
     // Read agent's output file if it exists
     const outputPath = path.join(
       projectDir,
-      '.claude',
-      'cache',
-      'agents',
+      ".claude",
+      "cache",
+      "agents",
       agentInfo.agentName,
-      'latest-output.md'
+      "latest-output.md",
     );
 
-    let outputSummary = '';
+    let outputSummary = "";
     if (fs.existsSync(outputPath)) {
-      const content = fs.readFileSync(outputPath, 'utf-8');
+      const content = fs.readFileSync(outputPath, "utf-8");
       // Extract first 500 chars or executive summary
-      const summaryMatch = content.match(/## Executive Summary\n([\s\S]*?)(?=\n##|$)/);
+      const summaryMatch = content.match(
+        /## Executive Summary\n([\s\S]*?)(?=\n##|$)/,
+      );
       const goalMatch = content.match(/## Goal\n([\s\S]*?)(?=\n##|$)/);
       const symptomMatch = content.match(/## Symptom\n([\s\S]*?)(?=\n##|$)/);
 
-      outputSummary = summaryMatch?.[1]?.trim() ||
+      outputSummary =
+        summaryMatch?.[1]?.trim() ||
         goalMatch?.[1]?.trim() ||
         symptomMatch?.[1]?.trim() ||
         content.slice(0, 300).trim();
@@ -94,26 +97,29 @@ async function main() {
     appendToLedger(projectDir, agentInfo, outputSummary);
 
     const message = `[SubagentStop] ${agentInfo.agentName} completed. Report: .claude/cache/agents/${agentInfo.agentName}/latest-output.md`;
-    console.log(JSON.stringify({ result: 'continue', message }));
-
+    console.log(JSON.stringify({ result: "continue", message }));
   } catch (err) {
     // Don't break on errors, just continue
-    console.log(JSON.stringify({ result: 'continue' }));
+    console.log(JSON.stringify({ result: "continue" }));
   }
 }
 
-function parseTranscript(transcriptPath: string): { agentName: string | null; task: string; agentId: string | null } {
+function parseTranscript(transcriptPath: string): {
+  agentName: string | null;
+  task: string;
+  agentId: string | null;
+} {
   let agentName: string | null = null;
-  let task = '';
+  let task = "";
   let agentId: string | null = null;
 
   try {
     if (!fs.existsSync(transcriptPath)) {
-      return { agentName: null, task: '', agentId: null };
+      return { agentName: null, task: "", agentId: null };
     }
 
-    const content = fs.readFileSync(transcriptPath, 'utf-8');
-    const lines = content.split('\n').filter(l => l.trim());
+    const content = fs.readFileSync(transcriptPath, "utf-8");
+    const lines = content.split("\n").filter((l) => l.trim());
 
     // Look for Task tool invocation to find agent name
     for (const line of lines) {
@@ -121,26 +127,35 @@ function parseTranscript(transcriptPath: string): { agentName: string | null; ta
         const entry: TranscriptEntry = JSON.parse(line);
 
         // Look for the Task tool call that spawned this agent
-        if (entry.tool_name === 'Task' && entry.tool_input) {
+        if (entry.tool_name === "Task" && entry.tool_input) {
           const subagentType = entry.tool_input.subagent_type as string;
           const prompt = entry.tool_input.prompt as string;
 
           // Check if it's one of our custom agents
-          if ([
-            'research-agent', 'plan-agent', 'debug-agent', 'rp-explorer',
-            'codebase-analyzer', 'codebase-locator', 'codebase-pattern-finder', 'explore'
-          ].includes(subagentType)) {
+          if (
+            [
+              "research-agent",
+              "plan-agent",
+              "debug-agent",
+              "rp-explorer",
+              "codebase-analyzer",
+              "codebase-locator",
+              "codebase-pattern-finder",
+              "explore",
+            ].includes(subagentType)
+          ) {
             agentName = subagentType;
-            task = prompt?.slice(0, 200) || '';
+            task = prompt?.slice(0, 200) || "";
             break;
           }
         }
 
         // Also check for agent file references in messages
         if (entry.message?.content) {
-          const content = typeof entry.message.content === 'string'
-            ? entry.message.content
-            : entry.message.content.map(c => c.text || '').join(' ');
+          const content =
+            typeof entry.message.content === "string"
+              ? entry.message.content
+              : entry.message.content.map((c) => c.text || "").join(" ");
 
           const agentMatch = content.match(/\.claude\/agents\/([\w-]+)\.md/);
           if (agentMatch) {
@@ -156,7 +171,7 @@ function parseTranscript(transcriptPath: string): { agentName: string | null; ta
   }
 
   // Generate agentId from transcript path (contains session info)
-  const transcriptName = path.basename(transcriptPath, '.jsonl');
+  const transcriptName = path.basename(transcriptPath, ".jsonl");
   agentId = `${agentName}-${transcriptName.slice(-8)}`;
 
   return { agentName, task, agentId };
@@ -165,12 +180,12 @@ function parseTranscript(transcriptPath: string): { agentName: string | null; ta
 function writeAgentLog(
   projectDir: string,
   agentInfo: { agentName: string | null; task: string; agentId: string | null },
-  outputPath: string
+  outputPath: string,
 ): void {
   if (!agentInfo.agentName || !agentInfo.agentId) return;
 
-  const logDir = path.join(projectDir, '.claude', 'cache', 'agents');
-  const logFile = path.join(logDir, 'agent-log.jsonl');
+  const logDir = path.join(projectDir, ".claude", "cache", "agents");
+  const logFile = path.join(logDir, "agent-log.jsonl");
 
   // Ensure directory exists
   if (!fs.existsSync(logDir)) {
@@ -182,25 +197,26 @@ function writeAgentLog(
     type: agentInfo.agentName,
     task: agentInfo.task.slice(0, 500),
     timestamp: new Date().toISOString(),
-    output: outputPath.replace(projectDir, ''),
-    status: 'completed',
-    canResume: true
+    output: outputPath.replace(projectDir, ""),
+    status: "completed",
+    canResume: true,
   };
 
-  fs.appendFileSync(logFile, JSON.stringify(logEntry) + '\n');
+  fs.appendFileSync(logFile, JSON.stringify(logEntry) + "\n");
 }
 
 function appendToLedger(
   projectDir: string,
   agentInfo: { agentName: string | null; task: string; agentId: string | null },
-  outputSummary: string
+  outputSummary: string,
 ): void {
   if (!agentInfo.agentName) return;
 
   // Find ledger file
-  const ledgerDir = path.join(projectDir, 'thoughts', 'ledgers');
-  const ledgerFiles = fs.readdirSync(ledgerDir)
-    .filter(f => f.startsWith('CONTINUITY_CLAUDE-') && f.endsWith('.md'));
+  const ledgerDir = path.join(projectDir, "thoughts", "ledgers");
+  const ledgerFiles = fs
+    .readdirSync(ledgerDir)
+    .filter((f) => f.startsWith("CONTINUITY_CLAUDE-") && f.endsWith(".md"));
 
   if (ledgerFiles.length === 0) return;
 
@@ -211,13 +227,13 @@ function appendToLedger(
   })[0];
 
   const ledgerPath = path.join(ledgerDir, mostRecent);
-  let content = fs.readFileSync(ledgerPath, 'utf-8');
+  let content = fs.readFileSync(ledgerPath, "utf-8");
 
   const timestamp = new Date().toISOString();
   const agentReport = `
 ### ${agentInfo.agentName} (${timestamp})
-- Task: ${agentInfo.task.slice(0, 100)}${agentInfo.task.length > 100 ? '...' : ''}
-- Summary: ${outputSummary.slice(0, 200)}${outputSummary.length > 200 ? '...' : ''}
+- Task: ${agentInfo.task.slice(0, 100)}${agentInfo.task.length > 100 ? "..." : ""}
+- Summary: ${outputSummary.slice(0, 200)}${outputSummary.length > 200 ? "..." : ""}
 - Output: \`.claude/cache/agents/${agentInfo.agentName}/latest-output.md\`
 `;
 
@@ -225,15 +241,23 @@ function appendToLedger(
   const agentReportsMatch = content.match(/## Agent Reports\n/);
   if (agentReportsMatch) {
     // Append to existing section
-    const insertPos = content.indexOf('## Agent Reports\n') + '## Agent Reports\n'.length;
-    content = content.slice(0, insertPos) + agentReport + content.slice(insertPos);
+    const insertPos =
+      content.indexOf("## Agent Reports\n") + "## Agent Reports\n".length;
+    content =
+      content.slice(0, insertPos) + agentReport + content.slice(insertPos);
   } else {
     // Create new section before Architecture Summary or at end
-    const archMatch = content.indexOf('## Architecture Summary');
-    const hooksMatch = content.indexOf('## Hooks Summary');
-    const insertBefore = archMatch > 0 ? archMatch : (hooksMatch > 0 ? hooksMatch : content.length);
+    const archMatch = content.indexOf("## Architecture Summary");
+    const hooksMatch = content.indexOf("## Hooks Summary");
+    const insertBefore =
+      archMatch > 0 ? archMatch : hooksMatch > 0 ? hooksMatch : content.length;
 
-    content = content.slice(0, insertBefore) + '\n## Agent Reports\n' + agentReport + '\n' + content.slice(insertBefore);
+    content =
+      content.slice(0, insertBefore) +
+      "\n## Agent Reports\n" +
+      agentReport +
+      "\n" +
+      content.slice(insertBefore);
   }
 
   fs.writeFileSync(ledgerPath, content);
@@ -241,9 +265,9 @@ function appendToLedger(
 
 async function readStdin(): Promise<string> {
   return new Promise((resolve) => {
-    let data = '';
-    process.stdin.on('data', chunk => data += chunk);
-    process.stdin.on('end', () => resolve(data));
+    let data = "";
+    process.stdin.on("data", (chunk) => (data += chunk));
+    process.stdin.on("end", () => resolve(data));
   });
 }
 

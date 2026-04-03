@@ -2,6 +2,7 @@
 name: loogle-search
 description: Search Mathlib for lemmas by type signature pattern
 ---
+
 # Loogle Search - Mathlib Type Signature Search
 
 Search Mathlib for lemmas by type signature pattern.
@@ -29,12 +30,12 @@ loogle-server &
 
 ## Query Syntax
 
-| Pattern | Meaning |
-|---------|---------|
-| `_` | Any single type |
+| Pattern    | Meaning                                    |
+| ---------- | ------------------------------------------ |
+| `_`        | Any single type                            |
 | `?a`, `?b` | Type variables (same variable = same type) |
-| `Foo, Bar` | Must mention both `Foo` and `Bar` |
-| `Foo.bar` | Exact name match |
+| `Foo, Bar` | Must mention both `Foo` and `Bar`          |
+| `Foo.bar`  | Exact name match                           |
 
 ## Examples
 
@@ -62,6 +63,7 @@ loogle-search "Fintype.card"
 ## Setup
 
 Loogle must be built first:
+
 ```bash
 cd ~/tools/loogle && lake build
 lake build LoogleMathlibCache  # or use --write-index
@@ -70,6 +72,7 @@ lake build LoogleMathlibCache  # or use --write-index
 ## Integration with Proofs
 
 When stuck in a Lean proof:
+
 1. Identify what type shape you need
 2. Query Loogle to find the lemma name
 3. Apply the lemma in your proof

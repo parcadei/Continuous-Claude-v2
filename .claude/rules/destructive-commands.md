@@ -5,6 +5,7 @@
 ## Deletion Commands (ALWAYS ASK FIRST)
 
 Before running ANY of these, ask the user:
+
 - `rm` / `rm -rf` (delete files/directories)
 - `rmdir` (remove directories)
 - `unlink` (remove files)
@@ -13,12 +14,14 @@ Before running ANY of these, ask the user:
 ### Example
 
 WRONG:
+
 ```
 "Let me clean that up"
 rm -rf /tmp/old-cache/
 ```
 
 RIGHT:
+
 ```
 "I can delete /tmp/old-cache/. Should I run `rm -rf /tmp/old-cache/`?"
 [wait for explicit "yes"]
@@ -27,6 +30,7 @@ RIGHT:
 ### Archive vs Delete
 
 When user says "archive X":
+
 - MOVE to archive folder (e.g., `mv X opc/archive/`)
 - Do NOT delete
 
@@ -35,6 +39,7 @@ When user says "archive X":
 ## Git Commands (ALWAYS ASK FIRST)
 
 ## Commands that require confirmation:
+
 - `git checkout` (can overwrite uncommitted changes)
 - `git reset` (can lose commits)
 - `git clean` (deletes untracked files)
@@ -45,6 +50,7 @@ When user says "archive X":
 - `git commit` (creates commits)
 
 ## Safe commands (no confirmation needed):
+
 - `git status`
 - `git log`
 - `git diff`
@@ -61,12 +67,14 @@ When user says "archive X":
 ## Example
 
 WRONG:
+
 ```
 "Let me restore that file"
 git checkout HEAD -- file.ts
 ```
 
 RIGHT:
+
 ```
 "I can restore file.ts from git. This will overwrite any uncommitted changes. Run `git checkout HEAD -- file.ts`?"
 [wait for user confirmation]

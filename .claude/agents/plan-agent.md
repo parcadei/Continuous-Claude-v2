@@ -69,11 +69,13 @@ uv run python -m runtime.harness scripts/morph_apply.py \
 ## Step 4: Write Output
 
 **ALWAYS write your plan to:**
+
 ```
 $CLAUDE_CC_DIR/.claude/cache/agents/plan-agent/output-{timestamp}.md
 ```
 
 Also copy to persistent location if plan should survive cache cleanup:
+
 ```
 $CLAUDE_CC_DIR/thoughts/shared/plans/[descriptive-name].md
 ```
@@ -84,35 +86,46 @@ Follow the skill methodology, but ensure you include:
 
 ```markdown
 # Implementation Plan: [Feature/Task Name]
+
 Generated: [timestamp]
 
 ## Goal
+
 [What we're building and why - from context]
 
 ## Research Summary
+
 [Key findings from MCP research]
 
 ## Existing Codebase Analysis
+
 [Relevant patterns, files, architecture notes from repoprompt]
 
 ## Implementation Phases
 
 ### Phase 1: [Name]
+
 **Files to modify:**
+
 - `path/to/file.ts` - [what to change]
 
 **Steps:**
+
 1. [Specific step]
 2. [Specific step]
 
 **Acceptance criteria:**
+
 - [ ] Criterion 1
 
 ### Phase 2: [Name]
+
 ...
 
 ## Testing Strategy
+
 ## Risks & Considerations
+
 ## Estimated Complexity
 ```
 

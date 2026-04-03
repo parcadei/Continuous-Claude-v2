@@ -10,6 +10,7 @@ You are tasked with creating git commits for the changes made during this sessio
 ## When to Use
 
 Activate when:
+
 - User says "/commit" or "/git-commit"
 - User says "commit these changes" or "create a commit"
 - After implementing a feature or fix that needs to be committed
@@ -46,6 +47,7 @@ Activate when:
    - Stored in `.git/claude/commits/<hash>/reasoning.md`
 
 ## Important:
+
 - **NEVER add co-author information or Claude attribution**
 - Commits should be authored solely by the user
 - Do not include any "Generated with Claude" messages
@@ -53,6 +55,7 @@ Activate when:
 - Write commit messages as if the user wrote them
 
 ## Remember:
+
 - You have the full context of what was done in this session
 - Group related changes together
 - Keep commits focused and atomic when possible

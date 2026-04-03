@@ -35,12 +35,15 @@ If the preview seems highly relevant, offer to show more:
 ## Examples
 
 **Good disclosure:**
+
 > User: "How do I fix this hook error?"
 > Claude: "I recall from a previous session that hook errors often come from path issues. Let me check if that applies here..."
 
 **Over-disclosure (avoid):**
+
 > User: "Fix the bug"
 > Claude: "I found 3 memories about bugs. Memory 1 says... Memory 2 says..." (too much)
 
 **No disclosure needed:**
+
 > Memory match is just test data or unrelated backfill entries

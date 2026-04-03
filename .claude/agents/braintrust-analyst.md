@@ -31,6 +31,7 @@ cd $CLAUDE_OPC_DIR && uv run python -m runtime.harness scripts/braintrust_analyz
 ```
 
 Other analyses (run as needed):
+
 - `--sessions 5` - List recent sessions
 - `--agent-stats` - Agent usage (7 days)
 - `--skill-stats` - Skill usage (7 days)
@@ -40,15 +41,18 @@ Other analyses (run as needed):
 ## Step 3: Write Report
 
 **ALWAYS write your findings to:**
+
 ```
 $CLAUDE_CC_DIR/.claude/cache/agents/braintrust-analyst/output-{timestamp}.md
 ```
 
 Use Read-then-Write pattern:
+
 1. Read the output file first (even if it doesn't exist)
 2. Write complete report with actual script output
 
 Your report MUST include:
+
 - Raw output from the script(s)
 - Your analysis and interpretation
 - Specific numbers and IDs from the data

@@ -10,7 +10,7 @@ var TASK_ERROR_PATTERNS = [
   /\btimeout\b/i,
   /\babort(ed)?\b/i,
   /\bpanic\b/i,
-  /\bfatal\b/i
+  /\bfatal\b/i,
 ];
 var ERROR_CONTEXT_PATTERNS = [
   /ModuleNotFoundError:\s*No module named\s*['"]?(\w+)['"]?/i,
@@ -29,17 +29,20 @@ var ERROR_CONTEXT_PATTERNS = [
   /Error:\s*(.+)/i,
   /error:\s*(.+)/i,
   /failed:\s*(.+)/i,
-  /FAILED:\s*(.+)/i
+  /FAILED:\s*(.+)/i,
 ];
 function isBashFailure(response) {
   if (typeof response === "object" && response !== null) {
     const bashResponse = response;
-    if (typeof bashResponse.exit_code === "number" && bashResponse.exit_code !== 0) {
+    if (
+      typeof bashResponse.exit_code === "number" &&
+      bashResponse.exit_code !== 0
+    ) {
       const stderr = bashResponse.stderr || "";
       const stdout = bashResponse.stdout || "";
       return {
         failed: true,
-        errorText: stderr || stdout
+        errorText: stderr || stdout,
       };
     }
   }
@@ -77,7 +80,9 @@ function extractErrorContext(errorText, toolInput) {
   return "execution failed";
 }
 function buildNiaSearchCommand(errorContext) {
-  const escapedContext = errorContext.replace(/'/g, "'\\''").replace(/"/g, '\\"');
+  const escapedContext = errorContext
+    .replace(/'/g, "'\\''")
+    .replace(/"/g, '\\"');
   return `uv run python -m runtime.harness scripts/nia_docs.py search universal "${escapedContext}" --limit 5`;
 }
 async function main() {
@@ -122,7 +127,7 @@ ${niaCommand}
 \`\`\`
 
 Error context: ${errorContext.substring(0, 200)}
----`
+---`,
   };
   console.log(JSON.stringify(output));
 }

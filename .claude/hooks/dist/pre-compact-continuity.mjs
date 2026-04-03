@@ -10,7 +10,7 @@ function parseTranscript(transcriptPath) {
     recentToolCalls: [],
     lastAssistantMessage: "",
     filesModified: [],
-    errorsEncountered: []
+    errorsEncountered: [],
   };
   if (!fs.existsSync(transcriptPath)) {
     return summary;
@@ -27,7 +27,10 @@ function parseTranscript(transcriptPath) {
       const entry = JSON.parse(line);
       if (entry.role === "assistant" && typeof entry.content === "string") {
         lastAssistant = entry.content;
-      } else if (entry.type === "assistant" && typeof entry.content === "string") {
+      } else if (
+        entry.type === "assistant" &&
+        typeof entry.content === "string"
+      ) {
         lastAssistant = entry.content;
       }
       if (entry.tool_name || entry.type === "tool_use") {
@@ -37,20 +40,28 @@ function parseTranscript(transcriptPath) {
             name: toolName,
             timestamp: entry.timestamp,
             input: entry.tool_input,
-            success: true
+            success: true,
             // Will be updated by result
           };
-          if (toolName === "TodoWrite" || toolName.toLowerCase().includes("todowrite")) {
+          if (
+            toolName === "TodoWrite" ||
+            toolName.toLowerCase().includes("todowrite")
+          ) {
             const input = entry.tool_input;
             if (input?.todos) {
               lastTodoState = input.todos.map((t, idx) => ({
                 id: t.id || `todo-${idx}`,
                 content: t.content || "",
-                status: t.status || "pending"
+                status: t.status || "pending",
               }));
             }
           }
-          if (toolName === "Edit" || toolName === "Write" || toolName.toLowerCase().includes("edit") || toolName.toLowerCase().includes("write")) {
+          if (
+            toolName === "Edit" ||
+            toolName === "Write" ||
+            toolName.toLowerCase().includes("edit") ||
+            toolName.toLowerCase().includes("write")
+          ) {
             const input = entry.tool_input;
             const filePath = input?.file_path || input?.path;
             if (filePath && typeof filePath === "string") {
@@ -99,14 +110,22 @@ function parseTranscript(transcriptPath) {
   return summary;
 }
 function generateAutoHandoff(summary, sessionName) {
-  const timestamp = (/* @__PURE__ */ new Date()).toISOString();
+  const timestamp = /* @__PURE__ */ new Date().toISOString();
   const dateOnly = timestamp.split("T")[0];
   const lines = [];
-  const inProgress = summary.lastTodos.filter((t) => t.status === "in_progress");
+  const inProgress = summary.lastTodos.filter(
+    (t) => t.status === "in_progress",
+  );
   const pending = summary.lastTodos.filter((t) => t.status === "pending");
   const completed = summary.lastTodos.filter((t) => t.status === "completed");
-  const currentTask = inProgress[0]?.content || pending[0]?.content || "Continue from auto-compact";
-  const goalSummary = completed.length > 0 ? `Completed ${completed.length} task(s) before auto-compact` : "Session auto-compacted";
+  const currentTask =
+    inProgress[0]?.content ||
+    pending[0]?.content ||
+    "Continue from auto-compact";
+  const goalSummary =
+    completed.length > 0
+      ? `Completed ${completed.length} task(s) before auto-compact`
+      : "Session auto-compacted";
   lines.push("---");
   lines.push(`session: ${sessionName}`);
   lines.push(`date: ${dateOnly}`);
@@ -152,13 +171,19 @@ function generateAutoHandoff(summary, sessionName) {
   lines.push('  - auto_compact: "Context limit reached, auto-compacted"');
   lines.push("");
   lines.push("findings:");
-  lines.push(`  - tool_calls: "${summary.recentToolCalls.length} recent tool calls"`);
-  lines.push(`  - files_modified: "${summary.filesModified.length} files changed"`);
+  lines.push(
+    `  - tool_calls: "${summary.recentToolCalls.length} recent tool calls"`,
+  );
+  lines.push(
+    `  - files_modified: "${summary.filesModified.length} files changed"`,
+  );
   lines.push("");
   lines.push("worked:");
   const successfulTools = summary.recentToolCalls.filter((t) => t.success);
   if (successfulTools.length > 0) {
-    lines.push(`  - "${successfulTools.map((t) => t.name).join(", ")} completed successfully"`);
+    lines.push(
+      `  - "${successfulTools.map((t) => t.name).join(", ")} completed successfully"`,
+    );
   } else {
     lines.push("  []");
   }
@@ -166,7 +191,9 @@ function generateAutoHandoff(summary, sessionName) {
   lines.push("failed:");
   const failedTools = summary.recentToolCalls.filter((t) => !t.success);
   if (failedTools.length > 0) {
-    lines.push(`  - "${failedTools.map((t) => t.name).join(", ")} encountered errors"`);
+    lines.push(
+      `  - "${failedTools.map((t) => t.name).join(", ")} encountered errors"`,
+    );
   } else {
     lines.push("  []");
   }
@@ -200,7 +227,9 @@ var isMainModule = import.meta.url === `file://${process.argv[1]}`;
 if (isMainModule) {
   const args = process.argv.slice(2);
   if (args.length === 0) {
-    console.log("Usage: npx tsx transcript-parser.ts <transcript-path> [session-name]");
+    console.log(
+      "Usage: npx tsx transcript-parser.ts <transcript-path> [session-name]",
+    );
     process.exit(1);
   }
   const transcriptPath = args[0];
@@ -218,11 +247,14 @@ async function main() {
   const input = JSON.parse(await readStdin());
   const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
   const ledgerDir = path.join(projectDir, "thoughts", "ledgers");
-  const ledgerFiles = fs2.readdirSync(ledgerDir).filter((f) => f.startsWith("CONTINUITY_CLAUDE-") && f.endsWith(".md"));
+  const ledgerFiles = fs2
+    .readdirSync(ledgerDir)
+    .filter((f) => f.startsWith("CONTINUITY_CLAUDE-") && f.endsWith(".md"));
   if (ledgerFiles.length === 0) {
     const output = {
       continue: true,
-      systemMessage: "[PreCompact] No ledger found. Create one? /continuity_ledger"
+      systemMessage:
+        "[PreCompact] No ledger found. Create one? /continuity_ledger",
     };
     console.log(JSON.stringify(output));
     return;
@@ -234,14 +266,25 @@ async function main() {
   })[0];
   const ledgerPath = path.join(ledgerDir, mostRecent);
   if (input.trigger === "auto") {
-    const sessionName = mostRecent.replace("CONTINUITY_CLAUDE-", "").replace(".md", "");
+    const sessionName = mostRecent
+      .replace("CONTINUITY_CLAUDE-", "")
+      .replace(".md", "");
     let handoffFile = "";
     if (input.transcript_path && fs2.existsSync(input.transcript_path)) {
       const summary = parseTranscript(input.transcript_path);
       const handoffContent = generateAutoHandoff(summary, sessionName);
-      const handoffDir = path.join(projectDir, "thoughts", "shared", "handoffs", sessionName);
+      const handoffDir = path.join(
+        projectDir,
+        "thoughts",
+        "shared",
+        "handoffs",
+        sessionName,
+      );
       fs2.mkdirSync(handoffDir, { recursive: true });
-      const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      const timestamp = /* @__PURE__ */ new Date()
+        .toISOString()
+        .replace(/[:.]/g, "-")
+        .slice(0, 19);
       handoffFile = `auto-handoff-${timestamp}.yaml`;
       const handoffPath = path.join(handoffDir, handoffFile);
       fs2.writeFileSync(handoffPath, handoffContent);
@@ -255,35 +298,48 @@ async function main() {
         appendToLedger(ledgerPath, briefSummary);
       }
     }
-    const message = handoffFile ? `[PreCompact:auto] Created YAML handoff: thoughts/shared/handoffs/${sessionName}/${handoffFile}` : `[PreCompact:auto] Session summary auto-appended to ${mostRecent}`;
+    const message = handoffFile
+      ? `[PreCompact:auto] Created YAML handoff: thoughts/shared/handoffs/${sessionName}/${handoffFile}`
+      : `[PreCompact:auto] Session summary auto-appended to ${mostRecent}`;
     const output = {
       continue: true,
-      systemMessage: message
+      systemMessage: message,
     };
     console.log(JSON.stringify(output));
   } else {
     const output = {
       continue: true,
       systemMessage: `[PreCompact] Consider updating ledger before compacting: /continuity_ledger
-Ledger: ${mostRecent}`
+Ledger: ${mostRecent}`,
     };
     console.log(JSON.stringify(output));
   }
 }
 function generateAutoSummary(projectDir, sessionId) {
-  const timestamp = (/* @__PURE__ */ new Date()).toISOString();
+  const timestamp = /* @__PURE__ */ new Date().toISOString();
   const lines = [];
-  const cacheDir = path.join(projectDir, ".claude", "tsc-cache", sessionId || "default");
+  const cacheDir = path.join(
+    projectDir,
+    ".claude",
+    "tsc-cache",
+    sessionId || "default",
+  );
   const editedFilesPath = path.join(cacheDir, "edited-files.log");
   let editedFiles = [];
   if (fs2.existsSync(editedFilesPath)) {
     const content = fs2.readFileSync(editedFilesPath, "utf-8");
-    editedFiles = [...new Set(
-      content.split("\n").filter((line) => line.trim()).map((line) => {
-        const parts = line.split(":");
-        return parts[1]?.replace(projectDir + "/", "") || "";
-      }).filter((f) => f)
-    )];
+    editedFiles = [
+      ...new Set(
+        content
+          .split("\n")
+          .filter((line) => line.trim())
+          .map((line) => {
+            const parts = line.split(":");
+            return parts[1]?.replace(projectDir + "/", "") || "";
+          })
+          .filter((f) => f),
+      ),
+    ];
   }
   const gitClaudeDir = path.join(projectDir, ".git", "claude", "branches");
   let buildAttempts = { passed: 0, failed: 0 };
@@ -294,29 +350,38 @@ function generateAutoSummary(projectDir, sessionId) {
         const attemptsFile = path.join(gitClaudeDir, branch, "attempts.jsonl");
         if (fs2.existsSync(attemptsFile)) {
           const content = fs2.readFileSync(attemptsFile, "utf-8");
-          content.split("\n").filter((l) => l.trim()).forEach((line) => {
-            try {
-              const attempt = JSON.parse(line);
-              if (attempt.type === "build_pass") buildAttempts.passed++;
-              if (attempt.type === "build_fail") buildAttempts.failed++;
-            } catch {
-            }
-          });
+          content
+            .split("\n")
+            .filter((l) => l.trim())
+            .forEach((line) => {
+              try {
+                const attempt = JSON.parse(line);
+                if (attempt.type === "build_pass") buildAttempts.passed++;
+                if (attempt.type === "build_fail") buildAttempts.failed++;
+              } catch {}
+            });
         }
       }
-    } catch {
-    }
+    } catch {}
   }
-  if (editedFiles.length === 0 && buildAttempts.passed === 0 && buildAttempts.failed === 0) {
+  if (
+    editedFiles.length === 0 &&
+    buildAttempts.passed === 0 &&
+    buildAttempts.failed === 0
+  ) {
     return null;
   }
   lines.push(`
 ## Session Auto-Summary (${timestamp})`);
   if (editedFiles.length > 0) {
-    lines.push(`- Files changed: ${editedFiles.slice(0, 10).join(", ")}${editedFiles.length > 10 ? ` (+${editedFiles.length - 10} more)` : ""}`);
+    lines.push(
+      `- Files changed: ${editedFiles.slice(0, 10).join(", ")}${editedFiles.length > 10 ? ` (+${editedFiles.length - 10} more)` : ""}`,
+    );
   }
   if (buildAttempts.passed > 0 || buildAttempts.failed > 0) {
-    lines.push(`- Build/test: ${buildAttempts.passed} passed, ${buildAttempts.failed} failed`);
+    lines.push(
+      `- Build/test: ${buildAttempts.passed} passed, ${buildAttempts.failed} failed`,
+    );
   }
   return lines.join("\n");
 }
@@ -327,11 +392,21 @@ function appendToLedger(ledgerPath, summary) {
     if (stateMatch) {
       const nowMatch = content.match(/(\n-\s*Now:)/);
       if (nowMatch && nowMatch.index) {
-        content = content.slice(0, nowMatch.index) + summary + content.slice(nowMatch.index);
+        content =
+          content.slice(0, nowMatch.index) +
+          summary +
+          content.slice(nowMatch.index);
       } else {
-        const nextSection = content.indexOf("\n## ", content.indexOf("## State") + 1);
+        const nextSection = content.indexOf(
+          "\n## ",
+          content.indexOf("## State") + 1,
+        );
         if (nextSection > 0) {
-          content = content.slice(0, nextSection) + summary + "\n" + content.slice(nextSection);
+          content =
+            content.slice(0, nextSection) +
+            summary +
+            "\n" +
+            content.slice(nextSection);
         } else {
           content += summary;
         }
@@ -340,13 +415,12 @@ function appendToLedger(ledgerPath, summary) {
       content += summary;
     }
     fs2.writeFileSync(ledgerPath, content);
-  } catch (err) {
-  }
+  } catch (err) {}
 }
 async function readStdin() {
   return new Promise((resolve) => {
     let data = "";
-    process.stdin.on("data", (chunk) => data += chunk);
+    process.stdin.on("data", (chunk) => (data += chunk));
     process.stdin.on("end", () => resolve(data));
   });
 }

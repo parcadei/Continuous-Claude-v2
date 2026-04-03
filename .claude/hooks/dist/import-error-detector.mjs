@@ -8,7 +8,7 @@ var IMPORT_ERROR_PATTERNS = [
   /ImportError:\s*No module named\s*['"]?(\w+)['"]?/i,
   /No module named\s*['"]?(\w+)['"]?/i,
   /ModuleNotFoundError/i,
-  /circular import/i
+  /circular import/i,
 ];
 function detectImportError(output) {
   for (const pattern of IMPORT_ERROR_PATTERNS) {
@@ -16,7 +16,7 @@ function detectImportError(output) {
     if (match) {
       return {
         detected: true,
-        module: match[1] || void 0
+        module: match[1] || void 0,
       };
     }
   }
@@ -35,7 +35,9 @@ async function main() {
     console.log(JSON.stringify({ result: "continue" }));
     return;
   }
-  const textToCheck = [input.tool_output, input.error].filter(Boolean).join("\n");
+  const textToCheck = [input.tool_output, input.error]
+    .filter(Boolean)
+    .join("\n");
   if (!textToCheck) {
     console.log(JSON.stringify({ result: "continue" }));
     return;
@@ -57,7 +59,7 @@ Consider using /dependency-preflight skill to diagnose:
 3. Verify import: uv run python -c "import ${result.module || "<module>"}"
 
 Or invoke the skill: /dependency-preflight
-\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501`
+\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501`,
     };
     console.log(JSON.stringify(output));
   } else {

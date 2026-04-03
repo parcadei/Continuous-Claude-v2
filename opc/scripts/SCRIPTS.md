@@ -12,6 +12,7 @@
 **DO:** Edit skill files to fix bugs or improve logic
 
 **Pattern:**
+
 ```
 Discover (ls) → Read (cat) → Execute with CLI args (--query, --num-urls, etc.)
 ```
@@ -19,9 +20,11 @@ Discover (ls) → Read (cat) → Execute with CLI args (--query, --num-urls, etc
 ## Agent Operational Intelligence
 
 **For simple tasks (1 tool call):**
+
 - Use Direct Access (call MCP tool directly)
 
 **For complex workflows (>2 tools, logic, processing):**
+
 1. `ls ./scripts/` - Discover available scripts
 2. `cat ./scripts/{script}.py` - Read script documentation and CLI arguments
 3. Execute with CLI args:
@@ -31,6 +34,7 @@ Discover (ls) → Read (cat) → Execute with CLI args (--query, --num-urls, etc
    ```
 
 **For novel workflows:**
+
 1. Explore `./servers/` to discover tools
 2. Write NEW skill following CLI template
 3. Save to `./skills/` for future reuse
@@ -39,12 +43,14 @@ Discover (ls) → Read (cat) → Execute with CLI args (--query, --num-urls, etc
 ## Efficiency Benefits
 
 **Token savings (for parameter changes):**
+
 - ❌ Writing from scratch: Load schemas + write code = ~5,000 tokens
 - ❌ Editing skill to change parameters: Read skill + edit + write = ~800 tokens
 - ✅ CLI execution with different args: Read skill + command = ~110 tokens
 - **Reduction: 98% (CLI approach)**
 
 **Time savings (for parameter changes):**
+
 - ❌ Writing from scratch: ~2 min
 - ❌ Editing skill to change parameters: ~30 sec
 - ✅ CLI execution with different args: ~5 sec
@@ -104,21 +110,23 @@ if __name__ == "__main__":
 
 ## Current Scripts Library
 
-| Category | Script | CLI Arguments |
-|----------|--------|---------------|
-| **Web** | firecrawl_scrape.py | `--url` (required) |
+| Category     | Script                 | CLI Arguments                                               |
+| ------------ | ---------------------- | ----------------------------------------------------------- |
+| **Web**      | firecrawl_scrape.py    | `--url` (required)                                          |
 | **Pipeline** | multi_tool_pipeline.py | `--repo-path` (default: "."), `--max-commits` (default: 10) |
-| **Search** | perplexity_search.py | `--query` (required) |
-| **Docs** | nia_docs.py | `--package`, `--query` |
+| **Search**   | perplexity_search.py   | `--query` (required)                                        |
+| **Docs**     | nia_docs.py            | `--package`, `--query`                                      |
 
 ## Creating New Skills
 
 **When to create:**
+
 - Novel workflow not covered
 - Found better pattern
 - Specific use case needs
 
 **How to create:**
+
 1. Explore `./servers/` to find needed tools
 2. Write skill following CLI template above
 3. Add CLI argument parsing with argparse
@@ -127,6 +135,7 @@ if __name__ == "__main__":
 6. Save to `./skills/`
 
 **Best practices:**
+
 - Use argparse for all configurable values
 - Document all CLI arguments in docstring with types and defaults
 - Include USAGE section with concrete example
@@ -138,6 +147,7 @@ if __name__ == "__main__":
 ## Skills vs Writing Scripts
 
 **Skills (PREFERRED):**
+
 - ✅ Reusable workflow templates
 - ✅ CLI arguments for parameter changes (no file edits needed)
 - ✅ Edit-friendly for bug fixes and improvements
@@ -147,6 +157,7 @@ if __name__ == "__main__":
 - ✅ Agent just reads and executes
 
 **Writing Scripts (ALTERNATIVE):**
+
 - ⚠️ Custom code each time
 - ⚠️ Requires schema exploration
 - ⚠️ More tokens (~2,000)

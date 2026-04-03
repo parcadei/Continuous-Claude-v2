@@ -5,8 +5,15 @@
  * Used for passing context to forked skills.
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs';
-import { join, dirname, basename } from 'path';
+import {
+  readFileSync,
+  writeFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  statSync,
+} from "fs";
+import { join, dirname, basename } from "path";
 
 export interface ProjectState {
   version: string;
@@ -15,17 +22,17 @@ export interface ProjectState {
   updatedAt: string;
 }
 
-const PROJECT_STATE_VERSION = '1.0';
+const PROJECT_STATE_VERSION = "1.0";
 
 export function getProjectStatePath(projectDir: string): string {
-  return join(projectDir, '.claude', 'cache', 'project-state.json');
+  return join(projectDir, ".claude", "cache", "project-state.json");
 }
 
 export function loadProjectState(projectDir: string): ProjectState {
   const path = getProjectStatePath(projectDir);
   if (existsSync(path)) {
     try {
-      return JSON.parse(readFileSync(path, 'utf-8'));
+      return JSON.parse(readFileSync(path, "utf-8"));
     } catch {
       // Corrupted file, start fresh
     }
@@ -34,11 +41,14 @@ export function loadProjectState(projectDir: string): ProjectState {
     version: PROJECT_STATE_VERSION,
     activePlan: null,
     activeSpec: null,
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 }
 
-export function saveProjectState(projectDir: string, state: ProjectState): void {
+export function saveProjectState(
+  projectDir: string,
+  state: ProjectState,
+): void {
   const path = getProjectStatePath(projectDir);
   const dir = dirname(path);
   if (!existsSync(dir)) {
@@ -48,13 +58,19 @@ export function saveProjectState(projectDir: string, state: ProjectState): void 
   writeFileSync(path, JSON.stringify(state, null, 2));
 }
 
-export function setActivePlan(projectDir: string, planPath: string | null): void {
+export function setActivePlan(
+  projectDir: string,
+  planPath: string | null,
+): void {
   const state = loadProjectState(projectDir);
   state.activePlan = planPath;
   saveProjectState(projectDir, state);
 }
 
-export function setActiveSpec(projectDir: string, specPath: string | null): void {
+export function setActiveSpec(
+  projectDir: string,
+  specPath: string | null,
+): void {
   const state = loadProjectState(projectDir);
   state.activeSpec = specPath;
   saveProjectState(projectDir, state);
@@ -64,18 +80,23 @@ export function setActiveSpec(projectDir: string, specPath: string | null): void
  * Find the latest file in a directory matching a pattern.
  * Uses filename timestamps (YYYY-MM-DD) or mtime as fallback.
  */
-export function findLatestFile(dir: string, pattern: RegExp = /\.md$/): string | null {
+export function findLatestFile(
+  dir: string,
+  pattern: RegExp = /\.md$/,
+): string | null {
   if (!existsSync(dir)) return null;
 
   try {
     const files = readdirSync(dir)
-      .filter(f => pattern.test(f))
-      .map(f => {
+      .filter((f) => pattern.test(f))
+      .map((f) => {
         const fullPath = join(dir, f);
         const stat = statSync(fullPath);
         // Try to extract date from filename (YYYY-MM-DD format)
         const dateMatch = f.match(/^(\d{4}-\d{2}-\d{2})/);
-        const fileDate = dateMatch ? new Date(dateMatch[1]).getTime() : stat.mtimeMs;
+        const fileDate = dateMatch
+          ? new Date(dateMatch[1]).getTime()
+          : stat.mtimeMs;
         return { path: fullPath, date: fileDate };
       })
       .sort((a, b) => b.date - a.date);
@@ -97,9 +118,9 @@ export function getActivePlanOrLatest(projectDir: string): string | null {
 
   // Fallback: find latest plan
   const planDirs = [
-    join(projectDir, 'thoughts', 'shared', 'plans'),
-    join(projectDir, 'plans'),
-    join(projectDir, 'specs')
+    join(projectDir, "thoughts", "shared", "plans"),
+    join(projectDir, "plans"),
+    join(projectDir, "specs"),
   ];
 
   for (const dir of planDirs) {
@@ -121,8 +142,8 @@ export function getActiveSpecOrLatest(projectDir: string): string | null {
 
   // Fallback: find latest spec
   const specDirs = [
-    join(projectDir, 'thoughts', 'shared', 'specs'),
-    join(projectDir, 'specs')
+    join(projectDir, "thoughts", "shared", "specs"),
+    join(projectDir, "specs"),
   ];
 
   for (const dir of specDirs) {

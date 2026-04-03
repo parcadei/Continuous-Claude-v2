@@ -7,12 +7,14 @@
 ## What Are Scripts?
 
 **Scripts** are CLI-based Python workflows that:
+
 - Accept parameters via command-line arguments (argparse)
 - Orchestrate MCP tool calls
 - Return structured results
 - Work with ANY AI agent (not just Claude Code)
 
 **NOT to be confused with:**
+
 - **Skills** = Claude Code's native format (.claude/skills/ with SKILL.md)
 
 ---
@@ -22,11 +24,13 @@
 **This directory contains MCP workflow scripts:**
 
 ### firecrawl_scrape.py
+
 - Web scraping pattern
 - CLI: `--url` (required)
 - Requires: `FIRECRAWL_API_KEY`
 
 ### multi_tool_pipeline.py
+
 - Multi-tool chaining pattern (git analysis)
 - CLI: `--repo-path` (default: "."), `--max-commits` (default: 10)
 - Works without API keys (uses git server)
@@ -34,21 +38,25 @@
 ### Math Cognitive Prosthetics
 
 **sympy_compute.py**
+
 - Symbolic math: solve, integrate, differentiate, simplify
 - CLI: `solve "expr" --var x --domain real`, `integrate "expr" --var x --bounds 0 1`
 - Requires: sympy (included in deps)
 
 **z3_solve.py**
+
 - Constraint solving: sat, prove, optimize
 - CLI: `sat "constraints" --type int`, `prove "theorem" --vars x y --type int`
 - Requires: z3-solver (included in deps)
 
 **math_scratchpad.py**
+
 - Step-by-step verification
 - CLI: `verify "step"`, `chain --steps '[...]'`, `explain "step"`
 - Uses SymPy + Z3 internally
 
 ### Other scripts
+
 See `ls scripts/` for all available workflows (perplexity, github, nia, etc.)
 
 ---
