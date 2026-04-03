@@ -1272,7 +1272,9 @@ async def run_setup_wizard() -> None:
                                 # Just load the model to trigger download (no indexing)
                                 download_result = subprocess.run(
                                     [
-                                        sys.executable,
+                                        "uv",
+                                        "run",
+                                        "python",
                                         "-c",
                                         f"from tldr.semantic import get_model; get_model('{model}')",
                                     ],
