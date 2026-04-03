@@ -8,6 +8,10 @@ user-invocable: false
 
 When `uv sync` or `pip install` behaves unexpectedly, check the actual interpreter.
 
+## When to Use
+
+This skill is invoked automatically when environment issues are detected. Not user-invocable directly.
+
 ## Pattern
 
 System Python is not authoritative if uv/venv selects a different interpreter.

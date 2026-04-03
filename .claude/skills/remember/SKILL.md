@@ -8,6 +8,14 @@ user-invocable: false
 
 Store a learning, pattern, or decision in the memory system for future recall.
 
+## When to Use
+
+Activate when:
+- User says "/remember" or "/remember-this"
+- User says "remember this pattern" or "save this learning"
+- User says "I learned that X" or "note that Y"
+- User wants to save a decision for future reference
+
 ## Usage
 
 ```
