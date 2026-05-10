@@ -1286,3 +1286,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
 ---
 
 **Continuous Claude**: Not just a coding assistant—a persistent, learning, multi-agent development environment that gets smarter with every session.
+
